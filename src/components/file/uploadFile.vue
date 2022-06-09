@@ -1,7 +1,12 @@
 <template>
 
-  <el-dialog title="上传文件" :visible.sync="fileUploadDialogIsShow" :close-on-click-modal="false" width="30%">
-
+  <el-dialog
+    title="上传文件"
+    :append-to-body="true"
+    :visible.sync="fileUploadDialogIsShow"
+    :close-on-click-modal="false"
+    width="30%">
+<!--    :modal-append-to-body="false"-->
     <el-upload
       multiple
       class="upload-demo"
@@ -104,7 +109,7 @@ export default {
         this.fileUploadDialogIsShow = false
         this.tempFileList = []
         // 发送上传成功的消息
-        this.$bus.$emit(this.$busEvents.file.uploadFileIsCommit, true)
+        this.$bus.$emit(this.$busEvents.file.uploadFileIsCommit, true, response.data)
       }
     }
   },

@@ -1,152 +1,171 @@
 <template>
+  <div>
+    <el-drawer
+      :title=" currentStep.id ? '修改步骤' : '新增步骤'"
+      size="70%"
+      :append-to-body="true"
+      :wrapperClosable="false"
+      :visible.sync="drawerIsShow"
+      :direction="direction">
+      <!--    <el-tabs v-model="activeName" v-show="currentStep.api_id" style="margin-left: 20px;margin-right: 20px">-->
+      <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
+        <!-- 步骤信息 -->
+        <el-tab-pane label="步骤信息" name="editStepInfo">
+          <el-form label-width="120px" v-model="currentStep">
 
-  <el-drawer
-    :title=" currentStep.id ? '修改步骤' : '新增步骤'"
-    size="70%"
-    :append-to-body="true"
-    :wrapperClosable="false"
-    :visible.sync="drawerIsShow"
-    :direction="direction">
-    <!--    <el-tabs v-model="activeName" v-show="currentStep.api_id" style="margin-left: 20px;margin-right: 20px">-->
-    <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
-      <!-- 步骤信息 -->
-      <el-tab-pane label="步骤信息" name="editStepInfo">
-        <el-form label-width="120px" v-model="currentStep">
+            <el-form-item label="步骤名称" prop="name" size="small" class="is-required">
+              <el-input v-model="currentStep.name" placeholder="步骤名称"></el-input>
+            </el-form-item>
 
-          <el-form-item label="步骤名称" prop="name" size="small" class="is-required">
-            <el-input v-model="currentStep.name" placeholder="步骤名称"></el-input>
-          </el-form-item>
+            <el-form-item label="前置处理" size="small">
+              <el-input
+                type="textarea"
+                autosize
+                v-model="currentStep.up_func"
+                placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
+            </el-form-item>
 
-          <el-form-item label="前置处理" size="small">
-            <el-input
-              type="textarea"
-              autosize
-              v-model="currentStep.up_func"
-              placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
-          </el-form-item>
+            <el-form-item label="后置处理" size="small">
+              <el-input
+                type="textarea"
+                autosize
+                v-model="currentStep.down_func"
+                placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
+            </el-form-item>
 
-          <el-form-item label="后置处理" size="small">
-            <el-input
-              type="textarea"
-              autosize
-              v-model="currentStep.down_func"
-              placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
-          </el-form-item>
+            <el-form-item label="执行方式" prop="execute_type" size="small" class="is-required">
+              <el-select
+                ref="pageSelectorView"
+                v-model="currentStep.execute_type"
+                placeholder="选择执行方式"
+                size="mini"
+                style="min-width: 100%"
+                filterable
+                default-first-option
+              >
+                <el-option
+                  v-for="(item) in $busEvents.data.executeTypeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
 
-          <el-form-item label="执行方式" prop="execute_type" size="small" class="is-required">
-            <el-select
-              ref="pageSelectorView"
-              v-model="currentStep.execute_type"
-              placeholder="选择执行方式"
-              size="mini"
-              style="min-width: 100%"
-              filterable
-              default-first-option
-            >
-              <el-option
-                v-for="(item) in $busEvents.data.executeTypeList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
+            <!-- 选择文件 -->
+            <el-form-item
+              v-show="currentStep.execute_type && currentStep.execute_type.indexOf('is_upload') !== -1"
+              :label="'选择文件'"
+              prop="send_keys"
+              size="small"
+              class="is-required">
+                <el-row>
+                  <el-col :span="20">
+                    <el-input disabled v-model="currentStep.send_keys" placeholder="选择文件" style="width: 90%"></el-input>
+                  </el-col>
 
-          <el-form-item
-            label="输入内容"
-            prop="send_keys"
-            v-show="currentStep.execute_type && currentStep.execute_type.indexOf('_need_input') !== -1"
-            size="small"
-            class="is-required">
-            <el-input v-model="currentStep.send_keys" placeholder="输入内容"></el-input>
-          </el-form-item>
+                  <el-col :span="4">
+                    <el-button type="primary" @click.native="openFileUploadDialog" size="mini">上传文件</el-button>
+                  </el-col>
+                </el-row>
+            </el-form-item>
 
-          <el-form-item label="执行次数" class="is-required">
-            <el-input-number
-              v-model="currentStep.run_times"
-              size="mini"
-              :precision="0"
-              :min="1"
-              :max="1000"
-            ></el-input-number>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
+            <!-- 输入文本 -->
+            <el-form-item
+              v-show="currentStep.execute_type && currentStep.execute_type.indexOf('is_input') !== -1"
+              :label="'输入内容'"
+              prop="send_keys"
+              size="small"
+              class="is-required">
+              <el-input v-model="currentStep.send_keys" placeholder="输入内容"></el-input>
+            </el-form-item>
 
-      <!-- 元素信息，允许修改元素 -->
-      <el-tab-pane label="元素信息" name="element">
-        <el-form label-width="120px">
+            <el-form-item label="执行次数" class="is-required">
+              <el-input-number
+                v-model="currentStep.run_times"
+                size="mini"
+                :precision="0"
+                :min="1"
+                :max="1000"
+              ></el-input-number>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
 
-          <el-form-item label="所属项目" prop="projectName" size="small">
-            <el-input disabled v-model="currentElement.projectName"></el-input>
-          </el-form-item>
+        <!-- 元素信息，允许修改元素 -->
+        <el-tab-pane label="元素信息" name="element">
+          <el-form label-width="120px">
 
-          <el-form-item label="所属页面" prop="pageName" size="small">
-            <el-input disabled v-model="currentElement.pageName"></el-input>
-          </el-form-item>
+            <el-form-item label="所属项目" prop="projectName" size="small">
+              <el-input disabled v-model="currentElement.projectName"></el-input>
+            </el-form-item>
 
-          <el-form-item label="元素名" prop="elementName" size="small">
-            <el-input disabled v-model="currentElement.name"></el-input>
-          </el-form-item>
+            <el-form-item label="所属页面" prop="pageName" size="small">
+              <el-input disabled v-model="currentElement.pageName"></el-input>
+            </el-form-item>
 
-          <el-form-item :label="'定位方式'" prop="by" size="mini" class="is-required">
-            <el-select
-              v-model="currentElement.by"
-              filterable
-              default-first-option
-              clearable
-              size="mini"
-              style="width:100%"
-              placeholder="请选择定位方式">
-              <el-option
-                v-for="option in $busEvents.data.findElementOptionList"
-                :key="option.label"
-                :label="option.label"
-                :value="option.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
+            <el-form-item label="元素名" prop="elementName" size="small">
+              <el-input disabled v-model="currentElement.name"></el-input>
+            </el-form-item>
 
-          <el-form-item label="定位元素" prop="element" size="small">
-            <el-input v-model="currentElement.element"></el-input>
-          </el-form-item>
+            <el-form-item :label="'定位方式'" prop="by" size="mini" class="is-required">
+              <el-select
+                v-model="currentElement.by"
+                filterable
+                default-first-option
+                clearable
+                size="mini"
+                style="width:100%"
+                placeholder="请选择定位方式">
+                <el-option
+                  v-for="option in $busEvents.data.findElementOptionList"
+                  :key="option.label"
+                  :label="option.label"
+                  :value="option.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
 
-        </el-form>
-      </el-tab-pane>
+            <el-form-item label="定位元素" prop="element" size="small">
+              <el-input v-model="currentElement.element"></el-input>
+            </el-form-item>
 
-      <!-- 数据提取 -->
-      <el-tab-pane label="数据提取" name="editExtracts">
-        <extractsView
-          ref="extractsView"
-          :currentData="currentStep.extracts"
-          :tempElementList="tempElementList"
-          :placeholderKey="'起个变量名'"
-          :placeholderValue="'提取数据的表达式'"
-          :placeholderDesc="'备注'"
-        ></extractsView>
-      </el-tab-pane>
+          </el-form>
+        </el-tab-pane>
 
-      <!-- 断言信息 -->
-      <el-tab-pane label="断言" name="editAssert">
-        <validatesView
-          ref="validatesView"
-          :tempElementList="tempElementList"
-          :stepDrawerStatus="drawerIsShow"
-          :validates="currentStep.validates"
-        ></validatesView>
-      </el-tab-pane>
+        <!-- 数据提取 -->
+        <el-tab-pane label="数据提取" name="editExtracts">
+          <extractsView
+            ref="extractsView"
+            :currentData="currentStep.extracts"
+            :tempElementList="tempElementList"
+            :placeholderKey="'起个变量名'"
+            :placeholderValue="'提取数据的表达式'"
+            :placeholderDesc="'备注'"
+          ></extractsView>
+        </el-tab-pane>
 
-      <!-- 数据驱动 -->
-      <el-tab-pane label="数据驱动" name="editDataDriver">
-        <!-- 使用示例 -->
-        <el-collapse accordion>
-          <el-collapse-item>
-            <template slot="title">
-              <div style="color:#409eff"> 点击查看示例</div>
-            </template>
-            <div style="margin-left: 20px">
-              列表嵌套字典，每一个字典就是一组请求数据，请求格式为
-              <pre>
+        <!-- 断言信息 -->
+        <el-tab-pane label="断言" name="editAssert">
+          <validatesView
+            ref="validatesView"
+            :tempElementList="tempElementList"
+            :stepDrawerStatus="drawerIsShow"
+            :validates="currentStep.validates"
+          ></validatesView>
+        </el-tab-pane>
+
+        <!-- 数据驱动 -->
+        <el-tab-pane label="数据驱动" name="editDataDriver">
+          <!-- 使用示例 -->
+          <el-collapse accordion>
+            <el-collapse-item>
+              <template slot="title">
+                <div style="color:#409eff"> 点击查看示例</div>
+              </template>
+              <div style="margin-left: 20px">
+                列表嵌套字典，每一个字典就是一组请求数据，请求格式为
+                <pre>
   [
     {
       "comment": "用例1描述",
@@ -158,45 +177,49 @@
     }
   ]
               </pre>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-        <!--        <jsonEditorView-->
-        <!--          ref="dataDriverView"-->
-        <!--          :data-json="currentStep.data_driver"-->
-        <!--        ></jsonEditorView>-->
-      </el-tab-pane>
-    </el-tabs>
+              </div>
+            </el-collapse-item>
+          </el-collapse>
+          <!--        <jsonEditorView-->
+          <!--          ref="dataDriverView"-->
+          <!--          :data-json="currentStep.data_driver"-->
+          <!--        ></jsonEditorView>-->
+        </el-tab-pane>
+      </el-tabs>
 
-    <div class="demo-drawer__footer">
+      <div class="demo-drawer__footer">
 
-      <el-button
-        v-show="activeName === 'element'"
-        style="float: right; margin-left: 10px"
-        size="mini"
-        type="primary"
-        :loading="submitButtonIsLoading"
-        @click="changElement()">{{ '保存元素修改' }}
-      </el-button>
+        <el-button
+          v-show="activeName === 'element'"
+          style="float: right; margin-left: 10px"
+          size="mini"
+          type="primary"
+          :loading="submitButtonIsLoading"
+          @click="changElement()">{{ '保存元素修改' }}
+        </el-button>
 
-      <el-button
-        v-show="activeName !== 'element'"
-        style="float: right; margin-left: 10px"
-        size="mini"
-        type="primary"
-        :loading="submitButtonIsLoading"
-        @click="currentStep.id ? editStep() : addStep()">{{ '保存步骤' }}
-      </el-button>
+        <el-button
+          v-show="activeName !== 'element'"
+          style="float: right; margin-left: 10px"
+          size="mini"
+          type="primary"
+          :loading="submitButtonIsLoading"
+          @click="currentStep.id ? editStep() : addStep()">{{ '保存步骤' }}
+        </el-button>
 
-      <el-button
-        v-show="activeName !== 'element' && currentStep.id"
-        style="float: right"
-        size="mini"
-        @click="rowBackStep()"> {{ '还原步骤' }}
-      </el-button>
-    </div>
+        <el-button
+          v-show="activeName !== 'element' && currentStep.id"
+          style="float: right"
+          size="mini"
+          @click="rowBackStep()"> {{ '还原步骤' }}
+        </el-button>
+      </div>
 
-  </el-drawer>
+      <uploadFileView></uploadFileView>
+
+    </el-drawer>
+
+  </div>
 </template>
 
 <script>
@@ -207,6 +230,7 @@ import bodyView from '@/components/apiBody'
 import jsonEditorView from "@/components/jsonView";
 import extractsView from "@/components/uiTest/extract"
 import validatesView from "@/components/uiTest/validates";
+import uploadFileView from "@/components/file/uploadFile";
 
 import {getProject} from "@/apis/uiTest/project";
 import {getPage} from "@/apis/uiTest/page";
@@ -225,7 +249,8 @@ export default {
     bodyView,
     jsonEditorView,
     extractsView,
-    validatesView
+    validatesView,
+    uploadFileView
   },
   data() {
     return {
@@ -336,6 +361,11 @@ export default {
       })
     },
 
+    // 打开文件上传窗口
+    openFileUploadDialog() {
+      this.$bus.$emit(this.$busEvents.file.uploadFileDialogIsShow, "ui_case")
+    },
+
     // 取消保存
     rowBackStep() {
       this.currentStep = this.currentStepCopy
@@ -400,6 +430,11 @@ export default {
       this.currentStep = this.initNewStep()
     })
 
+    // 上传文件后展示给前端
+    this.$bus.$on(this.$busEvents.file.uploadFileIsCommit, (status, file_name_list) => {
+      this.currentStep.send_keys = file_name_list[0]
+    })
+
   },
 
   beforeDestroy() {
@@ -407,6 +442,7 @@ export default {
     this.$bus.$off(this.$busEvents.ui.uiShowStepDrawer)
     this.$bus.$off(this.$busEvents.api.apiEditStep)
     this.$bus.$off(this.$busEvents.ui.uiCaseDrawerStatus)
+    this.$bus.$off(this.$busEvents.file.uploadFileIsCommit)
   }
 }
 </script>

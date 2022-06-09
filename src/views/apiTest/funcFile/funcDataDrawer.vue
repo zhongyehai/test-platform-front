@@ -10,6 +10,11 @@
       :direction="direction">
 
       <el-form size="small">
+
+        <el-form-item label="文件名" :label-width="'85px'" size="mini">
+          <el-input v-model="funcFileName" disabled style="width: 90%"></el-input>
+        </el-form-item>
+
         <el-form-item label="调试函数" :label-width="'85px'" size="mini">
           <el-input v-model="debugFuncData" placeholder="输入格式：${func(abc,123)}" type="textarea" :rows="1"
                     style="width: 80%"></el-input>
@@ -21,6 +26,7 @@
             @click="debugFunc">调试
           </el-button>
         </el-form-item>
+
       </el-form>
 
       <el-collapse accordion style="margin-left: 20px">
@@ -100,7 +106,7 @@ export default {
       saveButtonIsLoading: false,
       funcFileDrawerIsShow: false,
       funcData: '',
-      name: '',
+      funcFileName: '',
       id: '',
       debugFuncData: '',
       direction: 'rtl',  // 抽屉打开方式
@@ -162,6 +168,7 @@ export default {
     this.$bus.$on(this.$busEvents.api.apiEditFuncFileData, (funcFile) => {
       this.funcData = funcFile.func_data
       this.id = funcFile.id
+      this.funcFileName = funcFile.name
       this.funcFileDrawerIsShow = true
     })
 
