@@ -73,11 +73,11 @@
             <!-- 输入文本 -->
             <el-form-item
               v-show="currentStep.execute_type && currentStep.execute_type.indexOf('is_input') !== -1"
-              :label="'输入内容'"
+              label="输入内容"
               prop="send_keys"
               size="small"
               class="is-required">
-              <el-input v-model="currentStep.send_keys" placeholder="输入内容"></el-input>
+              <el-input type="textarea" autosize v-model="currentStep.send_keys" placeholder="输入对应内容"></el-input>
             </el-form-item>
 
             <el-form-item label="执行次数" class="is-required">
