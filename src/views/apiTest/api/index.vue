@@ -59,7 +59,7 @@
                 title="运行接口并生成报告？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @onConfirm="runApis(scope.row)"
+                @confirm="runApis(scope.row)"
               >
                 <el-button
                   type="text"
@@ -85,7 +85,7 @@
                 title="复制此接口并生成新的接口？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @onConfirm="copyApi(scope.row)"
+                @confirm="copyApi(scope.row)"
               >
                 <el-button
                   type="text"
@@ -103,7 +103,7 @@
                 :title="`确定删除【${scope.row.name}】?`"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @onConfirm="delApi(scope.row)"
+                @confirm="delApi(scope.row)"
               >
                 <el-button
                   slot="reference"

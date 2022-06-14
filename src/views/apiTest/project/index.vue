@@ -156,7 +156,7 @@
             title="从yapi拉取此服务下的模块、接口信息?"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @onConfirm="pullByYapi(row)"
+            @confirm="pullByYapi(row)"
           >
             <el-button
               slot="reference"
@@ -175,7 +175,7 @@
             title="从swagger拉取此服务下的模块、接口信息?"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @onConfirm="pullBySwagger(row)"
+            @confirm="pullBySwagger(row)"
           >
             <el-button
               slot="reference"
@@ -202,7 +202,7 @@
             :title="`确定删除【${row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @onConfirm="delProject(row)"
+            @confirm="delProject(row)"
           >
             <el-button
               slot="reference"

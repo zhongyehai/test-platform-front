@@ -68,7 +68,7 @@
             :title="`确定删除【${scope.row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @onConfirm="delFuncFile(scope.row)"
+            @confirm="delFuncFile(scope.row)"
           >
             <el-button
               slot="reference"

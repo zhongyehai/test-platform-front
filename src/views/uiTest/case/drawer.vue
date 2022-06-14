@@ -166,7 +166,7 @@
         :title="`自动保存，再触发调试，并生成测试报告?`"
         confirm-button-text='确认'
         cancel-button-text='取消'
-        @onConfirm="debugCase()"
+        @confirm="debugCase()"
       >
         <el-button
           slot="reference"
