@@ -74,7 +74,7 @@
                     title="运行任务并生成报告？"
                     confirm-button-text='确认'
                     cancel-button-text='取消'
-                    @confirm="run(scope.row)"
+                    @onConfirm="run(scope.row)"
                   >
                     <el-button
                       type="text"
@@ -100,7 +100,7 @@
                     title="复制此任务并生成新的任务？"
                     confirm-button-text='确认'
                     cancel-button-text='取消'
-                    @confirm="copy(scope.row)"
+                    @onConfirm="copy(scope.row)"
                   >
                     <el-button
                       type="text"
@@ -118,7 +118,7 @@
                     :title="`确定删除【${scope.row.name}】?`"
                     confirm-button-text='确认'
                     cancel-button-text='取消'
-                    @confirm="delTask(scope.row)"
+                    @onConfirm="delTask(scope.row)"
                   >
                     <el-button
                       slot="reference"

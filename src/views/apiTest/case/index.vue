@@ -57,7 +57,7 @@
                 title="运行测试用例并生成报告？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @confirm="runCase(scope.row)"
+                @onConfirm="runCase(scope.row)"
               >
                 <el-button
                   type="text"
@@ -83,7 +83,7 @@
                 title="复制用例及其步骤？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @confirm="copyCase(scope.row)"
+                @onConfirm="copyCase(scope.row)"
               >
                 <el-button
                   type="text"
@@ -101,7 +101,7 @@
                 :title="`确定删除【${scope.row.name}】及其步骤?`"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @confirm="delCase(scope.row)"
+                @onConfirm="delCase(scope.row)"
               >
                 <el-button
                   slot="reference"

@@ -151,7 +151,7 @@
             :title="`确定删除【${row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="delProject(row)"
+            @onConfirm="delProject(row)"
           >
             <el-button
               slot="reference"

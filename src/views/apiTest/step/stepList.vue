@@ -43,7 +43,7 @@
             title="复制此步骤并生成新的步骤？"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="copy(scope.row)"
+            @onConfirm="copy(scope.row)"
           >
             <el-button
               type="text"
@@ -70,7 +70,7 @@
             :title="`确定删除【${scope.row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
+            @onConfirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
           >
             <el-button
               slot="reference"
@@ -89,7 +89,7 @@
             :title="`是否解除引用【${scope.row.name}】？`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
+            @onConfirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
           >
             <el-button
               slot="reference"

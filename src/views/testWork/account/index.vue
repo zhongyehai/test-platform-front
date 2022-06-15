@@ -100,7 +100,7 @@
             :title="`确定删除【${scope.row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="delAccount(scope.row)"
+            @onConfirm="delAccount(scope.row)"
           >
             <el-button
               slot="reference"

@@ -66,7 +66,7 @@
                 title="复制此页面并生成新的页面？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @confirm="copyPage(scope.row)"
+                @onConfirm="copyPage(scope.row)"
               >
                 <el-button
                   type="text"
@@ -83,7 +83,7 @@
                 :title="`确定删除【${scope.row.name}】?`"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @confirm="delPage(scope.row)"
+                @onConfirm="delPage(scope.row)"
               >
                 <el-button
                   slot="reference"

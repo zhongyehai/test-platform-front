@@ -65,7 +65,7 @@
             title="复制此元素并生成新的元素？"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="copyElement(scope.row)"
+            @onConfirm="copyElement(scope.row)"
           >
             <el-button
               type="text"
@@ -82,7 +82,7 @@
             :title="`确定删除【${scope.row.name}】?`"
             confirm-button-text='确认'
             cancel-button-text='取消'
-            @confirm="delElement(scope.row)"
+            @onConfirm="delElement(scope.row)"
           >
             <el-button
               slot="reference"
