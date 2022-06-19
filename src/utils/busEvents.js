@@ -88,7 +88,9 @@ export default {
     uiEditStepIsCommit: 'uiEditStepIsCommit', // 修改步骤提交事件，更改对应的步骤数据
     uiGetElementByPage: 'uiGetElementByPage', // 根据页面id获取元素
 
-
+    // 定时任务
+    uiTaskDrawerIsShow: 'uiTaskDrawerIsShow',  // 打开定时任务编辑框
+    uiTaskDrawerIsCommit: 'uiTaskDrawerIsCommit',  // 定时任务已提交
   },
 
   // 缓存数据

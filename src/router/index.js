@@ -194,6 +194,12 @@ export const constantRoutes = [
         meta: {title: '用例管理', icon: 'el-icon-tickets'}
       },
       {
+        path: 'task',
+        name: 'Task',
+        component: () => import('@/views/uiTest/task/index'),
+        meta: {title: '定时任务', icon: 'el-icon-date'}
+      },
+      {
         path: 'uiReportShow',
         name: 'uiReportShow',
         hidden: true,

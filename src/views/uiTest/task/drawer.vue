@@ -264,11 +264,11 @@
 import environmentSelectorView from "@/components/Selector/environment";
 import emailServerSelector from "@/components/Selector/email";
 
-import {postTask, putTask, runTask} from '@/apis/apiTest/task'
-import {caseSetList} from "@/apis/apiTest/caseSet";
-import {caseList, caseRun, postCase, putCase} from '@/apis/apiTest/case'
+import {postTask, putTask, runTask} from '@/apis/uiTest/task'
+import {caseSetList} from "@/apis/uiTest/caseSet";
+import {caseList, caseRun, postCase, putCase} from '@/apis/uiTest/case'
+import {reportIsDone} from "@/apis/uiTest/report";
 import {arrayToTree} from "@/utils/parseData";
-import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
 
 export default {
@@ -425,7 +425,7 @@ export default {
     // 定时任务编辑框提交成功事件
     busEmit() {
       this.drawerIsShow = false
-      this.$bus.$emit(this.$busEvents.api.apiTaskDrawerIsCommit, 'success')
+      this.$bus.$emit(this.$busEvents.ui.uiTaskDrawerIsCommit, 'success')
     },
 
     // 创建定时任务
@@ -507,8 +507,7 @@ export default {
 
     // 打开测试报告
     openReportById(reportId) {
-      // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
+      let {href} = this.$router.resolve({path: 'uiReportShow', query: {id: reportId}})
       window.open(href, '_blank')
     }
 
@@ -517,7 +516,7 @@ export default {
   mounted() {
 
     // 服务树选中项事件
-    this.$bus.$on(this.$busEvents.api.apiProjectTreeChoiceProject, (project, project_list) => {
+    this.$bus.$on(this.$busEvents.ui.uiProjectTreeChoiceProject, (project, project_list) => {
       this.projectLists = project_list  // 当前服务所在的服务列表
       // 如果服务变了，则清空用例集数和用例列表
       if (project.id !== this.projectSelectedId) {
@@ -528,7 +527,7 @@ export default {
     })
 
     // 监听服务树菜单点击事件
-    this.$bus.$on(this.$busEvents.api.apiTaskDrawerIsShow, (status, taskOrProject) => {
+    this.$bus.$on(this.$busEvents.ui.uiTaskDrawerIsShow, (status, taskOrProject) => {
       if (status === 'update') {  // 修改
         this.tempTask = taskOrProject
       } else {  // 新增
@@ -544,8 +543,8 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiProjectTreeChoiceProject)
-    this.$bus.$off(this.$busEvents.api.apiTaskDrawerIsShow)
+    this.$bus.$off(this.$busEvents.ui.uiProjectTreeChoiceProject)
+    this.$bus.$off(this.$busEvents.ui.uiTaskDrawerIsShow)
   }
 }
 </script>

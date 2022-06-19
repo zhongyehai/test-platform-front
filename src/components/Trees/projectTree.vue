@@ -25,7 +25,7 @@
               <el-button
                 size="mini"
                 type="text"
-                @click="clickMenu(node, data)"
+                @click.stop="clickMenu(node, data)"
               >{{ menuName }}</el-button>
               </span>
             </span>
