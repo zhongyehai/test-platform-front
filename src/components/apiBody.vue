@@ -1,12 +1,19 @@
 <template>
+  <div>
+    <div style="text-align: center">
+      <el-radio v-model="activeName" label="data">form-data</el-radio>
+      <el-radio v-model="activeName" label="json">json</el-radio>
+      <el-radio v-model="activeName" label="xml">xml</el-radio>
+      <el-popconfirm placement="top" hide-icon title="发送请求时会使用此处选择的数据类型">
+        <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+      </el-popconfirm>
+    </div>
 
-  <el-tabs v-model="activeName">
-
-    <el-tab-pane label="form-data" name="data">
+    <div v-show="activeName === 'data'">
       <dataFormView :data-form="tempDataForm" ref="dataFormView"></dataFormView>
-    </el-tab-pane>
+    </div>
 
-    <el-tab-pane label="json" name="json">
+    <div v-show="activeName === 'json'">
       <!-- 使用示例 -->
       <el-collapse accordion>
         <el-collapse-item>
@@ -36,13 +43,13 @@
           ref="jsonEditorView"
           :dataJson="dataJson"
       ></jsonEditorView>
-    </el-tab-pane>
+    </div>
 
-    <el-tab-pane label="xml" name="xml">
+    <div v-show="activeName === 'xml'">
       <el-input v-model="tempDataXml" type="textarea" :rows="17"></el-input>
-    </el-tab-pane>
+    </div>
 
-  </el-tabs>
+  </div>
 
 </template>
 
