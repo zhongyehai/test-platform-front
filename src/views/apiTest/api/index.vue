@@ -52,22 +52,13 @@
             <template slot-scope="scope">
 
               <!-- 运行接口 -->
-              <el-popconfirm
-                placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="运行接口并生成报告？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="runApis(scope.row)"
-              >
-                <el-button
-                  type="text"
-                  slot="reference"
-                  icon="el-icon-video-play"
-                  :loading="scope.row.isLoading"
-                ></el-button>
-              </el-popconfirm>
+              <el-button
+                type="text"
+                slot="reference"
+                icon="el-icon-video-play"
+                :loading="scope.row.isLoading"
+                @click="clickRunApi(scope.row)"
+              ></el-button>
 
               <!--修改接口-->
               <el-button
@@ -118,6 +109,11 @@
 
         </el-table>
 
+        <selectRunEnv
+          :callBackEvent="callBackEvent"
+          :event="runEvent"
+        ></selectRunEnv>
+
         <pagination
           v-show="api_total>0"
           :total="api_total"
@@ -142,6 +138,7 @@ import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
 import apiDrawer from '@/views/apiTest/api/drawer'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {userList} from '@/apis/user/user'
 import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
@@ -153,7 +150,8 @@ export default {
   name: 'index',
   components: {
     Pagination,
-    apiDrawer
+    apiDrawer,
+    selectRunEnv
   },
 
   // 接收父组件传参的key
@@ -164,17 +162,10 @@ export default {
   data() {
     return {
 
-      // 请求列表等待响应的状态
-      tableLoadingIsShow: false,
-
-      // 运行接口按钮的loading状态
-      isLoading: false,
-
-      //  tab页的显示
-      apiTab: 'api',
-
-      // 接口新增/编辑临时数据
-      tempApi: {},
+      tableLoadingIsShow: false,  // 请求列表等待响应的状态
+      isLoading: false,  // 运行接口按钮的loading状态
+      apiTab: 'api',  //  tab页的显示
+      tempApi: {},  // 接口新增/编辑临时数据
 
       // 接口数据列表
       pageNum: 1,
@@ -188,6 +179,9 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
+      currentApi: {},
+      runEvent: 'runApiEventOnIndex',
+      callBackEvent: 'runApiOnIndex'
     }
   },
 
@@ -208,12 +202,16 @@ export default {
       this.getApiList()
     })
 
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.runApis(runDict)
+    })
+
     getRunTimeout(this)  // 初始化等待用例运行超时时间
   },
 
-
+  // 页面销毁的时候，关闭bus监听事件
   beforeDestroy() {
-    // 页面销毁的时候，关闭bus监听事件
+    this.$bus.$off(this.callBackEvent)
     this.$bus.$off(this.$busEvents.api.apiApiDrawerCommitSuccess)
   },
 
@@ -273,12 +271,19 @@ export default {
       this.tableLoadingIsShow = false
     },
 
+    // 点击运行接口
+    clickRunApi(row){
+      this.currentApi = row
+      this.$bus.$emit(this.runEvent, false)
+    },
+
     // 运行接口
-    runApis(row) {
-      this.$set(row, 'isLoading', true)
+    runApis(runData) {
+      this.$set(this.currentApi, 'isLoading', true)
       runApi({
-        'projectId': row.project_id,
-        'apis': [row.id]
+        'projectId': this.currentApi.project_id,
+        'apis': [this.currentApi.id],
+        env: runData.runEnv
       }).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
@@ -292,14 +297,14 @@ export default {
             if (queryCount <= runTimeoutCount) {
               reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
                 if (queryResponse.data === 1) {
-                  that.$set(row, 'isLoading', false)
+                  that.$set(that.currentApi, 'isLoading', false)
                   that.openReportById(runResponse.data.report_id)
                   clearInterval(timer)  // 关闭定时器
                 }
               })
               queryCount += 1
             } else {
-              that.$set(row, 'isLoading', false)
+              that.$set(that.currentApi, 'isLoading', false)
               that.$notify(runTestTimeOutMessage(that));
               clearInterval(timer)  // 关闭定时器
             }

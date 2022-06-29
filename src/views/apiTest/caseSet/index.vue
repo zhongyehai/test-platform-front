@@ -143,24 +143,10 @@
     </el-drawer>
 
     <!-- 运行用例集 -->
-    <el-dialog title="选择运行模式" :visible.sync="runSetDialogIsShow" width="30%">
-      <div>
-        <el-radio v-model="runType" :label="0">串行执行</el-radio>
-        <el-radio v-model="runType" :label="1">并行执行</el-radio>
-        <el-popconfirm
-          placement="top"
-          :title="'1、串行执行: 用例一条一条顺序串行执行  \n' +
-              '2、并行执行: 每条用例一个线程并行执行  \n' +
-              '注：并行执行仅仅是为了提升执行效率，请勿用于压力测试'"
-          hide-icon>
-          <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-        </el-popconfirm>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="runSetDialogIsShow = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="runCaseSet()">确 定</el-button>
-      </span>
-    </el-dialog>
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
 
   </div>
 
@@ -170,6 +156,7 @@
 <script>
 import waves from "@/directive/waves";
 import caseManage from '@/views/apiTest/case'  // 用例管理组件
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
@@ -182,7 +169,8 @@ import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 export default {
   name: 'index',
   components: {
-    caseManage
+    caseManage,
+    selectRunEnv
   },
   directives: {waves},
   data() {
@@ -210,14 +198,11 @@ export default {
       moduleDrawerStatus: '',
       dropdownStatus: false,  // el-dropdown 的展开/隐藏状态
       currentLabel: '',  // 当前鼠标滑入的节点名
-      runSetDialogIsShow: false,  // 运行用例集的确认框
-      runType: 1
+      runType: 1,
+      runEnv: 'test',
+      runEvent: 'runCaseSetEvent',
+      callBackEvent: 'runCaseSet'
     }
-  },
-
-  created() {
-    this.getProjectList()
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
   },
 
   methods: {
@@ -371,17 +356,15 @@ export default {
 
     // 点击运行测试用例集
     showRunCaseSet(node, data) {
-      this.runType = 1
-      this.runSetDialogIsShow = true
       this.runSetNode = node
       this.runSetData = data
+      this.$bus.$emit(this.runEvent, true)
     },
 
     // 运行用例集的用例
-    runCaseSet(node, data) {
-      this.runSetDialogIsShow = false
+    runCaseSet(runData) {
 
-      caseSetRun({'id': this.runSetData.id, is_async: this.runType}).then(runResponse => {
+      caseSetRun({'id': this.runSetData.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，
@@ -426,6 +409,24 @@ export default {
     },
 
   },
+
+  created() {
+    this.getProjectList()
+    getRunTimeout(this)  // 初始化等待用例运行超时时间
+  },
+
+  mounted() {
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.runCaseSet(runDict)
+    })
+
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
+  },
+
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);

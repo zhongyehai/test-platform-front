@@ -86,7 +86,7 @@
                             >{{ "删除当前用例集" }}
                             </el-dropdown-item>
 
-                            <el-dropdown-item @click.native.stop="runCaseSet(node, data)"
+                            <el-dropdown-item @click.native.stop="showRunCaseSet(node, data)"
                             >{{ "运行当前用例集下的用例" }}
                             </el-dropdown-item>
 
@@ -142,6 +142,12 @@
       </div>
     </el-drawer>
 
+    <!-- 运行用例集 -->
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
   </div>
 
 
@@ -150,6 +156,7 @@
 <script>
 import waves from "@/directive/waves";
 import caseManage from '@/views/uiTest/case'  // 用例管理组件
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
@@ -162,7 +169,8 @@ import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 export default {
   name: 'index',
   components: {
-    caseManage
+    caseManage,
+    selectRunEnv
   },
   directives: {waves},
   data() {
@@ -190,13 +198,13 @@ export default {
       moduleDrawerStatus: '',
       dropdownStatus: false,  // el-dropdown 的展开/隐藏状态
       // 当前鼠标滑入的节点名
-      currentLabel: ''
-    }
-  },
+      currentLabel: '',
 
-  created() {
-    this.getProjectList()
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
+      runType: 1,
+      runEnv: 'test',
+      runEvent: 'UiRunCaseSetEvent',
+      callBackEvent: 'UiRunCaseSet'
+    }
   },
 
   methods: {
@@ -348,10 +356,16 @@ export default {
       this.$bus.$emit(this.$busEvents.ui.uiCaseDrawerStatus, 'add')
     },
 
+    // 点击运行用例集
+    showRunCaseSet(node, data){
+      this.runSetNode = node
+      this.runSetData = data
+      this.$bus.$emit(this.runEvent, true)
+    },
+
     // 运行用例集的用例
-    runCaseSet(node, data) {
-      this.$set(data, 'runButtonIsNotShow', true)
-      caseSetRun({'id': data.id}).then(runResponse => {
+    runCaseSet(runData) {
+      caseSetRun({'id': this.runSetData.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，
@@ -365,14 +379,12 @@ export default {
             if (queryCount <= runTimeoutCount) {
               reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
                 if (queryResponse.data === 1) {
-                  that.$set(data, 'runButtonIsNotShow', false)
                   that.openReportById(runResponse.data.report_id)
                   clearInterval(timer)  // 关闭定时器
                 }
               })
               queryCount += 1
             } else {
-              that.$set(data, 'runButtonIsNotShow', false)
               that.$notify(runTestTimeOutMessage(that));
               clearInterval(timer)  // 关闭定时器
             }
@@ -398,6 +410,24 @@ export default {
     },
 
   },
+
+  created() {
+    this.getProjectList()
+    getRunTimeout(this)  // 初始化等待用例运行超时时间
+  },
+
+  mounted() {
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.runCaseSet(runDict)
+    })
+
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
+  },
+
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);

@@ -152,12 +152,6 @@ export const constantRoutes = [
         component: () => import('@/views/apiTest/report/index')
       },
       {
-        path: 'errorRecord',
-        name: 'apiErrorRecord',
-        meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
-        component: () => import('@/views/apiTest/errorRecord/index')
-      },
-      {
         path: 'debug',
         name: 'debug',
         hidden: true,
@@ -171,8 +165,8 @@ export const constantRoutes = [
   {
     path: '/uiTest',
     component: Layout,
-    redirect: '/webTest/project',
-    name: 'UITest',
+    redirect: '/uiTest/project',
+    name: 'UiTest',
     meta: {title: 'UI测试', icon: 'el-icon-connection'},
     children: [
       {
@@ -183,31 +177,31 @@ export const constantRoutes = [
       },
       {
         path: 'page',
-        name: 'Page',
+        name: 'uiPage',
         component: () => import('@/views/uiTest/module/index'),
         meta: {title: '页面管理', icon: 'el-icon-s-operation'}
       },
       {
         path: 'case',
-        name: 'Case',
+        name: 'uiCase',
         component: () => import('@/views/uiTest/caseSet/index'),
         meta: {title: '用例管理', icon: 'el-icon-tickets'}
       },
       {
         path: 'task',
-        name: 'Task',
+        name: 'uiTask',
         component: () => import('@/views/uiTest/task/index'),
         meta: {title: '定时任务', icon: 'el-icon-date'}
       },
       {
-        path: 'uiReportShow',
+        path: 'reportShow',
         name: 'uiReportShow',
         hidden: true,
         meta: {title: '查看测试报告', icon: 'form'},
         component: () => import('@/views/uiTest/report/show')
       },
       {
-        path: 'uiReport',
+        path: 'report',
         name: 'uiReport',
         meta: {title: '测试报告', icon: 'el-icon-s-data'},
         component: () => import('@/views/uiTest/report/index')
@@ -294,7 +288,13 @@ export const constantRoutes = [
         hidden: true,
         component: () => import('@/views/testWork/yapi/diffDetailShow'),
         meta: {title: 'yapi对比详情'}
-      }
+      },
+      {
+        path: 'errorRecord',
+        name: 'apiErrorRecord',
+        meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
+        component: () => import('@/views/apiTest/errorRecord/index')
+      },
     ]
   },
 

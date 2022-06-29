@@ -34,3 +34,8 @@ export function configList(params) {
 export function getConfigByName(params) {
   return request({url: baseDirConfig + '/configByName', method: 'get', params: params});
 }
+
+// 获取配置的执行模式
+export function getRunModel() {
+  return request({url: baseDirConfig + '/runModel', method: 'get'});
+}

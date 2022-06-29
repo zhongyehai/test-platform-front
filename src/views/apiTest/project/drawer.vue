@@ -108,6 +108,7 @@ import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
 
 import {postProject, putProject} from '@/apis/apiTest/project'
 import {funcFileList} from "@/apis/apiTest/funcFile";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'drawer',
@@ -138,12 +139,7 @@ export default {
       },
 
       // 环境映射
-      envMapping: {
-        "dev": "开发环境",
-        "test": "测试环境",
-        "uat": "uat环境",
-        "production": "生产环境",
-      },
+      envMapping: {},
       user_list: [],  // 用户列表
       funcFilesList: [],
       submitButtonIsLoading: false,
@@ -154,6 +150,13 @@ export default {
   },
 
   methods: {
+
+    // 获取环境配置
+    initEnv() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.envMapping = JSON.parse(response.data.value)
+      })
+    },
 
     /* 点击切换tab
     * activeName：要去的标签页
@@ -178,32 +181,6 @@ export default {
       }else {
         this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id, activeName)
       }
-      //
-      // if (!this.tempProject.id && activeName !== 'info') {
-      //   this.$notify.error('请先保存服务信息')
-      //   return false
-      // } else if (oldActiveName === 'info') {
-      //   // 对比服务信息是否改变
-      //   if (this.infoCopy.name !== this.tempProject.name ||
-      //     this.infoCopy.manager !== this.$refs.userSelect.tempData ||
-      //     this.infoCopy.swagger !== this.tempProject.swagger) {
-      //     this.$notify.error('请先保存当前服务信息的修改')
-      //     return false
-      //   }
-      //   this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id, activeName)
-      // } else if (oldActiveName !== 'info') {
-      //   let ref = this.$refs[oldActiveName][0]
-      //   if (ref.initData.host !== ref.tempEnv.host ||
-      //     JSON.stringify(ref.initData.headers) !== JSON.stringify(ref.tempEnv.headers) ||
-      //     JSON.stringify(ref.initData.func_files) !== JSON.stringify(ref.$refs.funcFiles.tempFuncFiles) ||
-      //     JSON.stringify(ref.initData.variables) !== JSON.stringify(ref.tempEnv.variables)) {
-      //     this.$notify.error('请先保存当前环境的修改')
-      //     return false
-      //   }
-      //   this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id, activeName)
-      // } else {
-      //   this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id, activeName)
-      // }
     },
 
     // 点击同步信息
@@ -289,6 +266,7 @@ export default {
 
   mounted() {
 
+    this.initEnv()
     this.getFuncFileList()
 
     this.$bus.$on(this.$busEvents.api.apiShowProjectDrawer, (status, data) => {

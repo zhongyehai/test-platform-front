@@ -50,22 +50,14 @@
             <template slot-scope="scope">
 
               <!-- 运行用例 -->
-              <el-popconfirm
-                placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="运行测试用例并生成报告？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="runCase(scope.row)"
-              >
-                <el-button
-                  type="text"
-                  slot="reference"
-                  icon="el-icon-video-play"
-                  :loading="scope.row.isShowRunLoading"
-                ></el-button>
-              </el-popconfirm>
+              <!-- 运行用例 -->
+              <el-button
+                type="text"
+                slot="reference"
+                icon="el-icon-video-play"
+                :loading="scope.row.isShowRunLoading"
+                @click="clickRunCase(scope.row)"
+              ></el-button>
 
               <!--修改用例-->
               <el-button
@@ -126,6 +118,11 @@
 
     </el-tabs>
 
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
     <caseDrawer
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
@@ -138,6 +135,7 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import caseDrawer from '@/views/uiTest/case/drawer'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {userList} from '@/apis/user/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/uiTest/case'
@@ -148,6 +146,7 @@ export default {
   name: 'index',
   components: {
     Pagination,
+    selectRunEnv,
     caseDrawer
   },
 
@@ -164,9 +163,8 @@ export default {
       // 初始化数据默认的数据
       pageNum: 1,
       pageSize: 20,
-
-
       tempCase: {},  // 用例新增/编辑临时数据
+      currentCase: '',  // 当前点击的用例
 
       // 用例数据列表
       caseTotal: 0,
@@ -178,30 +176,10 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
+
+      runEvent: 'UiRunCaseEventOnIndex',
+      callBackEvent: 'UiRunCaseOnIndex'
     }
-  },
-
-  created() {
-    this.oldList = this.caseList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-
-  mounted() {
-    this.getUserList()
-
-    // 监听 caseDialog 是否提交成功
-    this.$bus.$on(this.$busEvents.ui.uiCaseDrawerCommitSuccess, (status) => {
-      this.getCaseList()
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.ui.uiCaseDrawerCommitSuccess)
   },
 
   methods: {
@@ -241,15 +219,20 @@ export default {
     copyCase(api) {
       this.tempCase = JSON.parse(JSON.stringify(api))
       this.tempCase.num = ''
-      console.log('case.index.methods.copyCase.this.tempCase: ', JSON.stringify(this.tempCase))
       this.$bus.$emit(this.$busEvents.ui.uiCaseDrawerStatus, 'copy', this.tempCase)
     },
 
+    // 点击运行用例
+    clickRunCase(row) {
+      this.currentCase = row
+      this.$bus.$emit(this.runEvent, false)
+    },
+
     // 运行用例
-    runCase(caseData) {
-      this.$set(caseData, 'isShowRunLoading', true)
+    runCase(runData) {
+      this.$set(this.currentCase, 'isShowRunLoading', true)
       caseRun({
-        caseId: [caseData.id]
+        caseId: [this.currentCase.id], env: runData.runEnv, is_async: runData.runType
       }).then(runResponse => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
         if (this.showMessage(this, runResponse)) {
@@ -265,14 +248,14 @@ export default {
             if (queryCount <= runTimeoutCount) {
               reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
                 if (queryResponse.data === 1) {
-                  that.$set(caseData, 'isShowRunLoading', false)
+                  that.$set(that.currentCase, 'isShowRunLoading', false)
                   that.openReportById(runResponse.data.report_id)
                   clearInterval(timer)  // 关闭定时器
                 }
               })
               queryCount += 1
             } else {
-              that.$set(caseData, 'isShowRunLoading', false)
+              that.$set(that.currentCase, 'isShowRunLoading', false)
               that.$notify(runTestTimeOutMessage(that));
               clearInterval(timer)  // 关闭定时器
             }
@@ -284,7 +267,7 @@ export default {
     // 打开测试报告
     openReportById(reportId) {
       // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'uiReportShow', query: {id: reportId}})
+      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
       window.open(href, '_blank')
     },
 
@@ -340,6 +323,33 @@ export default {
         }
       })
     }
+  },
+
+  mounted() {
+    this.getUserList()
+
+    // 监听 case抽屉 是否提交成功
+    this.$bus.$on(this.$busEvents.ui.uiCaseDrawerCommitSuccess, (status) => {
+      this.getCaseList()
+    })
+
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.runCase(runDict)
+    })
+  },
+
+  created() {
+    this.oldList = this.caseList.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
+    this.$bus.$off(this.$busEvents.ui.uiCaseDrawerCommitSuccess)
   },
 
   watch: {

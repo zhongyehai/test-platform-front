@@ -61,6 +61,7 @@
 <script>
 
 import {projectEnvSynchronization} from '@/apis/apiTest/project'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'envSynchronizer',
@@ -69,12 +70,7 @@ export default {
       drawerIsShow: false,  // 抽屉的显示状态
       direction: 'rtl',  // 抽屉打开方式
       // 环境映射
-      envMapping: {
-        "dev": "开发环境",
-        "test": "测试环境",
-        "uat": "uat环境",
-        "production": "生产环境",
-      },
+      envMapping: {},
       projectId: '',
       fromActiveName: 'from',
       toActiveName: 'to',
@@ -85,6 +81,13 @@ export default {
   },
 
   methods: {
+
+    // 获取环境配置
+    initEnv() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.envMapping = JSON.parse(response.data.value)
+      })
+    },
 
     // 单选钮选中时，如果复选框已选中了单选的值，则去除多选按钮的选中状态
     changeRadio(value){
@@ -111,6 +114,9 @@ export default {
   },
 
   mounted() {
+
+    this.initEnv()
+
     this.$bus.$on(this.$busEvents.api.apiShowEnvSynchronizer, (projectId) => {
       this.projectId = projectId
       this.drawerIsShow = true

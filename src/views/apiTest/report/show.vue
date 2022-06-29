@@ -37,6 +37,9 @@
             <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
           </span>
+            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+            运行环境: {{ runEnvDict[reportData.run_env] }}
+          </span>
           </div>
         </el-col>
       </el-row>
@@ -447,6 +450,7 @@
 import JsonViewer from "vue-json-viewer";
 import vkbeautify from "vkbeautify";
 
+import {getConfigByName} from '@/apis/config/config'
 import {getReport} from '@/apis/apiTest/report'
 
 export default {
@@ -504,6 +508,7 @@ export default {
       }
     }
     return {
+      runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
       defaultShowResponseInFo: ['1', '2', '3', '4', '5', '6', '12', '13', '14', '16'],
@@ -691,6 +696,14 @@ export default {
 
     },
 
+    // 获取环境配置
+    getEnvDict() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.runEnvDict = JSON.parse(response.data.value)
+      })
+    },
+
+    // 获取测试报告具体内容
     getReportDataById() {
       getReport({'id': this.$route.query.id}).then((response) => {
           // console.log(response)
@@ -708,6 +721,7 @@ export default {
         }
       )
     },
+
     isShowPic(isShow) {
       if (isShow) {
         this.picStatus = true
@@ -718,10 +732,13 @@ export default {
       }
     }
   },
+
   // mounted() {
   //   this.getReportDataById()
   // },
+
   created() {
+    this.getEnvDict()
     this.getReportDataById()
   },
 }

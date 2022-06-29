@@ -204,7 +204,6 @@
 import {userList, deleteUser, postUser, putUser, getUser, roleList, userStatus} from '@/apis/user/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import {getDataFormListById} from "@/utils/parseData";
 
 export default {
   name: 'index',
@@ -216,6 +215,7 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 20,
+        detail: 1,
         name: undefined,  // 用户名
         account: undefined,  // 账号
         status: undefined, // 账号状态
@@ -260,7 +260,7 @@ export default {
 
     // 获取所有用户信息，同步请求
     async getAllUserList(func) {
-      let response = await userList()
+      let response = await userList({'detail': 1})
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user

@@ -66,7 +66,7 @@
                 title="复制此页面并生成新的页面？"
                 confirm-button-text='确认'
                 cancel-button-text='取消'
-                @onConfirm="copyPage(scope.row)"
+                @onConfirm="clickCopyPage(scope.row)"
               >
                 <el-button
                   type="text"
@@ -112,6 +112,7 @@
     <pageDrawer
       :currentProjectId="currentProjectId"
       :currentModuleId="currentModuleId"
+      :userDict="userDict"
     ></pageDrawer>
 
   </div>
@@ -145,9 +146,6 @@ export default {
       tableLoadingIsShow: false,  // 请求列表等待响应的状态
       pageTab: 'pageList',  //  tab页的显示
 
-      // 页面新增/编辑临时数据
-      tempPage: {},
-
       // 页面数据列表
       pageNum: 1,
       pageSize: 20,
@@ -155,6 +153,7 @@ export default {
       pageList: [],
       userList: [],
       userDict: {},
+
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -212,8 +211,7 @@ export default {
 
     // 打开编辑框
     showEditForm(row) {
-      this.tempPage = JSON.parse(JSON.stringify(row))
-      this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'edit', this.tempPage)
+      this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'edit', JSON.parse(JSON.stringify(row)))
     },
 
     // 删除页面
@@ -228,10 +226,8 @@ export default {
     },
 
     // 复制页面
-    copyPage(api) {
-      this.tempPage = api
-      this.tempPage.id = ''
-      this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'copy', JSON.parse(JSON.stringify(this.tempPage)))
+    clickCopyPage(page) {
+      this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'copy', JSON.parse(JSON.stringify(page)))
     },
 
     // 根据模块内容获取页面列表

@@ -92,9 +92,9 @@
                           >{{ "添加接口" }}
                           </el-dropdown-item>
 
-                          <el-dropdown-item @click.native.stop="showUploadFileDialog(node, data)"
-                          >{{ "导入接口" }}
-                          </el-dropdown-item>
+<!--                          <el-dropdown-item @click.native.stop="showUploadFileDialog(node, data)"-->
+<!--                          >{{ "导入接口" }}-->
+<!--                          </el-dropdown-item>-->
 
                           <el-dropdown-item @click.native.stop="showModuleDialog('add', node, data)"
                           >{{ '添加子模块' }}

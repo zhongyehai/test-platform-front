@@ -1,234 +1,216 @@
 <template>
-  <div>
+  <!-- 新增/修改接口表单 -->
+  <el-drawer
+    :title=" drawerType === 'update' ? '修改接口' : '新增接口'"
+    size="80%"
+    :wrapperClosable="false"
+    :visible.sync="drawerIsShow"
+    :direction="direction">
+    <!-- 接口所属信息 -->
+    <el-form style="margin-left: 20px;margin-right: 20px" label-width="100px">
 
-    <!-- 新增/修改接口表单 -->
-    <el-drawer
-      :title=" drawerType === 'update' ? '修改接口' : '新增接口'"
-      size="80%"
-      :wrapperClosable="false"
-      :visible.sync="drawerIsShow"
-      :direction="direction">
-      <!-- 接口所属信息 -->
-      <el-form style="margin-left: 20px;margin-right: 20px" label-width="100px">
+      <el-row>
 
-        <el-row>
-
-          <!-- 接口名称 -->
-          <el-col :span="10">
-            <el-form-item label="接口名称" class="is-required" style="margin-bottom: 5px">
-              <el-input v-model="tempApi.name" placeholder="接口名称" size="mini">
-              </el-input>
-            </el-form-item>
-          </el-col>
-
-          <!-- 选择环境 -->
-          <el-col :span="7">
-            <el-form-item label="选择环境" class="is-required" style="margin-bottom: 5px">
-              <environmentSelectorView
-                :choice_environment="tempApi.choice_host"
-                ref="environmentSelectorView"
-              ></environmentSelectorView>
-            </el-form-item>
-          </el-col>
-
-          <!-- 选择模块 -->
-          <el-col :span="7">
-            <el-form-item label="选择模块" class="is-required" style="margin-bottom: 5px">
-              <el-select v-model="moduleLabel" placeholder="请选择模块" size="mini" style="width: 100%">
-                <el-option :value="[]" style="height: auto">
-                  <el-tree
-                    ref="moduleTree"
-                    :data="moduleTree"
-                    show-checkbox
-                    node-key="id"
-                    check-strictly
-                    highlight-current
-                    :props="defaultProps"
-                    @check-change="handleNodeClick"
-                  ></el-tree>
-                </el-option>
-              </el-select>
-
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <!-- 前置条件 -->
-        <el-row>
-          <el-form-item label="前置条件" prop="up_func" style="margin-bottom: 5px">
-            <el-input
-              type="textarea"
-              autosize
-              style="width: 98%"
-              v-model="tempApi.up_func"
-              placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-              size="mini"></el-input>
-            <el-popconfirm placement="top" hide-icon title="在运行接口之前要做的一些前置操作，使用自定义函数的形式实现">
-              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-            </el-popconfirm>
+        <!-- 接口名称 -->
+        <el-col :span="12">
+          <el-form-item label="接口名称" class="is-required" style="margin-bottom: 5px">
+            <el-input v-model="tempApi.name" placeholder="接口名称" size="mini">
+            </el-input>
           </el-form-item>
-        </el-row>
+        </el-col>
 
-        <!-- 后置条件 -->
-        <el-row>
-          <el-form-item label="后置条件" prop="down_func" style="margin-bottom: 5px">
-            <el-input
-              type="textarea"
-              autosize
-              style="width: 98%"
-              v-model="tempApi.down_func"
-              placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-              size="mini"></el-input>
-            <el-popconfirm placement="top" hide-icon title="在运行接口之后要做的一些前置操作，使用自定义函数的形式实现">
-              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-            </el-popconfirm>
+        <!-- 选择模块 -->
+        <el-col :span="12">
+          <el-form-item label="选择模块" class="is-required" style="margin-bottom: 5px">
+            <el-select v-model="moduleLabel" placeholder="请选择模块" size="mini" style="width: 100%">
+              <el-option :value="[]" style="height: auto">
+                <el-tree
+                  ref="moduleTree"
+                  :data="moduleTree"
+                  show-checkbox
+                  node-key="id"
+                  check-strictly
+                  highlight-current
+                  :props="defaultProps"
+                  @check-change="handleNodeClick"
+                ></el-tree>
+              </el-option>
+            </el-select>
+
           </el-form-item>
-        </el-row>
+        </el-col>
+      </el-row>
 
-      </el-form>
-
-      <hr style="height:1px;border:none;border-top:1px solid rgb(241, 215, 215);"/>
-
-      <!-- 接口内容信息 -->
-      <el-form style="margin: 0 20px 0 20px;">
-        <el-form-item>
-
-          <!-- 请求方法选择器 -->
-          <methodsSelectorView
-            ref="methodsSelectorView"
-            :method="tempApi.method"
-            :busEmitEventName="$busEvents.api.apiMethodSelectorChoiceMethod"
-          ></methodsSelectorView>
-
-          <!-- 接口地址 -->
+      <!-- 前置条件 -->
+      <el-row>
+        <el-form-item label="前置条件" prop="up_func" style="margin-bottom: 5px">
           <el-input
-            v-model="tempApi.addr"
-            class="input-with-select"
-            placeholder="请输入接口地址"
-            size="mini"
-            style="width: 85%;margin-right: 5px">
-          </el-input>
-
+            type="textarea"
+            autosize
+            style="width: 98%"
+            v-model="tempApi.up_func"
+            placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
+            size="mini"></el-input>
+          <el-popconfirm placement="top" hide-icon title="在运行接口之前要做的一些前置操作，使用自定义函数的形式实现">
+            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+          </el-popconfirm>
         </el-form-item>
-      </el-form>
+      </el-row>
 
-      <!-- 参数信息 -->
-      <el-tabs style="margin: 0 20px 0 20px;" v-model="bodyShow">
+      <!-- 后置条件 -->
+      <el-row>
+        <el-form-item label="后置条件" prop="down_func" style="margin-bottom: 5px">
+          <el-input
+            type="textarea"
+            autosize
+            style="width: 98%"
+            v-model="tempApi.down_func"
+            placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
+            size="mini"></el-input>
+          <el-popconfirm placement="top" hide-icon title="在运行接口之后要做的一些前置操作，使用自定义函数的形式实现">
+            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+          </el-popconfirm>
+        </el-form-item>
+      </el-row>
 
-        <!-- 头部信息 -->
-        <el-tab-pane label="头部信息" name="headers">
-          <!-- 使用示例 -->
-          <el-collapse accordion>
-            <el-collapse-item>
-              <template slot="title">
-                <div style="color:#409eff"> 点击查看说明</div>
-              </template>
-              <div style="margin-left: 20px">
-                1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
-                2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
-                3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-          <headersView
-            ref="headersView"
-            :currentData="tempApi.headers"
-            :placeholder-key="'key'"
-            :placeholder-value="'value'"
-            :placeholder-desc="'备注'"
-          ></headersView>
-        </el-tab-pane>
+    </el-form>
 
-        <!-- 接口查询字符串信息 -->
-        <el-tab-pane label="url参数" name="params">
-          <queryStringView
-            ref="queryStringView"
-            :currentData="tempApi.params"
-            :placeholder-key="'key'"
-            :placeholder-value="'value'"
-            :placeholder-desc="'备注'"
-          ></queryStringView>
-        </el-tab-pane>
+    <!-- 接口内容信息 -->
+    <el-form style="margin: 0 20px 0 20px;">
+      <el-form-item label="接口地址" class="is-required">
 
-        <!-- 请求体 -->
-        <el-tab-pane label="请求体" name="body" :disabled="methodSelectorChoiceMethod === 'GET'">
-          <bodyView
-            ref="bodyView"
-            :data-type="tempApi.data_type"
-            :data-json="tempApi.data_json"
-            :data-form="tempApi.data_form"
-            :data-xml="tempApi.data_xml"
-          ></bodyView>
-        </el-tab-pane>
+        <!-- 请求方法选择器 -->
+        <methodsSelectorView
+          ref="methodsSelectorView"
+          :method="tempApi.method"
+          :busEmitEventName="$busEvents.api.apiMethodSelectorChoiceMethod"
+        ></methodsSelectorView>
 
-        <!-- 数据提取信息 -->
-        <el-tab-pane label="数据提取" name="extracts">
-          <extractsView
-            ref="extractsView"
-            :currentData="tempApi.extracts"
-            :placeholder-key="'起个变量名'"
-            :placeholder-value="'提取表达式'"
-            :placeholder-desc="'备注'"
-          ></extractsView>
-        </el-tab-pane>
-
-        <!-- 断言信息 -->
-        <el-tab-pane label="断言" name="validates">
-          <validatesView
-            ref="validatesView"
-            :validates="tempApi.validates"
-          ></validatesView>
-        </el-tab-pane>
-
-      </el-tabs>
-
-      <div class="demo-drawer__footer">
-
-        <el-popconfirm
-          placement="top"
-          hide-icon
-          :title="`自动保存，再触发调试，并生成测试报告?`"
-          confirm-button-text='确认'
-          cancel-button-text='取消'
-          @onConfirm="debugApi()"
-        >
-          <el-button
-            slot="reference"
-            size="mini"
-            type="primary"
-            style="float: left"
-            :loading="isShowDebugLoading"
-          >调试
-          </el-button>
-        </el-popconfirm>
-
-        <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
-        <el-button
-          type="primary"
+        <!-- 接口地址 -->
+        <el-input
+          v-model="tempApi.addr"
+          class="input-with-select"
+          placeholder="请输入接口地址"
           size="mini"
-          :loading="isShowSubmitLoading"
-          @click=" drawerType === 'update' ? changApi() : addApi() ">
-          {{ '保存' }}
-        </el-button>
+          style="width: 79%;margin-right: 5px">
+        </el-input>
 
-      </div>
-    </el-drawer>
+      </el-form-item>
+    </el-form>
 
-  </div>
+    <!-- 参数信息 -->
+    <el-tabs style="margin: 0 20px 0 20px;" v-model="bodyShow">
+
+      <!-- 头部信息 -->
+      <el-tab-pane label="头部信息" name="headers">
+        <!-- 使用示例 -->
+        <el-collapse accordion>
+          <el-collapse-item>
+            <template slot="title">
+              <div style="color:#409eff"> 点击查看说明</div>
+            </template>
+            <div style="margin-left: 20px">
+              1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
+              2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
+              3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+              4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+        <headersView
+          ref="headersView"
+          :currentData="tempApi.headers"
+          :placeholder-key="'key'"
+          :placeholder-value="'value'"
+          :placeholder-desc="'备注'"
+        ></headersView>
+      </el-tab-pane>
+
+      <!-- 接口查询字符串信息 -->
+      <el-tab-pane label="url参数" name="params">
+        <queryStringView
+          ref="queryStringView"
+          :currentData="tempApi.params"
+          :placeholder-key="'key'"
+          :placeholder-value="'value'"
+          :placeholder-desc="'备注'"
+        ></queryStringView>
+      </el-tab-pane>
+
+      <!-- 请求体 -->
+      <el-tab-pane label="请求体" name="body" :disabled="methodSelectorChoiceMethod === 'GET'">
+        <bodyView
+          ref="bodyView"
+          :data-type="tempApi.data_type"
+          :data-json="tempApi.data_json"
+          :data-form="tempApi.data_form"
+          :data-xml="tempApi.data_xml"
+        ></bodyView>
+      </el-tab-pane>
+
+      <!-- 数据提取信息 -->
+      <el-tab-pane label="数据提取" name="extracts">
+        <extractsView
+          ref="extractsView"
+          :currentData="tempApi.extracts"
+          :placeholder-key="'起个变量名'"
+          :placeholder-value="'提取表达式'"
+          :placeholder-desc="'备注'"
+        ></extractsView>
+      </el-tab-pane>
+
+      <!-- 断言信息 -->
+      <el-tab-pane label="断言" name="validates">
+        <validatesView
+          ref="validatesView"
+          :validates="tempApi.validates"
+        ></validatesView>
+      </el-tab-pane>
+
+    </el-tabs>
+
+    <div class="demo-drawer__footer">
+
+      <el-button
+        slot="reference"
+        size="mini"
+        type="primary"
+        style="float: left"
+        :loading="isShowDebugLoading"
+        @click="clickDebugApi()"
+      >调试
+      </el-button>
+
+      <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        :loading="isShowSubmitLoading"
+        @click=" drawerType === 'update' ? changApi() : addApi() ">
+        {{ '保存' }}
+      </el-button>
+
+    </div>
+
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
+  </el-drawer>
 
 </template>
 
 <script>
 import projectSelectorView from "@/components/Selector/project";
 import moduleSelectorView from "@/components/Selector/module";
-import environmentSelectorView from "@/components/Selector/environment";
 import methodsSelectorView from "@/components/Selector/methods";
 import headersView from '@/components/Inputs/changeRow'
 import queryStringView from '@/components/Inputs/changeRow'
 import bodyView from '@/components/apiBody'
 import extractsView from '@/components/Inputs/extract'
 import validatesView from '@/components/Inputs/validates'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {postApi, putApi, runApi} from '@/apis/apiTest/api'
 import {reportIsDone} from "@/apis/apiTest/report";
@@ -244,13 +226,13 @@ export default {
   components: {
     projectSelectorView,
     moduleSelectorView,
-    environmentSelectorView,
     methodsSelectorView,
     queryStringView,
     headersView,
     bodyView,
     extractsView,
-    validatesView
+    validatesView,
+    selectRunEnv
   },
   data() {
     return {
@@ -285,7 +267,6 @@ export default {
         up_func: '',
         down_func: '',
         method: '',
-        choice_host: 'test',
         addr: '',
         headers: [{key: null, value: null, remark: null}],
         params: [{key: null, value: null}],
@@ -297,7 +278,10 @@ export default {
         validates: [{key: null, value: null, validate_type: null, remark: null}],
         module_id: '',
         project_id: ''
-      }
+      },
+
+      runEvent: 'runApiEventOnDialog',
+      callBackEvent: 'runApiOnDialog'
     }
   },
 
@@ -318,14 +302,14 @@ export default {
     },
 
     // 调试api，先保存，走数据校验，再发送请求
-    debugApi() {
+    debugApi(runDict) {
       this.isShowDebugLoading = true
       if (this.tempApi.id) {
         putApi(this.getTempApi()).then(response => {
           this.isShowDebugLoading = false
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
-            this.runApis()
+            this.runApis(runDict)
           }
         })
       } else {
@@ -334,18 +318,23 @@ export default {
           if (this.showMessage(this, response)) {
             this.tempApi = response.data
             this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
-            this.runApis()
+            this.runApis(runDict)
           }
         })
       }
       this.drawerType = 'update'
     },
 
-    runApis() {
+    clickDebugApi() {
+      this.$bus.$emit(this.runEvent, false)
+    },
+
+    runApis(runDict) {
       this.isShowDebugLoading = true
       runApi({
         'projectId': this.tempApi.project_id,
-        'apis': [this.tempApi.id]
+        'apis': [this.tempApi.id],
+        env: runDict.runEnv
       }).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
@@ -410,7 +399,6 @@ export default {
       this.tempApi.up_func = ''
       this.tempApi.down_func = ''
       this.tempApi.method = ''
-      this.tempApi.choice_host = 'test'
       this.tempApi.addr = ''
       this.tempApi.headers = [{key: null, value: null, remark: null}]
       this.tempApi.params = [{key: null, value: null}]
@@ -443,7 +431,6 @@ export default {
         down_func: this.tempApi.down_func,
         addr: this.tempApi.addr,
         method: this.$refs.methodsSelectorView.tempMethod,
-        choice_host: this.$refs.environmentSelectorView.current_environment,
         headers: this.$refs.headersView.tempData,
         params: this.$refs.queryStringView.tempData,
         extracts: this.$refs.extractsView.tempData,
@@ -483,10 +470,15 @@ export default {
         this.drawerType = 'add'
       }
     })
+
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.debugApi(runDict)
+    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
     this.$bus.$off(this.$busEvents.api.apiApiDrawerStatus)
     this.$bus.$off(this.$busEvents.api.apiModuleTreeIsDone)
     this.$bus.$off(this.$busEvents.api.apiMethodSelectorChoiceMethod)

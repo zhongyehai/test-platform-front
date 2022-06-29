@@ -45,18 +45,6 @@
 
             </el-form-item>
 
-<!--            <el-form-item label="页面地址" style="margin-bottom: 5px">-->
-<!--              &lt;!&ndash; 页面地址 &ndash;&gt;-->
-<!--              <el-input-->
-<!--                v-model="tempPage.addr"-->
-<!--                disabled-->
-<!--                class="input-with-select"-->
-<!--                placeholder="请设置页面地址（不包含域名）"-->
-<!--                size="mini"-->
-<!--                style="width: 100%">-->
-<!--              </el-input>-->
-<!--            </el-form-item>-->
-
             <el-form-item label="页面描述" style="margin-bottom: 5px">
               <el-input v-model="tempPage.desc" size="mini" type="textarea" :rows="5" :placeholder="'页面描述'">
               </el-input>
@@ -71,7 +59,10 @@
             :currentPageId="tempPage.id"
             :currentModuleId="tempPage.module_id"
             :currentProjectId="tempPage.project_id"
+            :pageElementList="tempElementList"
+            :userDict="userDict"
           ></elementManage>
+<!--          :pageElementList="tempElementLlist"-->
         </el-tab-pane>
 
       </el-tabs>
@@ -105,8 +96,9 @@
 <script>
 import elementManage from '@/views/uiTest/element'
 
-import {postPage, putPage} from '@/apis/uiTest/page'
+import {postPage, putPage, copyPage} from '@/apis/uiTest/page'
 import {getModule} from "@/apis/uiTest/module";
+import {elementList} from "@/apis/uiTest/element";
 
 
 export default {
@@ -114,6 +106,7 @@ export default {
   props: [
     'currentProjectId',
     'currentModuleId',
+    'userDict'
   ],
   components: {elementManage},
   data() {
@@ -134,10 +127,12 @@ export default {
         id: '',
         name: '',
         desc: '',
-        // addr: '',
         module_id: '',
         project_id: ''
-      }
+      },
+
+      // 元素列表
+      tempElementList: []
     }
   },
 
@@ -154,7 +149,7 @@ export default {
     // 提交添加页面
     addPage() {
       this.isShowSubmitLoading = true
-      postPage(this.getTempApi()).then(response => {
+      postPage(this.getTempPage()).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
@@ -166,7 +161,7 @@ export default {
     // 提交修改页面
     changPage() {
       this.isShowSubmitLoading = true
-      putPage(this.getTempApi()).then(response => {
+      putPage(this.getTempPage()).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
@@ -176,29 +171,38 @@ export default {
     },
 
     // 点击新增页面时，初始化 dialog 数据
-    initNewTempApi() {
+    initNewTempPage() {
       this.tempPage.id = ''
       this.tempPage.name = ''
       this.tempPage.desc = ''
-      // this.tempPage.addr = ''
       this.tempPage.module_id = this.currentModuleId ? this.currentModuleId : ''
       this.tempPage.project_id = this.currentProjectId || ''
       this.drawerIsShow = true
     },
 
     // 点击修改页面时，初始化 dialog 数据
-    initUpdateTempApi(page) {
+    initUpdateTempPage(page) {
       this.tempPage = page
+      this.getElementList()
       this.drawerIsShow = true
     },
 
+    // 获取元素列表
+    getElementList() {
+      elementList({'pageId': this.tempPage.id,
+        'pageNum': this.pageNum,
+        'pageSize': this.pageSize
+      }).then(response => {
+        this.tempElementList = response.data.data
+      })
+    },
+
     // 获取 tempPage 用于提交数据
-    getTempApi() {
+    getTempPage() {
       return {
         id: this.tempPage.id,
         name: this.tempPage.name,
         desc: this.tempPage.desc,
-        // addr: this.tempPage.addr,
         module_id: this.$refs.moduleTree.getCheckedKeys()[0],
         project_id: this.tempPage.project_id
       }
@@ -211,7 +215,7 @@ export default {
     beforeLeave(activeName, oldActiveName) {
       if (!this.tempPage.id && oldActiveName === 'pageInfo') {
         this.isShowSubmitLoading = true
-        postPage(this.getTempApi()).then(response => {
+        postPage(this.getTempPage()).then(response => {
           this.isShowSubmitLoading = false
           if (this.showMessage(this, response)) {
             this.tempPage = response.data
@@ -238,21 +242,29 @@ export default {
 
     // 监听 页面编辑框命令事件
     this.$bus.$on(this.$busEvents.ui.uiPageDrawerStatus, (command, page) => {
+      // console.log('command: ', command)
+      // console.log('page: ', JSON.stringify(page))
       if (command === 'add') {
-        this.initNewTempApi()  // 新增
+        this.tempPage.id = ''
+        this.initNewTempPage()  // 新增
       } else if (command === 'edit') {
-        this.initUpdateTempApi(page)  // 修改
+        this.initUpdateTempPage(page)  // 修改
         this.$bus.$emit(this.$busEvents.ui.uiPageDrawerIsOpen, page.id)
       } else if (command === 'copy') {
-        this.initUpdateTempApi(page)  // 复制
-        this.$bus.$emit(this.$busEvents.ui.uiPageDrawerIsOpen, page.id)
+        copyPage({id: page.id}).then(response => {
+            if (this.showMessage(this, response)) {
+              this.tempPage = response.data.page
+              this.tempElementList = response.data.element
+              this.drawerIsShow = true
+              this.$bus.$emit(this.$busEvents.ui.uiPageDrawerCommitSuccess, 'success')
+            }
+          }
+        )
+        // this.initUpdateTempPage(page)  // 复制
+        // this.$bus.$emit(this.$busEvents.ui.uiPageDrawerIsOpen, page.id)
       }
     })
 
-    // 监听 元素是否为url，如果是的话，则更新页面的url
-    // this.$bus.$on(this.$busEvents.ui.uiElementIsUrl, (data) => {
-    //   this.tempPage.addr = data.addr
-    // })
   },
 
   // 组件销毁前，关闭bus监听事件

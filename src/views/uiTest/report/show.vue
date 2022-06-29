@@ -34,6 +34,12 @@
             <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             开始时间: {{ this.reportData.time.start_at }}
           </span>
+            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+            执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
+          </span>
+            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+            运行环境: {{ runEnvDict[reportData.run_env] }}
+          </span>
           </div>
         </el-col>
       </el-row>
@@ -174,14 +180,14 @@
                     <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.text }}</div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="6">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "执行前页面：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">
-                      <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].before "></el-image>
-                    </div>
-                  </el-collapse-item>
+                  <!--                  <el-collapse-item name="6">-->
+                  <!--                    <template slot="title">-->
+                  <!--                      <div class="el-collapse-item-title"> {{ "执行前页面：" }}</div>-->
+                  <!--                    </template>-->
+                  <!--                    <div class="el-collapse-item-content">-->
+                  <!--                      <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].before "></el-image>-->
+                  <!--                    </div>-->
+                  <!--                  </el-collapse-item>-->
 
                   <el-collapse-item name="7">
                     <template slot="title">
@@ -243,6 +249,7 @@ import JsonViewer from "vue-json-viewer";
 import vkbeautify from "vkbeautify";
 
 import {getReport} from '@/apis/uiTest/report'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'reportShow',
@@ -299,9 +306,10 @@ export default {
       }
     }
     return {
+      runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
-      defaultShowResponseInFo: ['1', '3', '4', '8', '9'],
+      defaultShowResponseInFo: ['1', '3', '4', '7', '8', '9'],
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,
@@ -487,6 +495,14 @@ export default {
 
     },
 
+    // 获取环境配置
+    getEnvDict() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.runEnvDict = JSON.parse(response.data.value)
+      })
+    },
+
+    // 获取测试报告具体内容
     getReportDataById() {
       getReport({'id': this.$route.query.id}).then((response) => {
           // console.log(response)
@@ -516,6 +532,7 @@ export default {
   },
 
   created() {
+    this.getEnvDict()
     this.getReportDataById()
   },
 }

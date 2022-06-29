@@ -22,7 +22,7 @@
             </el-col>
 
             <!-- 用例集选择 -->
-            <el-col :span="7">
+            <el-col :span="9">
               <el-form-item label="用例集" class="is-required" style="margin-bottom: 5px">
                 <el-select v-model="caseSetLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
@@ -43,41 +43,20 @@
 
             </el-col>
 
-            <!-- 选择环境 -->
-            <el-col :span="7">
-              <el-form-item label="环境" class="is-required" style="margin-bottom: 5px">
-                <environmentSelectorView
-                  :choice_environment="tempCase.choice_host"
-                  ref="environmentSelectorView"
-                ></environmentSelectorView>
-                <el-popconfirm
-                  placement="top"
-                  title="请确保此用例涉中及到的所有服务都设置了当前选中环境的域名"
-                  hide-icon>
-                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popconfirm>
-              </el-form-item>
-            </el-col>
-
-          </el-row>
-
-          <el-row>
-
-            <!-- 函数文件 -->
-            <el-col :span="17">
-              <el-form-item label="函数文件">
-                <funcFilesView :funcFiles="tempCase.func_files" ref="funcFilesView"></funcFilesView>
-              </el-form-item>
-            </el-col>
-
             <!-- 执行次数 -->
-            <el-col :span="7">
+            <el-col :span="5">
               <el-form-item label="执行次数" class="is-required">
                 <el-input-number v-model="tempCase.run_times" :min="1" :max="1000" controls-position="right"
                 ></el-input-number>
               </el-form-item>
             </el-col>
+
           </el-row>
+
+          <el-form-item label="函数文件">
+            <funcFilesView :funcFiles="tempCase.func_files" ref="funcFilesView"></funcFilesView>
+          </el-form-item>
+
         </el-form>
 
         <el-form :inline="true" class="demo-form-inline" size="mini">
@@ -159,24 +138,21 @@
 
     </el-tabs>
 
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
     <div class="demo-drawer__footer">
-      <el-popconfirm
-        placement="top"
-        hide-icon
-        :title="`自动保存，再触发调试，并生成测试报告?`"
-        confirm-button-text='确认'
-        cancel-button-text='取消'
-        @onConfirm="debugCase()"
-      >
-        <el-button
-          slot="reference"
-          size="mini"
-          type="primary"
-          style="float: left"
-          :loading="isShowDebugLoading"
-        >调试
-        </el-button>
-      </el-popconfirm>
+
+      <el-button
+        slot="reference"
+        size="mini"
+        type="primary"
+        style="float: left"
+        :loading="isShowDebugLoading"
+        @click="clickRunDebug()">调试
+      </el-button>
 
       <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
       <el-button
@@ -194,11 +170,11 @@
 
 <script>
 import moduleSelectorView from "@/components/Selector/module";
-import environmentSelectorView from "@/components/Selector/environment";
 import funcFilesView from '@/components/Selector/funcFile'
 import headersView from '@/components/Inputs/changeRow'
 import variablesView from '@/components/Inputs/changeRow'
 import stepView from '@/views/apiTest/step'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {postCase, putCase, copyCase, caseRun} from "@/apis/apiTest/case";
 import {getCaseSet} from "@/apis/apiTest/caseSet";
@@ -214,11 +190,11 @@ export default {
   ],
   components: {
     moduleSelectorView,
-    environmentSelectorView,
     funcFilesView,
     headersView,
     variablesView,
-    stepView
+    stepView,
+    selectRunEnv
   },
   data() {
     return {
@@ -240,7 +216,6 @@ export default {
         desc: '',
         is_run: true,
         run_times: '',
-        choice_host: '',
         func_files: [],
         variables: [{key: null, value: null, remark: null}],
         headers: [{key: null, value: null, remark: null}],
@@ -251,6 +226,8 @@ export default {
         steps: []  // 测试步骤
       },
 
+      runEvent: 'runCaseEventOnDialog',
+      callBackEvent: 'runCaseOnDialog'
     }
   },
 
@@ -262,7 +239,6 @@ export default {
       this.tempCase.name = ''
       this.tempCase.desc = ''
       this.tempCase.run_times = ''
-      this.tempCase.choice_host = ''
       this.tempCase.func_files = []
       this.tempCase.before_case = []
       this.tempCase.after_case = []
@@ -287,7 +263,6 @@ export default {
     getCaseDataToCommit() {
       let caseData = JSON.parse(JSON.stringify(this.tempCase))
       caseData.set_id = this.$refs.setTree.getCheckedKeys()[0]
-      caseData.choice_host = this.$refs.environmentSelectorView.current_environment
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.$refs.headersView.tempData
@@ -335,14 +310,20 @@ export default {
       })
     },
 
-    debugCase() {
+    // 点击调试按钮
+    clickRunDebug(){
+      this.$bus.$emit(this.runEvent, false)
+    },
+
+    // 保存并调试
+    debugCase(runDict) {
       this.submitLoadingIsShow = true
       if (this.tempCase.id) {
         putCase(this.getCaseDataToCommit()).then(response => {
           this.submitLoadingIsShow = false
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.api.apiCaseDrawerCommitSuccess, 'success')
-            this.runCase(this.tempCase.id)
+            this.runCase(this.tempCase.id, runDict)
           }
         })
       } else {
@@ -351,16 +332,16 @@ export default {
           if (this.showMessage(this, response)) {
             this.tempCase.id = response.data.id
             this.$bus.$emit(this.$busEvents.api.apiCaseDrawerCommitSuccess, 'success')
-            this.runCase(this.tempCase.id)
+            this.runCase(this.tempCase.id, runDict)
           }
         })
       }
     },
 
     // 运行用例
-    runCase(caseId) {
+    runCase(caseId, runDict) {
       this.isShowDebugLoading = true
-      caseRun({caseId: [caseId]}).then(runResponse => {
+      caseRun({caseId: [caseId], env: runDict.runEnv, is_async: runDict.runType}).then(runResponse => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
         if (this.showMessage(this, runResponse)) {
 
@@ -440,6 +421,10 @@ export default {
       })
     })
 
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.debugCase(runDict)
+    })
+
   },
 
   // 组件销毁前，关闭bus监听事件
@@ -447,6 +432,7 @@ export default {
     this.$bus.$off(this.$busEvents.api.apiCaseDrawerStatus)
     this.$bus.$off(this.$busEvents.api.apiCaseSetTreeIsDone)
     this.$bus.$off(this.$busEvents.api.apiIsAddStepTriggerSaveCase)
+    this.$bus.$off(this.callBackEvent)
   },
 
   watch: {

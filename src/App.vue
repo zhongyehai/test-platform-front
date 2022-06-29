@@ -43,10 +43,6 @@ export default {
 </script>
 
 <style>
-/*统一背景色*/
-/*#app{*/
-/*  background-color: #0066cc;*/
-/*}*/
 
 /*抽屉body*/
 .el-drawer__body {

@@ -48,7 +48,7 @@
             <el-col :span="12">
               <el-form-item label="选择环境" class="is-required">
                 <environmentSelectorView
-                  :choice_environment="tempTask.choice_host"
+                  :choice_environment="tempTask.env"
                   ref="environmentSelectorView"
                 ></environmentSelectorView>
                 <el-popconfirm
@@ -135,8 +135,10 @@
           </el-form-item>
 
           <el-form-item label="运行机制" class="is-required">
-            <el-radio v-model="tempTask.is_async" :label=0>串行执行</el-radio>
-            <el-radio v-model="tempTask.is_async" :label=1>并行执行</el-radio>
+            <el-radio
+              v-model="tempTask.is_async"
+              :label="parseInt(key)" v-for="(value, key) in runModeData" :key="key"
+            >{{ value }}</el-radio>
             <el-popconfirm
               placement="top"
               :title="'1、串行执行: 用例一条一条顺序串行执行  \n' +
@@ -228,24 +230,20 @@
 
     </el-form>
 
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
     <div class="demo-drawer__footer">
-      <el-popconfirm
-        placement="top"
-        hide-icon
-        :title="`自动保存，再触发调试，并生成测试报告?`"
-        confirm-button-text='确认'
-        cancel-button-text='取消'
-        @onConfirm="debugTask()"
-      >
-        <el-button
-          slot="reference"
-          size="mini"
-          type="primary"
-          style="float: left"
-          :loading="isShowDebugLoading"
-        >调试
-        </el-button>
-      </el-popconfirm>
+      <el-button
+        slot="reference"
+        size="mini"
+        type="primary"
+        style="float: left"
+        :loading="isShowDebugLoading"
+        @click="clickRunDebug()">调试
+      </el-button>
 
       <el-button @click="drawerIsShow = false" size="mini">取 消</el-button>
       <el-button
@@ -263,6 +261,7 @@
 <script>
 import environmentSelectorView from "@/components/Selector/environment";
 import emailServerSelector from "@/components/Selector/email";
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {postTask, putTask, runTask} from '@/apis/uiTest/task'
 import {caseSetList} from "@/apis/uiTest/caseSet";
@@ -270,12 +269,14 @@ import {caseList, caseRun, postCase, putCase} from '@/apis/uiTest/case'
 import {reportIsDone} from "@/apis/uiTest/report";
 import {arrayToTree} from "@/utils/parseData";
 import {runTestTimeOutMessage} from "@/utils/message";
+import {getRunModel} from "@/apis/config/config";
 
 export default {
   name: "drawer",
   components: {
     environmentSelectorView,
-    emailServerSelector
+    emailServerSelector,
+    selectRunEnv
   },
   data() {
     return {
@@ -300,10 +301,20 @@ export default {
       tempCaseSetList: [],  // 当前选中服务下的用例集列表
       currentCaseList: [],  // 当前选中模块下的用例列表
 
-      currentTreeDataId: ''
+      currentTreeDataId: '',
+      runModeData: {},
+      runEvent: 'runTaskEventOnDialog',
+      callBackEvent: 'runTaskOnDialog'
     }
   },
   methods: {
+
+    // 获取执行模式配置
+    initRunMode() {
+      getRunModel().then(response => {
+        this.runModeData = response.data
+      })
+    },
 
     // 用例列表的选中框是否禁用
     isDisable(row) {
@@ -380,7 +391,7 @@ export default {
         id: '',
         num: '',
         name: '',
-        choice_host: '',
+        env: '',
         task_type: 'cron',
         cron: '',
         is_send: '1',
@@ -404,7 +415,7 @@ export default {
         id: this.tempTask.id,
         num: this.tempTask.num,
         name: this.tempTask.name,
-        choice_host: this.$refs.environmentSelectorView.current_environment,
+        env: this.$refs.environmentSelectorView.current_environment,
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
         is_send: this.tempTask.is_send,
@@ -451,13 +462,18 @@ export default {
       })
     },
 
-    debugTask() {
+    // 点击调试按钮
+    clickRunDebug(){
+      this.$bus.$emit(this.runEvent, true)
+    },
+
+    debugTask(runData) {
       this.submitButtonIsLoading = true
       if (this.tempTask.id) {
         putTask(this.getTaskToCommit()).then(response => {
           this.submitButtonIsLoading = false
           if (this.showMessage(this, response)) {
-            this.run(this.tempTask.id)
+            this.run(this.tempTask.id, runData)
           }
         })
       } else {
@@ -465,7 +481,7 @@ export default {
           this.submitButtonIsLoading = false
           if (this.showMessage(this, response)) {
             this.tempTask.id = response.data.id
-            this.run(this.tempTask.id)
+            this.run(this.tempTask.id, runData)
           }
         })
       }
@@ -473,9 +489,9 @@ export default {
 
 
     // 运行任务
-    run(taskId) {
+    run(taskId, runData) {
       this.isShowDebugLoading = true
-      runTask({id: taskId}).then(runResponse => {
+      runTask({id: taskId, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，
@@ -507,13 +523,15 @@ export default {
 
     // 打开测试报告
     openReportById(reportId) {
-      let {href} = this.$router.resolve({path: 'uiReportShow', query: {id: reportId}})
+      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
       window.open(href, '_blank')
     }
 
   },
 
   mounted() {
+
+    this.initRunMode()
 
     // 服务树选中项事件
     this.$bus.$on(this.$busEvents.ui.uiProjectTreeChoiceProject, (project, project_list) => {
@@ -539,10 +557,15 @@ export default {
       // 获取当前服务对应的用例集列表
       this.getCaseSetByProjectId(this.projectSelectedId)
     })
+
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.debugTask(runDict)
+    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
     this.$bus.$off(this.$busEvents.ui.uiProjectTreeChoiceProject)
     this.$bus.$off(this.$busEvents.ui.uiTaskDrawerIsShow)
   }

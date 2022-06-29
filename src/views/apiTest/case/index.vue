@@ -50,22 +50,13 @@
             <template slot-scope="scope">
 
               <!-- 运行用例 -->
-              <el-popconfirm
-                placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="运行测试用例并生成报告？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="runCase(scope.row)"
-              >
-                <el-button
-                  type="text"
-                  slot="reference"
-                  icon="el-icon-video-play"
-                  :loading="scope.row.isShowRunLoading"
-                ></el-button>
-              </el-popconfirm>
+              <el-button
+                type="text"
+                slot="reference"
+                icon="el-icon-video-play"
+                :loading="scope.row.isShowRunLoading"
+                @click="clickRunCase(scope.row)"
+              ></el-button>
 
               <!--修改用例-->
               <el-button
@@ -126,6 +117,11 @@
 
     </el-tabs>
 
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
     <caseDrawer
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
@@ -138,6 +134,7 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import caseDrawer from '@/views/apiTest/case/drawer'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {userList} from '@/apis/user/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/apiTest/case'
@@ -148,6 +145,7 @@ export default {
   name: 'index',
   components: {
     Pagination,
+    selectRunEnv,
     caseDrawer
   },
 
@@ -159,31 +157,19 @@ export default {
   data() {
     return {
 
-      // 请求列表等待响应的状态
-      tableLoadingIsShow: false,
-
-      // tab页的显示
-      caseTab: 'case',
-
       // 初始化数据默认的数据
       pageNum: 1,
       pageSize: 20,
 
-      // 用例新增/编辑临时数据
-      tempCase: {},
+      tableLoadingIsShow: false,  // 请求列表等待响应的状态
+      caseTab: 'case',  // tab页的显示
 
-      // 服务列表数据
-      project_list: [],
-
-      // 模块列表数据
-      module_list: [],
+      tempCase: {},  // 用例新增/编辑临时数据
+      currentCase: '',  // 当前点击的用例
 
       // 用例数据列表
       case_total: 0,
       case_list: [],
-
-      // dialog框状态，edit为编辑数据, create为新增数据
-      caseDialogStatus: '',
 
       // 拖拽排序参数
       sortable: null,
@@ -191,30 +177,10 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
+
+      runEvent: 'runCaseEventOnIndex',
+      callBackEvent: 'runCaseOnIndex'
     }
-  },
-
-  created() {
-    this.oldList = this.case_list.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-
-  mounted() {
-    this.getUserList()
-
-    // 监听 caseDialog 是否提交成功
-    this.$bus.$on(this.$busEvents.api.apiCaseDrawerCommitSuccess, (status) => {
-      this.getCaseList()
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiCaseDrawerCommitSuccess)
   },
 
   methods: {
@@ -258,11 +224,17 @@ export default {
       this.$bus.$emit(this.$busEvents.api.apiCaseDrawerStatus, 'copy', this.tempCase)
     },
 
+    // 点击运行用例
+    clickRunCase(row) {
+      this.currentCase = row
+      this.$bus.$emit(this.runEvent, false)
+    },
+
     // 运行用例
-    runCase(caseData) {
-      this.$set(caseData, 'isShowRunLoading', true)
+    runCase(runData) {
+      this.$set(this.currentCase, 'isShowRunLoading', true)
       caseRun({
-        caseId: [caseData.id]
+        caseId: [this.currentCase.id], env: runData.runEnv, is_async: runData.runType
       }).then(runResponse => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
         if (this.showMessage(this, runResponse)) {
@@ -278,14 +250,14 @@ export default {
             if (queryCount <= runTimeoutCount) {
               reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
                 if (queryResponse.data === 1) {
-                  that.$set(caseData, 'isShowRunLoading', false)
+                  that.$set(that.currentCase, 'isShowRunLoading', false)
                   that.openReportById(runResponse.data.report_id)
                   clearInterval(timer)  // 关闭定时器
                 }
               })
               queryCount += 1
             } else {
-              that.$set(caseData, 'isShowRunLoading', false)
+              that.$set(that.currentCase, 'isShowRunLoading', false)
               that.$notify(runTestTimeOutMessage(that));
               clearInterval(timer)  // 关闭定时器
             }
@@ -353,6 +325,33 @@ export default {
         }
       })
     }
+  },
+
+  mounted() {
+    this.getUserList()
+
+    // 监听 caseDialog 是否提交成功
+    this.$bus.$on(this.$busEvents.api.apiCaseDrawerCommitSuccess, (status) => {
+      this.getCaseList()
+    })
+
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.runCase(runDict)
+    })
+  },
+
+  created() {
+    this.oldList = this.case_list.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
+    this.$bus.$off(this.$busEvents.api.apiCaseDrawerCommitSuccess)
   },
 
   watch: {

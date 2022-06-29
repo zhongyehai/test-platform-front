@@ -134,7 +134,9 @@ export default {
   props: [
     'currentProjectId',
     'currentModuleId',
-    'currentPageId'
+    'currentPageId',
+    'pageElementList',
+    'userDict'
   ],
   data() {
     return {
@@ -147,7 +149,7 @@ export default {
       elementTotal: 0,
       elementList: [],
       userList: [],
-      userDict: {},
+      // userDict: {},
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -157,6 +159,8 @@ export default {
   },
 
   created() {
+
+    this.elementList = this.pageElementList ? this.pageElementList : []
 
     this.oldList = this.elementList.map(v => v.id)
     this.newList = this.oldList.slice()
@@ -168,34 +172,34 @@ export default {
   },
 
   mounted() {
-    this.getUserList()
+    // this.getUserList()
 
     this.$bus.$on(this.$busEvents.ui.uiElementDrawerCommitSuccess, (status) => {
       this.getElementList()
     })
 
-    this.$bus.$on(this.$busEvents.ui.uiPageDrawerCommitSuccess, (status, pageId) => {
-      this.pageId = pageId
-      this.getElementList()
-    })
+    // this.$bus.$on(this.$busEvents.ui.uiPageDrawerCommitSuccess, (status, pageId) => {
+    //   this.pageId = pageId
+    //   this.getElementList()
+    // })
 
-    this.$bus.$on(this.$busEvents.ui.uiPageDrawerIsOpen, (pageId) => {
-      this.pageId = pageId
-      this.getElementList()
-    })
+    // this.$bus.$on(this.$busEvents.ui.uiPageDrawerIsOpen, (pageId) => {
+    //   this.pageId = pageId
+    //   this.getElementList()
+    // })
 
-    this.getElementList()
+    // this.getElementList()
   },
 
   methods: {
     // 获取用户信息，同步请求
-    async getUserList() {
-      let response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-    },
+    // async getUserList() {
+    //   let response = await userList()
+    //   this.currentUserList = response.data.data
+    //   response.data.data.forEach(user => {
+    //     this.userDict[user.id] = user
+    //   })
+    // },
 
     // 解析用户
     parseUser(userId) {
@@ -293,16 +297,29 @@ export default {
     'currentModuleId': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
+        // console.log('currentModuleId.newVal: ', newVal)
+        // console.log('currentModuleId.oldVal: ', oldVal)
         if (newVal) {
-          this.getElementList({
-            'moduleId': newVal,
-            'pageNum': this.pageNum,
-            'pageSize': this.pageSize
+          this.getElementList({'moduleId': newVal, 'pageNum': this.pageNum, 'pageSize': this.pageSize
           })
         } else {
           this.elementList = []
         }
 
+      }
+    },
+
+    'pageElementList': {
+
+      handler(newVal, oldVal) {
+        if (newVal && newVal.length > 0) {
+          this.elementList = newVal
+        } else {
+          this.elementList = []
+        }
+
+        this.oldList = this.elementList.map(v => v.id)
+        this.newList = this.elementList.slice()
       }
     }
   }

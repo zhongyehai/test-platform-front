@@ -15,6 +15,7 @@
 
 <script>
 import {configList} from "@/apis/config/config";
+import {configTypeList} from "@/apis/config/configType";
 
 export default {
   name: "email",
@@ -26,16 +27,26 @@ export default {
     }
   },
   methods: {
-    // 获取配置中的所有邮箱地址
-    getConfigEmailList() {
-      configList({'type': '邮箱'}).then(response => {
-        this.configEmailServerList = response.data.data
+    // 获取配置类型
+    getConfigTypeList() {
+      configTypeList().then(response => {
+        let configTypeData = 0
+        response.data.data.forEach(configType => {
+          if (configType.name === '邮箱'){
+            configTypeData = configType.id
+          }
+        })
+
+        // 获取对应的配置
+        configList({'type': configTypeData}).then(response => {
+          this.configEmailServerList = response.data.data
+        })
       })
-    },
+    }
   },
 
   mounted() {
-    this.getConfigEmailList()
+    this.getConfigTypeList()
   },
 
   created() {

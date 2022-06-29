@@ -30,18 +30,16 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" label="任务名称" min-width="35%">
+              <el-table-column :show-overflow-tooltip=true prop="name" label="任务名称" min-width="30%">
               </el-table-column>
 
-              <el-table-column label="生成时间" min-width="17%">
+              <el-table-column label="生成时间" min-width="20%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="performer" label="创建者" min-width="8%"></el-table-column>
-
-              <el-table-column label="是否通过" min-width="10%">
+              <el-table-column label="是否通过" min-width="12%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.is_passed === 1 ? 'success' : 'danger'">
                     {{ scope.row.is_passed === 1 ? '全部通过' : '有报错' }}
@@ -154,7 +152,7 @@ export default {
     // 打开测试报告
     openReportById(reportId) {
       // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'uiReportShow', query: {id: reportId}})
+      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
       window.open(href, '_blank')
     },
 

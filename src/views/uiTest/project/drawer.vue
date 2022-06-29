@@ -83,6 +83,7 @@ import envSynchronizer from "@/views/uiTest/project/envSynchronizer";
 
 import {postProject, putProject} from '@/apis/uiTest/project'
 import {funcFileList} from "@/apis/apiTest/funcFile";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'drawer',
@@ -112,12 +113,7 @@ export default {
       },
 
       // 环境映射
-      envMapping: {
-        "dev": "开发环境",
-        "test": "测试环境",
-        "uat": "uat环境",
-        "production": "生产环境",
-      },
+      envMapping: {},
       user_list: [],  // 用户列表
       funcFilesList: [],
       submitButtonIsLoading: false,
@@ -128,6 +124,13 @@ export default {
   },
 
   methods: {
+
+    // 获取环境配置
+    initEnv() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.envMapping = JSON.parse(response.data.value)
+      })
+    },
 
     /* 点击切换tab
     * activeName：要去的标签页
@@ -233,6 +236,7 @@ export default {
 
   mounted() {
 
+    this.initEnv()
     this.getFuncFileList()
 
     this.$bus.$on(this.$busEvents.ui.uiShowApiProjectDrawer, (status, data) => {

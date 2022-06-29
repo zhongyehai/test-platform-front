@@ -46,7 +46,7 @@
                 <template slot-scope="scope">
                   <el-switch
                     :disabled="scope.row.taskIsDisabled"
-                    v-model="scope.row.status === '启用中'"
+                    v-model="scope.row.status === 1"
                     @change="changeStatus(scope.row)"></el-switch>
                 </template>
               </el-table-column>
@@ -67,29 +67,20 @@
                 <template slot-scope="scope">
 
                   <!-- 运行任务 -->
-                  <el-popconfirm
-                    placement="top"
-                    hide-icon
-                    style="margin-right: 10px"
-                    title="运行任务并生成报告？"
-                    confirm-button-text='确认'
-                    cancel-button-text='取消'
-                    @onConfirm="run(scope.row)"
-                  >
-                    <el-button
-                      type="text"
-                      slot="reference"
-                      icon="el-icon-video-play"
-                      :loading="scope.row.runButtonIsLoading"
-                    ></el-button>
-                  </el-popconfirm>
+                  <el-button
+                    type="text"
+                    slot="reference"
+                    icon="el-icon-video-play"
+                    :loading="scope.row.runButtonIsLoading"
+                    @click="clickRunTask(scope.row)"
+                  ></el-button>
 
                   <!-- 修改任务 -->
                   <el-button
                     type="text"
                     icon="el-icon-edit"
                     style="margin-right: 10px"
-                    :disabled="scope.row.status === '启用中'"
+                    :disabled="scope.row.status === 1"
                     @click.native="editTask(scope.row)"></el-button>
 
                   <!-- 复制任务 -->
@@ -125,7 +116,7 @@
                       type="text"
                       style="color: red"
                       icon="el-icon-delete"
-                      :disabled="scope.row.status === '启用中'"
+                      :disabled="scope.row.status === 1"
                       :loading="scope.row.deleteLoadingIsShow"
                     ></el-button>
                   </el-popconfirm>
@@ -144,6 +135,12 @@
         </el-tabs>
       </el-col>
     </el-row>
+
+    <selectRunEnv
+      :callBackEvent="callBackEvent"
+      :event="runEvent"
+    ></selectRunEnv>
+
     <taskDrawer></taskDrawer>
   </div>
 </template>
@@ -153,6 +150,7 @@ import Sortable from 'sortablejs'
 import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 import taskDrawer from "@/views/uiTest/task/drawer";
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/uiTest/task'
 import {reportIsDone} from "@/apis/uiTest/report";
@@ -162,7 +160,7 @@ import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
 export default {
   name: "index",
-  components: {Pagination, projectTreeView, taskDrawer},
+  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv},
   data() {
     return {
       tableLoadingIsShow: false,
@@ -179,6 +177,10 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
+
+      currentTask: {},
+      runEvent: 'runUiTaskEventOnIndex',
+      callBackEvent: 'runUiTaskOnIndex'
     }
   },
 
@@ -200,7 +202,7 @@ export default {
 
     // 进入编辑
     editTask(row) {
-      if (row.status === '禁用中') {
+      if (row.status === 0) {
         this.$bus.$emit(this.$busEvents.ui.uiTaskDrawerIsShow, 'update', JSON.parse(JSON.stringify(row)))
       }
     },
@@ -217,10 +219,16 @@ export default {
       })
     },
 
+    // 点击运行任务
+    clickRunTask(task){
+      this.currentTask = task
+      this.$bus.$emit(this.runEvent, true)
+    },
+
     // 运行任务
-    run(task) {
-      this.$set(task, 'runButtonIsLoading', true)
-      runTask({id: task.id}).then(runResponse => {
+    run(runData) {
+      this.$set(this.currentTask, 'runButtonIsLoading', true)
+      runTask({id: this.currentTask.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，
@@ -234,14 +242,14 @@ export default {
             if (queryCount <= runTimeoutCount) {
               reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
                 if (queryResponse.data === 1) {
-                  that.$set(task, 'runButtonIsLoading', false)
+                  that.$set(that.currentTask, 'runButtonIsLoading', false)
                   that.openReportById(runResponse.data.report_id)
                   clearInterval(timer)  // 关闭定时器
                 }
               })
               queryCount += 1
             } else {
-              that.$set(task, 'runButtonIsLoading', false)
+              that.$set(that.currentTask, 'runButtonIsLoading', false)
               that.$notify(runTestTimeOutMessage(that));
               clearInterval(timer)  // 关闭定时器
             }
@@ -252,7 +260,7 @@ export default {
 
     // 打开测试报告
     openReportById(reportId) {
-      let {href} = this.$router.resolve({path: 'uiReportShow', query: {id: reportId}})
+      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
       window.open(href, '_blank')
     },
 
@@ -270,7 +278,7 @@ export default {
     // 修改定时任务状态
     changeStatus(task) {
       this.$set(task, 'taskIsDisabled', true)
-      if (task.status === '启用中') {
+      if (task.status === 1) {
         disableTask({id: task.id}).then(response => {
           this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
@@ -347,6 +355,9 @@ export default {
       this.getTaskList()
     })
 
+    this.$bus.$on(this.callBackEvent, (runDict) => {
+      this.run(runDict)
+    })
   },
 
   created() {
@@ -360,6 +371,7 @@ export default {
 
   // 页面销毁前，关闭bus监听服务选中事件
   beforeDestroy() {
+    this.$bus.$off(this.callBackEvent)
     this.$bus.$off(this.$busEvents.ui.uiTaskDrawerIsCommit)
     this.$bus.$off(this.$busEvents.ui.uiProjectTreeChoiceProject)
   }

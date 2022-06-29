@@ -25,6 +25,11 @@ export function deletePage(data) {
   return Func('delete', data)
 }
 
+// 复制页面
+export function copyPage(data) {
+  return request({url: baseDirUiTest + '/page/copy', method: 'post', data: data});
+}
+
 // 指定模块下页面list
 export function pageList(params) {
   return request({url: baseDirUiTest + '/page/list', method: 'get', params: params});
