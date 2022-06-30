@@ -62,15 +62,7 @@
         </el-tooltip>
       </el-tab-pane>
     </el-tabs>
-<!--    <div style="text-align: right; margin-right: 10px; margin-top: 5px">-->
-<!--      <el-button-->
-<!--        type="primary"-->
-<!--        size="mini"-->
-<!--        @click="saveEvent() "-->
-<!--        :loading="submitButtonIsLoading"-->
-<!--      >{{ `保存${currentEnvName}设置` }}-->
-<!--      </el-button>-->
-<!--    </div>-->
+
   </div>
 </template>
 
@@ -85,7 +77,6 @@ export default {
   name: 'envEditor',
   props: [
     'currentEnv',
-    'currentEnvName',
     'funcFilesList',
     'currentProjectId'
   ],
@@ -116,6 +107,7 @@ export default {
 
     // 保存环境设置
     saveEvent() {
+      console.log('saveEventsaveEventsaveEventsaveEventsaveEvent')
       this.submitButtonIsLoading = true
       this.tempEnv.env = this.currentEnv
       this.tempEnv.func_files = this.$refs.funcFiles.tempFuncFiles
@@ -148,22 +140,33 @@ export default {
     },
   },
 
+  created() {
+    this.env = this.currentEnv || 'test'
+    this.tempProjectId = this.currentProjectId
+
+    this.getEnv(this.env, this.currentProjectId)
+  },
+
   mounted() {
 
     this.initData = this.tempEnv
 
     // 监听 是否保存环境
     this.$bus.$on(this.$busEvents.api.apiSaveProjectEnv, (env) => {
+      console.log('this.$busEvents.api.apiSaveProjectEnv')
+      console.log('env：', env)
       if (env === this.currentEnv){
+        console.log('env === this.currentEnv')
         this.saveEvent()
       }
     })
 
     // 监听 点击环境设置面板 的状态
-    this.$bus.$on(this.$busEvents.api.apiClickProjectEnv, (projectId, env) => {
-      if (env === this.currentEnv){
-        this.getEnv(env, projectId)
-      }
+    this.$bus.$on(this.$busEvents.api.apiClickProjectEnv, (projectId) => {
+      // if (env === this.currentEnv){
+      //   this.getEnv(env, projectId)
+      // }
+      this.getEnv(this.currentEnv, projectId)
     })
 
     // 监听 环境同步是否完成 的状态
@@ -182,17 +185,22 @@ export default {
     this.$bus.$off(this.$busEvents.api.apiEnvSynchronizerIsSuccess)
   },
 
-  created() {
-    this.env = this.currentEnv
-    this.tempProjectId = this.currentProjectId
-  },
   watch: {
     'currentProjectId': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
         this.tempProjectId = newVal
       }
-    }
+    },
+
+    'currentEnv':{
+      deep: true,  // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal){
+          this.getEnv(newVal, this.currentProjectId)
+        }
+      }
+    },
   }
 }
 </script>

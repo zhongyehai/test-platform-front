@@ -83,7 +83,7 @@ export default {
       tempDataType: '',
       tempDataJson: '',
       tempDataForm: '',
-      tempDataXml: '',
+      tempDataXml: null,
     }
   },
 
@@ -105,7 +105,7 @@ export default {
     this.tempDataType = this.dataType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
     this.tempDataForm = this.dataForm || [{key: null, data_type: null, remark: null, value: null}]
-    this.tempDataXml = this.dataXml || ''
+    this.tempDataXml = this.dataXml || null
   },
 
   methods: {
