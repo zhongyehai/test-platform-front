@@ -62,32 +62,6 @@
 
           <el-tabs type="border-card">
 
-            <el-tab-pane label="头部信息">
-              <!-- 使用示例 -->
-              <el-collapse accordion>
-                <el-collapse-item>
-                  <template slot="title">
-                    <div style="color:#409eff"> 点击查看说明</div>
-                  </template>
-                  <div style="margin-left: 20px">
-                    1、可用此功能设置当前用例的固定的头部参数，比如token、cookie <br/>
-                    2、在此处设置的值，在运行此用例下的测试步骤的时候，会自动加到对应的步骤的头部参数上 <br/>
-                    3、此处的value可以使用公共变量设置的值 <br/>
-                    4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    5、若在此处设置的key与服务的头部参数中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
-                    6、若在用例中，测试步骤已用相同的key设置了其他值，则会使用测试步骤中设置的值
-                  </div>
-                </el-collapse-item>
-              </el-collapse>
-              <headersView
-                ref="headersView"
-                :currentData="tempCase.headers"
-                :placeholder-key="'key'"
-                :placeholder-value="'value'"
-                :placeholder-desc="'备注'"
-              ></headersView>
-            </el-tab-pane>
-
             <el-tab-pane label="公用变量">
               <!-- 使用示例 -->
               <el-collapse accordion>
@@ -113,6 +87,74 @@
               ></variablesView>
             </el-tab-pane>
 
+            <!-- cookie设置 -->
+            <el-tab-pane label="cookie设置">
+              <!-- 使用示例 -->
+              <el-collapse accordion>
+                <el-collapse-item>
+                  <template slot="title">
+                    <div style="color:#409eff"> 点击查看说明</div>
+                  </template>
+                  <div style="margin-left: 20px">
+                    1、cookie设置 <br/>
+                    2、cookie设置 <br/>
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+              <headersView
+                ref="cookiesView"
+                :currentData="tempCase.cookies"
+                :placeholder-key="'key'"
+                :placeholder-value="'value'"
+                :placeholder-desc="'备注'"
+              ></headersView>
+            </el-tab-pane>
+
+            <!-- sessionStorage设置 -->
+            <el-tab-pane label="sessionStorage设置">
+              <!-- 使用示例 -->
+              <el-collapse accordion>
+                <el-collapse-item>
+                  <template slot="title">
+                    <div style="color:#409eff"> 点击查看说明</div>
+                  </template>
+                  <div style="margin-left: 20px">
+                    1、sessionStorage设置 <br/>
+                    2、sessionStorage设置 <br/>
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+              <headersView
+                ref="sessionStorageView"
+                :currentData="tempCase.session_storage"
+                :placeholder-key="'key'"
+                :placeholder-value="'value'"
+                :placeholder-desc="'备注'"
+              ></headersView>
+            </el-tab-pane>
+
+            <!-- localStorage设置 -->
+            <el-tab-pane label="localStorage设置">
+              <!-- 使用示例 -->
+              <el-collapse accordion>
+                <el-collapse-item>
+                  <template slot="title">
+                    <div style="color:#409eff"> 点击查看说明</div>
+                  </template>
+                  <div style="margin-left: 20px">
+                    1、localStorage设置 <br/>
+                    2、localStorage设置 <br/>
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+              <headersView
+                ref="localStorageView"
+                :currentData="tempCase.local_storage"
+                :placeholder-key="'key'"
+                :placeholder-value="'value'"
+                :placeholder-desc="'备注'"
+              ></headersView>
+            </el-tab-pane>
           </el-tabs>
 
         </el-form>
@@ -221,7 +263,9 @@ export default {
         run_times: '',
         func_files: [],
         variables: [{key: null, value: null, remark: null}],
-        headers: [{key: null, value: null, remark: null}],
+        cookies: [{key: null, value: null, remark: null}],
+        session_storage: [{key: null, value: null, remark: null}],
+        local_storage: [{key: null, value: null, remark: null}],
         project_id: '',
         set_id: '',
         steps: []  // 测试步骤
@@ -250,7 +294,9 @@ export default {
       this.tempCase.run_times = ''
       this.tempCase.func_files = []
       this.tempCase.variables = [{key: null, value: null, remark: null}]
-      this.tempCase.headers = [{key: null, value: null, remark: null}]
+      this.tempCase.cookies = [{key: null, value: null, remark: null}]
+      this.tempCase.session_storage = [{key: null, value: null, remark: null}]
+      this.tempCase.local_storage = [{key: null, value: null, remark: null}]
       this.tempCase.steps = []
       this.tempCase.project_id = this.currentProjectId || ''
       this.tempCase.set_id = this.currentSetId || ''
@@ -270,7 +316,9 @@ export default {
       caseData.set_id = this.$refs.setTree.getCheckedKeys()[0]
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
-      caseData.headers = this.$refs.headersView.tempData
+      caseData.cookies = this.$refs.cookiesView.tempData
+      caseData.session_storage = this.$refs.sessionStorageView.tempData
+      caseData.local_storage = this.$refs.localStorageView.tempData
       caseData.steps = this.$refs.stepView.$refs.stepListView.stepList
       return caseData
     },

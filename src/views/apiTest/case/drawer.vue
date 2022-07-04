@@ -63,6 +63,31 @@
 
           <el-tabs type="border-card">
 
+            <el-tab-pane label="公用变量">
+              <!-- 使用示例 -->
+              <el-collapse accordion>
+                <el-collapse-item>
+                  <template slot="title">
+                    <div style="color:#409eff"> 点击查看说明</div>
+                  </template>
+                  <div style="margin-left: 20px">
+                    1、可用此功能设置一些预设值，比如token、账号信息 <br/>
+                    2、在此处设置的值，对于此用例下的测试步骤均可直接引用 <br/>
+                    3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+                    4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
+                    5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+              <variablesView
+                ref="variablesView"
+                :currentData="tempCase.variables"
+                :placeholder-key="'key'"
+                :placeholder-value="'value'"
+                :placeholder-desc="'备注'"
+              ></variablesView>
+            </el-tab-pane>
+
             <el-tab-pane label="头部信息">
               <!-- 使用示例 -->
               <el-collapse accordion>
@@ -87,31 +112,6 @@
                 :placeholder-value="'value'"
                 :placeholder-desc="'备注'"
               ></headersView>
-            </el-tab-pane>
-
-            <el-tab-pane label="公用变量">
-              <!-- 使用示例 -->
-              <el-collapse accordion>
-                <el-collapse-item>
-                  <template slot="title">
-                    <div style="color:#409eff"> 点击查看说明</div>
-                  </template>
-                  <div style="margin-left: 20px">
-                    1、可用此功能设置一些预设值，比如token、账号信息 <br/>
-                    2、在此处设置的值，对于此用例下的测试步骤均可直接引用 <br/>
-                    3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
-                    5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
-                  </div>
-                </el-collapse-item>
-              </el-collapse>
-              <variablesView
-                ref="variablesView"
-                :currentData="tempCase.variables"
-                :placeholder-key="'key'"
-                :placeholder-value="'value'"
-                :placeholder-desc="'备注'"
-              ></variablesView>
             </el-tab-pane>
 
           </el-tabs>

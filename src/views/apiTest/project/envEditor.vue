@@ -143,8 +143,6 @@ export default {
   created() {
     this.env = this.currentEnv || 'test'
     this.tempProjectId = this.currentProjectId
-
-    this.getEnv(this.env, this.currentProjectId)
   },
 
   mounted() {
@@ -153,19 +151,11 @@ export default {
 
     // 监听 是否保存环境
     this.$bus.$on(this.$busEvents.api.apiSaveProjectEnv, (env) => {
-      console.log('this.$busEvents.api.apiSaveProjectEnv')
-      console.log('env：', env)
-      if (env === this.currentEnv){
-        console.log('env === this.currentEnv')
-        this.saveEvent()
-      }
+      this.saveEvent()
     })
 
     // 监听 点击环境设置面板 的状态
     this.$bus.$on(this.$busEvents.api.apiClickProjectEnv, (projectId) => {
-      // if (env === this.currentEnv){
-      //   this.getEnv(env, projectId)
-      // }
       this.getEnv(this.currentEnv, projectId)
     })
 

@@ -24,14 +24,26 @@
               </el-form>
             </el-tab-pane>
 
-            <el-tab-pane :label="value" :name="key" v-for="(value, key, index) in envMapping" :key="key">
+            <el-tab-pane label="环境管理" name="env">
+              <div style="text-align: center">
+                <el-radio v-model="currentEnv" :label="key" v-for="(value, key) in envMapping" :key="key">
+                  {{ value }}</el-radio>
+                <el-popconfirm
+                  placement="top"
+                  hide-icon
+                  title="1、环境项数据来源于参数管理处的配置
+                         2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上">
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popconfirm>
+              </div>
+
               <envEditor
-                :ref="key"
-                :currentEnv="key"
-                :currentEnvName="value"
+                ref="envEditor"
+                :currentEnv="currentEnv"
                 :funcFilesList="funcFilesList"
                 :currentProjectId="tempProject.id"
               ></envEditor>
+
             </el-tab-pane>
 
           </el-tabs>
@@ -64,7 +76,7 @@
               @click="saveEnv()"
               :loading="submitEnvButtonIsLoading"
             >
-            {{'保存' + envMapping[activeName] + '信息' }}
+            {{'保存' + envMapping[currentEnv] + '信息' }}
             </el-button>
 
         </div>
@@ -112,8 +124,8 @@ export default {
         create_user: null
       },
 
-      // 环境映射
-      envMapping: {},
+      envMapping: {},  // 环境映射
+      currentEnv: 'test',
       user_list: [],  // 用户列表
       funcFilesList: [],
       submitButtonIsLoading: false,
@@ -146,13 +158,13 @@ export default {
           if (this.showMessage(this, response)) {
             this.tempProject = response.data
             this.sendIsCommitStatus()
-            that.$bus.$emit(that.$busEvents.ui.uiClickApiProjectEnv, that.tempProject.id, activeName)
+            that.$bus.$emit(that.$busEvents.ui.uiClickApiProjectEnv, that.tempProject.id)
           }else {
             this.activeName = oldActiveName
           }
         })
       }else {
-        this.$bus.$emit(this.$busEvents.ui.uiClickApiProjectEnv, this.tempProject.id, activeName)
+        this.$bus.$emit(this.$busEvents.ui.uiClickApiProjectEnv, this.tempProject.id)
       }
     },
 

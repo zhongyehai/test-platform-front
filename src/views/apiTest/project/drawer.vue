@@ -246,7 +246,7 @@ export default {
     // 点击保存环境信息
     saveEnv(){
       this.submitEnvButtonIsLoading = true
-      console.log('this.activeName: ', this.activeName)
+      // console.log('this.activeName: ', this.activeName)
       this.$bus.$emit(this.$busEvents.api.apiSaveProjectEnv, this.currentEnv)
     },
 

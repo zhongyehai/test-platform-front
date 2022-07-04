@@ -91,9 +91,11 @@ export default {
       this.tempData.splice(i, 1)
     }
   },
+
   created() {
     this.tempData = this.currentData
   },
+
   watch: {
     'currentData': {
       deep: true,  // 深度监听
