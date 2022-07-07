@@ -39,9 +39,10 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> {{ '取消' }}</el-button>
+        <el-button size="mini" @click="dialogFormVisible = false"> {{ '取消' }}</el-button>
         <el-button
           type="primary"
+          size="mini"
           :loading="submitButtonIsLoading"
           @click="changePassword"> {{ '确定' }}
         </el-button>
