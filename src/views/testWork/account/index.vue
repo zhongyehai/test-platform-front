@@ -15,7 +15,7 @@
 
         <el-form-item :label="'选择环境：'" size="mini">
           <el-select v-model="currentEvent" placeholder="请选择环境" size="mini">
-            <el-option v-for="item in eventList" :key="item.key" :label="item.value" :value="item.key">
+            <el-option v-for="(value, key) in eventList" :key="key" :label="value" :value="key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -146,7 +146,7 @@
 
         <el-form-item class="filter-item is-required" :label="'环境'" size="mini">
           <el-select v-model="currentAccount.event" placeholder="请选择环境" size="mini" style="width:100%">
-            <el-option v-for="item in eventList" :key="item.key" :label="item.value" :value="item.key">
+            <el-option v-for="(value, key) in eventList" :key="key" :label="value" :value="key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -192,7 +192,9 @@
 
 <script>
 import Pagination from '@/components/Pagination'
+
 import {userList} from '@/apis/user/user'
+import {getConfigByName} from "@/apis/config/config";
 import {
   accountList,
   postAccount,
@@ -215,11 +217,7 @@ export default {
       currentProject: '',  // 选中的项目
 
       // 文件类型列表
-      eventList: [
-        {'key': 'dev', 'value': 'dev环境'},
-        {'key': 'test', 'value': '测试环境'},
-        {'key': 'uat', 'value': 'uat环境'}
-      ],
+      eventList: [],
       projectList: [],  // 项目列表
       currentAccountList: [],  // 账号列表
       // 账号
@@ -241,6 +239,14 @@ export default {
   },
 
   methods: {
+
+    // 获取环境配置
+    initEnv() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.eventList = JSON.parse(response.data.value)
+      })
+    },
+
     // 获取用户信息，同步请求
     async getUserList(func) {
       let response = await userList()
@@ -382,6 +388,7 @@ export default {
   },
 
   mounted() {
+    this.initEnv()
     this.getUserList(this.getAccountList)
     this.getAccountProjectList()
     // this.getAccountList()

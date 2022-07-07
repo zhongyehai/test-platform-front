@@ -128,10 +128,6 @@ export default {
               this.$store.commit(types.userName, response.data.name)
               // 重定向到指定路由
               let redirect = this.$route.query.redirect || '/'
-              // let redirectPath = redirect.slice(redirect.indexOf('=') + 1)
-              // console.log(`切片后的路由: ${redirectPath}`)
-              // console.log(`重定向路由: ${redirect}`)
-              // this.$router.push({ path: redirectPath })  // 重定向到指定路由
               this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由
             }
           })
