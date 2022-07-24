@@ -106,7 +106,7 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {getDiffRecordList, getDiffRecordProjectList, getDiffRecordAsXmind} from "@/apis/testWork/yapi";
+import {getDiffRecordList, getDiffRecordProjectList, getDiffRecordAsXmind} from "@/apis/assist/yapi";
 import {userList} from "@/apis/user/user";
 
 export default {

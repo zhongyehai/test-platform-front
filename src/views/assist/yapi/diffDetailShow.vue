@@ -27,7 +27,7 @@
 // 使用方法详见：https://inspiring-golick-3c01b9.netlify.app/
 import MindElixir, {E} from "mind-elixir";
 
-import {getDiffRecord, getDiffRecordAsXmind} from "@/apis/testWork/yapi";
+import {getDiffRecord, getDiffRecordAsXmind} from "@/apis/assist/yapi";
 
 export default {
   name: 'showDiffDetail',

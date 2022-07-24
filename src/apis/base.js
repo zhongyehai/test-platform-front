@@ -2,6 +2,8 @@ export const baseDirApiTest = '/api/apiTest'
 
 export const baseDirUiTest = '/api/uiTest'
 
+export const baseDirAssist = '/api/assist'
+
 export const baseDirUcenter = '/api/ucenter'
 
 export const baseDirTestWork = '/api/testWork'

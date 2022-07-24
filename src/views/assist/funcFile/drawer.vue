@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import {postFuncFile, putFuncFile} from '@/apis/apiTest/funcFile'
+import {postFuncFile, putFuncFile} from '@/apis/assist/funcFile'
 
 export default {
   name: "drawer",

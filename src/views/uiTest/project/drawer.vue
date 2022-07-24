@@ -94,7 +94,7 @@ import envEditor from "@/views/uiTest/project/envEditor";
 import envSynchronizer from "@/views/uiTest/project/envSynchronizer";
 
 import {postProject, putProject} from '@/apis/uiTest/project'
-import {funcFileList} from "@/apis/apiTest/funcFile";
+import {funcFileList} from "@/apis/assist/funcFile";
 import {getConfigByName} from "@/apis/config/config";
 
 export default {

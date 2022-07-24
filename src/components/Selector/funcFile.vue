@@ -22,7 +22,7 @@
 
 <script>
 
-import {funcFileList} from '@/apis/apiTest/funcFile'
+import {funcFileList} from '@/apis/assist/funcFile'
 
 export default {
   name: 'funcFile',

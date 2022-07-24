@@ -97,11 +97,11 @@
 </template>
 
 <script>
-import funcFileDrawer from "@/views/apiTest/funcFile/drawer";
-import funcDataDrawer from "@/views/apiTest/funcFile/funcDataDrawer";
+import funcFileDrawer from "@/views/assist/funcFile/drawer";
+import funcDataDrawer from "@/views/assist/funcFile/funcDataDrawer";
 import Pagination from '@/components/Pagination'
 
-import {funcFileList, deleteFuncFile} from '@/apis/apiTest/funcFile'
+import {funcFileList, deleteFuncFile} from '@/apis/assist/funcFile'
 import {userList} from '@/apis/user/user'
 
 export default {

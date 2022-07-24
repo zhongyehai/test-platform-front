@@ -75,7 +75,7 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
-import {errorRecordList} from '@/apis/testWork/errorRecord'
+import {errorRecordList} from '@/apis/assist/errorRecord'
 
 export default {
   name: 'Project',

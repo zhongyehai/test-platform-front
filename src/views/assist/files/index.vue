@@ -113,7 +113,7 @@
 <script>
 import Pagination from '@/components/Pagination'
 import uploadFileView from "@/components/file/uploadFile";
-import {fileList, fileDelete, fileDownload} from "@/apis/testWork/file";
+import {fileList, fileDelete, fileDownload} from "@/apis/assist/file";
 
 export default {
   name: 'index',

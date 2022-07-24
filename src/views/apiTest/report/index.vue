@@ -67,11 +67,11 @@
                 <template slot-scope="scope">
 
                   <!--下载报告-->
-                  <el-button
-                    type="text"
-                    icon="el-icon-download"
-                    v-show="scope.row.is_done === 1"
-                    @click.native="downReport(scope.row.id)"></el-button>
+<!--                  <el-button-->
+<!--                    type="text"-->
+<!--                    icon="el-icon-download"-->
+<!--                    v-show="scope.row.is_done === 1"-->
+<!--                    @click.native="downReport(scope.row.id)"></el-button>-->
 
                   <!--查看报告-->
                   <el-button

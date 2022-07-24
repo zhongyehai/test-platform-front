@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import funcFileDrawer from "@/views/apiTest/funcFile/drawer";
-import {debugFuncFile, saveFuncFileData} from "@/apis/apiTest/funcFile";
+import funcFileDrawer from "@/views/assist/funcFile/drawer";
+import {debugFuncFile, saveFuncFileData} from "@/apis/assist/funcFile";
 
 export default {
   name: "funcEditor",

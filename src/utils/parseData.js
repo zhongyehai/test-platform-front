@@ -46,3 +46,27 @@ export function arrayToTree(arr, parentId) {
   });
   return temp;
 }
+
+// 把数据解析为int
+export function tryParseInt(data) {
+  if (data) {
+    try {
+      return parseInt(data)
+    } catch (e) {
+      return data
+    }
+  }
+  return data
+}
+
+// 把数据解析为string
+export function tryParseString(data) {
+  if (data) {
+    try {
+      return data.toString()
+    } catch (e) {
+      return data
+    }
+  }
+  return data
+}

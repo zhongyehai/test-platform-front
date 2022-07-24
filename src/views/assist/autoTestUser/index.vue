@@ -12,10 +12,10 @@
           @change="getAutoTestUserData()"
         >
           <el-option
-            v-for="item in envList"
-            :key="item"
-            :label="item"
-            :value="item"
+            v-for="(value, key) in envList"
+            :key="key"
+            :label="value"
+            :value="key"
           >
           </el-option>
         </el-select>
@@ -68,7 +68,7 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {getEnvList, getAutoTestUser} from "@/apis/testWork/dataPool";
+import {getEnvList, getAutoTestUser} from "@/apis/assist/dataPool";
 
 export default {
   name: 'dataPool',

@@ -126,6 +126,7 @@ export default {
               this.$store.commit(types.token, response.data.token)
               this.$store.commit(types.roles, response.data.role_id)
               this.$store.commit(types.userName, response.data.name)
+              localStorage.setItem('id', response.data.id)
               // 重定向到指定路由
               let redirect = this.$route.query.redirect || '/'
               this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由

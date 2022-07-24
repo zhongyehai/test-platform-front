@@ -54,6 +54,12 @@ export default {
     uploadFileIsCommit: 'uploadFileIsCommit',  // 文件上传已提交
   },
 
+  // 测试管理
+  testWork: {
+    clickProductTree: 'clickProductTree',  // 点击树
+    weeklyDrawerStatus: 'weeklyDrawerStatus',  // 周报编辑框
+  },
+
   // ui测试
   ui: {
     // 树组件 监听事件

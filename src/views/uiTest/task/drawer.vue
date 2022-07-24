@@ -179,8 +179,8 @@
                     node-key="id"
                     check-strictly
                     highlight-current
-                    :default-expanded-keys="tempTask.set_id"
-                    :default-checked-keys="tempTask.set_id"
+                    :default-expanded-keys="tempTask.set_ids"
+                    :default-checked-keys="tempTask.set_ids"
                     :props="defaultProps"
                     @node-click="clickTree"
                   >
@@ -325,7 +325,7 @@ export default {
     defaultClick() {
       this.$nextTick(() => {
         this.currentCaseList.forEach(caseRow => {
-          if (this.tempTask.case_id.indexOf(caseRow.id) >= 0) {
+          if (this.tempTask.case_ids.indexOf(caseRow.id) >= 0) {
             this.$refs.multipleTable.toggleRowSelection(caseRow, true)
           }
         })
@@ -342,23 +342,23 @@ export default {
 
     // 列表勾选事件，如果勾选的数据在列表里面，就去掉此数据，如果不在，就添加
     selectRow(selection, row) {
-      let index = this.tempTask.case_id.indexOf(row.id)
-      index >= 0 ? this.tempTask.case_id.splice(index, 1) : this.tempTask.case_id.push(row.id)
+      let index = this.tempTask.case_ids.indexOf(row.id)
+      index >= 0 ? this.tempTask.case_ids.splice(index, 1) : this.tempTask.case_ids.push(row.id)
     },
 
     // 全选或者全部取消
     selectAll(selection) {
       if (selection.length > 0) {  // 全选
         selection.forEach(row => {
-          if (this.tempTask.case_id.indexOf(row.id) < 0) {
-            this.tempTask.case_id.push(row.id)
+          if (this.tempTask.case_ids.indexOf(row.id) < 0) {
+            this.tempTask.case_ids.push(row.id)
           }
         })
       } else {
         this.currentCaseList.forEach(row => {  // 全部取消
-          let index = this.tempTask.case_id.indexOf(row.id)
+          let index = this.tempTask.case_ids.indexOf(row.id)
           if (index >= 0) {
-            this.tempTask.case_id.splice(index, 1)
+            this.tempTask.case_ids.splice(index, 1)
           }
         })
       }
@@ -403,8 +403,8 @@ export default {
         email_to: '',
         email_from: '',
         email_pwd: '',
-        set_id: [],
-        case_id: [],
+        set_ids: [],
+        case_ids: [],
         project_id: ''
       }
     },
@@ -428,8 +428,8 @@ export default {
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
         project_id: this.tempTask.project_id,
-        set_id: this.$refs.setTree.getCheckedKeys(),
-        case_id: this.tempTask.case_id,
+        set_ids: this.$refs.setTree.getCheckedKeys(),
+        case_ids: this.tempTask.case_ids,
       }
     },
 

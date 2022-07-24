@@ -84,7 +84,6 @@
         </el-tooltip>
       </el-form>
     </div>
-    <br>
 
     <!-- 表格栏 -->
     <el-table
@@ -236,8 +235,8 @@
 
 <script>
 import {deleteProject, projectList} from '@/apis/apiTest/project'
-import {yapiPull, yapiPullProject} from '@/apis/testWork/yapi'
-import {swaggerPull} from '@/apis/testWork/swagger'
+import {yapiPull, yapiPullProject} from '@/apis/assist/yapi'
+import {swaggerPull} from '@/apis/assist/swagger'
 import {userList} from '@/apis/user/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'

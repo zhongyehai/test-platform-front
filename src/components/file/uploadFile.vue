@@ -33,7 +33,7 @@
 
 
 <script>
-import {uploadApi, fileCheck, filePost} from "@/apis/testWork/file";
+import {uploadApi, fileCheck, filePost} from "@/apis/assist/file";
 
 export default {
   name: 'uploadFile',

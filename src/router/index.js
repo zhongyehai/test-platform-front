@@ -106,7 +106,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/apiTest/project',
     name: 'ApiTest',
-    meta: {title: '接口测试', icon: 'el-icon-link'},
+    meta: {title: '接口自动化', icon: 'el-icon-link'},
     children: [
       {
         path: 'project',
@@ -125,12 +125,6 @@ export const constantRoutes = [
         name: 'apiCase',
         component: () => import('@/views/apiTest/caseSet/index'),
         meta: {title: '用例管理', icon: 'el-icon-tickets'}
-      },
-      {
-        path: 'funcFile',
-        name: 'apiFuncFile',
-        component: () => import('@/views/apiTest/funcFile/index'),
-        meta: {title: '函数文件', icon: 'el-icon-help'}
       },
       {
         path: 'task',
@@ -167,7 +161,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/uiTest/project',
     name: 'UiTest',
-    meta: {title: 'UI测试', icon: 'el-icon-connection'},
+    meta: {title: 'UI自动化', icon: 'el-icon-connection'},
     children: [
       {
         path: 'project',
@@ -209,6 +203,60 @@ export const constantRoutes = [
     ]
   },
 
+  // 自定义函数
+  {
+    path: '/assist',
+    component: Layout,
+    redirect: '/assist/funcFile',
+    name: 'Assist',
+    meta: {title: '自动化辅助', icon: 'el-icon-s-opportunity'},
+    children: [
+      {
+        path: 'funcFile',
+        name: 'apiFuncFile',
+        component: () => import('@/views/assist/funcFile/index'),
+        meta: {title: '函数文件', icon: 'el-icon-help'}
+      },
+      {
+        path: 'file',
+        name: 'File',
+        component: () => import('@/views/assist/files'),
+        meta: {title: '文件管理', icon: 'el-icon-files'}
+      },
+      {
+        path: 'dataPool',
+        name: 'DataPool',
+        component: () => import('@/views/assist/dataPool'),
+        meta: {title: '自动化测试数据池', icon: 'el-icon-s-operation'}
+      },
+      {
+        path: 'autoTestUser',
+        name: 'AutoTestUser',
+        component: () => import('@/views/assist/autoTestUser'),
+        meta: {title: '自动化用户数据', icon: 'el-icon-s-custom'}
+      },
+      {
+        path: 'diffRecord',
+        name: 'DiffRecord',
+        component: () => import('@/views/assist/yapi/diffDecord'),
+        meta: {title: 'yapi监控记录', icon: 'el-icon-video-camera-solid'}
+      },
+      {
+        path: 'diffRecordShow',
+        name: 'DiffRecordShow',
+        hidden: true,
+        component: () => import('@/views/assist/yapi/diffDetailShow'),
+        meta: {title: 'yapi对比详情'}
+      },
+      {
+        path: 'errorRecord',
+        name: 'apiErrorRecord',
+        meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
+        component: () => import('@/views/assist/errorRecord/index')
+      }
+    ]
+  },
+
   // 配置管理
   {
     path: '/config',
@@ -241,6 +289,12 @@ export const constantRoutes = [
     meta: {title: '测试管理', icon: 'el-icon-magic-stick'},
     children: [
       {
+        path: 'weekly',
+        name: 'Weekly',
+        component: () => import('@/views/testWork/weekly'),
+        meta: {title: '周报', icon: 'el-icon-s-check'}
+      },
+      {
         path: 'kym',
         name: 'KYM',
         component: () => import('@/views/testWork/kym'),
@@ -257,44 +311,7 @@ export const constantRoutes = [
         name: 'Account',
         component: () => import('@/views/testWork/account'),
         meta: {title: '测试账号', icon: 'el-icon-s-check'}
-      },
-      {
-        path: 'file',
-        name: 'File',
-        component: () => import('@/views/testWork/files'),
-        meta: {title: '文件管理', icon: 'el-icon-files'}
-      },
-      {
-        path: 'dataPool',
-        name: 'DataPool',
-        component: () => import('@/views/testWork/dataPool'),
-        meta: {title: '数据池', icon: 'el-icon-s-operation'}
-      },
-      {
-        path: 'autoTestUser',
-        name: 'AutoTestUser',
-        component: () => import('@/views/testWork/autoTestUser'),
-        meta: {title: '自动化用户数据', icon: 'el-icon-s-custom'}
-      },
-      {
-        path: 'diffRecord',
-        name: 'DiffRecord',
-        component: () => import('@/views/testWork/yapi/diffDecord'),
-        meta: {title: 'yapi监控记录', icon: 'el-icon-video-camera-solid'}
-      },
-      {
-        path: 'diffRecordShow',
-        name: 'DiffRecordShow',
-        hidden: true,
-        component: () => import('@/views/testWork/yapi/diffDetailShow'),
-        meta: {title: 'yapi对比详情'}
-      },
-      {
-        path: 'errorRecord',
-        name: 'apiErrorRecord',
-        meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
-        component: () => import('@/views/apiTest/errorRecord/index')
-      },
+      }
     ]
   },
 
