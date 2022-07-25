@@ -471,7 +471,7 @@ export default {
 
   created() {
     this.initTempWeekly()
-    this.getProductList()
+    this.getUserList(this.getProductList)
 
     // 初始化上周、本周、下周的开始、结束时间节点
     let lastWeek = getCurrentWeekStartTimeAndEndTime(-7)
@@ -488,7 +488,7 @@ export default {
   },
 
   mounted() {
-    this.getUserList(this.getProductList)
+    this.getWeeklyList()
 
     this.$bus.$on(this.$busEvents.testWork.clickProductTree, (dataDict) => {
       this.getWeeklyList({
@@ -554,7 +554,7 @@ export default {
         this.userDict[user.id] = user
       })
       if (func) {
-        func()
+        func('true')
       }
     },
 
@@ -569,16 +569,18 @@ export default {
     },
 
     // 获取产品列表
-    getProductList() {
+    getProductList(isGetWeekly) {
       weeklyConfigList({parent: ''}).then(response => {
         response.data.data.forEach(product => {
           this.productDict[product.id.toString()] = product.name
         })
 
         this.productList = response.data.data
-
-        this.getWeeklyList()
       })
+
+      if (isGetWeekly){
+        this.getWeeklyList()
+      }
     },
 
     // 选中产品，获取项目列表
@@ -783,16 +785,18 @@ export default {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
         if (newVal) {
-          this.tempWeekly.product_id = newVal
+          this.listQuery.project_id = ''
+          this.selectedProduct()
         }
       }
     },
 
-    'tempWeekly.product_id': {
+    // 监听父组件传过来的当前选中的项目，实时获取周报列表
+    'currentProjectId': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        this.tempWeekly.project_id = ''
         if (newVal) {
+          this.listQuery.product_id = ''
           this.selectedProduct()
         }
       }
