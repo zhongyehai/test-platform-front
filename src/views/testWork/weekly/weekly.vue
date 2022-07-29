@@ -3,7 +3,7 @@
   <div>
 
     <!-- 周报管理 -->
-    <el-tabs v-model="tabName" class="table_padding table_api" :before-leave="beforeLeave">
+    <el-tabs v-model="tabName" class="table_padding table_api">
 
       <!-- 周报管理 -->
       <el-tab-pane :label="tabName" :name="tabName">
@@ -98,20 +98,20 @@
               {{ '导出最近一周' }}
             </el-button>
 
-<!--            <el-button-->
-<!--              disabled-->
-<!--              v-show="weeklyList.length > 0"-->
-<!--              type="primary"-->
-<!--              size="mini"-->
-<!--              :loading="downloadLoadingIsShow"-->
-<!--              @click="downloadWeeklyList">-->
-<!--              {{ '导出所选时间段' }}-->
-<!--            </el-button>-->
+            <!--            <el-button-->
+            <!--              disabled-->
+            <!--              v-show="weeklyList.length > 0"-->
+            <!--              type="primary"-->
+            <!--              size="mini"-->
+            <!--              :loading="downloadLoadingIsShow"-->
+            <!--              @click="downloadWeeklyList">-->
+            <!--              {{ '导出所选时间段' }}-->
+            <!--            </el-button>-->
 
             <el-button
               type="primary"
               size="mini"
-              @click="beforeLeave">
+              @click="clickAddWeekly">
               {{ '添加周报' }}
             </el-button>
 
@@ -262,7 +262,7 @@
             size="mini"
             placeholder="选择项目"
             filterable
-            default-first-option>
+            clearable>
             <el-option v-for="item in projectList" :key="item.id" :value="item.id" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
@@ -392,6 +392,7 @@ export default {
       productDict: {},  // 产品字典
       projectList: [], // 项目列表
       isShowLoading: false,
+      isDrawerSelectProduct: false,  // 是否在抽屉里面改变的产品id，是才重置项目id
       weekPosition: 0,  // 周定位，上周、本周、下周
 
       lastWeekStart: '',  // 上周开始的时间
@@ -499,16 +500,16 @@ export default {
       })
     })
 
-    this.$bus.$on(this.$busEvents.testWork.weeklyDrawerStatus, (_type) => {
-      this.openDrawer(_type)
-    })
+    // this.$bus.$on(this.$busEvents.testWork.weeklyDrawerStatus, (_type) => {
+    //   this.openDrawer(_type)
+    // })
 
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.testWork.clickProductTree)
-    this.$bus.$off(this.$busEvents.testWork.weeklyDrawerStatus)
+    // this.$bus.$off(this.$busEvents.testWork.weeklyDrawerStatus)
   },
 
   methods: {
@@ -578,7 +579,7 @@ export default {
         this.productList = response.data.data
       })
 
-      if (isGetWeekly){
+      if (isGetWeekly) {
         this.getWeeklyList()
       }
     },
@@ -592,27 +593,29 @@ export default {
 
     // 选中产品，获取项目列表
     selectedProduct() {
+      console.log(111111111)
+      console.log(JSON.stringify(this.tempWeekly))
       weeklyConfigList({parent: this.tempWeekly.product_id}).then(response => {
         this.projectList = response.data.data
       })
     },
 
     // 点击添加
-    beforeLeave() {
+    clickAddWeekly() {
       this.initTempWeekly()
       this.openDrawer('add')
-      return false
     },
 
     // 打开抽屉
     openDrawer(_type) {
       this.weeklyDrawerStatus = _type
-      this.weeklyDrawerIsShow = true
       this.getProductList()
+      this.weeklyDrawerIsShow = true
     },
 
     // 打开编辑框
     showEditForm(row) {
+      this.isDrawerSelectProduct = false
       this.tempWeekly = JSON.parse(JSON.stringify(row))
 
       // 处理产品id、项目id
@@ -800,8 +803,19 @@ export default {
           this.selectedProduct()
         }
       }
+    },
+
+    'tempWeekly.product_id': {
+      deep: true,  // 深度监听
+      handler(newVal, oldVal) {
+        if (this.isDrawerSelectProduct) {
+          this.tempWeekly.project_id = ''
+        }
+        this.isDrawerSelectProduct = true
+      }
     }
   }
+
 }
 </script>
 

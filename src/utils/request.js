@@ -32,9 +32,8 @@ service.interceptors.request.use(
 // 响应拦截器，请求后置处理
 service.interceptors.response.use(
   response => {
-    // 如果返回msg为登录超时，则跳转到登录页面
-    if (response.data['message'] === '登录超时,请重新登录') {
-      // console.log(`requests.service.interceptors: /login?redirect=${router.history.current.fullPath}`)
+    // 如果返回状态码为401，则跳转到登录页面
+    if (response.data.status === 401) {
       router.push({path: `/login?redirect=${router.history.current.fullPath}`});
     }
     return response.data

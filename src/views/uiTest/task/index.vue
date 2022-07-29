@@ -287,7 +287,7 @@ export default {
         })
       } else {
         enableTask({id: task.id}).then(response => {
-          this.$set(task, 'taskLoadingIsShow', false)
+          this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }

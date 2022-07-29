@@ -12,7 +12,7 @@
           @change="getAutoTestUserData()"
         >
           <el-option
-            v-for="(value, key) in envList"
+            v-for="(value, key) in envDict"
             :key="key"
             :label="value"
             :value="key"
@@ -60,6 +60,11 @@
           <span> {{ scope.row.role }} </span>
         </template>
       </el-table-column>
+      <el-table-column :show-overflow-tooltip=true label="所属环境" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ getEnv(scope.row.env) }} </span>
+        </template>
+      </el-table-column>
     </el-table>
 
   </div>
@@ -78,7 +83,7 @@ export default {
       listLoading: false,  // 加载状态
       currentDataList: [],  // 数据列表
       currentEnv: 'test',  // 选择的环境
-      envList: []  // 环境列表
+      envDict: {}  // 环境字典
     }
   },
 
@@ -87,7 +92,7 @@ export default {
     // 获取环境列表
     getAllEnv(){
       getEnvList().then(response => {
-        this.envList = response.data
+        this.envDict = response.data
       })
     },
 
@@ -96,6 +101,10 @@ export default {
       getAutoTestUser({'env': this.currentEnv}).then(response => {
         this.currentDataList = response.data
       })
+    },
+
+    getEnv(env){
+      return this.envDict[env]
     }
   },
 

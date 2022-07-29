@@ -358,6 +358,12 @@ export const constantRoutes = [
         name: 'Role',
         component: () => import('@/views/users/role/index'),
         meta: {title: '权限管理', icon: 'el-icon-user', roles: [2, '2']}
+      },
+      {
+        path: 'errorRecord',
+        name: 'systemErrorRecord',
+        meta: {title: '系统错误记录', icon: 'el-icon-video-camera-solid', roles: [2, '2']},
+        component: () => import('@/views/system/errorRecord/index')
       }
     ]
   },
