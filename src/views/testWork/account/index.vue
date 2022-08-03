@@ -33,15 +33,27 @@
       :data="currentAccountList"
       stripe
     >
-      <el-table-column prop="id" label="编号" min-width="5%">
+      <el-table-column prop="id" label="编号" min-width="8%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="project" label="服务" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="project" label="服务名" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.project }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="name" label="角色" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.role }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="name" label="权限" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.permission }} </span>
         </template>
       </el-table-column>
 
@@ -66,18 +78,6 @@
       <el-table-column :show-overflow-tooltip=true prop="desc" label="备注" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="'创建人'" prop="id" align="center" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
@@ -152,6 +152,34 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item class="filter-item is-required" :label="'角色'" size="mini">
+          <el-select
+            v-model="currentAccount.role"
+            filterable
+            allow-create
+            default-first-option
+            placeholder="角色，可手动输入"
+            size="mini"
+            style="width:100%">
+            <el-option v-for="item in roleList" :key="item.key" :label="item.value" :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item class="filter-item is-required" :label="'权限'" size="mini">
+          <el-select
+            v-model="currentAccount.permission"
+            filterable
+            allow-create
+            default-first-option
+            placeholder="权限，可手动输入"
+            size="mini"
+            style="width:100%">
+            <el-option v-for="item in permissionList" :key="item.key" :label="item.value" :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item :label="'账户名称'" class="filter-item is-required" prop="name" size="mini">
           <el-input v-model="currentAccount.name" placeholder="账户名称"/>
         </el-form-item>
@@ -201,7 +229,7 @@ import {
   postAccount,
   putAccount,
   deleteAccount,
-  accountProjectList
+  accountItemList
 } from "@/apis/testWork/account";
 
 export default {
@@ -220,11 +248,16 @@ export default {
       // 文件类型列表
       eventList: [],
       projectList: [],  // 项目列表
+      roleList: [],  // 角色列表
+      permissionList: [],  // 权限列表
+
       currentAccountList: [],  // 账号列表
       // 账号
       currentAccount: {
         id: '',
         project: '',
+        role: '',
+        permission: '',
         name: '',
         account: '',
         password: '',
@@ -267,8 +300,10 @@ export default {
 
     // 请求用户信息
     getAccountProjectList() {
-      accountProjectList().then(response => {
-        this.projectList = response.data
+      accountItemList().then(response => {
+        this.projectList = response.data.project_list
+        this.roleList = response.data.role_list
+        this.permissionList = response.data.permission_list
       })
     },
 
@@ -302,14 +337,14 @@ export default {
       this.getAccountList()
     },
 
-    // 在抽屉中新加的服务名添加到服务list中
-    addProjectName(projectName) {
-      for (let index in this.projectList) {
-        if (projectName === this.projectList[index]['key']) {
+    // 在抽屉中新加的服务名、角色、权限添加到对应list中
+    setItem(name, container) {
+      for (let index in container) {
+        if (name === container[index]['key']) {
           return
         }
       }
-      this.projectList.push({key: projectName, value: projectName})
+      container.push({key: name, value: name})
     },
 
     // 初始化新账号
@@ -317,6 +352,8 @@ export default {
       this.currentAccount.id = ''
       this.currentAccount.project = this.currentProject
       this.currentAccount.name = ''
+      this.currentAccount.role = ''
+      this.currentAccount.permission = ''
       this.currentAccount.account = ''
       this.currentAccount.password = ''
       this.currentAccount.desc = ''
@@ -338,6 +375,8 @@ export default {
       this.submitButtonIsLoading = true
       postAccount({
         project: this.currentAccount.project,
+        role: this.currentAccount.role,
+        permission: this.currentAccount.permission,
         name: this.currentAccount.name,
         account: this.currentAccount.account,
         password: this.currentAccount.password,
@@ -346,8 +385,11 @@ export default {
       }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          // 提交成功后，如果是新加的服务名，则加到服务名list中
-          this.addProjectName(this.currentAccount.project)
+          // 提交成功后，更新选项
+          this.setItem(this.currentAccount.project, this.projectList)
+          this.setItem(this.currentAccount.role, this.roleList)
+          this.setItem(this.currentAccount.permission, this.permissionList)
+
           this.drawerIsShow = false
           this.getAccountList()
         }
@@ -360,6 +402,8 @@ export default {
       putAccount({
         id: this.currentAccount.id,
         project: this.currentAccount.project,
+        role: this.currentAccount.role,
+        permission: this.currentAccount.permission,
         name: this.currentAccount.name,
         account: this.currentAccount.account,
         password: this.currentAccount.password,
@@ -368,8 +412,10 @@ export default {
       }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          // 提交成功后，如果是新加的服务名，则加到服务名list中
-          this.addProjectName(this.currentAccount.project)
+          // 提交成功后，更新选项
+          this.setItem(this.currentAccount.project, this.projectList)
+          this.setItem(this.currentAccount.role, this.roleList)
+          this.setItem(this.currentAccount.permission, this.permissionList)
           this.drawerIsShow = false
           this.getAccountList()
         }
@@ -397,7 +443,6 @@ export default {
     this.initEnv()
     this.getUserList(this.getAccountList)
     this.getAccountProjectList()
-    // this.getAccountList()
   },
 }
 </script>

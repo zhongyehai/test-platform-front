@@ -23,13 +23,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'请求人'" prop="name" align="center" min-width="20%" :show-overflow-tooltip=true>
+      <el-table-column :label="'请求方法'" prop="url" align="center" min-width="10%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
-          <span> {{ parseUser(scope.row.create_user) }} </span>
+          <span> {{ scope.row.method }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="50%" :show-overflow-tooltip=true>
+      <el-table-column :label="'接口地址'" prop="url" align="center" min-width="20%" :show-overflow-tooltip=true>
+        <template slot-scope="scope">
+          <span> {{ scope.row.url }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="40%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
           <span>{{ scope.row.detail }}</span>
         </template>
@@ -59,13 +65,71 @@
       @pagination="getErrorRecordList"/>
 
     <el-drawer
-      :title="currentRow.name"
+      :title="'错误详情'"
       size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">
       <div class="demo-drawer__content" style="margin-left: 20px">
-        <pre class="el-collapse-item-content" style="overflow: auto">{{ currentRow.detail }}</pre>
+        <div>
+          <label class="label-style">请求方法：</label>
+          <el-input :value="currentRow.method" style="width: 85%" size="mini" disabled></el-input>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="label-style">接口地址：</label>
+          <el-input :value="currentRow.url" style="width: 85%" size="mini" disabled></el-input>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="label-style">头部信息：</label>
+          <el-input
+            :value="currentRow.headers ? JSON.stringify(currentRow.headers) : {}"
+            disabled
+            style="width: 85%"
+            size="mini"
+            type="textarea"
+            :rows="2"></el-input>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="label-style">url参数：</label>
+          <el-input
+            :value="currentRow.params ? JSON.stringify(currentRow.params) : {}"
+            disabled
+            style="width: 85%"
+            size="mini"
+            type="textarea"
+            :rows="2"></el-input>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="label-style">form参数：</label>
+          <el-input
+            :value="currentRow.data_form ? JSON.stringify(currentRow.data_form) : {}"
+            disabled
+            style="width: 85%"
+            size="mini"
+            type="textarea"
+            :rows="2"></el-input>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="label-style">json参数：</label>
+          <el-input
+            :value="currentRow.data_json ? JSON.stringify(currentRow.data_json) : {}"
+            disabled
+            style="width: 85%"
+            size="mini"
+            type="textarea"
+            :rows="2"></el-input>
+        </div>
+
+        <div style="margin-top: 30px">
+          <label class="label-style">错误详情：</label>
+          <pre class="el-collapse-item-content" style="overflow: auto">{{ currentRow.detail }}</pre>
+        </div>
+
       </div>
     </el-drawer>
   </div>
@@ -158,3 +222,12 @@ export default {
   },
 }
 </script>
+
+<style>
+
+.label-style{
+  display:inline-block;
+  width:90px;
+}
+
+</style>

@@ -7,8 +7,8 @@ export function accountList(params) {
 }
 
 // 测试账号项目列表
-export function accountProjectList() {
-  return request({url: baseDirTestWork + '/account/project/list', method: 'get'});
+export function accountItemList() {
+  return request({url: baseDirTestWork + '/account/item/list', method: 'get'});
 }
 
 // 获取测试账号
