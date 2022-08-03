@@ -51,9 +51,10 @@
             v-model="tempApi.up_func"
             placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
             size="mini"></el-input>
-          <el-popconfirm placement="top" hide-icon title="在运行接口之前要做的一些前置操作，使用自定义函数的形式实现">
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>在运行接口之前要做的一些前置操作，使用自定义函数的形式实现</div>
             <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-          </el-popconfirm>
+          </el-popover>
         </el-form-item>
       </el-row>
 
@@ -67,9 +68,10 @@
             v-model="tempApi.down_func"
             placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
             size="mini"></el-input>
-          <el-popconfirm placement="top" hide-icon title="在运行接口之后要做的一些前置操作，使用自定义函数的形式实现">
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>在运行接口之后要做的一些前置操作，使用自定义函数的形式实现</div>
             <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-          </el-popconfirm>
+          </el-popover>
         </el-form-item>
       </el-row>
 

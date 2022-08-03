@@ -59,40 +59,43 @@
               </el-button>
 
               <!-- 复制页面 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="复制此页面并生成新的页面？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="clickCopyPage(scope.row)"
-              >
+                style="margin-right: 10px"
+                popper-class="down-popover"
+                v-model="scope.row.copyPopoverIsShow">
+                <p>复制此页面并生成新的页面?</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="clickCopyPage(scope.row)">确定</el-button>
+                </div>
                 <el-button
-                  type="text"
                   slot="reference"
+                  type="text"
                   icon="el-icon-document-copy"
                 ></el-button>
-              </el-popconfirm>
+              </el-popover>
 
               <!-- 删除页面 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                :title="`确定删除【${scope.row.name}】?`"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="delPage(scope.row)"
-              >
+                popper-class="down-popover"
+                v-model="scope.row.deletePopoverIsShow">
+                <p>确定删除【{{ scope.row.name }}】?</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="delPage(scope.row)">确定</el-button>
+                </div>
                 <el-button
                   slot="reference"
-                  type="text"
                   style="color: red"
+                  type="text"
                   icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
                 ></el-button>
-              </el-popconfirm>
+              </el-popover>
             </template>
           </el-table-column>
 
@@ -214,8 +217,17 @@ export default {
       this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'edit', JSON.parse(JSON.stringify(row)))
     },
 
+    cancelCopyPopover(row){
+      this.$set(row, 'copyPopoverIsShow', false)
+    },
+
+    cancelDeletePopover(row){
+      this.$set(row, 'deletePopoverIsShow', false)
+    },
+
     // 删除页面
     delPage(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
       deletePage({'id': row.id}).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
@@ -228,6 +240,7 @@ export default {
     // 复制页面
     clickCopyPage(page) {
       this.$bus.$emit(this.$busEvents.ui.uiPageDrawerStatus, 'copy', JSON.parse(JSON.stringify(page)))
+      this.$set(row, 'copyPopoverIsShow', false)
     },
 
     // 根据模块内容获取页面列表

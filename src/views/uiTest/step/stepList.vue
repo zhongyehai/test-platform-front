@@ -41,24 +41,6 @@
       <el-table-column align="center" label="操作" min-width="21%">
         <template slot-scope="scope">
 
-          <!-- 复制步骤 -->
-          <el-popconfirm
-            placement="top"
-            hide-icon
-            style="margin-right: 10px"
-            title="复制此步骤并生成新的步骤？"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="copy(scope.row)"
-          >
-            <el-button
-              type="text"
-              slot="reference"
-              icon="el-icon-document-copy"
-              :loading="scope.row.copyIsLoading"
-            ></el-button>
-          </el-popconfirm>
-
           <!-- 编辑步骤 -->
           <el-button
             v-if="!scope.row.quote_case"
@@ -68,43 +50,69 @@
             icon="el-icon-edit"
             @click.native="editStep(scope.row, scope.$index)"></el-button>
 
+          <!-- 复制步骤 -->
+          <el-popover
+            :ref="scope.row.id"
+            placement="top"
+            style="margin-right: 10px"
+            popper-class="down-popover"
+            v-model="scope.row.copyStepPopoverIsShow">
+            <p>复制此步骤并生成新的步骤?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelCopyStepPopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="text"
+              icon="el-icon-document-copy"
+              :loading="scope.row.copyIsLoading"
+            ></el-button>
+          </el-popover>
+
           <!-- 删除步骤 -->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             v-if="!scope.row.quote_case"
             placement="top"
-            hide-icon
-            :title="`确定删除【${scope.row.name}】?`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.deletePopoverIsShow">
+            <p>确定删除【{{ scope.row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini"
+                         @click="deleteStepOnList({id: scope.row.id, index: scope.$index, row: scope.row})">确定
+              </el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
             ></el-button>
-            <!--:loading="scope.row.deleteLoadingIsShow"-->
-          </el-popconfirm>
+          </el-popover>
 
           <!-- 解除引用 -->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             v-if="scope.row.quote_case"
             placement="top"
-            hide-icon
-            :title="`是否解除引用【${scope.row.name}】？`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="deleteStepOnList({id: scope.row.id, index: scope.$index})"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.deletePopoverIsShow">
+            <p>是否解除引用【{{ scope.row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini"
+                         @click="deleteStepOnList({id: scope.row.id, index: scope.$index, row: scope.row})">确定
+              </el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
             ></el-button>
-            <!--:loading="scope.row.deleteLoadingIsShow"-->
-          </el-popconfirm>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
@@ -209,6 +217,7 @@ export default {
 
     // 删除步骤
     deleteStepOnList(stepInfo) {
+      this.$set(stepInfo.row, 'deletePopoverIsShow', false)
       this.tableLoadingIsShow = true
       deleteStep({"id": stepInfo.id}).then(response => {
         this.tableLoadingIsShow = false
@@ -216,6 +225,14 @@ export default {
           this.stepList.splice(stepInfo.index, 1)  // 从步骤列表中删除步骤
         }
       })
+    },
+
+    cancelDeletePopover(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
+    },
+
+    cancelCopyStepPopover(row) {
+      this.$set(row, 'copyStepPopoverIsShow', false)
     },
 
     // 点击编辑步骤
@@ -226,6 +243,7 @@ export default {
 
     // 复制步骤
     copy(row) {
+      this.$set(row, 'copyStepPopoverIsShow', false)
       this.$set(row, 'copyIsLoading', true)
       stepCopy({'id': row.id}).then(response => {
         this.$set(row, 'copyIsLoading', false)

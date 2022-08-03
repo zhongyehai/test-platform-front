@@ -122,23 +122,25 @@
             @click="handleUpdate(row)"></el-button>
 
           <!-- 删除账号 -->
-          <el-popconfirm
+          <el-popover
+            :ref="row.id"
             placement="top"
-            hide-icon
-            style="margin-right: 10px"
-            :title="`确定删除【${row.name}】?`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="delUser(row)"
-          >
+            popper-class="down-popover"
+            v-model="row.deletePopoverIsShow">
+            <p>确定删除【{{ row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="delUser(row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
               :loading="row.deleteLoadingIsShow"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
+
         </template>
       </el-table-column>
     </el-table>
@@ -363,8 +365,13 @@ export default {
       })
     },
 
+    cancelDeletePopover(row){
+      this.$set(row, 'deletePopoverIsShow', false)
+    },
+
     // 删除用户
     delUser(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
       deleteUser({"id": row.id}).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)

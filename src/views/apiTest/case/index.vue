@@ -67,41 +67,43 @@
               </el-button>
 
               <!-- 复制用例 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="复制用例及其步骤？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="copyCase(scope.row)"
-              >
+                style="margin-right: 10px"
+                popper-class="down-popover"
+                v-model="scope.row.copyPopoverIsShow">
+                <p>复制用例及其步骤？</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="copyCase(scope.row)">确定</el-button>
+                </div>
                 <el-button
-                  type="text"
                   slot="reference"
+                  type="text"
                   icon="el-icon-document-copy"
                 ></el-button>
-                <!--:loading="scope.row.copyButtonIsLoading"-->
-              </el-popconfirm>
+              </el-popover>
 
               <!-- 删除用例 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                :title="`确定删除【${scope.row.name}】及其步骤?`"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="delCase(scope.row)"
-              >
+                popper-class="down-popover"
+                v-model="scope.row.deletePopoverIsShow">
+                <p>确定删除【{{ scope.row.name }}】?</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="delCase(scope.row)">确定</el-button>
+                </div>
                 <el-button
                   slot="reference"
-                  type="text"
                   style="color: red"
+                  type="text"
                   icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
                 ></el-button>
-              </el-popconfirm>
+              </el-popover>
             </template>
           </el-table-column>
         </el-table>
@@ -207,6 +209,7 @@ export default {
 
     // 删除用例
     delCase(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
       deleteCase({'id': row.id}).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
@@ -217,11 +220,20 @@ export default {
     },
 
     // 复制用例
-    copyCase(api) {
-      this.tempCase = api
+    copyCase(caseData) {
+      this.tempCase = caseData
       this.tempCase.num = ''
       // console.log('case.index.methods.copyCase.this.tempCase: ', JSON.stringify(this.tempCase))
       this.$bus.$emit(this.$busEvents.api.apiCaseDrawerStatus, 'copy', this.tempCase)
+      this.$set(caseData, 'copyPopoverIsShow', false)
+    },
+
+    cancelDeletePopover(caseData){
+      this.$set(caseData, 'deletePopoverIsShow', false)
+    },
+
+    cancelCopyPopover(caseData){
+      this.$set(caseData, 'copyPopoverIsShow', false)
     },
 
     // 点击运行用例

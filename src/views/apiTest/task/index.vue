@@ -88,42 +88,45 @@
                     @click.native="editTask(scope.row)"></el-button>
 
                   <!-- 复制任务 -->
-                  <el-popconfirm
+                  <el-popover
+                    :ref="scope.row.id"
                     placement="top"
-                    hide-icon
                     style="margin-right: 10px"
-                    title="复制此任务并生成新的任务？"
-                    confirm-button-text='确认'
-                    cancel-button-text='取消'
-                    @onConfirm="copy(scope.row)"
-                  >
+                    popper-class="down-popover"
+                    v-model="scope.row.copyPopoverIsShow">
+                    <p>复制此任务并生成新的任务?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+                      <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
+                    </div>
                     <el-button
-                      type="text"
                       slot="reference"
+                      type="text"
                       icon="el-icon-document-copy"
                       :loading="scope.row.copyButtonIsLoading"
                     ></el-button>
-                  </el-popconfirm>
+                  </el-popover>
 
                   <!-- 删除任务 -->
-                  <el-popconfirm
+                  <el-popover
+                    :ref="scope.row.id"
                     placement="top"
-                    hide-icon
-                    style="margin-right: 10px"
-                    :title="`确定删除【${scope.row.name}】?`"
-                    confirm-button-text='确认'
-                    cancel-button-text='取消'
-                    @onConfirm="delTask(scope.row)"
-                  >
+                    popper-class="down-popover"
+                    v-model="scope.row.deletePopoverIsShow">
+                    <p>确定删除【{{ scope.row.name }}】?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+                      <el-button type="primary" size="mini" @click="delTask(scope.row)">确定</el-button>
+                    </div>
                     <el-button
                       slot="reference"
-                      type="text"
                       style="color: red"
+                      type="text"
                       icon="el-icon-delete"
                       :disabled="scope.row.status === 1"
                       :loading="scope.row.deleteLoadingIsShow"
                     ></el-button>
-                  </el-popconfirm>
+                  </el-popover>
                 </template>
               </el-table-column>
             </el-table>
@@ -211,8 +214,17 @@ export default {
       }
     },
 
+    cancelCopyPopover(task){
+      this.$set(task, 'copyPopoverIsShow', false)
+    },
+
+    cancelDeletePopover(task){
+      this.$set(task, 'deletePopoverIsShow', false)
+    },
+
     // 复制任务
     copy(task) {
+      this.$set(task, 'copyPopoverIsShow', false)
       this.$set(task, 'copyButtonIsLoading', true)
       copyTask({'id': task.id}).then(response => {
         this.$set(task, 'copyButtonIsLoading', false)
@@ -271,6 +283,7 @@ export default {
 
     // 删除任务
     delTask(task) {
+      this.$set(task, 'deletePopoverIsShow', false)
       this.$set(task, 'deleteLoadingIsShow', true)
       deleteTask({id: task.id}).then(response => {
         this.$set(task, 'deleteLoadingIsShow', false)

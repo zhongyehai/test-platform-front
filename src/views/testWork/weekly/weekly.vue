@@ -179,41 +179,46 @@
               </el-button>
 
               <!-- 复制 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="复制此周报并生成新的周报？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="copyWeekly(scope.row)"
-              >
+                style="margin-right: 10px"
+                popper-class="down-popover"
+                v-model="scope.row.copyPopoverIsShow">
+                <p>复制此周报并生成新的周报?</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="copyWeekly(scope.row)">确定</el-button>
+                </div>
                 <el-button
-                  type="text"
                   slot="reference"
+                  type="text"
                   icon="el-icon-document-copy"
                 ></el-button>
-              </el-popconfirm>
+              </el-popover>
 
               <!-- 删除 -->
-              <el-popconfirm
+              <el-popover
+                :ref="scope.row.id"
                 placement="top"
-                hide-icon
-                style="margin-right: 8px"
-                title="确定删除此数据？"
-                confirm-button-text='确认'
-                cancel-button-text='取消'
-                @onConfirm="thisDeleteWeekly(scope.row)"
-              >
+                popper-class="down-popover"
+                v-model="scope.row.deletePopoverIsShow">
+                <p>确定删除此数据?</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+                  <el-button type="primary" size="mini" @click="thisDeleteWeekly(scope.row)">确定</el-button>
+                </div>
                 <el-button
                   v-show="currentUserRole === '2' || parseInt(currentUserId) === parseInt(scope.row.create_user)"
                   slot="reference"
-                  type="text"
                   style="color: red"
+                  type="text"
                   icon="el-icon-delete"
+                  :disabled="scope.row.status === 1"
                   :loading="scope.row.isShowDeleteLoading"
                 ></el-button>
-              </el-popconfirm>
+              </el-popover>
+
             </template>
           </el-table-column>
         </el-table>
@@ -593,8 +598,6 @@ export default {
 
     // 选中产品，获取项目列表
     selectedProduct() {
-      console.log(111111111)
-      console.log(JSON.stringify(this.tempWeekly))
       weeklyConfigList({parent: this.tempWeekly.product_id}).then(response => {
         this.projectList = response.data.data
       })
@@ -677,6 +680,7 @@ export default {
 
     // 删除周报
     thisDeleteWeekly(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
       deleteWeekly({'id': row.id}).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
@@ -686,8 +690,17 @@ export default {
       })
     },
 
+    cancelDeletePopover(weekly){
+      this.$set(weekly, 'deletePopoverIsShow', false)
+    },
+
+    cancelCopyPopover(weekly){
+      this.$set(weekly, 'copyPopoverIsShow', false)
+    },
+
     // 复制周报
     copyWeekly(weekly) {
+      this.$set(weekly, 'copyPopoverIsShow', false)
       this.tempWeekly = JSON.parse(JSON.stringify(weekly))
       // 处理产品id、项目id
       this.tempWeekly.product_id = tryParseInt(this.tempWeekly.product_id)

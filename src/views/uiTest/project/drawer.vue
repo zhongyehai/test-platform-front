@@ -28,13 +28,16 @@
               <div style="text-align: center">
                 <el-radio v-model="currentEnv" :label="key" v-for="(value, key) in envMapping" :key="key">
                   {{ value }}</el-radio>
-                <el-popconfirm
-                  placement="top"
-                  hide-icon
-                  title="1、环境项数据来源于参数管理处的配置
-                         2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上">
+                <el-popover
+                  class="el_popover_class"
+                  placement="top-start"
+                  trigger="hover">
+                  <div>
+                    <div>1、环境项数据来源于参数管理处的配置</div>
+                    <div>2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上</div>
+                  </div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popconfirm>
+                </el-popover>
               </div>
 
               <envEditor

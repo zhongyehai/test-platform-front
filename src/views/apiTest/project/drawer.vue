@@ -26,15 +26,17 @@
                     v-model="tempProject.swagger"
                     style="width: 98%"
                     placeholder="当前服务的swagger地址，用于拉取模块、接口数据"/>
-                  <el-popconfirm
-                    placement="top"
-                    hide-icon
-                    :title="
-                    '1、此处填写对应服务获取swagger数据的地址 \n' +
-                    '2、回到列表页点击同步按钮，系统会自动获取swagger数据，并把其中的模块、接口同步到测试平台，无需手动录入 \n'+
-                    '注：请输入获取swagger数据的地址，不要输入swagger-ui地址'">
+                  <el-popover
+                    class="el_popover_class"
+                    placement="top-start"
+                    trigger="hover">
+                    <div>
+                      <div>1、此处填写对应服务获取swagger数据的地址</div>
+                      <div>2、回到列表页点击同步按钮，系统会自动获取swagger数据，并把其中的模块、接口同步到测试平台，无需手动录入</div>
+                      <div>注：请输入获取swagger数据的地址，不要输入swagger-ui地址</div>
+                    </div>
                     <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                  </el-popconfirm>
+                  </el-popover>
                 </el-form-item>
               </el-form>
 
@@ -44,13 +46,16 @@
               <div style="text-align: center">
                 <el-radio v-model="currentEnv" :label="key" v-for="(value, key) in envMapping" :key="key">
                   {{ value }}</el-radio>
-                <el-popconfirm
-                  placement="top"
-                  hide-icon
-                  title="1、环境项数据来源于参数管理处的配置
-                         2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上">
+                <el-popover
+                  class="el_popover_class"
+                  placement="top-start"
+                  trigger="hover">
+                  <div>
+                    <div>1、环境项数据来源于参数管理处的配置</div>
+                    <div>2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上</div>
+                  </div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popconfirm>
+                </el-popover>
               </div>
 
               <envEditor

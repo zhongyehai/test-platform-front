@@ -144,45 +144,51 @@
       </el-table-column>
 
       <el-table-column :label="'操作'" align="center" min-width="10%" class-name="small-padding fixed-width">
-        <template slot-scope="{row, $index}">
+        <template slot-scope="scope">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
-          <el-popconfirm
-            v-show="row.yapi_id"
+          <el-popover
+            v-show="scope.row.yapi_id"
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
+            width="160"
             style="margin-right: 10px"
-            title="从yapi拉取此服务下的模块、接口信息?"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="pullByYapi(row)"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.pullByYapiPopoverIsShow">
+            <p>从yapi拉取此服务下的模块、接口信息?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelPullByYapi(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="pullByYapi(scope.row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
               type="text"
               icon="el-icon-refresh"
-              :loading="row.isPullByYapi"
+              :loading="scope.row.pullByYapiPopoverLoadingIsShow"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
 
           <!-- 从swagger拉取模块、接口信息-->
-          <el-popconfirm
-            v-show="!row.yapi_id && row.swagger"
+          <el-popover
+            v-show="!scope.row.yapi_id && scope.row.swagger"
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
+            width="160"
             style="margin-right: 10px"
-            title="从swagger拉取此服务下的模块、接口信息?"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="pullBySwagger(row)"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.pullBySwaggerPopoverIsShow">
+            <p>从swagger拉取此服务下的模块、接口信息?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelPullBySwagger(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="pullBySwagger(scope.row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
               type="text"
               icon="el-icon-refresh"
-              :loading="row.isPullBySwagger"
+              :loading="scope.row.isPullBySwagger"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
 
           <!-- 编辑服务 -->
           <el-button
@@ -190,27 +196,29 @@
             size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
-            @click="showEditForm(row)">
+            @click="showEditForm(scope.row)">
           </el-button>
 
           <!--删除服务-->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
-            style="margin-right: 10px"
-            :title="`确定删除【${row.name}】?`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="delProject(row)"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.deletePopoverIsShow">
+            <p>确定删除【{{ scope.row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="delProject(scope.row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
-              :loading="row.deleteButtonIsLoading"
+              :loading="scope.row.deleteButtonIsLoading"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
+
         </template>
       </el-table-column>
 
@@ -259,30 +267,14 @@ export default {
         manager: '',  // 负责人
         create_user: '', // 创建人
       },
-
-      // 当前选中的服务
-      currentProject: {},
-
-      // 服务列表
-      project_list: [],
-
-      // 服务数据表格起始
-      tableKey: 0,
-
-      // 服务数据表格总条数
-      total: 0,
-
-      // dialog框状态，edit 为编辑数据, create 为新增数据
-      dialogStatus: '',
-
-      // 下载表格状态
-      downloadLoading: false,
-
-      // 请求加载状态
-      listLoading: true,
-
+      currentProject: {},  // 当前选中的服务
+      project_list: [],  // 服务列表
+      tableKey: 0,  // 服务数据表格起始
+      total: 0,  // 服务数据表格总条数
+      dialogStatus: '',  // dialog框状态，edit 为编辑数据, create 为新增数据
+      downloadLoading: false,  // 下载表格状态
+      listLoading: true,  // 请求加载状态
       pullYapiProjectIsLoading: false,
-
       currentUserList: [],
       userDict: {},
     }
@@ -318,10 +310,11 @@ export default {
 
     // 从yapi同步服务信息
     pullByYapi(row) {
-      this.$set(row, 'isPullByYapi', true)
+      this.$set(row, 'pullByYapiPopoverIsShow', false)
+      this.$set(row, 'pullByYapiPopoverLoadingIsShow', true)
       yapiPull({id: row.id}).then(response => {
         this.showMessage(this, response)
-        this.$set(row, 'isPullByYapi', false)
+        this.$set(row, 'pullByYapiPopoverLoadingIsShow', false)
       })
     },
 
@@ -338,6 +331,7 @@ export default {
 
     // 从swagger同步服务信息
     pullBySwagger(row) {
+      this.$set(row, 'pullBySwaggerPopoverIsShow', false)
       this.$set(row, 'isPullBySwagger', true)
       swaggerPull({id: row.id}).then(response => {
         this.showMessage(this, response)
@@ -357,6 +351,7 @@ export default {
 
     // 删除服务
     delProject(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteButtonIsLoading', true)
       deleteProject({"id": row.id}).then(response => {
         this.$set(row, 'deleteButtonIsLoading', false)
@@ -364,6 +359,18 @@ export default {
           this.getProjectList(); // 重新从后台获取服务列表
         }
       })
+    },
+
+    cancelPullByYapi(row){
+      this.$set(row, 'pullByYapiPopoverIsShow', false)
+    },
+
+    cancelPullBySwagger(row){
+      this.$set(row, 'pullBySwaggerPopoverIsShow', false)
+    },
+
+    cancelDeletePopover(row){
+      this.$set(row, 'deletePopoverIsShow', false)
     },
 
     // 触发查询

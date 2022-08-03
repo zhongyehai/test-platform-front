@@ -68,12 +68,10 @@
                     :disabled="putStepHostIsLoading"
                     v-model="currentStep.replace_host"
                     @change="changeStatus()"></el-switch>
-                  <el-popconfirm
-                    placement="top"
-                    title="解析当前步骤时，若此项为激活状态，则使用用例所在服务的域名，否则使用步骤对应接口所在服务的域名"
-                    hide-icon>
+                  <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                    <div>解析当前步骤时，若此项为激活状态，则使用用例所在服务的域名，否则使用步骤对应接口所在服务的域名</div>
                     <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                  </el-popconfirm>
+                  </el-popover>
                 </el-form-item>
               </el-form>
             </el-col>

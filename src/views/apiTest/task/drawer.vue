@@ -34,12 +34,10 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-                <el-popconfirm
-                  placement="top"
-                  title="若没有选择用例集，则默认运行此服务下的所有用例"
-                  hide-icon>
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>若没有选择用例集，则默认运行此服务下的所有用例</div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popconfirm>
+                </el-popover>
               </el-form-item>
             </el-col>
 
@@ -50,12 +48,10 @@
                   :choice_environment="tempTask.env"
                   ref="environmentSelectorView"
                 ></environmentSelectorView>
-                <el-popconfirm
-                  placement="top"
-                  title="触发次定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名"
-                  hide-icon>
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>触发次定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名</div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popconfirm>
+                </el-popover>
               </el-form-item>
             </el-col>
           </el-row>
@@ -138,14 +134,12 @@
               v-model="tempTask.is_async"
               :label="parseInt(key)" v-for="(value, key) in runModeData" :key="key">
               {{ value }}</el-radio>
-            <el-popconfirm
-              placement="top"
-              :title="'1、串行执行: 用例一条一条顺序串行执行  \n' +
-              '2、并行执行: 每条用例一个线程并行执行  \n' +
-              '注：并行执行仅仅是为了提升执行效率，请勿用于压力测试'"
-              hide-icon>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、串行执行: 用例一条一条顺序串行执行</div>
+              <div>2、并行执行: 每条用例一个线程并行执行</div>
+              <div>注：并行执行仅仅是为了提升执行效率，请勿用于压力测试</div>
               <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-            </el-popconfirm>
+            </el-popover>
           </el-form-item>
 
         </el-tab-pane>

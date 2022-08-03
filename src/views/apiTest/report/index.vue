@@ -82,23 +82,25 @@
                     @click.native="openReportById(scope.row.id)"></el-button>
 
                   <!-- 删除报告 -->
-                  <el-popconfirm
+                  <el-popover
+                    :ref="scope.row.id"
                     v-show="scope.row.is_done === 1"
                     placement="top"
-                    hide-icon
-                    style="margin-right: 10px"
-                    :title="`确定删除【${scope.row.name}】?`"
-                    confirm-button-text='确认'
-                    cancel-button-text='取消'
-                    @onConfirm="delReport(scope.row.id)"
-                  >
+                    popper-class="down-popover"
+                    v-model="scope.row.deletePopoverIsShow">
+                    <p>确定删除【{{ scope.row.name }}】?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+                      <el-button type="primary" size="mini" @click="delReport(scope.row)">确定</el-button>
+                    </div>
                     <el-button
                       slot="reference"
-                      type="text"
                       style="color: red"
+                      type="text"
                       icon="el-icon-delete"
                     ></el-button>
-                  </el-popconfirm>
+                  </el-popover>
+
                 </template>
               </el-table-column>
             </el-table>
@@ -231,9 +233,14 @@ export default {
       return true;
     },
 
+    cancelDeletePopover(report){
+      this.$set(report, 'deletePopoverIsShow', false)
+    },
+
     // 删除报告
-    delReport(reportId) {
-      deleteReport({id: reportId}).then(response => {
+    delReport(report) {
+      this.$set(report, 'deletePopoverIsShow', false)
+      deleteReport({id: report.id}).then(response => {
         if (this.showMessage(this, response)) {
           this.getReportList()
         }

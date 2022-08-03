@@ -4,9 +4,10 @@
       <el-radio v-model="activeName" label="data">form-data</el-radio>
       <el-radio v-model="activeName" label="json">json</el-radio>
       <el-radio v-model="activeName" label="xml">xml</el-radio>
-      <el-popconfirm placement="top" hide-icon title="发送请求时会使用此处选择的数据类型">
+      <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+        <div>发送请求时会使用此处选择的数据类型</div>
         <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-      </el-popconfirm>
+      </el-popover>
     </div>
 
     <div v-show="activeName === 'data'">

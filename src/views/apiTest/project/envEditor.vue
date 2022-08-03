@@ -107,7 +107,6 @@ export default {
 
     // 保存环境设置
     saveEvent() {
-      console.log('saveEventsaveEventsaveEventsaveEventsaveEvent')
       this.submitButtonIsLoading = true
       this.tempEnv.env = this.currentEnv
       this.tempEnv.func_files = this.$refs.funcFiles.tempFuncFiles

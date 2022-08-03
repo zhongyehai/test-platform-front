@@ -58,40 +58,43 @@
           </el-button>
 
           <!-- 复制元素 -->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
-            style="margin-right: 8px"
-            title="复制此元素并生成新的元素？"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="copyElement(scope.row)"
-          >
+            style="margin-right: 10px"
+            popper-class="down-popover"
+            v-model="scope.row.copyPopoverIsShow">
+            <p>复制此元素并生成新的元素?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="copyElement(scope.row)">确定</el-button>
+            </div>
             <el-button
-              type="text"
               slot="reference"
+              type="text"
               icon="el-icon-document-copy"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
 
           <!-- 删除元素 -->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
-            style="margin-right: 8px"
-            :title="`确定删除【${scope.row.name}】?`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="delElement(scope.row)"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.deletePopoverIsShow">
+            <p>确定删除【{{ scope.row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="delElement(scope.row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
               :loading="scope.row.isShowDeleteLoading"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
         </template>
       </el-table-column>
 
@@ -214,6 +217,7 @@ export default {
 
     // 删除元素
     delElement(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
       deleteElement({'id': row.id}).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
@@ -228,11 +232,20 @@ export default {
       return this.$busEvents.data.findElementOptionDict[option]
     },
 
+    cancelDeletePopover(row){
+      this.$set(row, 'deletePopoverIsShow', false)
+    },
+
+    cancelCopyPopover(row){
+      this.$set(row, 'copyPopoverIsShow', false)
+    },
+
     // 复制元素
     copyElement(element) {
       this.tempElement = element
       this.tempElement.id = ''
       this.$bus.$emit(this.$busEvents.ui.uiElementDrawerStatus, 'copy', JSON.parse(JSON.stringify(this.tempElement)))
+      this.$set(element, 'copyPopoverIsShow', false)
     },
 
     // 根据页面获取元素列表

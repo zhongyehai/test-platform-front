@@ -75,23 +75,24 @@
           ></el-button>
 
           <!-- 删除文件 -->
-          <el-popconfirm
+          <el-popover
+            :ref="scope.row.id"
             placement="top"
-            hide-icon
-            style="margin-right: 10px"
-            :title="`确定删除【${scope.row.name}】?`"
-            confirm-button-text='确认'
-            cancel-button-text='取消'
-            @onConfirm="delFile(scope.row)"
-          >
+            popper-class="down-popover"
+            v-model="scope.row.deletePopoverIsShow">
+            <p>确定删除【{{ scope.row.name }}】?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="delFile(scope.row)">确定</el-button>
+            </div>
             <el-button
               slot="reference"
-              type="text"
               style="color: red"
+              type="text"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>
-          </el-popconfirm>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
@@ -176,8 +177,13 @@ export default {
       })
     },
 
+    cancelDeletePopover(row){
+      this.$set(row, 'deletePopoverIsShow', false)
+    },
+
     // 删除文件
     delFile(row) {
+      this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
       fileDelete({'name': row.name, 'fileType': this.fileType}).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
