@@ -286,33 +286,60 @@
 
                   <el-collapse-item name="7">
                     <template slot="title">
+                      <div class="el-collapse-item-title"> {{ "文件参数：" }}</div>
+                    </template>
+                    <el-row>
+                      <el-col :span="20">
+                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.files">
+                          <JsonViewer
+                            :value="strToJson(this.meta_datas.data[0].request.files)"
+                            :expand-depth="5"
+                            copyable
+                          ></JsonViewer>
+                        </div>
+                      </el-col>
+                      <el-col :span="4">
+                        <el-button
+                          size="mini"
+                          v-if="this.meta_datas.data[0].request.files"
+                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.files)"
+                          v-clipboard:success="onCopy"
+                          v-clipboard:error="onError"
+                        >复制
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                  </el-collapse-item>
+
+                  <el-collapse-item name="8">
+                    <template slot="title">
                       <div class="el-collapse-item-title"> {{ "请求时间：" }}</div>
                     </template>
                     <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="8">
+                  <el-collapse-item name="9">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应时间：" }}</div>
                     </template>
                     <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="9">
+                  <el-collapse-item name="10">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
                     </template>
                     <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="10">
+                  <el-collapse-item name="11">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应编码：" }}</div>
                     </template>
                     <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.encoding }}</div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="11">
+                  <el-collapse-item name="12">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应头部信息：" }}</div>
                     </template>
@@ -339,7 +366,7 @@
                     </el-row>
                   </el-collapse-item>
 
-                  <el-collapse-item name="12">
+                  <el-collapse-item name="13">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应json：" }}</div>
                     </template>
@@ -366,14 +393,14 @@
                     </el-row>
                   </el-collapse-item>
 
-                  <el-collapse-item name="13">
+                  <el-collapse-item name="14">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "响应文本：" }}</div>
                     </template>
                     <div class="el-collapse-item-content" v-html="this.meta_datas.data[0].response.text"></div>
                   </el-collapse-item>
 
-                  <el-collapse-item name="14">
+                  <el-collapse-item name="15">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
                     </template>
@@ -400,7 +427,7 @@
                     </el-row>
                   </el-collapse-item>
 
-                  <el-collapse-item name="15">
+                  <el-collapse-item name="16">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "发送请求时内存中的公共变量：" }}</div>
                     </template>
@@ -427,7 +454,7 @@
                     </el-row>
                   </el-collapse-item>
 
-                  <el-collapse-item name="16">
+                  <el-collapse-item name="17">
                     <template slot="title">
                       <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
                     </template>
@@ -511,7 +538,7 @@ export default {
       runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
-      defaultShowResponseInFo: ['1', '2', '3', '4', '5', '6', '12', '13', '14', '16'],
+      defaultShowResponseInFo: ['1', '2', '3', '4', '5', '6', '7', '13', '14', '15', '17'],
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,
@@ -573,7 +600,10 @@ export default {
         data: [{
           request: {body: null, url: null, headers: null, data: null, params: null, json: null},
           response: {content: null, json: null, status_code: null}
-        }]
+        }],
+        stat: {
+          request_at: ''
+        }
       },
       caseChartData: {
         columns: ['caseName', 'num'],

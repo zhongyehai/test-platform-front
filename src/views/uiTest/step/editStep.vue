@@ -295,7 +295,7 @@ export default {
         "validates": [],
         "data_form": [],
         "data_json": '',
-        "data_xml": '',
+        "data_text": '',
         "data_driver": '',
         "case_id": this.caseId,
         "project_id": ''

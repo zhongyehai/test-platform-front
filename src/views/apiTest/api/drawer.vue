@@ -94,7 +94,7 @@
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
-          style="width: 79%;margin-right: 5px">
+          style="width: 78%;margin-right: 5px">
         </el-input>
 
       </el-form-item>
@@ -146,7 +146,7 @@
           :data-type="tempApi.data_type"
           :data-json="tempApi.data_json"
           :data-form="tempApi.data_form"
-          :data-xml="tempApi.data_xml"
+          :data-text="tempApi.data_text"
         ></bodyView>
       </el-tab-pane>
 
@@ -275,7 +275,7 @@ export default {
         data_type: '',
         data_form: [{key: null, form_data_type: null, remark: null, value: null}],
         data_json: JSON.stringify({}),
-        data_xml: '',
+        data_text: '',
         extracts: [{key: null, value: null, remark: null}],
         validates: [{key: null, value: null, validate_type: null, remark: null}],
         module_id: '',
@@ -407,7 +407,7 @@ export default {
       this.tempApi.data_type = ''
       this.tempApi.data_form = [{key: null, data_type: null, remark: null, value: null}]
       this.tempApi.data_json = {}
-      this.tempApi.data_xml = ''
+      this.tempApi.data_text = ''
       this.tempApi.extracts = [{key: null, value: null, remark: null}]
       this.tempApi.validates = [{key: null, value: null, validate_type: null, remark: null}]
       this.tempApi.module_id = this.currentModuleId ? this.currentModuleId : ''
@@ -437,10 +437,10 @@ export default {
         params: this.$refs.queryStringView.tempData,
         extracts: this.$refs.extractsView.tempData,
         validates: this.$refs.validatesView.tempValidates,
-        data_type: this.$refs.bodyView.activeName,
+        data_type: this.$refs.bodyView.tempDataType,
         data_form: this.$refs.bodyView.$refs.dataFormView.tempDataForm,
         data_json: json_data ? JSON.parse(json_data) : {},
-        data_xml: this.$refs.bodyView.tempDataXml,
+        data_text: this.$refs.bodyView.tempDataText,
         module_id: this.$refs.moduleTree.getCheckedKeys()[0],
         project_id: this.tempApi.project_id
       }

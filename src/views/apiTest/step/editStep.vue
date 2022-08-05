@@ -108,7 +108,7 @@
           :data-type="currentStep.data_type"
           :data-json="currentStep.data_json"
           :data-form="currentStep.data_form"
-          :data-xml="currentStep.data_xml"
+          :data-text="currentStep.data_text"
         ></bodyView>
       </el-tab-pane>
 
@@ -230,9 +230,10 @@ export default {
         "params": [],
         "extracts": [],
         "validates": [],
+        "data_type": "json",
         "data_form": [],
         "data_json": '',
-        "data_xml": '',
+        "data_text": '',
         "data_driver": '',
         "case_id": this.caseId,
         "api_id": '',
@@ -255,9 +256,10 @@ export default {
         "params": [],
         "extracts": [],
         "validates": [],
+        "data_type": "json",
         "data_form": [],
         "data_json": '',
-        "data_xml": '',
+        "data_text": '',
         "data_driver": '',
         "case_id": this.caseId,
         "api_id": '',
@@ -279,9 +281,10 @@ export default {
         "params": this.$refs.paramsView.tempData,
         "extracts": this.$refs.extractsView.tempData,
         "validates": this.$refs.validatesView.tempValidates,
+        "data_type": this.$refs.bodyView.tempDataType,
         "data_form": this.$refs.bodyView.$refs.dataFormView.tempDataForm,
         "data_json": json_data ? JSON.parse(json_data) : {},
-        "data_xml": this.$refs.bodyView.tempDataXml,
+        "data_text": this.$refs.bodyView.tempDataText,
         "data_driver": this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson ? JSON.parse(this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson) : {},
         "quote_case": null,
         "case_id": this.caseId,

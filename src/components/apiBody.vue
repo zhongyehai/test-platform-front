@@ -1,20 +1,20 @@
 <template>
   <div>
     <div style="text-align: center">
-      <el-radio v-model="activeName" label="data">form-data</el-radio>
-      <el-radio v-model="activeName" label="json">json</el-radio>
-      <el-radio v-model="activeName" label="xml">xml</el-radio>
+      <el-radio v-model="tempDataType" label="form">form-data</el-radio>
+      <el-radio v-model="tempDataType" label="json">json</el-radio>
+      <el-radio v-model="tempDataType" label="text">xml / 文本</el-radio>
       <el-popover class="el_popover_class" placement="top-start" trigger="hover">
         <div>发送请求时会使用此处选择的数据类型</div>
         <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
       </el-popover>
     </div>
 
-    <div v-show="activeName === 'data'">
+    <div v-show="tempDataType === 'form'">
       <dataFormView :data-form="tempDataForm" ref="dataFormView"></dataFormView>
     </div>
 
-    <div v-show="activeName === 'json'">
+    <div v-show="tempDataType === 'json'">
       <!-- 使用示例 -->
       <el-collapse accordion>
         <el-collapse-item>
@@ -46,8 +46,8 @@
       ></jsonEditorView>
     </div>
 
-    <div v-show="activeName === 'xml'">
-      <el-input v-model="tempDataXml" type="textarea" :rows="17"></el-input>
+    <div v-show="tempDataType === 'text'">
+      <el-input v-model="tempDataText" type="textarea" :rows="17"></el-input>
     </div>
 
   </div>
@@ -67,11 +67,9 @@ export default {
     dataJsonView,
     jsonEditorView
   },
-  props: ['dataType', 'dataJson', 'dataForm', 'dataXml'],
+  props: ['dataType', 'dataJson', 'dataForm', 'dataText'],
   data() {
     return {
-      activeName: 'json',
-
       // form-data的类型，文本还是文件
       formDataTypes: ['string', 'file'],
 
@@ -81,10 +79,10 @@ export default {
       // 当前上传文件的数据的索引值，上传文件后直接修改
       currentTempApiDataFormIndex: '',
 
-      tempDataType: '',
+      tempDataType: 'json',
       tempDataJson: '',
       tempDataForm: '',
-      tempDataXml: null,
+      tempDataText: null,
     }
   },
 
@@ -93,7 +91,7 @@ export default {
       this.tempDataType = api.data_type
       this.tempDataJson = JSON.stringify(api.data_json)
       this.tempDataForm = api.data_form
-      this.tempDataXml = api.data_xml
+      this.tempDataText = api.data_text
     })
   },
 
@@ -106,7 +104,7 @@ export default {
     this.tempDataType = this.dataType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
     this.tempDataForm = this.dataForm || [{key: null, data_type: null, remark: null, value: null}]
-    this.tempDataXml = this.dataXml || null
+    this.tempDataText = this.dataText || null
   },
 
   methods: {
@@ -140,9 +138,9 @@ export default {
       }
     },
 
-    'dataXml': {
+    'dataText': {
       handler(newVal, oldVal) {
-        this.tempDataXml = newVal
+        this.tempDataText = newVal
       }
     },
 
