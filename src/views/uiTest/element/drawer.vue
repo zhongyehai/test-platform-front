@@ -11,7 +11,7 @@
 
         <div style="margin-left: 20px;margin-right: 20px">
 
-          <el-form ref="dataForm" :model="tempElement" label-width="100px">
+          <el-form ref="dataForm" :model="tempElement" label-width="120px">
             <el-form-item :label="'元素名'" prop="name" size="mini" class="is-required">
               <el-input v-model="tempElement.name"/>
             </el-form-item>
@@ -36,6 +36,18 @@
 
             <el-form-item :label="'元素表达式'" prop="element" size="mini" class="is-required">
               <el-input v-model="tempElement.element"/>
+            </el-form-item>
+
+            <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
+              <el-input-number size="mini" v-model="tempElement.wait_time_out" :min="2"></el-input-number>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>
+                  1、等待元素出现的超时时间，最少设置为2秒 <br>
+                  2、若在此时间内，元素出现，则立即执行步骤，若超过此时间，元素仍未出现，则报错 <br>
+                  3、若元素管理处已设置超时时间，以步骤处设置的为准
+                </div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
             </el-form-item>
 
             <el-form-item :label="'备注'" prop="desc" size="mini">
@@ -84,7 +96,8 @@ export default {
         name: null,
         by: null,
         element: null,
-        desc: null
+        desc: null,
+        wait_time_out: 10,
       },
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
@@ -103,6 +116,7 @@ export default {
         by: null,
         element: null,
         desc: null,
+        wait_time_out: 10,
         page_id: this.pageId,
         module_id: this.currentModuleId,
         project_id: this.currentProjectId
@@ -117,6 +131,7 @@ export default {
       this.tempElement.by = row.by
       this.tempElement.element = row.element
       this.tempElement.desc = row.desc
+      this.tempElement.wait_time_out = row.wait_time_out
       this.tempElement.page_id = row.page_id
       this.tempElement.module_id = row.module_id
       this.tempElement.project_id = row.project_id
@@ -131,6 +146,7 @@ export default {
         by: this.tempElement.by,
         element: this.tempElement.element,
         desc: this.tempElement.desc,
+        wait_time_out: this.tempElement.wait_time_out,
         page_id: this.tempElement.page_id,
         module_id: this.tempElement.module_id,
         project_id: this.tempElement.project_id,

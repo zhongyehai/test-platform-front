@@ -155,7 +155,7 @@
 
     <!-- 新增/修改表单 -->
     <el-drawer
-      :title=" drawerType === 'add' ? '新增服务' : '修改服务'"
+      :title=" drawerType === 'add' ? '新增用户' : '修改用户'"
       size="40%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"

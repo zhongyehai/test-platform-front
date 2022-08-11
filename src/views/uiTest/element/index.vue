@@ -22,31 +22,31 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="by" label="定位方式" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="by" label="定位方式" min-width="23%">
         <template slot-scope="scope">
           <span> {{ parseFindElementOption(scope.row.by) }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="by" label="元素表达式" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="element" label="元素表达式" min-width="23%">
         <template slot-scope="scope">
           <span> {{ scope.row.element }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true prop="wait_time_out" label="等待时间(秒)" min-width="10%">
         <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
+          <span> {{ scope.row.wait_time_out }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
+      <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="元素操作" min-width="14%">
+      <el-table-column label="元素操作" min-width="8%">
         <template slot-scope="scope">
 
           <!--修改元素-->

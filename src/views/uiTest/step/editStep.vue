@@ -80,15 +80,33 @@
               <el-input type="textarea" autosize v-model="currentStep.send_keys" placeholder="输入对应内容"></el-input>
             </el-form-item>
 
-            <el-form-item label="执行次数" class="is-required">
-              <el-input-number
-                v-model="currentStep.run_times"
-                size="mini"
-                :precision="0"
-                :min="1"
-                :max="1000"
-              ></el-input-number>
-            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
+                  <el-input-number size="mini" v-model="currentStep.wait_time_out" :min="2"></el-input-number>
+                  <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                    <div>
+                      1、等待元素出现的超时时间，最少设置为2秒 <br>
+                      2、若在此时间内，元素出现，则立即执行步骤，若超过此时间，元素仍未出现，则报错 <br>
+                      3、若元素管理处已设置超时时间，以步骤处设置的为准</div>
+                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                  </el-popover>
+                </el-form-item>
+              </el-col>
+
+              <el-col :span="12">
+                <el-form-item label="执行次数" class="is-required">
+                  <el-input-number
+                    v-model="currentStep.run_times"
+                    size="mini"
+                    :precision="0"
+                    :min="1"
+                    :max="1000"
+                  ></el-input-number>
+                </el-form-item>
+              </el-col>
+            </el-row>
+
           </el-form>
         </el-tab-pane>
 
@@ -265,6 +283,7 @@ export default {
         'id': '',
         "is_run": '',
         "name": '',
+        "wait_time_out": 10,
         "up_func": '',
         "down_func": '',
         "execute_type": '',
@@ -285,6 +304,7 @@ export default {
         'id': '',
         "is_run": '',
         "name": '',
+        "wait_time_out": 10,
         "up_func": '',
         "down_func": '',
         "execute_type": '',
@@ -307,6 +327,7 @@ export default {
         'id': this.currentStep.id,
         "is_run": this.currentStep.is_run,
         "name": this.currentStep.name,
+        "wait_time_out": this.currentStep.wait_time_out,
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
         "run_times": this.currentStep.run_times,
@@ -374,7 +395,7 @@ export default {
 
   mounted() {
 
-    // 新增步骤
+    // 新增步骤（把元素转为步骤）
     this.$bus.$on(this.$busEvents.ui.uiShowStepDrawer, (type, step) => {
       this.currentElement = step
 
@@ -382,6 +403,7 @@ export default {
         this.currentStep.id = ''
         this.currentStep.is_run = true
         this.currentStep.name = step.name
+        this.currentStep.wait_time_out = step.wait_time_out
         this.currentStep.up_func = ''
         this.currentStep.down_func = ''
         this.currentStep.execute_type = ''

@@ -49,7 +49,7 @@
           </el-form-item>
 
           <el-row>
-            <el-col :span="12">
+            <el-col :span="8">
               <el-form-item label="执行次数" class="is-required">
                 <el-input-number
                   v-model="currentStep.run_times"
@@ -61,7 +61,21 @@
               </el-form-item>
             </el-col>
 
-            <el-col :span="12">
+            <el-col :span="8">
+              <el-form-item label="超时时间">
+                <el-input-number
+                  v-model="currentStep.time_out"
+                  size="mini"
+                  :min="5"
+                ></el-input-number>
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>发送request请求时，等待回调的超时时间，最少设置为5秒</div>
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popover>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="8">
               <el-form label-width="200px" v-show="currentStep.id">
                 <el-form-item label="是否使用用例所在项目的域名">
                   <el-switch
@@ -223,6 +237,7 @@ export default {
         "is_run": '',
         "replace_host": '',
         "name": '',
+        "time_out": 60,
         "up_func": '',
         "down_func": '',
         "run_times": 0,
@@ -249,6 +264,7 @@ export default {
         "is_run": '',
         "replace_host": '',
         "name": '',
+        "time_out": 60,
         "up_func": '',
         "down_func": '',
         "run_times": 0,
@@ -274,6 +290,7 @@ export default {
         "is_run": this.currentStep.is_run,
         "replace_host": this.currentStep.replace_host,
         "name": this.currentStep.name,
+        "time_out": this.currentStep.time_out,
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
         "run_times": this.currentStep.run_times,

@@ -12,7 +12,7 @@
       <el-row>
 
         <!-- 接口名称 -->
-        <el-col :span="12">
+        <el-col :span="9">
           <el-form-item label="接口名称" class="is-required" style="margin-bottom: 5px">
             <el-input v-model="tempApi.name" placeholder="接口名称" size="mini">
             </el-input>
@@ -20,7 +20,7 @@
         </el-col>
 
         <!-- 选择模块 -->
-        <el-col :span="12">
+        <el-col :span="9">
           <el-form-item label="选择模块" class="is-required" style="margin-bottom: 5px">
             <el-select v-model="moduleLabel" placeholder="请选择模块" size="mini" style="width: 100%">
               <el-option :value="[]" style="height: auto">
@@ -36,9 +36,20 @@
                 ></el-tree>
               </el-option>
             </el-select>
-
           </el-form-item>
         </el-col>
+
+        <!-- 接口超时时间 -->
+        <el-col :span="6">
+          <el-form-item label="超时时间" class="is-required" style="margin-bottom: 5px">
+            <el-input-number size="mini" v-model="tempApi.time_out" :min="5"></el-input-number>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>发送request请求时，等待回调的超时时间，最少设置为5秒</div>
+              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            </el-popover>
+          </el-form-item>
+        </el-col>
+
       </el-row>
 
       <!-- 前置条件 -->
@@ -69,7 +80,7 @@
             placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
             size="mini"></el-input>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>在运行接口之后要做的一些前置操作，使用自定义函数的形式实现</div>
+            <div>在运行接口之后要做的一些后置操作，使用自定义函数的形式实现</div>
             <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
           </el-popover>
         </el-form-item>
@@ -270,6 +281,7 @@ export default {
         down_func: '',
         method: '',
         addr: '',
+        time_out: 60,
         headers: [{key: null, value: null, remark: null}],
         params: [{key: null, value: null}],
         data_type: '',
@@ -402,6 +414,7 @@ export default {
       this.tempApi.down_func = ''
       this.tempApi.method = ''
       this.tempApi.addr = ''
+      this.tempApi.time_out = 60
       this.tempApi.headers = [{key: null, value: null, remark: null}]
       this.tempApi.params = [{key: null, value: null}]
       this.tempApi.data_type = ''
@@ -432,6 +445,7 @@ export default {
         up_func: this.tempApi.up_func,
         down_func: this.tempApi.down_func,
         addr: this.tempApi.addr,
+        time_out: this.tempApi.time_out,
         method: this.$refs.methodsSelectorView.tempMethod,
         headers: this.$refs.headersView.tempData,
         params: this.$refs.queryStringView.tempData,

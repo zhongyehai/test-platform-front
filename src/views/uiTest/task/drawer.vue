@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     :title=" tempTask.id ? '修改定时任务' : '新增定时任务'"
-    size="60%"
+    size="65%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
@@ -16,7 +16,6 @@
           <!-- 服务选择 -->
           <el-row>
 
-
             <el-col :span="12">
               <el-form-item label="选择服务" class="is-required">
                 <el-select
@@ -25,7 +24,7 @@
                   size="mini"
                   filterable
                   default-first-option
-                  style="width: 95%"
+                  style="width: 90%"
                   :disabled="true"
                 >
                   <el-option
@@ -55,6 +54,7 @@
                 </el-popover>
               </el-form-item>
             </el-col>
+
           </el-row>
 
           <el-form-item label="发送报告" class="is-required">

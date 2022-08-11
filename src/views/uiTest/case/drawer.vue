@@ -15,14 +15,14 @@
           <!-- 第一行 -->
           <el-row>
             <!-- 用例名称 -->
-            <el-col :span="10">
+            <el-col :span="13">
               <el-form-item label="用例名称" class="is-required">
                 <el-input v-model="tempCase.name"></el-input>
               </el-form-item>
             </el-col>
 
             <!-- 用例集选择 -->
-            <el-col :span="9">
+            <el-col :span="6">
               <el-form-item label="用例集" class="is-required" style="margin-bottom: 5px">
                 <el-select v-model="caseSetLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
@@ -50,6 +50,7 @@
                 ></el-input-number>
               </el-form-item>
             </el-col>
+
           </el-row>
 
           <!-- 函数文件 -->

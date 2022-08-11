@@ -143,8 +143,10 @@ export default {
 
     // 监听选中服务
     this.$bus.$on(this.$busEvents.api.apiProjectSelectorChoiceProject, (project) => {
-      this.currentProjectId = project
-      this.getModulesByProjectId(project.id)
+      if (project){
+        this.currentProjectId = project
+        this.getModulesByProjectId(project.id)
+      }
     })
 
     // 获取模块对应的接口列表
