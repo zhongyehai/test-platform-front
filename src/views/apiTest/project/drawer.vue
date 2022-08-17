@@ -45,7 +45,8 @@
             <el-tab-pane label="环境管理" name="env">
               <div style="text-align: center">
                 <el-radio v-model="currentEnv" :label="key" v-for="(value, key) in envMapping" :key="key">
-                  {{ value }}</el-radio>
+                  {{ value }}
+                </el-radio>
                 <el-popover
                   class="el_popover_class"
                   placement="top-start"
@@ -97,11 +98,27 @@
             @click="saveEnv()"
             :loading="submitEnvButtonIsLoading"
           >
-            {{'保存' + envMapping[currentEnv] + '信息' }}
+            {{ '保存' + envMapping[currentEnv] + '信息' }}
           </el-button>
 
         </div>
       </div>
+
+      <el-dialog
+        append-to-body
+        :visible.sync="dialogIsShow"
+        width="40%"
+        :before-close="closeDialog">
+        <div style="text-align: center">
+          {{ responseMessage  + '，是否需要设置环境信息？'}}
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button size="mini" @click="closeDialog">不设置</el-button>
+          <el-button size="mini" type="primary" @click="openEnvTab">要设置</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- 环境编辑 -->
       <envSynchronizer></envSynchronizer>
     </el-drawer>
   </div>
@@ -153,11 +170,25 @@ export default {
       submitButtonIsLoading: false,
       submitEnvButtonIsLoading: false,
       submitButtonIsShow: true,
-      infoCopy: {}
+      infoCopy: {},
+      responseMessage: '',
+      dialogIsShow: false
     }
   },
 
   methods: {
+
+    // 关闭dialog
+    closeDialog(done) {
+      this.dialogIsShow = false  // 关闭dialog
+      this.drawerIsShow = false  // 关闭抽屉
+    },
+
+    // 切换到环境编辑tab
+    openEnvTab(){
+      this.dialogIsShow = false  // 关闭dialog
+      this.activeName = 'env'
+    },
 
     // 获取环境配置
     initEnv() {
@@ -173,7 +204,7 @@ export default {
     beforeLeave(activeName, oldActiveName) {
 
       // 从服务管理页面切到环境管理，则自动保存
-      if (oldActiveName === 'info' && !this.tempProject.id){
+      if (oldActiveName === 'info' && !this.tempProject.id) {
         this.activeName = oldActiveName
         this.submitButtonIsLoading = true
         let that = this
@@ -183,11 +214,11 @@ export default {
             this.tempProject = response.data
             this.sendIsCommitStatus()
             that.$bus.$emit(that.$busEvents.api.apiClickProjectEnv, that.tempProject.id)
-          }else {
+          } else {
             this.activeName = oldActiveName
           }
         })
-      }else {
+      } else {
         this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id)
       }
     },
@@ -241,6 +272,8 @@ export default {
       postProject(this.getProjectForCommit()).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
+          this.responseMessage = response.message
+          this.dialogIsShow = true
           this.infoCopy = JSON.parse(JSON.stringify(response.data))
           this.tempProject.id = response.data.id
           this.sendIsCommitStatus()
@@ -249,7 +282,7 @@ export default {
     },
 
     // 点击保存环境信息
-    saveEnv(){
+    saveEnv() {
       this.submitEnvButtonIsLoading = true
       // console.log('this.activeName: ', this.activeName)
       this.$bus.$emit(this.$busEvents.api.apiSaveProjectEnv, this.currentEnv)
@@ -261,6 +294,8 @@ export default {
       putProject(this.getProjectForCommit()).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
+          this.responseMessage = response.message
+          this.dialogIsShow = true
           this.infoCopy = JSON.parse(JSON.stringify(response.data))
           this.sendIsCommitStatus()
         }
@@ -292,7 +327,7 @@ export default {
     // 环境提交成功后，取消loading、关闭抽屉
     this.$bus.$on(this.$busEvents.api.apiEnvIsCommit, (projectId, host, env, status) => {
       this.submitEnvButtonIsLoading = false
-      if (status){
+      if (status) {
         this.drawerIsShow = false
       }
     })

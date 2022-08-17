@@ -126,16 +126,18 @@ export default {
 
     // 获取环境信息
     getEnv(env, projectId) {
-      getProjectEnv({env: env, projectId: projectId}).then(response => {
-        this.initData = JSON.parse(JSON.stringify(response.data))
-        this.tempEnv.id = response.data.id
-        this.tempEnv.env = response.data.env
-        this.tempEnv.host = response.data.host
-        this.tempEnv.headers = response.data.headers
-        this.tempEnv.variables = response.data.variables
-        this.tempEnv.project_id = response.data.project_id
-        this.tempEnv.func_files = response.data.func_files
-      })
+      if (projectId) {
+        getProjectEnv({env: env, projectId: projectId}).then(response => {
+          this.initData = JSON.parse(JSON.stringify(response.data))
+          this.tempEnv.id = response.data.id
+          this.tempEnv.env = response.data.env
+          this.tempEnv.host = response.data.host
+          this.tempEnv.headers = response.data.headers
+          this.tempEnv.variables = response.data.variables
+          this.tempEnv.project_id = response.data.project_id
+          this.tempEnv.func_files = response.data.func_files
+        })
+      }
     },
   },
 
@@ -182,10 +184,10 @@ export default {
       }
     },
 
-    'currentEnv':{
+    'currentEnv': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        if (newVal){
+        if (newVal) {
           this.getEnv(newVal, this.currentProjectId)
         }
       }
