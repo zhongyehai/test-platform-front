@@ -55,6 +55,17 @@
 
           <el-form-item label="函数文件">
             <funcFilesView :funcFiles="tempCase.func_files" ref="funcFilesView"></funcFilesView>
+            <el-popover
+              class="el_popover_class"
+              placement="top-start"
+              trigger="hover">
+              <div>
+                <div>1、用例下要用到自定义函数可以在这里统一引用对应的函数文件</div>
+                <div>2、此处引用的函数文件，对于当前用例下的测试步骤均有效</div>
+                <div>3、若此处引用了函数文件，服务处也引用了函数文件，则会把两边引用的合并去重</div>
+              </div>
+              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            </el-popover>
           </el-form-item>
 
         </el-form>

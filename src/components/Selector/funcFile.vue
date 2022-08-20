@@ -7,7 +7,7 @@
     default-first-option
     clearable
     size="mini"
-    style="width:100%"
+    style="width:98%"
     placeholder="请选择函数文件"
     class="filter-item">
     <el-option

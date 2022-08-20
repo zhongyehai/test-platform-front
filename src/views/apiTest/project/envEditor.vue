@@ -7,21 +7,6 @@
         <el-input v-model="tempEnv.host" placeholder="域名，必填"/>
       </el-form-item>
 
-      <!-- 函数文件 -->
-      <el-tooltip class="item" effect="dark" placement="top-end">
-        <div slot="content">
-          若服务下要用到自定义函数可以在这里统一引用对应的函数文件 <br/>
-          此处引用的函数文件，对于当前服务下的接口、用例均有效
-        </div>
-        <el-form-item label="函数文件" prop="func_files" size="mini">
-          <funcFileView
-            ref="funcFiles"
-            :funcFiles="tempEnv.func_files"
-            :currentFuncFileList="funcFilesList"
-          ></funcFileView>
-        </el-form-item>
-      </el-tooltip>
-
     </el-form>
 
     <el-tabs style="margin-left: 20px" :key="currentEnv">
@@ -69,7 +54,6 @@
 <script>
 import headersView from '@/components/Inputs/changeRow'
 import variablesView from '@/components/Inputs/changeRow'
-import funcFileView from '@/components/Selector/funcFile'
 
 import {getProjectEnv, putProjectEnv} from '@/apis/apiTest/project'
 
@@ -77,12 +61,10 @@ export default {
   name: 'envEditor',
   props: [
     'currentEnv',
-    'funcFilesList',
     'currentProjectId'
   ],
   components: {
     headersView,
-    funcFileView,
     variablesView
   },
   data() {
@@ -93,7 +75,6 @@ export default {
         env: '',
         host: '',
         project_id: '',
-        func_files: [],
         headers: [{'key': "", 'value': "", 'remark': ""}],
         variables: [{'key': "", 'value': "", 'remark': ""}]
       },
@@ -109,7 +90,6 @@ export default {
     saveEvent() {
       this.submitButtonIsLoading = true
       this.tempEnv.env = this.currentEnv
-      this.tempEnv.func_files = this.$refs.funcFiles.tempFuncFiles
       this.tempEnv.project_id = this.tempProjectId
       putProjectEnv(this.tempEnv).then(response => {
         this.submitButtonIsLoading = false
@@ -135,7 +115,6 @@ export default {
           this.tempEnv.headers = response.data.headers
           this.tempEnv.variables = response.data.variables
           this.tempEnv.project_id = response.data.project_id
-          this.tempEnv.func_files = response.data.func_files
         })
       }
     },
@@ -165,7 +144,6 @@ export default {
       if (envData[this.tempEnv]) {
         this.tempEnv.headers = envData[this.tempEnv].headers
         this.tempEnv.variables = envData[this.tempEnv].variables
-        this.tempEnv.func_files = envData[this.tempEnv].func_files
       }
     })
   },

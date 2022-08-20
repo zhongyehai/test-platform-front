@@ -21,6 +21,25 @@
                 <el-form-item :label="'负责人'" prop="manager" size="mini" class="is-required">
                   <userSelector ref="userSelect" :user="tempProject.manager"></userSelector>
                 </el-form-item>
+
+                <!-- 函数文件 -->
+                <el-form-item label="函数文件" prop="func_files" size="mini">
+                  <funcFileView
+                    ref="funcFiles"
+                    :funcFiles="tempProject.func_files"
+                    :currentFuncFileList="funcFilesList"
+                  ></funcFileView>
+                  <el-popover
+                    class="el_popover_class"
+                    placement="top-start"
+                    trigger="hover">
+                    <div>
+                      <div>1、若服务下要用到自定义函数可以在这里统一引用对应的函数文件</div>
+                      <div>2、此处引用的函数文件，对于当前服务下的接口、用例均有效</div>
+                    </div>
+                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                  </el-popover>
+                </el-form-item>
               </el-form>
             </el-tab-pane>
 
@@ -88,6 +107,8 @@
 
       <el-dialog
         append-to-body
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :visible.sync="dialogIsShow"
         width="40%"
         :before-close="closeDialog">
@@ -112,6 +133,7 @@ import variablesView from '@/components/Inputs/changeRow'
 import userSelector from "@/components/Selector/user";
 import envEditor from "@/views/uiTest/project/envEditor";
 import envSynchronizer from "@/views/uiTest/project/envSynchronizer";
+import funcFileView from '@/components/Selector/funcFile'
 
 import {postProject, putProject} from '@/apis/uiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
@@ -128,7 +150,8 @@ export default {
     variablesView,
     userSelector,
     envEditor,
-    envSynchronizer
+    envSynchronizer,
+    funcFileView
   },
   data() {
     return {
@@ -141,6 +164,7 @@ export default {
         id: null,
         name: null,
         manager: null,
+        func_files: [],
         create_user: null
       },
 
@@ -224,7 +248,8 @@ export default {
       this.tempProject = {
         id: null,
         name: null,
-        manager: null
+        manager: null,
+        func_files: []
       }
       this.submitButtonIsShow = true
     },
@@ -235,6 +260,7 @@ export default {
       this.tempProject.id = row.id
       this.tempProject.name = row.name
       this.tempProject.manager = row.manager
+      this.tempProject.func_files = row.func_files
       this.submitButtonIsShow = true
     },
 
@@ -243,7 +269,8 @@ export default {
       return {
         id: this.tempProject.id,
         name: this.tempProject.name,
-        manager: this.$refs.userSelect.tempData
+        manager: this.$refs.userSelect.tempData,
+        func_files: this.$refs.funcFiles.tempFuncFiles
       }
     },
 

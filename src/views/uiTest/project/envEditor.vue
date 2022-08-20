@@ -7,21 +7,6 @@
         <el-input v-model="tempEnv.host" placeholder="域名，必填"/>
       </el-form-item>
 
-      <!-- 函数文件 -->
-      <el-tooltip class="item" effect="dark" placement="top-end">
-        <div slot="content">
-          若服务下要用到自定义函数可以在这里统一引用对应的函数文件 <br/>
-          此处引用的函数文件，对于当前服务下的接口、用例均有效
-        </div>
-        <el-form-item label="函数文件" prop="func_files" size="mini">
-          <funcFileView
-            ref="funcFiles"
-            :funcFiles="tempEnv.func_files"
-            :currentFuncFileList="funcFilesList"
-          ></funcFileView>
-        </el-form-item>
-      </el-tooltip>
-
     </el-form>
 
     <el-tabs style="margin-left: 20px" :key="currentEnv">
@@ -125,7 +110,6 @@ import variablesView from '@/components/Inputs/changeRow'
 import cookiesView from '@/components/Inputs/changeRow'
 import sessionStorageView from '@/components/Inputs/changeRow'
 import localStorageView from '@/components/Inputs/changeRow'
-import funcFileView from '@/components/Selector/funcFile'
 
 import {getProjectEnv, putProjectEnv} from '@/apis/uiTest/project'
 
@@ -133,11 +117,9 @@ export default {
   name: 'envEditor',
   props: [
     'currentEnv',
-    'funcFilesList',
     'currentProjectId'
   ],
   components: {
-    funcFileView,
     variablesView,
     cookiesView,
     sessionStorageView,
@@ -151,7 +133,6 @@ export default {
         env: '',
         host: '',
         project_id: '',
-        func_files: [],
         variables: [{'key': "", 'value': "", 'remark': ""}],
         cookies: [{'key': "", 'value': "", 'remark': ""}],
         session_storage: [{'key': "", 'value': "", 'remark': ""}],
@@ -169,7 +150,6 @@ export default {
       this.tempEnv.cookies = this.$refs.cookiesView.tempData
       this.tempEnv.session_storage = this.$refs.sessionStorageView.tempData
       this.tempEnv.local_storage = this.$refs.localStorageView.tempData
-      this.tempEnv.func_files = this.$refs.funcFiles.tempFuncFiles
       this.tempEnv.project_id = this.tempProjectId
       putProjectEnv(this.tempEnv).then(response => {
         this.$bus.$emit(
@@ -196,7 +176,6 @@ export default {
           this.tempEnv.session_storage = response.data.session_storage
           this.tempEnv.local_storage = response.data.local_storage
           this.tempEnv.project_id = response.data.project_id
-          this.tempEnv.func_files = response.data.func_files
         })
       }
     },
@@ -228,7 +207,6 @@ export default {
         this.tempEnv.cookies = envData[this.tempEnv].cookies
         this.tempEnv.session_storage = envData[this.tempEnv].session_storage
         this.tempEnv.local_storage = envData[this.tempEnv].local_storage
-        this.tempEnv.func_files = envData[this.tempEnv].func_files
       }
     })
   },

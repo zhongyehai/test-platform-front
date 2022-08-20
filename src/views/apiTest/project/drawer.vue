@@ -21,6 +21,7 @@
                 <el-form-item :label="'负责人'" prop="manager" size="mini" class="is-required">
                   <userSelector ref="userSelect" :user="tempProject.manager"></userSelector>
                 </el-form-item>
+
                 <el-form-item :label="'swagger地址'" prop="swagger" class="filter-item" size="mini">
                   <el-input
                     v-model="tempProject.swagger"
@@ -38,6 +39,26 @@
                     <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
                   </el-popover>
                 </el-form-item>
+
+                <!-- 函数文件 -->
+                <el-form-item label="函数文件" prop="func_files" size="mini">
+                  <funcFileView
+                    ref="funcFiles"
+                    :funcFiles="tempProject.func_files"
+                    :currentFuncFileList="funcFilesList"
+                  ></funcFileView>
+                  <el-popover
+                    class="el_popover_class"
+                    placement="top-start"
+                    trigger="hover">
+                    <div>
+                      <div>1、若服务下要用到自定义函数可以在这里统一引用对应的函数文件</div>
+                      <div>2、此处引用的函数文件，对于当前服务下的接口、用例均有效</div>
+                    </div>
+                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                  </el-popover>
+                </el-form-item>
+
               </el-form>
 
             </el-tab-pane>
@@ -62,7 +83,6 @@
               <envEditor
                 ref="envEditor"
                 :currentEnv="currentEnv"
-                :funcFilesList="funcFilesList"
                 :currentProjectId="tempProject.id"
               ></envEditor>
 
@@ -106,11 +126,13 @@
 
       <el-dialog
         append-to-body
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :visible.sync="dialogIsShow"
         width="40%"
         :before-close="closeDialog">
         <div style="text-align: center">
-          {{ responseMessage  + '，是否需要设置环境信息？'}}
+          {{ responseMessage + '，是否需要设置环境信息？' }}
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="closeDialog">不设置</el-button>
@@ -130,6 +152,7 @@ import variablesView from '@/components/Inputs/changeRow'
 import userSelector from "@/components/Selector/user";
 import envEditor from "@/views/apiTest/project/envEditor";
 import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
+import funcFileView from '@/components/Selector/funcFile'
 
 import {postProject, putProject} from '@/apis/apiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
@@ -146,7 +169,8 @@ export default {
     variablesView,
     userSelector,
     envEditor,
-    envSynchronizer
+    envSynchronizer,
+    funcFileView
   },
   data() {
     return {
@@ -160,6 +184,7 @@ export default {
         name: null,
         manager: null,
         swagger: '',
+        func_files: [],
         create_user: null
       },
 
@@ -185,7 +210,7 @@ export default {
     },
 
     // 切换到环境编辑tab
-    openEnvTab(){
+    openEnvTab() {
       this.dialogIsShow = false  // 关闭dialog
       this.activeName = 'env'
     },
@@ -241,7 +266,8 @@ export default {
         id: null,
         name: null,
         manager: null,
-        swagger: ''
+        swagger: '',
+        func_files: []
       }
       this.submitButtonIsShow = true
     },
@@ -253,6 +279,7 @@ export default {
       this.tempProject.name = row.name
       this.tempProject.manager = row.manager
       this.tempProject.swagger = row.swagger
+      this.tempProject.func_files = row.func_files
       this.submitButtonIsShow = true
     },
 
@@ -262,7 +289,8 @@ export default {
         id: this.tempProject.id,
         name: this.tempProject.name,
         manager: this.$refs.userSelect.tempData,
-        swagger: this.tempProject.swagger
+        swagger: this.tempProject.swagger,
+        func_files: this.$refs.funcFiles.tempFuncFiles
       }
     },
 

@@ -143,49 +143,27 @@
       </el-table-column>
 
       <el-table-column :label="'操作'" align="center" min-width="10%" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template slot-scope="{row, $index}">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
           <el-popover
-            v-show="scope.row.yapi_id"
-            :ref="scope.row.id"
+            v-show="row.yapi_id || row.swagger"
+            :ref="row.id"
             placement="top"
             width="160"
             style="margin-right: 10px"
             popper-class="down-popover"
-            v-model="scope.row.pullByYapiPopoverIsShow">
-            <p>从yapi拉取此服务下的模块、接口信息?</p>
+            v-model="row.pullPopoverIsShow">
+            <p>从{{row.yapi_id ? 'yapi' : 'swagger'}}拉取此服务下的模块、接口信息?</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelPullByYapi(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="pullByYapi(scope.row)">确定</el-button>
+              <el-button size="mini" type="text" @click="cancelPull(row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="row.yapi_id ? pullByYapi(row) : pullBySwagger(row)">确定</el-button>
             </div>
             <el-button
               slot="reference"
               type="text"
               icon="el-icon-refresh"
-              :loading="scope.row.pullByYapiPopoverLoadingIsShow"
-            ></el-button>
-          </el-popover>
-
-          <!-- 从swagger拉取模块、接口信息-->
-          <el-popover
-            v-show="!scope.row.yapi_id && scope.row.swagger"
-            :ref="scope.row.id"
-            placement="top"
-            width="160"
-            style="margin-right: 10px"
-            popper-class="down-popover"
-            v-model="scope.row.pullBySwaggerPopoverIsShow">
-            <p>从swagger拉取此服务下的模块、接口信息?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelPullBySwagger(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="pullBySwagger(scope.row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              type="text"
-              icon="el-icon-refresh"
-              :loading="scope.row.isPullBySwagger"
+              :loading="row.pullPopoverLoadingIsShow"
             ></el-button>
           </el-popover>
 
@@ -195,26 +173,26 @@
             size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
-            @click="showEditForm(scope.row)">
+            @click="showEditForm(row)">
           </el-button>
 
           <!--删除服务-->
           <el-popover
-            :ref="scope.row.id"
+            :ref="row.id"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.deletePopoverIsShow">
-            <p>确定删除【{{ scope.row.name }}】?</p>
+            v-model="row.deletePopoverIsShow">
+            <p>确定删除【{{ row.name }}】?</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delProject(scope.row)">确定</el-button>
+              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="delProject(row)">确定</el-button>
             </div>
             <el-button
               slot="reference"
               style="color: red"
               type="text"
               icon="el-icon-delete"
-              :loading="scope.row.deleteButtonIsLoading"
+              :loading="row.deleteButtonIsLoading"
             ></el-button>
           </el-popover>
 
@@ -309,11 +287,11 @@ export default {
 
     // 从yapi同步服务信息
     pullByYapi(row) {
-      this.$set(row, 'pullByYapiPopoverIsShow', false)
-      this.$set(row, 'pullByYapiPopoverLoadingIsShow', true)
+      this.$set(row, 'pullPopoverIsShow', false)
+      this.$set(row, 'pullPopoverLoadingIsShow', true)
       yapiPull({id: row.id}).then(response => {
         this.showMessage(this, response)
-        this.$set(row, 'pullByYapiPopoverLoadingIsShow', false)
+        this.$set(row, 'pullPopoverLoadingIsShow', false)
       })
     },
 
@@ -330,11 +308,11 @@ export default {
 
     // 从swagger同步服务信息
     pullBySwagger(row) {
-      this.$set(row, 'pullBySwaggerPopoverIsShow', false)
-      this.$set(row, 'isPullBySwagger', true)
+      this.$set(row, 'pullPopoverIsShow', false)
+      this.$set(row, 'pullPopoverLoadingIsShow', true)
       swaggerPull({id: row.id}).then(response => {
         this.showMessage(this, response)
-        this.$set(row, 'isPullBySwagger', false)
+        this.$set(row, 'pullPopoverLoadingIsShow', false)
       })
     },
 
@@ -360,8 +338,8 @@ export default {
       })
     },
 
-    cancelPullByYapi(row){
-      this.$set(row, 'pullByYapiPopoverIsShow', false)
+    cancelPull(row){
+      this.$set(row, 'pullPopoverIsShow', false)
     },
 
     cancelPullBySwagger(row){
