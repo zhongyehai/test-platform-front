@@ -36,9 +36,10 @@
             min-width="47%"
           ></el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="10%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" label="使用次数" min-width="10%">
             <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.create_user) }}</span>
+              <el-tag type="success" v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
+              <el-tag type="danger" v-else>0</el-tag>
             </template>
           </el-table-column>
 
@@ -263,6 +264,7 @@ export default {
     copyApi(api) {
       this.tempApi = api
       this.tempApi.id = ''
+      this.tempApi.quote_count = 0
       this.$bus.$emit(this.$busEvents.api.apiApiDrawerStatus, 'copy', JSON.parse(JSON.stringify(this.tempApi)))
       this.$set(api, 'copyPopoverIsShow', false)
     },
