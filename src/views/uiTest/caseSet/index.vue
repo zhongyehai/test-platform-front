@@ -162,7 +162,7 @@ import {ellipsis, arrayToTree} from "@/utils/parseData"
 
 import {projectList} from "@/apis/uiTest/project";
 import {caseSetTree, caseSetRun, deleteCaseSet, postCaseSet, putCaseSet} from "@/apis/uiTest/caseSet";
-import {reportIsDone} from "@/apis/apiTest/report";
+import {reportIsDone} from "@/apis/uiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
