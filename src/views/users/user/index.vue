@@ -174,7 +174,7 @@
           <el-input v-model="tempUser.account" placeholder="2~12位"/>
         </el-form-item>
         <el-form-item :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="6~18位"/>
+          <el-input v-model="tempUser.password" placeholder="4~18位"/>
         </el-form-item>
         <el-form-item :label="'角色'" class="is-required" size="mini">
           <el-select v-model="tempUser.role_id" placeholder="请选择角色" style="width:100%">
