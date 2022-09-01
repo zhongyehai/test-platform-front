@@ -155,7 +155,7 @@
 
     <!-- 新增/修改表单 -->
     <el-drawer
-      :title=" drawerType === 'add' ? '新增用户' : '修改用户'"
+      :title=" drawerType === 'create' ? '新增用户' : '修改用户'"
       size="40%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
@@ -170,12 +170,19 @@
         <el-form-item :label="'用户名'" prop="name" class="is-required" size="mini">
           <el-input v-model="tempUser.name" placeholder="2~12位"/>
         </el-form-item>
+
         <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
           <el-input v-model="tempUser.account" placeholder="2~12位"/>
         </el-form-item>
-        <el-form-item :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位"/>
+
+        <el-form-item v-if="drawerType === 'create'" :label="'密码'" prop="name" class="is-required" size="mini">
+          <el-input v-model="tempUser.password" placeholder="4~18位，必填"/>
         </el-form-item>
+
+        <el-form-item v-else :label="'密码'" prop="name" size="mini">
+          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改"/>
+        </el-form-item>
+
         <el-form-item :label="'角色'" class="is-required" size="mini">
           <el-select v-model="tempUser.role_id" placeholder="请选择角色" style="width:100%">
             <el-option
@@ -193,7 +200,7 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click="drawerType==='create'?addUser():changUser()">保存
+          @click="drawerType==='create' ? addUser() : changUser()">保存
         </el-button>
       </div>
 

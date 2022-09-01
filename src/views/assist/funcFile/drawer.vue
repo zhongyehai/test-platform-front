@@ -60,6 +60,7 @@ export default {
       if (status === 'add') {
         this.tempFunc.name = ''
         this.tempFunc.desc = ''
+        this.tempFunc.id = ''
       } else if (status === 'update') {
         this.tempFunc.id = data.id
         this.tempFunc.name = data.name
