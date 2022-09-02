@@ -157,6 +157,7 @@
           :data-type="tempApi.data_type"
           :data-json="tempApi.data_json"
           :data-form="tempApi.data_form"
+          :data-urlencoded="tempApi.data_urlencoded"
           :data-text="tempApi.data_text"
         ></bodyView>
       </el-tab-pane>
@@ -178,6 +179,15 @@
           ref="validatesView"
           :validates="tempApi.validates"
         ></validatesView>
+      </el-tab-pane>
+
+      <!-- 响应信息 -->
+      <el-tab-pane label="响应对象" name="response">
+        <JsonViewer
+          :value="strToJson(tempApi.response)"
+          :expand-depth="5"
+          copyable
+        ></JsonViewer>
       </el-tab-pane>
 
     </el-tabs>
@@ -215,6 +225,8 @@
 </template>
 
 <script>
+import JsonViewer from "vue-json-viewer";
+
 import projectSelectorView from "@/components/Selector/project";
 import moduleSelectorView from "@/components/Selector/module";
 import methodsSelectorView from "@/components/Selector/methods";
@@ -237,6 +249,7 @@ export default {
     'currentModuleId',
   ],
   components: {
+    JsonViewer,
     projectSelectorView,
     moduleSelectorView,
     methodsSelectorView,
@@ -287,9 +300,11 @@ export default {
         data_type: '',
         data_form: [{key: null, form_data_type: null, remark: null, value: null}],
         data_json: JSON.stringify({}),
+        data_urlencoded: JSON.stringify({}),
         data_text: '',
         extracts: [{key: null, value: null, remark: null}],
         validates: [{key: null, value: null, validate_type: null, remark: null}],
+        response: {},
         module_id: '',
         project_id: ''
       },
@@ -300,6 +315,15 @@ export default {
   },
 
   methods: {
+
+    // 解析字符串为json
+    strToJson(str) {
+      try {
+        return JSON.parse(str)
+      } catch (err) {
+        return str
+      }
+    },
 
     // 勾选树事件
     handleNodeClick(data, checked, node) {
@@ -420,7 +444,9 @@ export default {
       this.tempApi.data_type = ''
       this.tempApi.data_form = [{key: null, data_type: null, remark: null, value: null}]
       this.tempApi.data_json = {}
+      this.tempApi.data_urlencoded = {}
       this.tempApi.data_text = ''
+      this.tempApi.response = {}
       this.tempApi.extracts = [{key: null, value: null, remark: null}]
       this.tempApi.validates = [{key: null, value: null, validate_type: null, remark: null}]
       this.tempApi.module_id = this.currentModuleId ? this.currentModuleId : ''
@@ -438,6 +464,7 @@ export default {
     // 获取 tempApi 用于提交数据
     getTempApi() {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
       return {
         id: this.tempApi.id,
         name: this.tempApi.name,
@@ -451,9 +478,11 @@ export default {
         params: this.$refs.queryStringView.tempData,
         extracts: this.$refs.extractsView.tempData,
         validates: this.$refs.validatesView.tempValidates,
+        // response: this.tempApi.response,
         data_type: this.$refs.bodyView.tempDataType,
         data_form: this.$refs.bodyView.$refs.dataFormView.tempDataForm,
         data_json: json_data ? JSON.parse(json_data) : {},
+        data_urlencoded: data_urlencoded ? JSON.parse(data_urlencoded) : {},
         data_text: this.$refs.bodyView.tempDataText,
         module_id: this.$refs.moduleTree.getCheckedKeys()[0],
         project_id: this.tempApi.project_id

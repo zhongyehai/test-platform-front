@@ -172,9 +172,16 @@
         label-position="left"
         label-width="90px"
         style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+
         <el-form-item :label="'模块名称'" class="filter-item is-required" prop="name" size="mini">
           <el-input v-model="tempDataForm.name" placeholder="同一节点下，模块名称不可重复"/>
         </el-form-item>
+
+
+        <el-form-item :label="'controller'" class="filter-item" prop="name" size="mini">
+          <el-input v-model="tempDataForm.controller" disabled/>
+        </el-form-item>
+
       </el-form>
       <div class="demo-drawer__footer">
         <el-button size="mini" @click="moduleDrawerIsShow = false"> {{ '取消' }}</el-button>
@@ -229,6 +236,7 @@ export default {
         level: '',
         parent: '',
         project_id: '',
+        controller: ''
       },
       moduleDrawerIsShow: false,
       moduleDrawerStatus: '',
@@ -326,6 +334,7 @@ export default {
     showModuleDialog(command, node, data) {
       this.moduleDrawerStatus = command
       this.tempDataForm.name = command === 'edit' ? data.name : ''
+      this.tempDataForm.controller = data.controller
       this.moduleDrawerIsShow = true
     },
 
@@ -414,6 +423,7 @@ export default {
       this.$bus.$emit(this.$busEvents.api.apiApiDrawerStatus, 'add', {
         data_type: 'json',
         data_json: {},
+        data_urlencoded: {},
         data_form: [{key: null, data_type: null, remark: null, value: null}]
       })
     },

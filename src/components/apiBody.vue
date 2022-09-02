@@ -2,6 +2,7 @@
   <div>
     <div style="text-align: center">
       <el-radio v-model="tempDataType" label="form">form-data</el-radio>
+      <el-radio v-model="tempDataType" label="urlencoded">form-urlencoded</el-radio>
       <el-radio v-model="tempDataType" label="json">json</el-radio>
       <el-radio v-model="tempDataType" label="text">xml / 文本</el-radio>
       <el-popover class="el_popover_class" placement="top-start" trigger="hover">
@@ -12,6 +13,38 @@
 
     <div v-show="tempDataType === 'form'">
       <dataFormView :data-form="tempDataForm" ref="dataFormView"></dataFormView>
+    </div>
+
+    <div v-show="tempDataType === 'urlencoded'">
+      <!-- 使用示例 -->
+      <el-collapse accordion>
+        <el-collapse-item>
+          <template slot="title">
+            <div style="color:#409eff"> 点击查看示例</div>
+          </template>
+          <div style="margin-left: 20px">
+            可以使用自定义函数，也可以使用自定义变量
+            <pre>
+  {
+    "key1": "123",
+    "key2": "$extract_name_2",  // 自定义变量（提取的变量）
+    "key3": "some_data$extract_name_2",  // 字符串+自定义变量拼接
+    "key4": "${do_something()}",  // 自定义函数
+    "key5": "${do_something(1, b=2)}",  // 带参数的自定义函数
+    "key6": "${do_something($extract_name_1)}",  // 自定义函数传自定义变量为参数
+    "key7": "${do_something($extract_name_1, b=$extract_name_2)}",  // 自定义函数指定位置传参
+    "key8": "some_data${do_something($extract_name_1, b=$extract_name_2)}",  // 字符串+自定义函数拼接
+    "key9": "${do_something($extract_name_1, b=$extract_name_2)}some_data"   // 字符串+自定义函数拼接
+  }
+  <span style="margin-top: 5px"><span style="color: red">注</span>：不支持 自定义变量+字符串的拼接，如：$extract_name_2some_data</span>
+              </pre>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
+      <jsonEditorView
+          ref="urlencodedEditorView"
+          :dataJson="dataUrlencoded"
+      ></jsonEditorView>
     </div>
 
     <div v-show="tempDataType === 'json'">
@@ -67,7 +100,7 @@ export default {
     dataJsonView,
     jsonEditorView
   },
-  props: ['dataType', 'dataJson', 'dataForm', 'dataText'],
+  props: ['dataType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'],
   data() {
     return {
       // form-data的类型，文本还是文件
@@ -80,17 +113,20 @@ export default {
       currentTempApiDataFormIndex: '',
 
       tempDataType: 'json',
-      tempDataJson: '',
+      tempDataJson: {},
       tempDataForm: '',
+      tempDataUrlencoded: {},
       tempDataText: null,
     }
   },
 
   mounted() {
     this.$bus.$on(this.$busEvents.api.apiApiDrawerStatus, (command, api) => {
+      console.log(api)
       this.tempDataType = api.data_type
       this.tempDataJson = JSON.stringify(api.data_json)
       this.tempDataForm = api.data_form
+      this.tempDataUrlencoded = JSON.stringify(api.data_urlencoded)
       this.tempDataText = api.data_text
     })
   },
@@ -103,6 +139,7 @@ export default {
   created() {
     this.tempDataType = this.dataType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
+    this.tempDataUrlencoded = JSON.stringify(this.dataUrlencoded) || JSON.stringify({})
     this.tempDataForm = this.dataForm || [{key: null, data_type: null, remark: null, value: null}]
     this.tempDataText = this.dataText || null
   },
@@ -129,6 +166,12 @@ export default {
     'dataJson': {
       handler(newVal, oldVal) {
         this.tempDataJson = JSON.stringify(newVal) || JSON.stringify({})
+      }
+    },
+
+    'dataUrlencoded': {
+      handler(newVal, oldVal) {
+        this.tempDataUrlencoded = JSON.stringify(newVal) || JSON.stringify({})
       }
     },
 

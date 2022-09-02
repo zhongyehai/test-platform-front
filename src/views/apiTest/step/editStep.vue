@@ -122,6 +122,7 @@
           :data-type="currentStep.data_type"
           :data-json="currentStep.data_json"
           :data-form="currentStep.data_form"
+          :data-urlencoded="currentStep.data_urlencoded"
           :data-text="currentStep.data_text"
         ></bodyView>
       </el-tab-pane>
@@ -247,7 +248,8 @@ export default {
         "validates": [],
         "data_type": "json",
         "data_form": [],
-        "data_json": '',
+        "data_json": {},
+        "data_urlencoded": {},
         "data_text": '',
         "data_driver": '',
         "case_id": this.caseId,
@@ -274,7 +276,8 @@ export default {
         "validates": [],
         "data_type": "json",
         "data_form": [],
-        "data_json": '',
+        "data_json": {},
+        "data_urlencoded": {},
         "data_text": '',
         "data_driver": '',
         "case_id": this.caseId,
@@ -285,6 +288,7 @@ export default {
 
     getStepForCommit() {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
       return {
         'id': this.currentStep.id,
         "is_run": this.currentStep.is_run,
@@ -301,6 +305,7 @@ export default {
         "data_type": this.$refs.bodyView.tempDataType,
         "data_form": this.$refs.bodyView.$refs.dataFormView.tempDataForm,
         "data_json": json_data ? JSON.parse(json_data) : {},
+        "data_urlencoded": data_urlencoded ? JSON.parse(data_urlencoded) : {},
         "data_text": this.$refs.bodyView.tempDataText,
         "data_driver": this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson ? JSON.parse(this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson) : {},
         "quote_case": null,
