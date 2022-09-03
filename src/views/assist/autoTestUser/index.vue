@@ -45,9 +45,14 @@
           <span> {{ scope.row.password }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="token" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true label="access_token" min-width="25%">
         <template slot-scope="scope">
-          <span> {{ scope.row.u_token }} </span>
+          <span> {{ scope.row.access_token }} </span>
+        </template>
+      </el-table-column>
+      <el-table-column :show-overflow-tooltip=true label="refresh_token" min-width="25%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.refresh_token }} </span>
         </template>
       </el-table-column>
       <el-table-column :show-overflow-tooltip=true label="公司名称" min-width="25%">
