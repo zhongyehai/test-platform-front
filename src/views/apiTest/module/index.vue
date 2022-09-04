@@ -334,7 +334,7 @@ export default {
     showModuleDialog(command, node, data) {
       this.moduleDrawerStatus = command
       this.tempDataForm.name = command === 'edit' ? data.name : ''
-      this.tempDataForm.controller = data.controller
+      this.tempDataForm.controller = command === 'edit' ? data.controller : ''
       this.moduleDrawerIsShow = true
     },
 
