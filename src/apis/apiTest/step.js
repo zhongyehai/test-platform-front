@@ -1,8 +1,10 @@
 import request from '@/utils/request';  // 加载请求配置文件
 import {baseDirApiTest} from "@/apis/base";
 
+let currentBaseDir = baseDirApiTest + '/step/'
+
 function Func(method, data = null, params = null) {
-  return request({url: baseDirApiTest + '/step', method: method, data: data, params: params});
+  return request({url: currentBaseDir, method: method, data: data, params: params});
 }
 
 // 添加步骤
@@ -27,25 +29,25 @@ export function deleteStep(data) {
 
 // 修改步骤状态
 export function putStepIsRun(data) {
-  return request({url: baseDirApiTest + '/step/changeIsRun', method: 'put', data: data});
+  return request({url: currentBaseDir + 'changeIsRun/', method: 'put', data: data});
 }
 
 // 修改步骤引用的host
 export function putStepHost(data) {
-  return request({url: baseDirApiTest + '/step/changeHost', method: 'put', data: data});
+  return request({url: currentBaseDir + 'changeHost/', method: 'put', data: data});
 }
 
 // 获取步骤list
 export function stepList(params) {
-  return request({url: baseDirApiTest + '/step/list', method: 'get', params: params});
+  return request({url: currentBaseDir + 'list/', method: 'get', params: params});
 }
 
 // 修改步骤排序
 export function stepSort(data) {
-  return request({url: baseDirApiTest + '/step/sort', method: 'put', data: data});
+  return request({url: currentBaseDir + 'sort/', method: 'put', data: data});
 }
 
 // 复制步骤
 export function stepCopy(data) {
-  return request({url: baseDirApiTest + '/step/copy', method: 'post', data: data});
+  return request({url: currentBaseDir + 'copy/', method: 'post', data: data});
 }

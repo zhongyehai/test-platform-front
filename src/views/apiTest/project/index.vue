@@ -151,7 +151,7 @@
             :ref="row.id"
             placement="top"
             width="160"
-            style="margin-right: 10px"
+            style="margin-right: 5px"
             popper-class="down-popover"
             v-model="row.pullPopoverIsShow">
             <p>从{{row.yapi_id ? 'yapi' : 'swagger'}}拉取此服务下的模块、接口信息?</p>
@@ -171,9 +171,17 @@
           <el-button
             type="text"
             size="mini"
-            style="margin-right: 10px"
             icon="el-icon-edit"
             @click="showEditForm(row)">
+          </el-button>
+
+          <!-- 编辑服务环境 -->
+          <el-button
+            type="text"
+            size="mini"
+            style="margin-right: 5px"
+            icon="el-icon-edit-outline"
+            @click="showEditEnvForm(row)">
           </el-button>
 
           <!--删除服务-->
@@ -215,6 +223,9 @@
       :currentUserList="currentUserList"
     ></projectDrawer>
 
+    <projectEnvDrawer
+    :env-mapping="envMapping"
+    ></projectEnvDrawer>
   </div>
 </template>
 
@@ -222,16 +233,19 @@
 import {deleteProject, projectList} from '@/apis/apiTest/project'
 import {yapiPull, yapiPullProject} from '@/apis/assist/yapi'
 import {swaggerPull} from '@/apis/assist/swagger'
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/apiTest/project/drawer'
+import projectEnvDrawer from '@/views/apiTest/project/envEditor'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'Project',
   components: {
     Pagination,
-    projectDrawer
+    projectDrawer,
+    projectEnvDrawer
   },
   directives: {waves},
   data() {
@@ -254,6 +268,7 @@ export default {
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
+      envMapping: {}
     }
   },
 
@@ -283,6 +298,11 @@ export default {
     // 编辑按钮
     showEditForm(row) {
       this.$bus.$emit(this.$busEvents.api.apiShowProjectDrawer, 'edit', row)
+    },
+
+    // 编辑环境
+    showEditEnvForm(row) {
+      this.$bus.$emit(this.$busEvents.api.apiShowProjectEnvDrawer, row)
     },
 
     // 从yapi同步服务信息
@@ -342,9 +362,6 @@ export default {
       this.$set(row, 'pullPopoverIsShow', false)
     },
 
-    cancelPullBySwagger(row){
-      this.$set(row, 'pullBySwaggerPopoverIsShow', false)
-    },
 
     cancelDeletePopover(row){
       this.$set(row, 'deletePopoverIsShow', false)
@@ -395,6 +412,11 @@ export default {
 
     this.$bus.$on(this.$busEvents.api.apiProjectDrawerCommitSuccess, (status) => {
       this.getProjectList()
+    })
+
+    // 获取环境配置
+    getConfigByName({'name': 'run_test_env'}).then(response => {
+      this.envMapping = JSON.parse(response.data.value)
     })
 
     // test环境修改后，前端页面也跟随修改域名

@@ -346,7 +346,7 @@ import {
   weeklyConfigList, downloadWeeklyData
 } from "@/apis/testWork/weekly";
 
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 import {formatTime, getCurrentWeekStartTimeAndEndTime} from "@/utils/timeUtil";
 import {tryParseInt} from "@/utils/parseData";
 

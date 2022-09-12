@@ -1,5 +1,5 @@
 import {getConfigByName} from '@/apis/config/config'
-import {assertMappingList, extractMappingList, extractTypeList} from '@/apis/uiTest/step'
+import {assertMappingList, extractMappingList} from '@/apis/webUiTest/step'
 
 // 获取配置的运行等待超时时间
 export function getRunTimeout(_this) {

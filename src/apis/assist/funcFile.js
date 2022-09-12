@@ -1,8 +1,11 @@
 import request from '@/utils/request';  //加载请求配置文件
 import {baseDirAssist} from "@/apis/base";
 
+
+let currentBaseDir = baseDirAssist + '/func/'
+
 function Func(method, data = null, params = null) {
-  return request({url: baseDirAssist + '/func', method: method, data: data, params: params});
+  return request({url: currentBaseDir, method: method, data: data, params: params});
 }
 
 // 新增自定函数文件
@@ -22,20 +25,20 @@ export function getFuncFile(params) {
 
 // 删除自定函数文件
 export function deleteFuncFile(data) {
-  return Func('delete', null, data)
+  return Func('delete', data)
 }
 
 // 保存自定义函数内容
 export function saveFuncFileData(data) {
-  return request({url: baseDirAssist + '/func/data', method: 'put', data: data});
+  return request({url: currentBaseDir + 'data/', method: 'put', data: data});
 }
 
 // 获取所有自定函数文件名
 export function funcFileList(params) {
-  return request({url: baseDirAssist + '/func/list', method: 'get', params: params});
+  return request({url: currentBaseDir + 'list/', method: 'get', params: params});
 }
 
 // 校验自定函数文件
 export function debugFuncFile(data) {
-  return request({url: baseDirAssist + '/func/debug', method: 'POST', data: data});
+  return request({url: currentBaseDir + 'debug/', method: 'POST', data: data});
 }

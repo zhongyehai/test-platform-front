@@ -32,6 +32,78 @@
             <el-input disabled v-model="currentStep.addr"></el-input>
           </el-form-item>
 
+          <el-form-item label="跳过条件" size="small">
+            <!-- 实际结果 -->
+            <el-col :span="6">
+              <el-input
+                v-model="currentStep.skip_if.check_value"
+                type="textarea"
+                :rows="1"
+                style="width: 95%"
+                placeholder="实际结果，支持自定义变量表达式"></el-input>
+            </el-col>
+
+            <!-- 断言方式 -->
+            <el-col :span="6">
+              <el-select
+                v-model="currentStep.skip_if.comparator"
+                placeholder="断言类型"
+                style="width: 95%"
+                filterable
+                clearable
+                default-first-option
+                size="mini"
+                @change="selectValidateType($event)"
+              >
+                <el-option
+                  v-for="(item) in validateTypeList"
+                  :key="item.value"
+                  :label="item.value"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-col>
+
+            <!-- 数据类型 -->
+            <el-col :span="6">
+              <el-select
+                v-model="currentStep.skip_if.data_type"
+                placeholder="选择数据类型"
+                :disabled="currentStep.skip_if.comparator === '值为真' || currentStep.skip_if.comparator === '值为假'"
+                style="width: 95%"
+                filterable
+                clearable
+                default-first-option
+                size="mini">
+                <el-option
+                  v-for="(item) in dataTypeMapping"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-col>
+
+            <!-- 预期结果 -->
+            <el-col :span="6">
+              <el-input
+                v-model="currentStep.skip_if.expect"
+                type="textarea"
+                :rows="1"
+                style="width: 90%"
+                :disabled="currentStep.skip_if.comparator === '值为真' || currentStep.skip_if.comparator === '值为假'"
+                placeholder="预期结果，请填写具体的数或值"></el-input>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>1、执行当前步骤时，会先判断此条件，如果条件成立，则跳过当前步骤</div>
+                <div>2、实际结果，在步骤过程中提取的要用来判断的自定义变量表达式，或者常量</div>
+                <div>3、预期结果，仅支持常量</div>
+                <div>4、数据类型，将会把预期结果转为指定的类型后再与实际结果进行对比</div>
+                <div style="color: red">注：如果条件成立，则跳过当前步骤</div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
+            </el-col>
+          </el-form-item>
+
           <el-form-item label="前置处理" size="small">
             <el-input
               type="textarea"
@@ -208,8 +280,9 @@ import extractsView from "@/components/Inputs/extract"
 import validatesView from "@/components/Inputs/validates";
 
 import {postStep, putStep, putStepHost} from "@/apis/apiTest/step"
-import {getApi} from "@/apis/apiTest/api";
+import {getApi, getAssertMapping} from "@/apis/apiTest/api";
 import {getProject} from "@/apis/apiTest/project";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: "editStep",
@@ -241,6 +314,7 @@ export default {
         "time_out": 60,
         "up_func": '',
         "down_func": '',
+        "skip_if": {"expect": null, "comparator": "", "data_type": "", "check_value": null},
         "run_times": 0,
         "headers": [],
         "params": [],
@@ -255,7 +329,10 @@ export default {
         "case_id": this.caseId,
         "api_id": '',
         "project_id": ''
-      }
+      },
+
+      validateTypeList: [],
+      dataTypeMapping: [],
     }
   },
   methods: {
@@ -269,6 +346,7 @@ export default {
         "time_out": 60,
         "up_func": '',
         "down_func": '',
+        "skip_if": {"expect": null, "comparator": "", "data_type": "", "check_value": null},
         "run_times": 0,
         "headers": [],
         "params": [],
@@ -297,6 +375,7 @@ export default {
         "time_out": this.currentStep.time_out,
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
+        "skip_if": this.currentStep.skip_if,
         "run_times": this.currentStep.run_times,
         "headers": this.$refs.headersView.tempData,
         "params": this.$refs.paramsView.tempData,
@@ -353,10 +432,45 @@ export default {
     // 取消保存
     rowBackStep() {
       this.currentStep = this.currentStepCopy
-    }
+    },
+
+    // 从后端获取断言方式
+    getAssertMappings() {
+      getAssertMapping().then(response => {
+        this.validateTypeList = response.data
+      })
+    },
+
+    // 从后端获取数据类型映射
+    getDataTypeMapping(){
+      getConfigByName({'name': 'data_type_mapping'}).then(response => {
+        this.dataTypeMapping = JSON.parse(response.data.value)
+      })
+    },
+
+    // 选中断言类型事件
+    selectValidateType(data){
+      if (data === '值为真'){
+        this.currentStep.skip_if.data_type = 'str'
+        this.currentStep.skip_if.expect = 'True'
+        return true
+      }else if (data === '值为假'){
+        this.currentStep.skip_if.data_type = 'str'
+        this.currentStep.skip_if.expect = 'False'
+        return true
+      }
+    },
   },
 
   mounted() {
+
+    if (this.validateTypeList.length === 0) {
+      this.getAssertMappings()
+    }
+
+    if (this.dataTypeMapping.length === 0) {
+      this.getDataTypeMapping()
+    }
 
     // 新增步骤
     this.$bus.$on(this.$busEvents.api.apiAddApiToStep, (step, type) => {
@@ -379,6 +493,9 @@ export default {
       getProject({id: step.project_id}).then(response => {
         this.$set(this.currentStep, 'projectName', response.data.name)
       })
+      if (!step.skip_if || step.skip_if.length <= 1){
+        step.skip_if = this.currentStep.skip_if
+      }
       this.currentStep = step
       this.currentStepCopy = JSON.parse(JSON.stringify(step))  // 深拷贝
       this.drawerType = 'update'

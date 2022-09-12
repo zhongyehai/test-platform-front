@@ -107,7 +107,7 @@
 import Pagination from '@/components/Pagination'
 
 import {getDiffRecordList, getDiffRecordProjectList, getDiffRecordAsXmind} from "@/apis/assist/yapi";
-import {userList} from "@/apis/user/user";
+import {userList} from "@/apis/system/user";
 
 export default {
   name: 'diffDecord',

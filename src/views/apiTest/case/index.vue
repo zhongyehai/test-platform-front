@@ -138,7 +138,7 @@ import Pagination from '@/components/Pagination'
 import caseDrawer from '@/views/apiTest/case/drawer'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/apiTest/case'
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";

@@ -78,7 +78,8 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {getEnvList, getAutoTestUser} from "@/apis/assist/dataPool";
+import {getAutoTestUser} from "@/apis/assist/dataPool";
+import {getConfigByName} from "@/apis/config/config";  // 初始化超时时间
 
 export default {
   name: 'dataPool',
@@ -96,8 +97,8 @@ export default {
 
     // 获取环境列表
     getAllEnv(){
-      getEnvList().then(response => {
-        this.envDict = response.data
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.envDict = JSON.parse(response.data.value)
       })
     },
 

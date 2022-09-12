@@ -17,7 +17,6 @@
               :label="key"
               :key="key"
               @change="changeRadio()"
-              border
             >{{ value }}
             </el-radio>
           </el-tab-pane>

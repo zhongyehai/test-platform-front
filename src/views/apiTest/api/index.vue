@@ -144,7 +144,7 @@ import Pagination from '@/components/Pagination'
 import apiDrawer from '@/views/apiTest/api/drawer'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";

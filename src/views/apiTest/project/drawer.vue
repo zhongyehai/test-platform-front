@@ -9,116 +9,64 @@
       <div class="demo-drawer__content">
 
         <div style="margin-left: 20px">
+          <el-form ref="dataForm" :model="tempProject" label-width="100px"
+                   style="min-width: 200px;margin-left: 20px;margin-right: 20px">
+            <el-form-item :label="'服务名'" prop="name" size="mini" class="is-required">
+              <el-input v-model="tempProject.name"/>
+            </el-form-item>
 
-          <el-tabs v-model="activeName" :before-leave="beforeLeave">
-            <el-tab-pane label="服务信息" name="info">
-              <el-form ref="dataForm" :model="tempProject" label-width="100px"
-                       style="min-width: 200px;margin-left: 20px;margin-right: 20px">
-                <el-form-item :label="'服务名'" prop="name" size="mini" class="is-required">
-                  <el-input v-model="tempProject.name"/>
-                </el-form-item>
+            <el-form-item :label="'负责人'" prop="manager" size="mini" class="is-required">
+              <userSelector ref="userSelect" :user="tempProject.manager"></userSelector>
+            </el-form-item>
 
-                <el-form-item :label="'负责人'" prop="manager" size="mini" class="is-required">
-                  <userSelector ref="userSelect" :user="tempProject.manager"></userSelector>
-                </el-form-item>
+            <el-form-item :label="'swagger地址'" prop="swagger" class="filter-item" size="mini">
+              <el-input
+                v-model="tempProject.swagger"
+                style="width: 98%"
+                placeholder="当前服务的swagger地址，用于拉取模块、接口数据"/>
+              <el-popover
+                class="el_popover_class"
+                placement="top-start"
+                trigger="hover">
+                <div>
+                  <div>1、此处填写对应服务获取swagger数据的地址</div>
+                  <div>2、回到列表页点击同步按钮，系统会自动获取swagger数据，并把其中的模块、接口同步到测试平台，无需手动录入</div>
+                  <div>注：请输入获取swagger数据的地址，不要输入swagger-ui地址</div>
+                </div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
+            </el-form-item>
 
-                <el-form-item :label="'swagger地址'" prop="swagger" class="filter-item" size="mini">
-                  <el-input
-                    v-model="tempProject.swagger"
-                    style="width: 98%"
-                    placeholder="当前服务的swagger地址，用于拉取模块、接口数据"/>
-                  <el-popover
-                    class="el_popover_class"
-                    placement="top-start"
-                    trigger="hover">
-                    <div>
-                      <div>1、此处填写对应服务获取swagger数据的地址</div>
-                      <div>2、回到列表页点击同步按钮，系统会自动获取swagger数据，并把其中的模块、接口同步到测试平台，无需手动录入</div>
-                      <div>注：请输入获取swagger数据的地址，不要输入swagger-ui地址</div>
-                    </div>
-                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                  </el-popover>
-                </el-form-item>
+            <!-- 函数文件 -->
+            <el-form-item label="函数文件" prop="func_files" size="mini">
+              <funcFileView
+                ref="funcFiles"
+                :funcFiles="tempProject.func_files"
+                :currentFuncFileList="funcFilesList"
+              ></funcFileView>
+              <el-popover
+                class="el_popover_class"
+                placement="top-start"
+                trigger="hover">
+                <div>
+                  <div>1、若服务下要用到自定义函数可以在这里统一引用对应的函数文件</div>
+                  <div>2、此处引用的函数文件，对于当前服务下的接口、用例均有效</div>
+                </div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
+            </el-form-item>
 
-                <!-- 函数文件 -->
-                <el-form-item label="函数文件" prop="func_files" size="mini">
-                  <funcFileView
-                    ref="funcFiles"
-                    :funcFiles="tempProject.func_files"
-                    :currentFuncFileList="funcFilesList"
-                  ></funcFileView>
-                  <el-popover
-                    class="el_popover_class"
-                    placement="top-start"
-                    trigger="hover">
-                    <div>
-                      <div>1、若服务下要用到自定义函数可以在这里统一引用对应的函数文件</div>
-                      <div>2、此处引用的函数文件，对于当前服务下的接口、用例均有效</div>
-                    </div>
-                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                  </el-popover>
-                </el-form-item>
-
-              </el-form>
-
-            </el-tab-pane>
-
-            <el-tab-pane label="环境管理" name="env">
-              <div style="text-align: center">
-                <el-radio v-model="currentEnv" :label="key" v-for="(value, key) in envMapping" :key="key">
-                  {{ value }}
-                </el-radio>
-                <el-popover
-                  class="el_popover_class"
-                  placement="top-start"
-                  trigger="hover">
-                  <div>
-                    <div>1、环境项数据来源于参数管理处的配置</div>
-                    <div>2、若新加了环境项，对于每个项目请自行把环境数据同步到新加的环境上</div>
-                  </div>
-                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popover>
-              </div>
-
-              <envEditor
-                ref="envEditor"
-                :currentEnv="currentEnv"
-                :currentProjectId="tempProject.id"
-              ></envEditor>
-
-            </el-tab-pane>
-
-          </el-tabs>
+          </el-form>
         </div>
 
         <div class="demo-drawer__footer">
-          <!-- 同步环境信息 -->
+          <el-button size="mini" @click="drawerIsShow = false" style="float: left"> {{ '取消' }}</el-button>
           <el-button
-            style="float: left"
-            v-if="tempProject.id"
-            type="primary"
-            size="mini"
-            @click="showEnvSynchronizer()"
-          >{{ '同步环境信息' }}
-          </el-button>
-
-          <el-button
-            v-show="activeName === 'info'"
             type="primary"
             size="mini"
             @click="tempProject.id ? changProject() : addProject() "
             :loading="submitButtonIsLoading"
           >{{ tempProject.id ? '保存项目信息' : '新增项目信息' }}
-          </el-button>
-
-          <el-button
-            v-show="activeName !== 'info'"
-            type="primary"
-            size="mini"
-            @click="saveEnv()"
-            :loading="submitEnvButtonIsLoading"
-          >
-            {{ '保存' + envMapping[currentEnv] + '信息' }}
           </el-button>
 
         </div>
@@ -136,27 +84,20 @@
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="closeDialog">不设置</el-button>
-          <el-button size="mini" type="primary" @click="openEnvTab">要设置</el-button>
+          <el-button size="mini" type="primary" @click="showEnvDrawer">要设置</el-button>
         </span>
       </el-dialog>
 
-      <!-- 环境编辑 -->
-      <envSynchronizer></envSynchronizer>
     </el-drawer>
   </div>
 </template>
 
 <script>
-import headersView from '@/components/Inputs/changeRow'
-import variablesView from '@/components/Inputs/changeRow'
 import userSelector from "@/components/Selector/user";
-import envEditor from "@/views/apiTest/project/envEditor";
-import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
 import funcFileView from '@/components/Selector/funcFile'
 
 import {postProject, putProject} from '@/apis/apiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
-import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'drawer',
@@ -165,19 +106,13 @@ export default {
     'currentUserList'
   ],
   components: {
-    headersView,
-    variablesView,
     userSelector,
-    envEditor,
-    envSynchronizer,
     funcFileView
   },
   data() {
     return {
       drawerIsShow: false,  // 抽屉的显示状态
       direction: 'rtl',  // 抽屉打开方式
-      activeName: 'info',
-
       // 临时数据，添加、修改
       tempProject: {
         id: null,
@@ -187,15 +122,10 @@ export default {
         func_files: [],
         create_user: null
       },
-
-      envMapping: {},  // 环境映射
-      currentEnv: 'test',
       user_list: [],  // 用户列表
       funcFilesList: [],
       submitButtonIsLoading: false,
-      submitEnvButtonIsLoading: false,
       submitButtonIsShow: true,
-      infoCopy: {},
       responseMessage: '',
       dialogIsShow: false
     }
@@ -210,47 +140,10 @@ export default {
     },
 
     // 切换到环境编辑tab
-    openEnvTab() {
+    showEnvDrawer() {
       this.dialogIsShow = false  // 关闭dialog
-      this.activeName = 'env'
-    },
-
-    // 获取环境配置
-    initEnv() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.envMapping = JSON.parse(response.data.value)
-      })
-    },
-
-    /* 点击切换tab
-    * activeName：要去的标签页
-    * oldActiveName：当前的标签页
-    * */
-    beforeLeave(activeName, oldActiveName) {
-
-      // 从服务管理页面切到环境管理，则自动保存
-      if (oldActiveName === 'info' && !this.tempProject.id) {
-        this.activeName = oldActiveName
-        this.submitButtonIsLoading = true
-        let that = this
-        postProject(this.getProjectForCommit()).then(response => {
-          this.submitButtonIsLoading = false
-          if (this.showMessage(this, response)) {
-            this.tempProject = response.data
-            this.sendIsCommitStatus()
-            that.$bus.$emit(that.$busEvents.api.apiClickProjectEnv, that.tempProject.id)
-          } else {
-            this.activeName = oldActiveName
-          }
-        })
-      } else {
-        this.$bus.$emit(this.$busEvents.api.apiClickProjectEnv, this.tempProject.id)
-      }
-    },
-
-    // 点击同步信息
-    showEnvSynchronizer() {
-      this.$bus.$emit(this.$busEvents.api.apiShowEnvSynchronizer, this.tempProject.id)
+      this.drawerIsShow = false  // 关闭抽屉
+      this.$bus.$emit(this.$busEvents.api.apiShowProjectEnvDrawer, this.tempProject)
     },
 
     // 获取自定义函数列表
@@ -274,7 +167,6 @@ export default {
 
     // 初始化临时服务数据 (修改)
     updateTempProject(row) {
-      this.infoCopy = JSON.parse(JSON.stringify(row))
       this.tempProject.id = row.id
       this.tempProject.name = row.name
       this.tempProject.manager = row.manager
@@ -301,19 +193,11 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.responseMessage = response.message
-          this.dialogIsShow = true
-          this.infoCopy = JSON.parse(JSON.stringify(response.data))
           this.tempProject.id = response.data.id
           this.sendIsCommitStatus()
+          this.dialogIsShow = true
         }
       })
-    },
-
-    // 点击保存环境信息
-    saveEnv() {
-      this.submitEnvButtonIsLoading = true
-      // console.log('this.activeName: ', this.activeName)
-      this.$bus.$emit(this.$busEvents.api.apiSaveProjectEnv, this.currentEnv)
     },
 
     // 修改服务
@@ -323,9 +207,8 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.responseMessage = response.message
-          this.dialogIsShow = true
-          this.infoCopy = JSON.parse(JSON.stringify(response.data))
           this.sendIsCommitStatus()
+          this.dialogIsShow = true
         }
       })
     },
@@ -339,7 +222,6 @@ export default {
 
   mounted() {
 
-    this.initEnv()
     this.getFuncFileList()
 
     this.$bus.$on(this.$busEvents.api.apiShowProjectDrawer, (status, data) => {
@@ -351,20 +233,11 @@ export default {
       }
       this.drawerIsShow = true
     })
-
-    // 环境提交成功后，取消loading、关闭抽屉
-    this.$bus.$on(this.$busEvents.api.apiEnvIsCommit, (projectId, host, env, status) => {
-      this.submitEnvButtonIsLoading = false
-      if (status) {
-        this.drawerIsShow = false
-      }
-    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.api.apiShowProjectDrawer)
-    this.$bus.$off(this.$busEvents.api.apiEnvIsCommit)
   },
 
   watch: {

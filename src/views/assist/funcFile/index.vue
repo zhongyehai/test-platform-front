@@ -105,7 +105,7 @@ import funcDataDrawer from "@/views/assist/funcFile/funcDataDrawer";
 import Pagination from '@/components/Pagination'
 
 import {funcFileList, deleteFuncFile} from '@/apis/assist/funcFile'
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 
 export default {
   name: "funcFile",
@@ -175,7 +175,7 @@ export default {
     delFuncFile(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      deleteFuncFile({'name': row.name}).then(response => {
+      deleteFuncFile({'id': row.id}).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getFuncFileList()

@@ -18,6 +18,7 @@ export default {
     apiProjectDrawerCommitSuccess: 'apiProjectDrawerCommitSuccess',  // 服务抽屉的提交状态
     apiEnvIsCommit: 'apiEnvIsCommit',  // 服务环境的提交状态
     apiSaveProjectEnv: 'apiSaveProjectEnv',  // 服务环境的提交状态
+    apiShowProjectEnvDrawer: 'apiShowProjectEnvDrawer',  // 服务环境编辑
     // 接口
     apiApiDrawerStatus: 'apiApiDrawerStatus',  // 接口抽屉的状态，新增/编辑
     apiApiDrawerCommitSuccess: 'apiApiDrawerCommitSuccess',  // 接口抽屉的提交状态
@@ -73,6 +74,7 @@ export default {
     uiProjectDialogCommitSuccess: 'uiProjectDialogCommitSuccess',  // 服务抽屉的提交状态
     uiSaveProjectEnv: 'uiSaveProjectEnv',  // 保存服务环境
     uiEnvIsCommit: 'uiEnvIsCommit',  // 服务环境的提交状态
+    uiShowProjectEnvDrawer: 'uiShowProjectEnvDrawer',  // 服务环境编辑
     // 页面
     uiPageDrawerIsOpen: 'uiPageDrawerIsOpen',  // 页面抽屉打开
     uiPageDrawerStatus: 'uiPageDrawerStatus',  // 页面抽屉的状态，新增/编辑

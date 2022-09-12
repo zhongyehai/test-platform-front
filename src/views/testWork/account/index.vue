@@ -222,7 +222,7 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {userList} from '@/apis/user/user'
+import {userList} from '@/apis/system/user'
 import {getConfigByName} from "@/apis/config/config";
 import {
   accountList,

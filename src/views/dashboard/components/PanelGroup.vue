@@ -127,7 +127,7 @@
 
 <script>
 
-import {getTitleCount} from '@/apis/home/home'
+import {getTitleCount} from '@/apis/home/apiTest'
 import CountTo from 'vue-count-to'
 
 export default {

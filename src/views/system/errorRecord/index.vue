@@ -140,7 +140,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
 import {errorRecordList} from '@/apis/system/errorRecord'
-import {userList} from "@/apis/user/user";
+import {userList} from "@/apis/system/user";
 
 export default {
   name: 'Project',

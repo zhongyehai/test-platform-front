@@ -241,7 +241,7 @@
 
 <script>
 
-import {assertMappingList} from '@/apis/uiTest/step'
+import {assertMappingList} from '@/apis/webUiTest/step'
 import {getConfigByName} from '@/apis/config/config'
 
 export default {

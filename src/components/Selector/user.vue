@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import {userList} from "@/apis/user/user";
+import {userList} from "@/apis/system/user";
 
 export default {
   name: "user",

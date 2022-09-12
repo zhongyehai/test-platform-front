@@ -36,7 +36,7 @@ import TransactionTable from './components/TransactionTable'
 import TodoList from './components/TodoList'
 // import BoxCard from './components/BoxCard'
 
-import { getDetailCount } from '@/apis/home/home'
+import { getDetailCount } from '@/apis/home/apiTest'
 
 const lineChartData = {
   newVisitis: {

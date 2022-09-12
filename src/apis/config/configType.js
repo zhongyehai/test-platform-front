@@ -1,8 +1,10 @@
 import request from '@/utils/request';
 import {baseDirConfig} from "@/apis/base";  // 加载请求配置类型文件
 
+let currentBaseDir = baseDirConfig + '/config/type/'
+
 function Func(method, data = null, params = null) {
-  return request({url: baseDirConfig + '/type', method: method, data: data, params: params});
+  return request({url: currentBaseDir, method: method, data: data, params: params});
 }
 
 // 添加配置类型
@@ -27,5 +29,5 @@ export function deleteConfigType(data) {
 
 // 获取配置类型list
 export function configTypeList(params) {
-  return request({url: baseDirConfig + '/type/list', method: 'get', params: params});
+  return request({url: currentBaseDir + 'list/', method: 'get', params: params});
 }

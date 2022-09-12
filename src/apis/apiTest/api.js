@@ -1,10 +1,11 @@
 import request from '@/utils/request';  //加载请求配置文件
 import {baseDirApiTest} from "@/apis/base";
 
-export const uploadApiMsg = baseDirApiTest + '/apiMsg/upload'
+let currentBaseDir = baseDirApiTest + '/apiMsg/'
+export const uploadApiMsg = currentBaseDir + 'upload/'
 
 function Func(method, data = null, params = null) {
-  return request({url: baseDirApiTest + '/apiMsg', method: method, data: data, params: params});
+  return request({url: currentBaseDir, method: method, data: data, params: params});
 }
 
 // 添加接口信息
@@ -29,40 +30,40 @@ export function deleteApi(data) {
 
 // 指定模块下接口list
 export function uploadApi(data) {
-  return request({url: baseDirApiTest + '/apiMsg/upload', method: 'post', data: data});
+  return request({url: currentBaseDir + 'upload/', method: 'post', data: data});
 }
 
 // 下载接口模板
 export function downloadApiMsgTemplate() {
-  return request({url: baseDirApiTest + '/apiMsg/template/download', method: 'get', responseType: 'blob'});
+  return request({url: currentBaseDir + 'template/download/', method: 'get', responseType: 'blob'});
 }
 
 // 指定模块下接口list
 export function apiList(params) {
-  return request({url: baseDirApiTest + '/apiMsg/list', method: 'get', params: params});
+  return request({url: currentBaseDir + 'list/', method: 'get', params: params});
 }
 
 // 接口调试
 export function runApi(data) {
-  return request({url: baseDirApiTest + '/apiMsg/run', method: 'post', data: data});
+  return request({url: currentBaseDir + 'run/', method: 'post', data: data});
 }
 
 // 获取请求方式
 export function getMethodsMapping() {
-  return request({url: baseDirApiTest + '/apiMsg/methods', method: 'get'});
+  return request({url: currentBaseDir + 'methods/', method: 'get'});
 }
 
 // 获取断言类型
 export function getAssertMapping() {
-  return request({url: baseDirApiTest + '/apiMsg/assertMapping', method: 'get'});
+  return request({url: currentBaseDir + 'assertMapping/', method: 'get'});
 }
 
 // 修改接口排序
 export function apiMsgSort(data) {
-  return request({url: baseDirApiTest + '/apiMsg/sort', method: 'put', data: data});
+  return request({url: currentBaseDir + 'sort/', method: 'put', data: data});
 }
 
 // 查询接口归属
 export function apiMsgBelongTo(params) {
-  return request({url: baseDirApiTest + '/apiMsg/belongTo', method: 'get', params: params});
+  return request({url: currentBaseDir + 'belongTo/', method: 'get', params: params});
 }

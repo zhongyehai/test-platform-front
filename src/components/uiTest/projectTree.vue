@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import {projectList} from '@/apis/uiTest/project'
+import {projectList} from '@/apis/webUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 

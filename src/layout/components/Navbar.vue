@@ -58,7 +58,7 @@ import {mapGetters} from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import * as types from "@/store/types";
-import {userPassword} from "@/apis/user/user";
+import {userPassword} from "@/apis/system/user";
 
 export default {
   components: {

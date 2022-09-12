@@ -210,7 +210,8 @@
 </template>
 
 <script>
-import {userList, deleteUser, postUser, putUser, getUser, roleList, userStatus} from '@/apis/user/user'
+import {userList, deleteUser, postUser, putUser, getUser, userStatus} from '@/apis/system/user'
+import {roleList} from '@/apis/system/role'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 

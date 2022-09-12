@@ -114,7 +114,7 @@ import Pagination from '@/components/Pagination'
 import configDialog from "@/views/config/configs/drawer";
 
 import {configList, deleteConfig} from '@/apis/config/config'
-import {userList} from "@/apis/user/user";
+import {userList} from "@/apis/system/user";
 import {configTypeList} from "@/apis/config/configType";
 
 export default {

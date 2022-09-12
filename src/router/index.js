@@ -152,58 +152,121 @@ export const constantRoutes = [
         meta: {title: '调试界面', icon: 'form'},
         component: () => import('@/views/debug/index')
       },
+      {
+        path: 'http://localhost:8024/api/apiTest/swagger',
+        name: 'apiTestSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
     ]
   },
 
-  // web测试
+  // web-ui测试
   {
-    path: '/uiTest',
+    path: '/webUiTest',
     component: Layout,
-    redirect: '/uiTest/project',
-    name: 'UiTest',
-    meta: {title: 'UI自动化', icon: 'el-icon-connection'},
+    redirect: '/webUiTest/project',
+    name: 'WebUiTest',
+    meta: {title: 'webUi自动化', icon: 'el-icon-connection'},
     children: [
       {
         path: 'project',
-        name: 'uiProject',
-        component: () => import('@/views/uiTest/project/index'),
+        name: 'WebUiProject',
+        component: () => import('@/views/webUiTest/project/index'),
         meta: {title: '项目管理', icon: 'el-icon-folder-opened'}
       },
       {
         path: 'page',
-        name: 'uiPage',
-        component: () => import('@/views/uiTest/module/index'),
+        name: 'WebUiPage',
+        component: () => import('@/views/webUiTest/module/index'),
         meta: {title: '页面管理', icon: 'el-icon-s-operation'}
       },
       {
         path: 'case',
-        name: 'uiCase',
-        component: () => import('@/views/uiTest/caseSet/index'),
+        name: 'WebUiCase',
+        component: () => import('@/views/webUiTest/caseSet/index'),
         meta: {title: '用例管理', icon: 'el-icon-tickets'}
       },
       {
         path: 'task',
-        name: 'uiTask',
-        component: () => import('@/views/uiTest/task/index'),
+        name: 'WebUiTask',
+        component: () => import('@/views/webUiTest/task/index'),
         meta: {title: '定时任务', icon: 'el-icon-date'}
       },
       {
         path: 'reportShow',
-        name: 'uiReportShow',
+        name: 'WebUiReportShow',
         hidden: true,
         meta: {title: '查看测试报告', icon: 'form'},
-        component: () => import('@/views/uiTest/report/show')
+        component: () => import('@/views/webUiTest/report/show')
       },
       {
         path: 'report',
-        name: 'uiReport',
+        name: 'WebUiReport',
         meta: {title: '测试报告', icon: 'el-icon-s-data'},
-        component: () => import('@/views/uiTest/report/index')
+        component: () => import('@/views/webUiTest/report/index')
+      },
+      {
+        path: 'http://localhost:8024/api/webUiTest/swagger',
+        name: 'WebUiTestSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
       },
     ]
   },
 
-  // 自定义函数
+  // app-ui测试
+  {
+    path: '/appUiTest',
+    component: Layout,
+    redirect: '/appUiTest/project',
+    name: 'AppUiTest',
+    meta: {title: 'appUi自动化', icon: 'el-icon-connection'},
+    children: [
+      {
+        path: 'project',
+        name: 'AppUiProject',
+        component: () => import('@/views/appUiTest/project/index'),
+        meta: {title: 'appUi自动化', icon: 'el-icon-folder-opened'}
+      },
+      // {
+      //   path: 'page',
+      //   name: 'uiPage',
+      //   component: () => import('@/views/uiTest/module/index'),
+      //   meta: {title: '页面管理', icon: 'el-icon-s-operation'}
+      // },
+      // {
+      //   path: 'case',
+      //   name: 'uiCase',
+      //   component: () => import('@/views/uiTest/caseSet/index'),
+      //   meta: {title: '用例管理', icon: 'el-icon-tickets'}
+      // },
+      // {
+      //   path: 'task',
+      //   name: 'uiTask',
+      //   component: () => import('@/views/uiTest/task/index'),
+      //   meta: {title: '定时任务', icon: 'el-icon-date'}
+      // },
+      // {
+      //   path: 'reportShow',
+      //   name: 'uiReportShow',
+      //   hidden: true,
+      //   meta: {title: '查看测试报告', icon: 'form'},
+      //   component: () => import('@/views/uiTest/report/show')
+      // },
+      // {
+      //   path: 'report',
+      //   name: 'uiReport',
+      //   meta: {title: '测试报告', icon: 'el-icon-s-data'},
+      //   component: () => import('@/views/uiTest/report/index')
+      // },
+      // {
+      //   path: 'http://localhost:8024/api/uiTest/swagger',
+      //   name: 'uiTestSwagger',
+      //   meta: {title: 'swagger', icon: 'el-icon-document'}
+      // },
+    ]
+  },
+
+  // 自动化辅助
   {
     path: '/assist',
     component: Layout,
@@ -253,7 +316,12 @@ export const constantRoutes = [
         name: 'apiErrorRecord',
         meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
         component: () => import('@/views/assist/errorRecord/index')
-      }
+      },
+      {
+        path: 'http://localhost:8024/api/assist/swagger',
+        name: 'assistSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
     ]
   },
 
@@ -276,7 +344,12 @@ export const constantRoutes = [
         name: 'Args',
         meta: {title: '参数管理', icon: 'el-icon-star-on'},
         component: () => import('@/views/config/configs/index')
-      }
+      },
+      {
+        path: 'http://localhost:8024/api/config/swagger',
+        name: 'configSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
     ]
   },
 
@@ -311,7 +384,12 @@ export const constantRoutes = [
         name: 'Account',
         component: () => import('@/views/testWork/account'),
         meta: {title: '测试账号', icon: 'el-icon-s-check'}
-      }
+      },
+      {
+        path: 'http://localhost:8024/api/testWork/swagger',
+        name: 'testWorkSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
     ]
   },
 
@@ -334,14 +412,19 @@ export const constantRoutes = [
         name: 'MakeUserInfo',
         component: () => import('@/views/tools/makeUserInfo'),
         meta: {title: '生成用户信息', icon: 'el-icon-s-unfold'}
-      }
+      },
+      {
+        path: 'http://localhost:8024/api/tools/swagger',
+        name: 'toolsSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
 
     ]
   },
 
   // 系统管理
   {
-    path: '/manage',
+    path: '/system',
     component: Layout,
     redirect: '/manage/user',
     name: 'Manage',
@@ -364,7 +447,12 @@ export const constantRoutes = [
         name: 'systemErrorRecord',
         meta: {title: '系统错误记录', icon: 'el-icon-video-camera-solid', roles: [2, '2']},
         component: () => import('@/views/system/errorRecord/index')
-      }
+      },
+      {
+        path: 'http://localhost:8024/api/system/swagger',
+        name: 'systemSwagger',
+        meta: {title: 'swagger', icon: 'el-icon-document'}
+      },
     ]
   },
 

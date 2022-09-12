@@ -160,7 +160,7 @@ import taskDrawer from "@/views/apiTest/task/drawer";
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/apiTest/task'
-import {userList} from "@/apis/user/user";
+import {userList} from "@/apis/system/user";
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
