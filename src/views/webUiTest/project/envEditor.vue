@@ -145,7 +145,17 @@
         >
           {{ '保存' + envMapping[currentEnv] + '信息' }}
         </el-button>
-
+        <el-popover
+          class="el_popover_class"
+          placement="top-start"
+          trigger="hover">
+          <div>
+            <div>1、保存时，会遍历当环境变量的key和value同步到其他环境</div>
+            <div>2、若其他环境没有当前的key，则会自动将变量的key和value同步到该环境</div>
+            <div>3、若其他环境已有当前的key，则不会同步当前key的信息到该环境</div>
+          </div>
+          <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+        </el-popover>
       </div>
     </div>
 
