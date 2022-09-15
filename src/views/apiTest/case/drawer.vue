@@ -72,9 +72,9 @@
 
         <el-form :inline="true" class="demo-form-inline" size="mini">
 
-          <el-tabs type="border-card">
+          <el-tabs>
 
-            <el-tab-pane label="公用变量">
+            <el-tab-pane label="自定义变量">
               <!-- 使用示例 -->
               <el-collapse accordion>
                 <el-collapse-item>
@@ -93,6 +93,7 @@
               <variablesView
                 ref="variablesView"
                 :currentData="tempCase.variables"
+                :dataTypeMapping="dataTypeMapping"
                 :placeholder-key="'key'"
                 :placeholder-value="'value'"
                 :placeholder-desc="'备注'"
@@ -183,7 +184,7 @@
 import moduleSelectorView from "@/components/Selector/module";
 import funcFilesView from '@/components/Selector/funcFile'
 import headersView from '@/components/Inputs/changeRow'
-import variablesView from '@/components/Inputs/changeRow'
+import variablesView from '@/components/Inputs/variables'
 import stepView from '@/views/apiTest/step'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
@@ -197,7 +198,8 @@ export default {
   name: 'drawer',
   props: [
     'currentProjectId',
-    'currentSetId'
+    'currentSetId',
+    'dataTypeMapping'
   ],
   components: {
     moduleSelectorView,

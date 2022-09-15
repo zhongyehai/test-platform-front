@@ -211,14 +211,16 @@
       :limit.sync="listQuery.pageSize"
       @pagination="getProjectList"/>
 
-    <!-- 抽屉 -->
+    <!-- 服务信息抽屉 -->
     <projectDrawer
       :currentProject="currentProject"
       :currentUserList="currentUserList"
     ></projectDrawer>
 
+    <!-- 服务环境抽屉 -->
     <projectEnvDrawer
     :env-mapping="envMapping"
+    :dataTypeMapping="dataTypeMapping"
     ></projectEnvDrawer>
   </div>
 </template>
@@ -262,7 +264,8 @@ export default {
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
-      envMapping: {}
+      envMapping: {},
+      dataTypeMapping: []
     }
   },
 
@@ -406,6 +409,11 @@ export default {
 
     this.$bus.$on(this.$busEvents.api.apiProjectDrawerCommitSuccess, (status) => {
       this.getProjectList()
+    })
+
+    // 从后端获取数据类型映射
+    getConfigByName({'name': 'data_type_mapping'}).then(response => {
+      this.dataTypeMapping = JSON.parse(response.data.value)
     })
 
     // 获取环境配置

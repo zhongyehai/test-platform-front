@@ -34,7 +34,7 @@
 
         <el-tabs style="margin-left: 20px">
           <!-- 公用变量 -->
-          <el-tab-pane label="公用变量">
+          <el-tab-pane label="自定义变量">
             <!-- 使用示例 -->
             <el-collapse accordion>
               <el-collapse-item>
@@ -53,6 +53,7 @@
 
             <variablesView
               :currentData="tempEnv.variables"
+              :dataTypeMapping="dataTypeMapping"
               :placeholderKey="'key'"
               :placeholderValue="'value'"
               :placeholderDesc="'备注'"
@@ -159,14 +160,14 @@
       </div>
     </div>
 
-    <!-- 环境编辑 -->
+    <!-- 同步环境 -->
     <envSynchronizer></envSynchronizer>
 
   </el-drawer>
 </template>
 
 <script>
-import variablesView from '@/components/Inputs/changeRow'
+import variablesView from '@/components/Inputs/variables'
 import cookiesView from '@/components/Inputs/changeRow'
 import sessionStorageView from '@/components/Inputs/changeRow'
 import localStorageView from '@/components/Inputs/changeRow'
@@ -177,7 +178,8 @@ import {getProjectEnv, putProjectEnv} from '@/apis/webUiTest/project'
 export default {
   name: 'envEditor',
   props: [
-    'envMapping'
+    'envMapping',
+    'dataTypeMapping'
   ],
   components: {
     variablesView,
@@ -233,7 +235,6 @@ export default {
     // 获取环境信息
     getEnv(env, projectId) {
       getProjectEnv({env: env, projectId: projectId}).then(response => {
-        console.log(JSON.stringify(response))
         this.tempEnv.id = response.data.id
         this.tempEnv.env = response.data.env
         this.tempEnv.host = response.data.host
@@ -255,7 +256,6 @@ export default {
 
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.ui.uiShowProjectEnvDrawer, (proejct) => {
-      console.log(proejct)
       this.drawerIsShow = true
       this.getEnv(this.currentEnv, proejct.id)
     })

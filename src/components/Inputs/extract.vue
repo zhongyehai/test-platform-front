@@ -227,6 +227,18 @@
         </template>
       </el-table-column>
 
+      <el-table-column align="center" label="更新到头部" min-width="11%">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.update_to_header"></el-switch>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>1、若打开此开关，则会将此处提取到的值，以当前设置的key更新到后续步骤的头部信息中</div>
+            <div>2、若在其他地方已预设头部信息包含当前的key，对于头部信息中的这个key，则会以将此处提取到的值为准</div>
+            <div>注：提取后的数据会以key、value的形式存在于自定义变量池中，不管是否选择更新到头部，都可使用</div>
+            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+
       <el-table-column label="备注" header-align="center" min-width="20%">
         <template slot-scope="scope">
           <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc">
@@ -234,7 +246,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加" header-align="center" min-width="5%">
+      <el-table-column label="添加/删除" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
@@ -246,11 +258,6 @@
             >
             </el-button>
           </el-tooltip>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="删除" header-align="center" min-width="5%">
-        <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
               v-show="isShowDelButton(scope.$index)"
@@ -264,6 +271,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
+
     </el-table>
   </div>
 
@@ -313,7 +321,7 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({key: null, data_source: null, value: null, remark: null})
+      this.tempData.push({key: null, data_source: null, value: null, remark: null, update_to_header: null})
     },
 
     // 是否显示删除按钮
@@ -337,7 +345,7 @@ export default {
         if (newVal) {
           this.tempData = newVal
         } else {
-          this.tempData = [{key: null, data_source: null, value: null, remark: null}]
+          this.tempData = [{key: null, data_source: null, value: null, remark: null, update_to_header: null}]
         }
       }
     },

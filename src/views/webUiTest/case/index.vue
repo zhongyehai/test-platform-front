@@ -127,6 +127,7 @@
     <caseDrawer
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
+      :dataTypeMapping="dataTypeMapping"
     ></caseDrawer>
 
   </div>
@@ -142,6 +143,7 @@ import {userList} from '@/apis/system/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/webUiTest/case'
 import {reportIsDone} from "@/apis/webUiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'index',
@@ -177,7 +179,7 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
-
+      dataTypeMapping:[],
       runEvent: 'UiRunCaseEventOnIndex',
       callBackEvent: 'UiRunCaseOnIndex'
     }
@@ -338,6 +340,11 @@ export default {
 
   mounted() {
     this.getUserList()
+
+    // 从后端获取数据类型映射
+    getConfigByName({'name': 'data_type_mapping'}).then(response => {
+      this.dataTypeMapping = JSON.parse(response.data.value)
+    })
 
     // 监听 case抽屉 是否提交成功
     this.$bus.$on(this.$busEvents.ui.uiCaseDrawerCommitSuccess, (status) => {

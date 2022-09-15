@@ -33,7 +33,7 @@
 
         <el-tabs style="margin-left: 20px">
           <!-- 公用变量 -->
-          <el-tab-pane label="公用变量">
+          <el-tab-pane label="自定义变量">
             <el-tooltip class="item" effect="dark" placement="top-end">
               <div slot="content">
                 1、可用此功能设置一些预设值，比如token、账号信息 <br/>
@@ -44,6 +44,7 @@
               </div>
               <variablesView
                 :currentData="tempEnv.variables"
+                :dataTypeMapping="dataTypeMapping"
                 :placeholderKey="'key'"
                 :placeholderValue="'value'"
                 :placeholderDesc="'备注'"
@@ -104,7 +105,7 @@
       </div>
     </div>
 
-    <!-- 环境编辑 -->
+    <!-- 同步环境 -->
     <envSynchronizer></envSynchronizer>
 
   </el-drawer>
@@ -112,7 +113,7 @@
 
 <script>
 import headersView from '@/components/Inputs/changeRow'
-import variablesView from '@/components/Inputs/changeRow'
+import variablesView from '@/components/Inputs/variables'
 import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
 
 import {getProjectEnv, putProjectEnv} from '@/apis/apiTest/project'
@@ -120,7 +121,8 @@ import {getProjectEnv, putProjectEnv} from '@/apis/apiTest/project'
 export default {
   name: 'envEditor',
   props: [
-    'envMapping'
+    'envMapping',
+    'dataTypeMapping'
   ],
   components: {
     headersView,
