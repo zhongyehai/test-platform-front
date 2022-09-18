@@ -13,43 +13,49 @@
           v-loading="tableLoadingIsShow"
           element-loading-text="正在排序中"
           element-loading-spinner="el-icon-loading"
+          :header-cell-style="{'text-align':'center'}"
           :data="api_list"
           row-key="id"
           stripe
         >
-          <el-table-column prop="num" label="序号" min-width="7%">
+          <el-table-column prop="num" label="序号" align="center" min-width="8%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" label="接口名称" min-width="20%">
+          <el-table-column
+            :show-overflow-tooltip=true
+            prop="name"
+            label="接口信息"
+            align="center"
+            min-width="67%">
             <template slot-scope="scope">
-              <span> {{ scope.row.name }} </span>
+              <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_${scope.row.method.toLowerCase()}`">
+                    {{ scope.row.method }}
+                  </span>
+                <span class="block-method block_url">{{ scope.row.addr }}</span>
+                <span class="block-summary-description">{{ scope.row.name }}</span>
+              </div>
             </template>
           </el-table-column>
 
           <el-table-column
             :show-overflow-tooltip=true
-            prop="addr"
-            label="接口地址"
-            min-width="47%"
-          ></el-table-column>
-
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="使用次数" min-width="10%">
+            :render-header="renderHeader"
+            prop="create_user"
+            label="使用次数"
+            align="center"
+            min-width="10%">
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
               <el-tag type="danger" v-else>0</el-tag>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
-            <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.update_user) }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="接口操作" min-width="14%">
+          <el-table-column label="操作" align="center" min-width="15%">
             <template slot-scope="scope">
 
               <!-- 运行接口 -->
@@ -220,6 +226,27 @@ export default {
   },
 
   methods: {
+
+    renderHeader (h, {column}) {
+      // 悬浮提示的文字内容
+      const info = '统计有多少条用例里直接使用了此接口；被设计为用例后该用例被引用的，不纳入统计'
+      return h(
+        'div',
+        [
+          h('span', column.label),
+          // placement指定悬浮显示方向
+          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
+            [
+              // style 调文字颜色样式
+              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
+              // el-icon-warning是element图标, style 调图标颜色 样式
+              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
+            ]
+          )
+        ]
+      )
+    },
+
     // 获取用户信息，同步请求
     async getUserList() {
       let response = await userList()
@@ -387,6 +414,133 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.block_post {
+  border: 1px solid #49cc90;
+  background-color: rgba(73, 204, 144, .1)
+}
 
+.block_method_post {
+  background-color: #49cc90;
+}
+
+.block_put {
+  border: 1px solid #fca130;
+  background-color: rgba(252, 161, 48, .1)
+}
+
+.block_method_put {
+  background-color: #fca130;
+}
+
+.block_get {
+  border: 1px solid #61affe;
+  background-color: rgba(97, 175, 254, .1)
+}
+
+.block_method_get {
+  background-color: #61affe;
+}
+
+.block_delete {
+  border: 1px solid #f93e3e;
+  background-color: rgba(249, 62, 62, .1)
+}
+
+.block_method_delete {
+  background-color: #f93e3e;
+}
+
+.block_patch {
+  border: 1px solid #50e3c2;
+  background-color: rgba(80, 227, 194, .1)
+}
+
+.block_method_patch {
+  background-color: #50e3c2;
+}
+
+.block_head {
+  border: 1px solid #e6a23c;
+  background-color: rgba(230, 162, 60, .1)
+}
+
+.block_method_head {
+  background-color: #e6a23c;
+}
+
+.block_options {
+  border: 1px solid #409eff;
+  background-color: rgba(64, 158, 255, .1)
+}
+
+.block_method_options {
+  background-color: #409eff;
+}
+
+.block {
+  position: relative;
+  border-radius: 4px;
+  height: 48px;
+  overflow: hidden;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.block_url {
+  word-break: normal;
+  width: auto;
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  font-family: Open Sans, sans-serif;
+  color: #3b4151;
+}
+
+.block_name {
+  padding-left: 5px;
+  word-break: normal;
+  width: auto;
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  font-family: Open Sans, sans-serif;
+  color: #3b4151;
+}
+
+.block_method_color {
+  cursor: pointer;
+  color: #fff;
+}
+
+.block-method {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 50px;
+  padding: 0px 10px;
+  text-align: center;
+  border-radius: 5px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .1);
+  font-family: Titillium Web, sans-serif;
+}
+
+.block-summary-description {
+  word-break: normal;
+  width: auto;
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  font-family: Open Sans, sans-serif;
+  color: #3b4151;
+}
 </style>

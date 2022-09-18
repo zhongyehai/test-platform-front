@@ -374,6 +374,7 @@ export default {
         'apis': [this.tempApi.id],
         env: runDict.runEnv
       }).then(runResponse => {
+        this.isShowDebugLoading = false
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，

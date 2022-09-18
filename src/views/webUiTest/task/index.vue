@@ -28,21 +28,21 @@
               row-key="id"
               stripe
             >
-              <el-table-column prop="num" label="序号" min-width="7%">
+              <el-table-column prop="num" label="序号" align="center" min-width="7%">
                 <template slot-scope="scope">
                   <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" label="任务名称" min-width="25%">
+              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.name }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="cron" label="cron表达式" min-width="35%"></el-table-column>
+              <el-table-column prop="cron" align="center" label="cron表达式" min-width="35%"></el-table-column>
 
-              <el-table-column align="center" label="是否启用" min-width="15%">
+              <el-table-column align="center" label="是否启用" min-width="15%" :render-header="renderHeader">
                 <template slot-scope="scope">
                   <el-switch
                     :disabled="scope.row.taskIsDisabled"
@@ -51,19 +51,19 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="9%">
-                <template slot-scope="scope">
-                  <span>{{ parseUser(scope.row.create_user) }}</span>
-                </template>
-              </el-table-column>
+<!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="9%">-->
+<!--                <template slot-scope="scope">-->
+<!--                  <span>{{ parseUser(scope.row.create_user) }}</span>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
 
-              <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
+              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人" min-width="12%">
                 <template slot-scope="scope">
                   <span>{{ parseUser(scope.row.update_user) }}</span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="操作" min-width="16%">
+              <el-table-column align="center" label="操作" min-width="16%">
                 <template slot-scope="scope">
 
                   <!-- 运行任务 -->
@@ -351,7 +351,26 @@ export default {
           })
         }
       })
-    }
+    },
+    renderHeader (h, {column}) {
+      // 悬浮提示的文字内容
+      const info = '启用中的任务才会定时执行；禁用中的任务才支持修改'
+      return h(
+        'div',
+        [
+          h('span', column.label),
+          // placement指定悬浮显示方向
+          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
+            [
+              // style 调文字颜色样式
+              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
+              // el-icon-warning是element图标, style 调图标颜色 样式
+              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
+            ]
+          )
+        ]
+      )
+    },
   },
 
   mounted() {

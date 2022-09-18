@@ -13,37 +13,37 @@
       :data="funcFiles.list"
       stripe
     >
-      <el-table-column label="序号" min-width="10%">
+      <el-table-column label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="文件名称" min-width="40%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="name" label="文件名称" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" label="备注" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="desc" label="备注" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="update_user" label="最后修改人" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="update_user" label="最后修改人" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="10%">
+      <el-table-column label="操作" align="center" min-width="10%">
         <template slot-scope="scope">
 
           <!--修改文件信息-->

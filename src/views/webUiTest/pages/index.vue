@@ -17,37 +17,43 @@
           row-key="id"
           stripe
         >
-          <el-table-column prop="num" label="序号" min-width="7%">
+          <el-table-column prop="num" label="序号" align="center" min-width="7%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" label="页面名称" min-width="20%">
+          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="页面名称" min-width="20%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="addr" label="页面地址" min-width="47%">
+          <el-table-column
+            :show-overflow-tooltip=true
+            prop="addr"
+            align="center"
+            label="页面地址"
+            :render-header="renderHeader"
+            min-width="47%">
             <template slot-scope="scope">
               <span> {{ scope.row.addr || '未设置' }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="10%">
-            <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.create_user) }}</span>
-            </template>
-          </el-table-column>
+<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{ parseUser(scope.row.create_user) }}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
             <template slot-scope="scope">
               <span>{{ parseUser(scope.row.update_user) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="页面操作" min-width="14%">
+          <el-table-column label="操作" align="center" min-width="14%">
             <template slot-scope="scope">
 
               <!--修改页面-->
@@ -286,7 +292,26 @@ export default {
           })
         }
       })
-    }
+    },
+    renderHeader (h, {column}) {
+      // 悬浮提示的文字内容
+      const info = '在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处'
+      return h(
+        'div',
+        [
+          h('span', column.label),
+          // placement指定悬浮显示方向
+          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
+            [
+              // style 调文字颜色样式
+              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
+              // el-icon-warning是element图标, style 调图标颜色 样式
+              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
+            ]
+          )
+        ]
+      )
+    },
 
   },
 

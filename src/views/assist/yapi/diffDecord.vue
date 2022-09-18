@@ -37,13 +37,13 @@
       :data="diffRecordList"
       stripe
     >
-      <el-table-column prop="id" label="数据id" min-width="10%">
+      <el-table-column prop="id" label="数据id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.id }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="project" label="名称" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="project" align="center" label="名称" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -61,7 +61,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="是否有改变" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="是否有改变" min-width="10%">
         <template slot-scope="scope">
           <el-tag size="small" :type="scope.row.is_changed === 1 ? 'danger' : 'success'">
             {{ scope.row.is_changed === 1 ? '有改变' : '没有改变' }}
@@ -69,7 +69,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="20%">
+      <el-table-column label="操作" align="center" min-width="20%">
         <template slot-scope="scope">
 
           <el-button type="primary"

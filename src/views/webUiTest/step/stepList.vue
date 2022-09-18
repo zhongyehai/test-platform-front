@@ -14,13 +14,13 @@
       style="width: 100%"
       :height="tableHeight"
     >
-      <el-table-column prop="num" label="序号" min-width="11%">
+      <el-table-column prop="num" label="序号" align="center" min-width="11%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="执行" min-width="15%">
+      <el-table-column align="center" label="执行" min-width="15%" :render-header="renderHeader">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.is_run" @change="changeStepIsRun(scope.$index)"></el-switch>
         </template>
@@ -147,11 +147,14 @@ export default {
   mounted() {
 
     // 引用用例事件，把此步骤添加到步骤列表
-    this.$bus.$on(this.$busEvents.ui.uiQuoteCaseToStep, (step) => {
-      this.stepList.push(step)
-
-      this.oldList = this.stepList.map(v => v.id)
-      this.newList = this.oldList.slice()
+    this.$bus.$on(this.$busEvents.ui.uiQuoteCaseToStep, (addStep) => {
+      if (Array.isArray(addStep)){
+        addStep.forEach(step => {
+          this.pushToDataList(step)
+        })
+      }else {
+        this.pushToDataList(addStep)
+      }
     })
 
     // 新增步骤提交事件，把此步骤添加到步骤列表
@@ -206,6 +209,14 @@ export default {
     })
   },
   methods: {
+
+    // 把新加的步骤加入到列表中
+    pushToDataList(step){
+      this.stepList.push(step)
+
+      this.oldList = this.stepList.map(v => v.id)
+      this.newList = this.oldList.slice()
+    },
 
     // 修改步骤的执行状态
     changeStepIsRun(index) {
@@ -284,7 +295,26 @@ export default {
           })
         }
       })
-    }
+    },
+    renderHeader (h, {column}) {
+      // 悬浮提示的文字内容
+      const info = '若此处设置为不运行，则执行测试时将不会运行此步骤'
+      return h(
+        'div',
+        [
+          h('span', column.label),
+          // placement指定悬浮显示方向
+          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
+            [
+              // style 调文字颜色样式
+              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
+              // el-icon-warning是element图标, style 调图标颜色 样式
+              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
+            ]
+          )
+        ]
+      )
+    },
   },
   watch: {
     'caseStepList': {

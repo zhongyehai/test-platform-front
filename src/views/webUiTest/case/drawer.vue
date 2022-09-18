@@ -333,7 +333,7 @@ export default {
       caseData.cookies = this.$refs.cookiesView.tempData
       caseData.session_storage = this.$refs.sessionStorageView.tempData
       caseData.local_storage = this.$refs.localStorageView.tempData
-      caseData.steps = this.$refs.stepView.$refs.stepListView.stepList
+      caseData.steps = undefined
       return caseData
     },
 

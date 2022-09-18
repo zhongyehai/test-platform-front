@@ -143,6 +143,33 @@
             </el-popover>
           </el-form-item>
 
+          <el-form-item label="回调流水线" size="mini">
+            <el-input
+              type="textarea"
+              size="mini"
+              autosize
+              v-model="tempTask.call_back"
+              style="width: 98%"
+              placeholder='[
+            {
+              "url": "https://xxx",
+              "method": "post",
+              "headers": {
+                "token": "xxx"
+              },
+              "json": {
+                "status": "$status"
+              }
+            }
+          ]'></el-input>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、用于回调流水线自动化测试的执行结果，流水线根据结果判断是否往下走</div>
+              <div>2、json参数的$status会被替换为运行结果，全部通过为true，否则为false</div>
+              <div>3、请严格按照示例填写内容，否则回调会不成功</div>
+              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            </el-popover>
+          </el-form-item>
+
         </el-tab-pane>
 
 
@@ -298,7 +325,19 @@ export default {
       currentTreeDataId: '',
       runModeData: {},
       runEvent: 'runTaskEventOnDialog',
-      callBackEvent: 'runTaskOnDialog'
+      callBackEvent: 'runTaskOnDialog',
+      callBackPlaceholder: JSON.stringify([
+        {
+          "url": "https://xxx",
+          "method": "post",
+          "headers": {
+            "token": "xxx"
+          },
+          "json": {
+            "status": "$status"
+          }
+        },
+      ])
     }
   },
   methods: {
@@ -397,6 +436,7 @@ export default {
         email_to: '',
         email_from: '',
         email_pwd: '',
+        call_back: this.callBackPlaceholder,
         set_ids: [],
         case_ids: [],
         project_id: ''
@@ -421,6 +461,7 @@ export default {
         email_to: this.tempTask.email_to,
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
+        call_back: this.tempTask.call_back,
         project_id: this.tempTask.project_id,
         set_ids: this.$refs.setTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids,

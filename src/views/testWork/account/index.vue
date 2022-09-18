@@ -33,55 +33,55 @@
       :data="currentAccountList"
       stripe
     >
-      <el-table-column prop="id" label="编号" min-width="8%">
+      <el-table-column prop="id" label="编号" align="center" min-width="8%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="project" label="服务名" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="project" label="服务名" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.project }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="角色" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="name" label="角色" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.role }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="权限" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="name" label="权限" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.permission }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="账户名" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="name" label="账户名" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="account" label="账号" min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="account" label="账号" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.account }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="password" label="密码" min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="password" label="密码" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.password }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" label="备注" min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="desc" label="备注" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="10%">
+      <el-table-column label="操作" align="center" min-width="10%">
         <template slot-scope="scope">
 
           <!--修改账号信息-->

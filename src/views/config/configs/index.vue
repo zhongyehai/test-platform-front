@@ -33,49 +33,49 @@
       :data="mailService.list"
       stripe
     >
-      <el-table-column prop="id" label="编号" min-width="5%">
+      <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="配置名称" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="配置名称" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="value" label="配置值" min-width="28%">
+      <el-table-column :show-overflow-tooltip=true prop="value" align="center" label="配置值" min-width="28%">
         <template slot-scope="scope">
           <span> {{ scope.row.value }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" label="备注" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="type" label="配置类型" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true prop="type" align="center" label="配置类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ parseConfigType(scope.row.type) }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="8%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="8%">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseUser(scope.row.create_user) }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
+      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="7%">
+      <el-table-column label="操作" align="center" min-width="7%">
         <template slot-scope="scope">
           <el-tooltip
             class="item"

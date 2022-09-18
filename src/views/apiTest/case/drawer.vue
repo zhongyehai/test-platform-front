@@ -279,7 +279,7 @@ export default {
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.$refs.headersView.tempData
-      caseData.steps = this.$refs.stepView.$refs.stepListView.stepList
+      caseData.steps = undefined
       return caseData
     },
 

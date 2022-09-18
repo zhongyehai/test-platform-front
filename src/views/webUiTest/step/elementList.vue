@@ -66,25 +66,25 @@
         :data="elementList.data"
         stripe
       >
-        <el-table-column prop="num" label="序号" min-width="10%">
+        <el-table-column prop="num" label="序号" align="center" min-width="10%">
           <template slot-scope="scope">
             <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" label="元素名称" min-width="20%">
+        <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="元素名称" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="addr" label="定位方式" min-width="20%">
+        <el-table-column :show-overflow-tooltip=true prop="addr" align="center" label="定位方式" min-width="20%">
           <template slot-scope="scope">
             <span> {{ parseFindBy(scope.row.by) }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="addr" label="定位元素" min-width="20%">
+        <el-table-column :show-overflow-tooltip=true prop="addr" align="center" label="定位元素" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.element }} </span>
           </template>

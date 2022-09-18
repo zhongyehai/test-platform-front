@@ -16,37 +16,42 @@
           row-key="id"
           stripe
         >
-          <el-table-column prop="num" label="序号" min-width="10%">
+          <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" min-width="46%">
+          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="用例名称" min-width="46%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="10%">
-            <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.create_user) }}</span>
-            </template>
-          </el-table-column>
+<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{ parseUser(scope.row.create_user) }}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="12%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
             <template slot-scope="scope">
               <span>{{ parseUser(scope.row.update_user) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column align="center" label="是否执行" min-width="15%">
+          <el-table-column
+            align="center"
+            label="是否执行"
+            min-width="15%"
+            :render-header="renderHeader"
+          >
             <template slot-scope="scope">
               <el-switch v-model="scope.row.is_run" @change="changeCaseIsRun(scope.row)"></el-switch>
             </template>
           </el-table-column>
 
-          <el-table-column label="用例操作" min-width="14%">
+          <el-table-column label="操作" align="center" min-width="14%">
             <template slot-scope="scope">
 
               <!-- 运行用例 -->
@@ -338,7 +343,26 @@ export default {
           })
         }
       })
-    }
+    },
+    renderHeader (h, {column}) {
+      // 悬浮提示的文字内容
+      const info = '若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例；请务必将用例调试通过后再设为要运行'
+      return h(
+        'div',
+        [
+          h('span', column.label),
+          // placement指定悬浮显示方向
+          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
+            [
+              // style 调文字颜色样式
+              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
+              // el-icon-warning是element图标, style 调图标颜色 样式
+              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
+            ]
+          )
+        ]
+      )
+    },
   },
 
   mounted() {

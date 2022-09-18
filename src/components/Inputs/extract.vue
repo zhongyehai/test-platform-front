@@ -193,7 +193,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="数据源" header-align="center" min-width="20%">
+      <el-table-column label="数据源" header-align="center" min-width="25%">
         <template slot-scope="scope">
           <el-row>
             <el-select
@@ -227,7 +227,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="更新到头部" min-width="11%">
+      <el-table-column align="center" label="更新到头部" min-width="10%">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.update_to_header"></el-switch>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
@@ -246,7 +246,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加/删除" header-align="center" min-width="6%">
+      <el-table-column label="添加/删除" header-align="center" min-width="10%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button

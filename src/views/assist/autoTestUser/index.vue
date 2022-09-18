@@ -30,42 +30,42 @@
       stripe
       style="width: 100%"
     >
-      <el-table-column :show-overflow-tooltip=true label="数据id" min-width="8%">
+      <el-table-column :show-overflow-tooltip=true label="数据id" align="center" min-width="8%">
         <template slot-scope="scope">
           <span> {{ scope.row.id }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="手机号" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true label="手机号" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.mobile }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="密码" min-width="22%">
+      <el-table-column :show-overflow-tooltip=true label="密码" align="center" min-width="22%">
         <template slot-scope="scope">
           <span> {{ scope.row.password }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="access_token" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true label="access_token" align="center" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.access_token }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="refresh_token" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true label="refresh_token" align="center" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.refresh_token }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="公司名称" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true label="公司名称" align="center" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.company_name }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="角色" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true label="角色" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.role }} </span>
         </template>
       </el-table-column>
-      <el-table-column :show-overflow-tooltip=true label="所属环境" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true label="所属环境" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ getEnv(scope.row.env) }} </span>
         </template>

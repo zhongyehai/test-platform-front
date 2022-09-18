@@ -33,37 +33,37 @@
       :data="fileList"
       stripe
     >
-      <el-table-column prop="id" label="编号" min-width="5%">
+      <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="文件名" min-width="40%">
+      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="文件名" min-width="40%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="size" label="文件大小" min-width="10%">
+      <el-table-column :show-overflow-tooltip=true prop="size" align="center" label="文件大小" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.size }} 字节</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="lastVisitTime" label="最近一次使用时间" min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="lastVisitTime" label="最近一次使用时间" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.lastVisitTime }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="LastModifiedTime" label="最后一次更新时间" min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" prop="LastModifiedTime" label="最后一次更新时间" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.LastModifiedTime }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="10%">
+      <el-table-column label="操作" align="center" min-width="10%">
         <template slot-scope="scope">
           <!-- 下载文件 -->
           <el-button

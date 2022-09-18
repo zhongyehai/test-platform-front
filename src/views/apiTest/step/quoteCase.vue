@@ -46,29 +46,43 @@
     <!-- 用例列表 -->
     <el-row>
       <el-table ref="caseTable" :data="caseList" stripe>
-        <el-table-column prop="num" label="序号" min-width="10%">
+        <el-table-column prop="num" label="序号" align="center" min-width="10%">
           <template slot-scope="scope">
             <span> {{ (quotePageNum - 1) * quotePageSize + scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" min-width="82%">
+        <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" align="center" min-width="80%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" min-width="8%">
+        <el-table-column label="操作" align="center" min-width="10%">
           <template slot-scope="scope">
+
+            <!-- 复制用例 -->
             <el-tooltip
               class="item"
               effect="dark"
-              content="引用此用例为步骤"
+              content="完全复制此用例的步骤为当前用例的步骤"
+              placement="top-start">
+              <el-button
+                type="text"
+                icon="el-icon-document-copy"
+                @click.native="copyCaseStepAsStep(scope.row)">
+              </el-button>
+            </el-tooltip>
+
+            <!-- 引用用例 -->
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="引用此用例为当前用例的步骤"
               placement="top-start">
               <el-button
                 type="text"
                 icon="el-icon-d-arrow-left"
-                :loading="scope.row.addToQuoteLoadingIsShow"
                 @click.native="addQuote(scope.row)">
               </el-button>
             </el-tooltip>
@@ -92,7 +106,7 @@ import Pagination from '@/components/Pagination'
 
 import {projectList} from "@/apis/apiTest/project";
 import {caseSetTree} from "@/apis/apiTest/caseSet";
-import {caseList} from "@/apis/apiTest/case";
+import {caseList, copyCaseStep} from "@/apis/apiTest/case";
 
 export default {
   name: "quoteCase",
@@ -200,6 +214,19 @@ export default {
         new_api['data_driver'] = []
         this.$bus.$emit(this.$busEvents.api.apiAddApiToStep, new_api, 'quote')
       } else {
+        this.$bus.$emit(this.$busEvents.api.apiIsAddStepTriggerSaveCase, 'true')
+      }
+    },
+
+    // 复制指定用例的步骤为当前用例的步骤
+    copyCaseStepAsStep(fromCase){
+      if (this.caseId){
+        copyCaseStep({source: fromCase.id, to: this.caseId}).then(response => {
+          if (this.showMessage(this, response)){
+            this.$bus.$emit(this.$busEvents.api.apiAddStepIsCommit, response.data)
+          }
+        })
+      }else{
         this.$bus.$emit(this.$busEvents.api.apiIsAddStepTriggerSaveCase, 'true')
       }
     }

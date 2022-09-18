@@ -24,22 +24,22 @@
               :data="reportDataList"
               stripe
             >
-              <el-table-column prop="id" label="序号" min-width="5%">
+              <el-table-column prop="id" align="center" label="序号" min-width="5%">
                 <template slot-scope="scope">
                   <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" label="任务名称" min-width="30%">
+              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="30%">
               </el-table-column>
 
-              <el-table-column label="生成时间" min-width="20%">
+              <el-table-column label="生成时间" align="center" min-width="20%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否通过" min-width="12%">
+              <el-table-column label="是否通过" align="center" min-width="12%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.is_passed === 1 ? 'success' : 'danger'">
                     {{ scope.row.is_passed === 1 ? '全部通过' : '有报错' }}
@@ -47,7 +47,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="生成状态" min-width="8%">
+              <el-table-column label="是否生成" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.is_done === 1 ? 'success' : 'warning'">
                     {{ scope.row.is_done === 1 ? '已生成' : '未生成' }}
@@ -55,7 +55,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="状态" min-width="7%">
+              <el-table-column label="是否已阅" align="center" min-width="7%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.status === '已读' ? 'success' : 'warning'">
                     {{ scope.row.status }}
@@ -63,7 +63,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="操作" min-width="10%">
+              <el-table-column label="操作" align="center" min-width="10%">
                 <template slot-scope="scope">
 
                   <!--下载报告-->

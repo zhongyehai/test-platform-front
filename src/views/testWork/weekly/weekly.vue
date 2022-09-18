@@ -125,49 +125,49 @@
           row-key="id"
           stripe
         >
-          <el-table-column prop="num" label="序号" min-width="10%">
+          <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
               <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="product_id" label="所属产品" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="product_id" align="center" label="所属产品" min-width="15%">
             <template slot-scope="scope">
               <span> {{ parseProduct(scope.row.product_id) }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="version" label="版本号" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="version" align="center" label="版本号" min-width="15%">
             <template slot-scope="scope">
               <span> {{ scope.row.version }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="开始时间" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="开始时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.start_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="结束时间" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="结束时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.end_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" label="创建者" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="15%">
             <template slot-scope="scope">
               <span>{{ parseUser(scope.row.create_user) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="desc" label="备注" min-width="15%">
+          <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="15%">
             <template slot-scope="scope">
               <span>{{ scope.row.desc }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" min-width="15%">
+          <el-table-column label="操作" align="center" min-width="15%">
             <template slot-scope="scope">
 
               <!--修改-->
