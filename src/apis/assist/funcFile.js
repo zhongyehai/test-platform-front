@@ -42,3 +42,8 @@ export function funcFileList(params) {
 export function debugFuncFile(data) {
   return request({url: currentBaseDir + 'debug/', method: 'POST', data: data});
 }
+
+// 修改排序
+export function funcSort(data) {
+  return request({url: currentBaseDir + 'sort/', method: 'put', data: data});
+}

@@ -182,7 +182,7 @@
             <el-row>
               <el-select
                 v-model="scope.row.data_type"
-                placeholder="选择数据类型"
+                placeholder="选择预期结果数据类型"
                 :disabled="scope.row.validate_type === '值为真' || scope.row.validate_type === '值为假'"
                 style="width: 100%"
                 filterable

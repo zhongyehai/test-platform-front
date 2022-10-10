@@ -62,7 +62,7 @@ export default {
       dialogIsShow: false,
       runEnvData: {},
       runModeData: {},
-      runEnv: 'test',
+      runEnv: '',
       runModeIsShow: false,
       runType: '0'
     }
@@ -92,9 +92,10 @@ export default {
 
   mounted() {
 
-    this.$bus.$on(this.event, (runModeIsShow) => {
+    this.$bus.$on(this.event, (runModeIsShow, defaultEnv) => {
       this.runModeIsShow = runModeIsShow
       this.dialogIsShow = true
+      this.runEnv = defaultEnv
     })
 
     this.initEnv()

@@ -33,6 +33,7 @@ export default {
     apiEditStep: 'apiEditStep', // 编辑步骤
     apiAddStepIsCommit: 'apiAddStepIsCommit', // 新增步骤提交
     apiEditStepIsCommit: 'apiEditStepIsCommit', // 编辑步骤提交
+    apiQuoteCaseAsStepIsCommit: 'apiQuoteCaseAsStepIsCommit', // 引用用例为步骤成功
     // 函数文件
     apiAddFuncFileDrawerIsShow: 'apiAddFuncFileDrawerIsShow',  // 打开新增函数文件框
     apiEditFuncFileData: 'apiEditFuncFileData',  // 编辑函数文件内容
@@ -95,6 +96,7 @@ export default {
     uiAddStepIsCommit: 'uiAddStepIsCommit', // 新增步骤提交事件，把此步骤添加到步骤列表
     uiEditStepIsCommit: 'uiEditStepIsCommit', // 修改步骤提交事件，更改对应的步骤数据
     uiGetElementByPage: 'uiGetElementByPage', // 根据页面id获取元素
+    uiQuoteCaseAsStepIsCommit: 'uiQuoteCaseAsStepIsCommit', // 根据页面id获取元素
 
     // 定时任务
     uiTaskDrawerIsShow: 'uiTaskDrawerIsShow',  // 打开定时任务编辑框

@@ -242,7 +242,7 @@ export default {
       submitButtonIsLoading: false,
       deleteButtonIsLoading: false,
       drawerIsShow: false,  // 抽屉是否展示
-      currentEvent: 'test',  // 选中的环境
+      currentEvent: '',  // 选中的环境
       currentProject: '',  // 选中的项目
 
       // 文件类型列表

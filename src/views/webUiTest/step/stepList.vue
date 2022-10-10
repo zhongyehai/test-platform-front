@@ -70,6 +70,16 @@
             ></el-button>
           </el-popover>
 
+          <!-- 查看用例描述 -->
+          <el-button
+            v-if="scope.row.quote_case"
+            slot="reference"
+            type="text"
+            style="margin-right: 5px"
+            icon="el-icon-view"
+            @click="showCaseRemark(scope.row.quote_case)"
+          ></el-button>
+
           <!-- 删除步骤 -->
           <el-popover
             :ref="scope.row.id"
@@ -123,6 +133,7 @@
 import Sortable from 'sortablejs'
 
 import {deleteStep, putStepIsRun, stepSort, stepCopy, executeList} from "@/apis/webUiTest/step"
+import {getCase} from "@/apis/webUiTest/case";
 
 export default {
   name: 'stepList',
@@ -140,7 +151,11 @@ export default {
       oldList: [],
       newList: [],
 
-      tableHeight: 500  // 表格高度
+      tableHeight: 500,  // 表格高度
+
+      direction: 'rtl',  // 抽屉打开方式
+      caseRemarkDetail: '',  // 被引用用例的描述
+      caseRemarkIsShow: false  // 是否展示被引用用例的描述
     }
   },
 
@@ -197,7 +212,7 @@ export default {
       })
     })
 
-    this.tableHeight = window.innerHeight * 0.78;
+    this.tableHeight = window.innerHeight * 0.80;
 
     // 初始化父组件传过来的步骤列表
     this.stepList = this.caseStepList ? this.caseStepList : []
@@ -234,6 +249,16 @@ export default {
         this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.stepList.splice(stepInfo.index, 1)  // 从步骤列表中删除步骤
+        }
+      })
+    },
+
+    // 点击查看步骤
+    showCaseRemark(caseId){
+      getCase({id:caseId}).then(response => {
+        if (this.showMessage(this, response)){
+          this.caseRemarkIsShow = true
+          this.caseRemarkDetail = response.data.desc
         }
       })
     },

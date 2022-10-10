@@ -41,3 +41,13 @@ export function getConfigByName(params) {
 export function getRunModel() {
   return request({url: currentBaseDir + 'runModel/', method: 'get'});
 }
+
+// 获取跳过条件类型
+export function getSkipIfTypeMapping() {
+  return request({url: currentBaseDir + 'skipIfType/', method: 'get'});
+}
+
+// 获取跳过条件数据源
+export function getSkipIfDataSourceMapping(params) {
+  return request({url: currentBaseDir + 'skipIfDataSource/', method: 'get', params: params});
+}

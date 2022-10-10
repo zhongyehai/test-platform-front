@@ -277,6 +277,8 @@ export default {
               clearInterval(timer)  // 关闭定时器
             }
           }, 3000)
+        }else {
+          this.$set(this.currentCase, 'isShowRunLoading', false)
         }
       })
     },

@@ -8,7 +8,7 @@
           v-model="currentProjectId"
           placeholder="选择服务"
           size="mini"
-          style="width: 300px"
+          style="width: 400px"
           filterable
           default-first-option
           @change="getModuleList"
@@ -22,18 +22,18 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="addParentModule()"
-        >为当前服务添加一级模块
+        >添加一级模块
         </el-button>
 
       </el-form-item>
 
-      <el-form-item :label="'查询接口归属：'" size="mini">
+      <el-form-item :label="'查询接口：'" size="mini">
         <el-input
           v-model="queryAddr"
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
-          style="width: 300px">
+          style="width: 400px">
         </el-input>
         <el-button
           v-show="queryAddr"
@@ -41,9 +41,18 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongTo()"
-        >查询
+        >归属
+        </el-button>
+        <el-button
+          v-show="queryAddr"
+          type="primary"
+          size="mini"
+          style="margin-left: 10px"
+          @click.native="getApiMsgBelongToStep()"
+        >使用情况
         </el-button>
       </el-form-item>
+
     </el-form>
 
     <el-row>
@@ -208,7 +217,7 @@ import {ellipsis, arrayToTree} from "@/utils/parseData"
 
 import {projectList} from "@/apis/apiTest/project";
 import {moduleTree, deleteModule, postModule, putModule} from "@/apis/apiTest/module";
-import {apiMsgBelongTo, downloadApiMsgTemplate, uploadApi, uploadApiMsg} from "@/apis/apiTest/api";
+import {apiMsgBelongTo, apiMsgBelongToStep, downloadApiMsgTemplate, uploadApi, uploadApiMsg} from "@/apis/apiTest/api";
 
 
 export default {
@@ -264,7 +273,13 @@ export default {
     getApiMsgBelongTo(){
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
         this.showMessage(this, response)
-        // console.log(JSON.stringify(response.message))
+      })
+    },
+
+    // 获取接口使用情况
+    getApiMsgBelongToStep(){
+      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
+        this.showMessage(this, response)
       })
     },
 

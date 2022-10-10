@@ -5,7 +5,7 @@
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
-    <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
+    <el-form label-width="110px" style="margin-left: 20px;margin-right: 20px">
 
       <el-tabs v-model="activeName">
         <el-tab-pane label="任务信息" name="taskInfo">
@@ -43,9 +43,9 @@
 
             <!-- 选择环境 -->
             <el-col :span="12">
-              <el-form-item label="选择环境" class="is-required">
+              <el-form-item label="默认运行环境" class="is-required">
                 <environmentSelectorView
-                  :choice_environment="tempTask.env"
+                  :env="tempTask.env"
                   ref="environmentSelectorView"
                 ></environmentSelectorView>
                 <el-popover class="el_popover_class" placement="top-start" trigger="hover">
@@ -447,7 +447,7 @@ export default {
         id: this.tempTask.id,
         num: this.tempTask.num,
         name: this.tempTask.name,
-        env: this.$refs.environmentSelectorView.current_environment,
+        env: this.$refs.environmentSelectorView.current_env,
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
         is_send: this.tempTask.is_send,
@@ -497,7 +497,7 @@ export default {
 
     // 点击调试按钮
     clickRunDebug(){
-      this.$bus.$emit(this.runEvent, true)
+      this.$bus.$emit(this.runEvent, true, this.tempTask.env)
     },
 
     debugTask(runData) {

@@ -9,7 +9,7 @@
             class="input-with-select"
             placeholder="请输入接口地址，如 /mock/{projectSystemId}"
             size="mini"
-            style="width: 85%">
+            style="width: 80%">
           </el-input>
           <el-button
             v-show="queryAddr"
@@ -17,7 +17,15 @@
             size="mini"
             style="margin-left: 10px"
             @click.native="getApiMsgBelongTo()"
-          >查询
+          >归属
+          </el-button>
+          <el-button
+            v-show="queryAddr"
+            type="primary"
+            size="mini"
+            style="margin-left: 10px"
+            @click.native="getApiMsgBelongToStep()"
+          >使用情况
           </el-button>
         </el-form-item>
       </el-row>
@@ -115,7 +123,7 @@ import moduleSelectorView from "@/components/Selector/module";
 import editStepView from "@/views/apiTest/step/editStep";
 import Pagination from '@/components/Pagination'
 
-import {apiList, apiMsgBelongTo} from "@/apis/apiTest/api";
+import {apiList, apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";
 import {moduleList} from "@/apis/apiTest/module";
 
 export default {
@@ -183,7 +191,13 @@ export default {
     getApiMsgBelongTo() {
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
         this.showMessage(this, response)
-        // console.log(JSON.stringify(response.message))
+      })
+    },
+
+    // 获取接口使用情况
+    getApiMsgBelongToStep(){
+      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
+        this.showMessage(this, response)
       })
     },
 

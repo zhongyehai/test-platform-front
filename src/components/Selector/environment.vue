@@ -1,6 +1,6 @@
 <template>
   <el-select
-    v-model="current_environment"
+    v-model="current_env"
     filterable
     default-first-option
     placeholder="请选择运行环境"
@@ -8,43 +8,51 @@
     size="mini"
   >
     <el-option
-      v-for="(item) in environments"
-      :key="item.key"
-      :label="item.value"
-      :value="item.key"
+      v-for="(value, key) in environments"
+      :key="key"
+      :label="value"
+      :value="key"
     >
     </el-option>
   </el-select>
 </template>
 
 <script>
+import {getConfigByName} from "@/apis/config/config";
+
 export default {
   name: "environment",
-  props: ['choice_environment'],
+  props: ['env'],
   data() {
     return {
-      current_environment: 'test',
-      environments: [
-        {'key': 'dev', 'value': '开发环境'},
-        {'key': 'test', 'value': '测试环境'},
-        {'key': 'uat', 'value': 'uat环境'},
-        {'key': 'production', 'value': '生产环境'},
-      ]
-
+      current_env: '',
+      environments: []
     }
   },
 
-  methods: {},
+  methods: {
+    // 获取环境配置
+    initEnv() {
+      getConfigByName({'name': 'run_test_env'}).then(response => {
+        this.environments = JSON.parse(response.data.value)
+      })
+    },
+  },
 
-  created() {
-    this.current_environment = this.choice_environment ? this.choice_environment : 'test'
+  mounted(){
+    this.initEnv()
+  },
+
+  created(){
+    this.current_env = this.env
   },
 
   watch: {
     // 实时更新接口选择的环境
-    'choice_environment': {
+    'env': {
+      deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        this.current_environment = newVal ? this.choice_environment : 'test'
+        this.current_env = newVal
       }
     },
   }

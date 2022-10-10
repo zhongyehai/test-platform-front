@@ -74,6 +74,7 @@
           content="从yapi拉取项目列表"
           placement="top-start">
           <el-button
+            disabled
             type="primary"
             size="mini"
             :loading="pullYapiProjectIsLoading"
@@ -86,14 +87,14 @@
 
     <!-- 表格栏 -->
     <el-table
-      :key="tableKey"
-      v-loading="listLoading"
+      ref="projectTable"
+      v-loading="tableIsLoading"
+      element-loading-text="正在排序中"
+      element-loading-spinner="el-icon-loading"
       :data="project_list"
-      fit
+      row-key="id"
       stripe
-      highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="8%">
         <template slot-scope="scope">
@@ -107,18 +108,32 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'测试环境'" prop="test" align="center" min-width="32%" :show-overflow-tooltip=true>
+      <el-table-column :label="'swagger地址'" prop="test" align="center" min-width="30%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
-          <div v-if="scope.row.test">
-            <span>{{ scope.row.test }}</span>
+          <div v-if="scope.row.swagger">
+            <span>{{ scope.row.swagger }}</span>
           </div>
           <div v-else>
-            <el-tag type="danger">请设置测试环境地址</el-tag>
+            <el-tag type="warning">未设置</el-tag>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="14%">
+      <el-table-column :label="'最近一次拉取状态'" prop="test" align="center" min-width="20%" :show-overflow-tooltip=true>
+        <template slot-scope="scope">
+          <div v-if="scope.row.last_pull_status === 0">
+            <el-tag type="danger">拉取失败</el-tag>
+          </div>
+          <div v-else-if="scope.row.last_pull_status === 2">
+            <el-tag type="success">拉取成功</el-tag>
+          </div>
+          <div v-else>
+            <el-tag type="warning">未拉取</el-tag>
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
         <template slot-scope="scope">
           <span>{{ scope.row.created_time }}</span>
         </template>
@@ -130,13 +145,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'最后修改人'" prop="id" align="center" min-width="8%">
+      <el-table-column :label="'最后修改人'" prop="id" align="center" min-width="15%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'操作'" align="center" min-width="10%" class-name="small-padding fixed-width">
+      <el-table-column :label="'操作'" align="center" min-width="15%" class-name="small-padding fixed-width">
         <template slot-scope="{row, $index}">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
@@ -156,7 +171,7 @@
             <el-button
               slot="reference"
               type="text"
-              icon="el-icon-refresh"
+              icon="el-icon-bottom-left"
               :loading="row.pullPopoverLoadingIsShow"
             ></el-button>
           </el-popover>
@@ -226,10 +241,11 @@
 </template>
 
 <script>
-import {deleteProject, projectList} from '@/apis/apiTest/project'
+import {deleteProject, projectList, projectSort} from '@/apis/apiTest/project'
 import {yapiPull, yapiPullProject} from '@/apis/assist/yapi'
 import {swaggerPull} from '@/apis/assist/swagger'
 import {userList} from '@/apis/system/user'
+import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/apiTest/project/drawer'
@@ -256,22 +272,25 @@ export default {
       },
       currentProject: {},  // 当前选中的服务
       project_list: [],  // 服务列表
-      tableKey: 0,  // 服务数据表格起始
       total: 0,  // 服务数据表格总条数
       dialogStatus: '',  // dialog框状态，edit 为编辑数据, create 为新增数据
       downloadLoading: false,  // 下载表格状态
-      listLoading: true,  // 请求加载状态
+      tableIsLoading: true,  // 请求加载状态
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
       envMapping: {},
-      dataTypeMapping: []
+      dataTypeMapping: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
     }
   },
 
   created() {
     this.getUserList(this.getProjectList)  // 先获取用户数据
     // this.getProjectList()  // 获取服务列表
+
   },
 
   methods: {
@@ -335,12 +354,18 @@ export default {
 
     // 获取服务列表
     getProjectList() {
-      this.listLoading = true
+      this.tableIsLoading = true
       projectList(this.listQuery).then(response => {
         this.project_list = response.data.data
         this.total = response.data.total
+
+        this.oldList = this.project_list.map(v => v.id)
+        this.newList = this.oldList.slice()
+        this.$nextTick(() => {
+          this.setSort()
+        })
       })
-      this.listLoading = false
+      this.tableIsLoading = false
     },
 
     // 删除服务
@@ -358,7 +383,6 @@ export default {
     cancelPull(row){
       this.$set(row, 'pullPopoverIsShow', false)
     },
-
 
     cancelDeletePopover(row){
       this.$set(row, 'deletePopoverIsShow', false)
@@ -387,23 +411,34 @@ export default {
       this.getProjectList()
     },
 
-    // 修改排序
-    sortChange(data) {
-      const {prop, order} = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.projectTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.project_list.splice(evt.oldIndex, 1)[0]
+          this.project_list.splice(evt.newIndex, 0, targetRow)
 
-    // 修改排序
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    }
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+
+          // 发送请求，改变排序
+          this.tableIsLoading = true
+          projectSort({
+            List: this.newList,
+            pageNum: this.listQuery.pageNum,
+            pageSize: this.listQuery.pageSize,
+          }).then(response => {
+            this.showMessage(this, response)
+            this.tableIsLoading = false
+          })
+        }
+      })
+    },
   },
   mounted() {
 

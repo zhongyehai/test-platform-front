@@ -52,3 +52,8 @@ export function postProjectEnv(data) {
 export function projectEnvSynchronization(data) {
   return request({url: currentEnvDir + 'synchronization/', method: 'post', data: data});
 }
+
+// 修改服务排序
+export function projectSort(data) {
+  return request({url: currentBaseDir + 'sort/', method: 'put', data: data});
+}

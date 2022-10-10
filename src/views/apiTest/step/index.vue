@@ -88,11 +88,12 @@ export default {
 
     // 新增步骤
     this.$bus.$on(this.$busEvents.api.apiAddApiToStep, (apiOrCase, type) => {
-      if (type === 'quote') {  // 引用接口
+      if (type === 'quote') {  // 引用用例
         postStep(apiOrCase).then(response => {
           if (this.showMessage(this, response)) {
             // 避免重复请求步骤列表，新建完步骤过后，把新增的步骤给步骤列表更新
             this.$bus.$emit(this.$busEvents.api.apiAddStepIsCommit, response.data)
+            this.$bus.$emit(this.$busEvents.api.apiQuoteCaseAsStepIsCommit, response.data)
           }
         })
       }

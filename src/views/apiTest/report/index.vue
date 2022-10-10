@@ -30,16 +30,22 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="30%">
+              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
               </el-table-column>
 
-              <el-table-column label="生成时间" align="center" min-width="20%">
+              <el-table-column label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否通过" align="center" min-width="12%">
+              <el-table-column label="运行环境" align="center" min-width="15%">
+                <template slot-scope="scope">
+                  <span> {{ eventDict[scope.row.env] }} </span>
+                </template>
+              </el-table-column>
+
+              <el-table-column label="是否通过" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.is_passed === 1 ? 'success' : 'danger'">
                     {{ scope.row.is_passed === 1 ? '全部通过' : '有报错' }}
@@ -47,7 +53,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否生成" align="center" min-width="8%">
+              <el-table-column label="是否生成" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.is_done === 1 ? 'success' : 'warning'">
                     {{ scope.row.is_done === 1 ? '已生成' : '未生成' }}
@@ -55,7 +61,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否已阅" align="center" min-width="7%">
+              <el-table-column label="是否已阅" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="scope.row.status === '已读' ? 'success' : 'warning'">
                     {{ scope.row.status }}
@@ -127,6 +133,7 @@ import projectTreeView from '@/components/Trees/projectTree'
 import Pagination from '@/components/Pagination'
 
 import {reportList, deleteReport, downloadReport} from '@/apis/apiTest/report'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'index',
@@ -139,6 +146,7 @@ export default {
       reportTotal: 0,
       pageNum: 0,
       pageSize: 20,
+      eventDict: {}
     }
   },
   methods: {
@@ -252,6 +260,10 @@ export default {
     this.$bus.$on(this.$busEvents.api.apiProjectTreeChoiceProject, (project) => {
       this.projectId = project.id
       this.getReportList()
+    })
+
+    getConfigByName({'name': 'run_test_env'}).then(response => {
+      this.eventDict = JSON.parse(response.data.value)
     })
   },
 

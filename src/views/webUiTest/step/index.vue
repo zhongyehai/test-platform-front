@@ -89,28 +89,29 @@ export default {
   mounted() {
 
     // 新增步骤
-    this.$bus.$on(this.$busEvents.ui.uiAddElementToStep, (apiOrCase, type) => {
-      if (type === 'quote') {  // 引用接口
-        postStep(apiOrCase).then(response => {
-          if (this.showMessage(this, response)) {
-            // 避免重复请求步骤列表，新建完步骤过后，把新增的步骤给步骤列表更新
-            this.$bus.$emit(this.$busEvents.api.apiAddStepIsCommit, response.data)
-          }
-        })
-      }
-    })
+    // this.$bus.$on(this.$busEvents.ui.uiAddElementToStep, (apiOrCase, type) => {
+    //   if (type === 'quote') {  // 引用用例
+    //     postStep(apiOrCase).then(response => {
+    //       if (this.showMessage(this, response)) {
+    //         // 避免重复请求步骤列表，新建完步骤过后，把新增的步骤给步骤列表更新
+    //         this.$bus.$emit(this.$busEvents.ui.uiAddStepIsCommit, response.data)
+    //         this.$bus.$emit(this.$busEvents.ui.uiQuoteCaseAsStepIsCommit, response.data)
+    //       }
+    //     })
+    //   }
+    // })
 
     // 打开用例caseDialog的时候，定位到接口列表栏
-    this.$bus.$on(this.$busEvents.api.apiCaseDrawerStatus, (command, currentCase) => {
+    this.$bus.$on(this.$busEvents.ui.uiCaseDrawerStatus, (command, currentCase) => {
       this.activeName = 'apiList'
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.ui.uiAddElementToStep)
-    this.$bus.$off(this.$busEvents.editStep)
-    this.$bus.$off(this.$busEvents.api.apiCaseDrawerStatus)
+    // this.$bus.$off(this.$busEvents.ui.uiAddElementToStep)
+    // this.$bus.$off(this.$busEvents.editStep)
+    this.$bus.$off(this.$busEvents.ui.uiCaseDrawerStatus)
   }
 }
 </script>

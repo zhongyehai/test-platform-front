@@ -84,42 +84,42 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column :label="'序号'" prop="id" align="center" min-width="8%">
+      <el-table-column :label="'序号'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'项目名'" prop="name" align="center" min-width="20%" :show-overflow-tooltip=true>
+      <el-table-column :label="'项目名'" prop="name" align="center" min-width="40%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'测试环境'" prop="test" align="center" min-width="32%" :show-overflow-tooltip=true>
-        <template slot-scope="scope">
-          <div v-if="scope.row.test">
-            <span>{{ scope.row.test }}</span>
-          </div>
-          <div v-else>
-            <el-tag type="danger">请设置测试环境地址</el-tag>
-          </div>
-        </template>
-      </el-table-column>
+<!--      <el-table-column :label="'测试环境'" prop="test" align="center" min-width="32%" :show-overflow-tooltip=true>-->
+<!--        <template slot-scope="scope">-->
+<!--          <div v-if="scope.row.test">-->
+<!--            <span>{{ scope.row.test }}</span>-->
+<!--          </div>-->
+<!--          <div v-else>-->
+<!--            <el-tag type="danger">请设置测试环境地址</el-tag>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="14%">
+      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
         <template slot-scope="scope">
           <span>{{ scope.row.created_time }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'负责人'" prop="id" align="center" min-width="8%">
+      <el-table-column :label="'负责人'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.manager) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'最后修改人'" prop="id" align="center" min-width="8%">
+      <el-table-column :label="'最后修改人'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>

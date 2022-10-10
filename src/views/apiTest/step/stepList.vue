@@ -14,7 +14,7 @@
       style="width: 100%"
       :height="tableHeight"
     >
-      <el-table-column prop="num" label="序号" min-width="9%">
+      <el-table-column prop="num" label="序号" min-width="15%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
@@ -23,7 +23,7 @@
       <el-table-column
         align="center"
         label="执行"
-        min-width="11%"
+        min-width="20%"
         :render-header="renderHeader"
       >
         <template slot-scope="scope">
@@ -37,7 +37,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="18%">
+      <el-table-column align="center" label="操作" min-width="30%">
         <template slot-scope="scope">
 
           <!-- 编辑步骤 -->
@@ -68,6 +68,16 @@
               :loading="scope.row.copyIsLoading"
             ></el-button>
           </el-popover>
+
+          <!-- 查看用例描述 -->
+          <el-button
+            v-if="scope.row.quote_case"
+            slot="reference"
+            type="text"
+            style="margin-right: 5px"
+            icon="el-icon-view"
+            @click="showCaseRemark(scope.row.quote_case)"
+          ></el-button>
 
           <!-- 删除步骤 -->
           <el-popover
@@ -117,6 +127,18 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-drawer
+      title="用例描述"
+      size="60%"
+      :append-to-body="true"
+      :wrapperClosable="false"
+      :visible.sync="caseRemarkIsShow"
+      :direction="direction">
+      <div class="demo-drawer__content" style="margin-left: 20px">
+        <pre class="el-collapse-item-content" style="overflow: auto">{{ caseRemarkDetail }}</pre>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -124,6 +146,7 @@
 import Sortable from 'sortablejs'
 
 import {deleteStep, putStepIsRun, stepSort, stepCopy} from "@/apis/apiTest/step"
+import {getCase} from "@/apis/apiTest/case";
 
 export default {
   name: 'stepList',
@@ -132,21 +155,21 @@ export default {
   data() {
     return {
 
-      // 加载状态
-      tableLoadingIsShow: false,
 
-      // 步骤列表
-      stepList: [],
-
-      // 当前步骤
-      currentStep: {},
+      tableLoadingIsShow: false,      // 加载状态
+      stepList: [],      // 步骤列表
+      currentStep: {},      // 当前步骤
 
       // 拖拽排序参数
       sortable: null,
       oldList: [],
       newList: [],
 
-      tableHeight: 500  // 表格高度
+      tableHeight: 500,  // 表格高度
+
+      direction: 'rtl',  // 抽屉打开方式
+      caseRemarkDetail: '',  // 被引用用例的描述
+      caseRemarkIsShow: false  // 是否展示被引用用例的描述
     }
   },
 
@@ -185,7 +208,7 @@ export default {
 
   created() {
 
-    this.tableHeight = window.innerHeight * 0.78;
+    this.tableHeight = window.innerHeight * 0.80;
 
     // 初始化父组件传过来的步骤列表
     this.stepList = this.caseStepList ? this.caseStepList : []
@@ -238,6 +261,16 @@ export default {
     editStep(row, index) {
       this.currentStep = row
       this.$bus.$emit(this.$busEvents.api.apiEditStep, this.currentStep)
+    },
+
+    // 点击查看步骤
+    showCaseRemark(caseId){
+      getCase({id:caseId}).then(response => {
+        if (this.showMessage(this, response)){
+          this.caseRemarkIsShow = true
+          this.caseRemarkDetail = response.data.desc
+        }
+      })
     },
 
     // 复制步骤

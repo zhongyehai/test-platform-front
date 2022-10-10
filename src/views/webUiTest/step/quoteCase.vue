@@ -213,6 +213,7 @@ export default {
         postStep(new_case).then(response => {
           if (this.showMessage(this, response)){
             this.$bus.$emit(this.$busEvents.ui.uiQuoteCaseToStep, response.data)
+            this.$bus.$emit(this.$busEvents.ui.uiQuoteCaseAsStepIsCommit, response.data)
           }
         })
 

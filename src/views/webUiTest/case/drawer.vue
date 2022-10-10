@@ -234,7 +234,7 @@ import variablesView from '@/components/Inputs/variables'
 import stepView from '@/views/webUiTest/step'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
-import {postCase, putCase, copyCase, caseRun} from "@/apis/webUiTest/case";
+import {postCase, putCase, getCase, copyCase, caseRun} from "@/apis/webUiTest/case";
 import {getCaseSet} from "@/apis/webUiTest/caseSet";
 import {stepList} from "@/apis/webUiTest/step";
 import {reportIsDone} from "@/apis/webUiTest/report";
@@ -276,7 +276,7 @@ export default {
         is_run: true,
         run_times: '',
         func_files: [],
-        variables: [{key: null, value: null, remark: null}],
+        variables: [{key: null, value: null, remark: null, data_type: 'str'}],
         cookies: [{key: null, value: null, remark: null}],
         session_storage: [{key: null, value: null, remark: null}],
         local_storage: [{key: null, value: null, remark: null}],
@@ -307,7 +307,7 @@ export default {
       this.tempCase.desc = ''
       this.tempCase.run_times = ''
       this.tempCase.func_files = []
-      this.tempCase.variables = [{key: null, value: null, remark: null}]
+      this.tempCase.variables = [{key: null, value: null, remark: null, data_type: 'str'}]
       this.tempCase.cookies = [{key: null, value: null, remark: null}]
       this.tempCase.session_storage = [{key: null, value: null, remark: null}]
       this.tempCase.local_storage = [{key: null, value: null, remark: null}]
@@ -378,7 +378,7 @@ export default {
     },
 
     // 点击调试按钮
-    clickRunDebug(){
+    clickRunDebug() {
       this.$bus.$emit(this.runEvent, false)
     },
 
@@ -435,6 +435,8 @@ export default {
               clearInterval(timer)  // 关闭定时器
             }
           }, 3000)
+        } else {
+          this.isShowDebugLoading = false
         }
       })
     },
@@ -484,6 +486,28 @@ export default {
         )
       }
       this.activeName = 'caseInFo'
+    })
+
+    // 引用用例为步骤后，后端会合并两条用例的公共变量，所以获取当前用例的最新公共变量
+    this.$bus.$on(this.$busEvents.ui.uiQuoteCaseAsStepIsCommit, () => {
+      getCase({id: this.tempCase.id}).then(response => {
+        let tempCase_variables = {}, response_variables = {}
+
+        response.data.variables.forEach(variable => {
+          response_variables[variable["key"]] = variable
+        })
+
+        this.tempCase.variables.forEach(variable => {
+          tempCase_variables[variable["key"]] = variable
+        })
+
+        for (let key in response_variables) {
+          if (!(key in tempCase_variables)) {
+            this.tempCase.variables.push(response_variables[key])
+            // tempCase_variables[key] = response_variables[key]
+          }
+        }
+      })
     })
 
     // 监听、接收用例集树

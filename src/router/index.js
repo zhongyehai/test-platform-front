@@ -130,7 +130,7 @@ export const constantRoutes = [
         path: 'task',
         name: 'apiTask',
         component: () => import('@/views/apiTest/task/index'),
-        meta: {title: '定时任务', icon: 'el-icon-date'}
+        meta: {title: '任务管理', icon: 'el-icon-date'}
       },
       {
         path: 'reportShow',
@@ -190,7 +190,7 @@ export const constantRoutes = [
         path: 'task',
         name: 'WebUiTask',
         component: () => import('@/views/webUiTest/task/index'),
-        meta: {title: '定时任务', icon: 'el-icon-date'}
+        meta: {title: '任务管理', icon: 'el-icon-date'}
       },
       {
         path: 'reportShow',
@@ -243,7 +243,7 @@ export const constantRoutes = [
       //   path: 'task',
       //   name: 'uiTask',
       //   component: () => import('@/views/uiTest/task/index'),
-      //   meta: {title: '定时任务', icon: 'el-icon-date'}
+      //   meta: {title: '任务管理', icon: 'el-icon-date'}
       // },
       // {
       //   path: 'reportShow',

@@ -2,13 +2,13 @@
 
   <div class="app-container">
 
-    <el-form label-width="200px">
+    <el-form label-width="150px" inline>
       <el-form-item :label="'选择服务：'" size="mini">
         <el-select
           v-model="currentProjectId"
           placeholder="选择服务"
           size="mini"
-          style="width: 500px"
+          style="width: 400px"
           filterable
           default-first-option
           @change="getSetList"
@@ -22,9 +22,34 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="addParentSet()"
-        >为当前服务添加一级用例集
+        >添加一级用例集
         </el-button>
+      </el-form-item>
 
+      <el-form-item :label="'查询接口：'" size="mini">
+        <el-input
+          v-model="queryAddr"
+          class="input-with-select"
+          placeholder="请输入接口地址"
+          size="mini"
+          style="width: 400px">
+        </el-input>
+        <el-button
+          v-show="queryAddr"
+          type="primary"
+          size="mini"
+          style="margin-left: 10px"
+          @click.native="getApiMsgBelongTo()"
+        >归属
+        </el-button>
+        <el-button
+          v-show="queryAddr"
+          type="primary"
+          size="mini"
+          style="margin-left: 10px"
+          @click.native="getApiMsgBelongToStep()"
+        >使用情况
+        </el-button>
       </el-form-item>
     </el-form>
 
@@ -164,7 +189,8 @@ import {projectList} from "@/apis/apiTest/project";
 import {caseSetTree, caseSetRun, deleteCaseSet, postCaseSet, putCaseSet} from "@/apis/apiTest/caseSet";
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
-import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
+import {getRunTimeout} from "@/utils/getConfig";
+import {apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";  // 初始化超时时间
 
 export default {
   name: 'index',
@@ -193,6 +219,7 @@ export default {
         parent: '',
         project_id: '',
       },
+      queryAddr: '',
       moduleDrawerIsShow: false,
       defaultCaseSet: {},
       moduleDrawerStatus: '',
@@ -407,6 +434,20 @@ export default {
      */
     nodeDragEnd(start_node, end_node, position, event) {
     },
+
+    // 获取接口归属
+    getApiMsgBelongTo(){
+      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
+        this.showMessage(this, response)
+      })
+    },
+
+    // 获取接口使用情况
+    getApiMsgBelongToStep(){
+      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
+        this.showMessage(this, response)
+      })
+    }
 
   },
 

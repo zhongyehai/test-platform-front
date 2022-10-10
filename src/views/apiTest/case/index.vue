@@ -255,7 +255,7 @@ export default {
       caseRun({
         caseId: [this.currentCase.id], env: runData.runEnv, is_async: runData.runType
       }).then(runResponse => {
-        // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
+        console.log('case.index.methods.runCase.response: ', JSON.stringify(runResponse))
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，
@@ -281,6 +281,8 @@ export default {
               clearInterval(timer)  // 关闭定时器
             }
           }, 3000)
+        }else {
+          this.$set(this.currentCase, 'isShowRunLoading', false)
         }
       })
     },
@@ -307,13 +309,15 @@ export default {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }).then(response => {
+        this.tableLoadingIsShow = false
+
         this.case_list = response.data.data
         this.case_total = response.data.total
 
         this.oldList = this.case_list.map(v => v.id)
         this.newList = this.oldList.slice()
       })
-      this.tableLoadingIsShow = false
+
     },
 
     // 拖拽排序
@@ -344,6 +348,7 @@ export default {
         }
       })
     },
+
     renderHeader (h, {column}) {
       // 悬浮提示的文字内容
       const info = '若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例；请务必将用例调试通过后再设为要运行'

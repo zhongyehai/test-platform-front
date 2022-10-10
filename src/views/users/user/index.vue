@@ -122,24 +122,24 @@
             @click="handleUpdate(row)"></el-button>
 
           <!-- 删除账号 -->
-          <el-popover
-            :ref="row.id"
-            placement="top"
-            popper-class="down-popover"
-            v-model="row.deletePopoverIsShow">
-            <p>确定删除【{{ row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delUser(row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              icon="el-icon-delete"
-              :loading="row.deleteLoadingIsShow"
-            ></el-button>
-          </el-popover>
+<!--          <el-popover-->
+<!--            :ref="row.id"-->
+<!--            placement="top"-->
+<!--            popper-class="down-popover"-->
+<!--            v-model="row.deletePopoverIsShow">-->
+<!--            <p>确定删除【{{ row.name }}】?</p>-->
+<!--            <div style="text-align: right; margin: 0">-->
+<!--              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>-->
+<!--              <el-button type="primary" size="mini" @click="delUser(row)">确定</el-button>-->
+<!--            </div>-->
+<!--            <el-button-->
+<!--              slot="reference"-->
+<!--              style="color: red"-->
+<!--              type="text"-->
+<!--              icon="el-icon-delete"-->
+<!--              :loading="row.deleteLoadingIsShow"-->
+<!--            ></el-button>-->
+<!--          </el-popover>-->
 
         </template>
       </el-table-column>

@@ -67,3 +67,8 @@ export function apiMsgSort(data) {
 export function apiMsgBelongTo(params) {
   return request({url: currentBaseDir + 'belongTo/', method: 'get', params: params});
 }
+
+// 查询使用接口转为步骤后的归属
+export function apiMsgBelongToStep(params) {
+  return request({url: currentBaseDir + 'belongToStep/', method: 'get', params: params});
+}

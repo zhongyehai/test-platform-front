@@ -1,471 +1,481 @@
 <template>
   <div>
-    <!--    <reportHeader></reportHeader>-->
-    <!--    <div class="reportShow" style="line-height: 36px;font-family:LiSu">-->
     <div class="reportShow" style="line-height: 36px;">
-      <!-- 第一行，头部信息 -->
-      <el-row>
-        <el-col :span="24">
-          <div class="grid-content" style="background-color: #f5f5f5 !important;">
-            <el-button type="primary" round style="padding: 4px 10px ;" v-show="false">{{ null }}</el-button>
-            <el-button type="primary" size="mini" round style="margin-top: 5px;padding: 4px 10px ;"
-                       @click.native="isShowPic(false)"
-                       v-show="this.picStatus"
-            >隐藏统计图
-            </el-button>
-            <el-button type="primary" size="mini" round style="padding: 4px 10px ;"
-                       @click.native="isShowPic(true)"
-                       v-show="!this.picStatus"
-            >展示统计图
-            </el-button>
-            <el-dropdown @command="handleCommand" style="line-height:15px;margin-left:10px;color: #3a8ee6;">
+
+      <!-- 有测试报告数据 -->
+      <div v-show="reportData.details.length > 0">
+        <!-- 第一行，头部信息 -->
+        <el-row>
+          <el-col :span="24">
+            <div class="grid-content" style="background-color: #f5f5f5 !important;">
+              <el-button type="primary" round style="padding: 4px 10px ;" v-show="false">{{ null }}</el-button>
+              <el-button type="primary" size="mini" round style="margin-top: 5px;padding: 4px 10px ;"
+                         @click.native="isShowPic(false)"
+                         v-show="this.picStatus"
+              >隐藏统计图
+              </el-button>
+              <el-button type="primary" size="mini" round style="padding: 4px 10px ;"
+                         @click.native="isShowPic(true)"
+                         v-show="!this.picStatus"
+              >展示统计图
+              </el-button>
+              <el-dropdown @command="handleCommand" style="line-height:15px;margin-left:10px;color: #3a8ee6;">
                           <span class="el-dropdown-link">
                             根据状态筛选用例<i class="el-icon-arrow-down el-icon--right"></i>
                           </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="None">全部用例</el-dropdown-item>
-                <el-dropdown-item command="success">成功的用例</el-dropdown-item>
-                <el-dropdown-item command="error">失败的用例</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="None">全部用例</el-dropdown-item>
+                  <el-dropdown-item command="success">成功的用例</el-dropdown-item>
+                  <el-dropdown-item command="error">失败的用例</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             总共耗时: {{ this.reportData.time.duration }} 秒
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             开始时间: {{ this.reportData.time.start_at }}
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             运行环境: {{ runEnvDict[reportData.run_env] }}
           </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <!-- 第二行，饼图 -->
-      <el-row v-show="this.picStatus">
-        <!-- 步骤 -->
-        <el-col :span="10"
-                style="border-style:solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;border-width: 1px;"
-        >
-          <div style="height: 200px;float:left;">
-            <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
-          </div>
-          <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-            <li style="font-weight:700;font-size:16px">步骤概况</li>
-            <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-            <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
-            <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
-            <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
-            <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
-          </ol>
-        </el-col>
-
-        <!-- 用例 -->
-        <el-col :span="14" style="border-width: 1px;">
-          <div style="height: 200px;float:left;">
-            <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px"
-                     width="350px"
-            ></ve-ring>
-          </div>
-          <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-            <li style="font-weight:700;font-size:16px">用例概况</li>
-            <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.testcases.total }}
-            </li>
-            <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.testcases.success }}
-            </li>
-            <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.testcases.fail }}</li>
-          </ol>
-        </el-col>
-      </el-row>
-
-      <!-- 第三行，用例和详情 -->
-      <el-row>
-        <!-- 用例、步骤列表 -->
-        <el-col :span="6"
-                style="border-style:solid;border-color: rgb(234, 234, 234) #ffffff #ffffff #ffffff;border-width: 1px;"
-        >
-          <el-scrollbar>
-            <div :style={height:picHeight}>
-              <el-collapse accordion>
-                <!-- 遍历用例 -->
-                <el-collapse-item
-                  v-for="(item, index) in reportData['details']"
-                  :key="index"
-                  v-show="item.success === true ? showScene[0]: showScene[1]"
-                >
-                  <template slot="title">
-                    <el-tooltip class="item"
-                                effect="dark"
-                                :content="item.records ? `${item.records.length}个步骤` : ''"
-                                placement="top-start">
-                      <div style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                           :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
-                        {{ item.name }}
-                      </div>
-                    </el-tooltip>
-                  </template>
-                  <div>
-                    <ol id="test" style="padding:5px;font-family:Times New Roman">
-                      <!-- 遍历步骤 -->
-                      <li style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
-                          :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
-                          v-for="(item1, index1) in item['records']"
-                          :key="index1"
-                          @click="handleNodeClick(index, index1)"
-                      >
-                        <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
-                          <span class="test-name">{{ item1.name }}</span>
-                          <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
-                          <span class="test-status right pass">{{ item1.status }}</span>
-                        </div>
-                      </li>
-                    </ol>
-                  </div>
-
-                </el-collapse-item>
-              </el-collapse>
             </div>
-          </el-scrollbar>
-        </el-col>
-        <!-- 详情页 -->
-        <el-col :span="18"
-                style="border-style:solid;border-color:rgb(234, 234, 234) #ffffff rgb(234, 234, 234) rgb(234, 234, 234);border-width: 1px;font-family:Serif"
-        >
+          </el-col>
+        </el-row>
 
+        <!-- 第二行，饼图 -->
+        <el-row v-show="this.picStatus">
+          <!-- 步骤 -->
+          <el-col :span="10"
+                  style="border-style:solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;border-width: 1px;"
+          >
+            <div style="height: 200px;float:left;">
+              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
+            </div>
+            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
+              <li style="font-weight:700;font-size:16px">步骤概况</li>
+              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
+              <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
+              <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
+            </ol>
+          </el-col>
 
-          <el-scrollbar :wrapStyle={height:picHeight}>
-            <div :style={height:picHeight}>
+          <!-- 用例 -->
+          <el-col :span="14" style="border-width: 1px;">
+            <div style="height: 200px;float:left;">
+              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px"
+                       width="350px"
+              ></ve-ring>
+            </div>
+            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
+              <li style="font-weight:700;font-size:16px">用例概况</li>
+              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.testcases.total }}
+              </li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.testcases.success }}
+              </li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.testcases.fail }}</li>
+            </ol>
+          </el-col>
+        </el-row>
 
-              <div style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
-                   border="0" cellpadding="0" cellspacing="0">
-
-
-                <el-collapse v-model="defaultShowResponseInFo">
-
-                  <el-collapse-item name="1">
+        <!-- 第三行，用例和详情 -->
+        <el-row>
+          <!-- 用例、步骤列表 -->
+          <el-col :span="6"
+                  style="border-style:solid;border-color: rgb(234, 234, 234) #ffffff #ffffff #ffffff;border-width: 1px;"
+          >
+            <el-scrollbar>
+              <div :style={height:picHeight}>
+                <el-collapse accordion>
+                  <!-- 遍历用例 -->
+                  <el-collapse-item
+                    v-for="(item, index) in reportData['details']"
+                    :key="index"
+                    v-show="item.success === true ? showScene[0]: showScene[1]"
+                  >
                     <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "请求方法：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.method }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="2">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "请求地址：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.url }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="3">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "查询字符串参数：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.params">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].request.params)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
+                      <el-tooltip class="item"
+                                  effect="dark"
+                                  :content="item.records ? `${item.records.length}个步骤` : ''"
+                                  placement="top-start">
+                        <div style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
+                             :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
+                          {{ item.name }}
                         </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.params"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.params)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="4">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "头部参数：" }}</div>
+                      </el-tooltip>
                     </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.headers">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].request.headers)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.headers"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.headers)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
+                    <div>
+                      <ol id="test" style="padding:5px;font-family:Times New Roman">
+                        <!-- 遍历步骤 -->
+                        <li style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
+                            :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
+                            v-for="(item1, index1) in item['records']"
+                            :key="index1"
+                            @click="handleNodeClick(index, index1)"
+                        >
+                          <div :style="
+                        item1.status === 'success' ? 'color:#67c23a':
+                        item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'">
+                            <span class="test-name">{{ item1.name }}</span>
+                            <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
+                            <span class="test-status right pass">{{ item1.status }}</span>
+                          </div>
+                        </li>
+                      </ol>
+                    </div>
 
-                  <el-collapse-item name="5">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "json参数：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.json">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].request.json)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.json"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.json)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="6">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "data参数：" }}</div>
-                    </template>
-                    <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'object'">
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].request.data)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.data"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.data)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                    <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'string'">
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
-                          <xmp>{{ formatXml(meta_datas.data[0].request.data) }}</xmp>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.data"
-                          v-clipboard:copy="formatXml(this.meta_datas.data[0].request.data)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="7">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "文件参数：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.files">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].request.files)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].request.files"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.files)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="8">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "请求时间：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="9">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应时间：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="10">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="11">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应编码：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.encoding }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="12">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应头部信息：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.headers">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].response.headers)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].response.headers"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.headers)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="13">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应json：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.json">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].response.json)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].response.json"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.json)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="14">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "响应文本：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content" v-html="this.meta_datas.data[0].response.text"></div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="15">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].extract_msgs">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].extract_msgs)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].extract_msgs"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].extract_msgs)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="16">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "发送请求时内存中的公共变量：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.variables_mapping">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.variables_mapping)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
-                        </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.variables_mapping"
-                          v-clipboard:copy="getCopyData(this.meta_datas.variables_mapping)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="17">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
-                    </template>
-                    <pre class="el-collapse-item-content" style="overflow: auto">{{ this.attachment }}</pre>
                   </el-collapse-item>
                 </el-collapse>
               </div>
-            </div>
-          </el-scrollbar>
-        </el-col>
-      </el-row>
+            </el-scrollbar>
+          </el-col>
+          <!-- 详情页 -->
+          <el-col :span="18"
+                  style="border-style:solid;border-color:rgb(234, 234, 234) #ffffff rgb(234, 234, 234) rgb(234, 234, 234);border-width: 1px;font-family:Serif"
+          >
+
+
+            <el-scrollbar :wrapStyle={height:picHeight}>
+              <div :style={height:picHeight}>
+
+                <div style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
+                     border="0" cellpadding="0" cellspacing="0">
+
+
+                  <el-collapse v-model="defaultShowResponseInFo">
+
+                    <el-collapse-item name="1">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "请求方法：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.method }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="2">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "请求地址：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.url }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="3">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "查询字符串参数：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.params">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].request.params)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.params"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.params)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="4">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "头部参数：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.headers">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].request.headers)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.headers"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.headers)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="5">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "json参数：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.json">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].request.json)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.json"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.json)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="6">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "data参数：" }}</div>
+                      </template>
+                      <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'object'">
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].request.data)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.data"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.data)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                      <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'string'">
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
+                            <xmp>{{ formatXml(meta_datas.data[0].request.data) }}</xmp>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.data"
+                            v-clipboard:copy="formatXml(this.meta_datas.data[0].request.data)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="7">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "文件参数：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.files">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].request.files)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].request.files"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.files)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="8">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "请求时间：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="9">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应时间：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="10">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="11">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应编码：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.encoding }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="12">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应头部信息：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.headers">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].response.headers)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].response.headers"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.headers)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="13">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应json：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.json">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].response.json)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].response.json"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.json)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="14">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应文本：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content" v-html="this.meta_datas.data[0].response.text"></div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="15">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].extract_msgs">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].extract_msgs)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].extract_msgs"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].extract_msgs)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="16">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "发送请求时内存中的公共变量：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.variables_mapping">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.variables_mapping)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.variables_mapping"
+                            v-clipboard:copy="getCopyData(this.meta_datas.variables_mapping)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="17">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
+                      </template>
+                      <pre class="el-collapse-item-content" style="overflow: auto">{{ this.attachment }}</pre>
+                    </el-collapse-item>
+                  </el-collapse>
+                </div>
+              </div>
+            </el-scrollbar>
+          </el-col>
+        </el-row>
+      </div>
+
+      <!-- 无测试报告数据 -->
+      <div class="str" v-show="reportData.details.length === 0">
+        无运行数据或所有运行数据均已跳过
+      </div>
+
     </div>
   </div>
 
@@ -839,5 +849,11 @@ export default {
   line-height: 150%;
   height: auto;
   padding: 10px 0;
+}
+
+.str {
+  font-size: 30px;
+  text-align: center;
+  margin-top: 10%;
 }
 </style>

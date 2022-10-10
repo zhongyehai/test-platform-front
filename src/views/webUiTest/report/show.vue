@@ -1,242 +1,249 @@
 <template>
   <div>
-    <!--    <reportHeader></reportHeader>-->
-    <!--    <div class="reportShow" style="line-height: 36px;font-family:LiSu">-->
     <div class="reportShow" style="line-height: 36px;">
-      <!-- 第一行，头部信息 -->
-      <el-row>
-        <el-col :span="24">
-          <div class="grid-content" style="background-color: #f5f5f5 !important;">
-            <el-button type="primary" round style="padding: 4px 10px ;" v-show="false">{{ null }}</el-button>
-            <el-button type="primary" size="mini" round style="margin-top: 5px;padding: 4px 10px ;"
-                       @click.native="isShowPic(false)"
-                       v-show="this.picStatus"
-            >隐藏统计图
-            </el-button>
-            <el-button type="primary" size="mini" round style="padding: 4px 10px ;"
-                       @click.native="isShowPic(true)"
-                       v-show="!this.picStatus"
-            >展示统计图
-            </el-button>
-            <el-dropdown @command="handleCommand" style="line-height:15px;margin-left:10px;color: #3a8ee6;">
+
+      <!-- 有测试报告数据 -->
+      <div v-show="reportData.details.length > 0">
+        <!-- 第一行，头部信息 -->
+        <el-row>
+          <el-col :span="24">
+            <div class="grid-content" style="background-color: #f5f5f5 !important;">
+              <el-button type="primary" round style="padding: 4px 10px ;" v-show="false">{{ null }}</el-button>
+              <el-button type="primary" size="mini" round style="margin-top: 5px;padding: 4px 10px ;"
+                         @click.native="isShowPic(false)"
+                         v-show="this.picStatus"
+              >隐藏统计图
+              </el-button>
+              <el-button type="primary" size="mini" round style="padding: 4px 10px ;"
+                         @click.native="isShowPic(true)"
+                         v-show="!this.picStatus"
+              >展示统计图
+              </el-button>
+              <el-dropdown @command="handleCommand" style="line-height:15px;margin-left:10px;color: #3a8ee6;">
                           <span class="el-dropdown-link">
                             根据状态筛选用例<i class="el-icon-arrow-down el-icon--right"></i>
                           </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="None">全部用例</el-dropdown-item>
-                <el-dropdown-item command="success">成功的用例</el-dropdown-item>
-                <el-dropdown-item command="error">失败的用例</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="None">全部用例</el-dropdown-item>
+                  <el-dropdown-item command="success">成功的用例</el-dropdown-item>
+                  <el-dropdown-item command="error">失败的用例</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             总共耗时: {{ this.reportData.time.duration }} 秒
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             开始时间: {{ this.reportData.time.start_at }}
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
           </span>
-            <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             运行环境: {{ runEnvDict[reportData.run_env] }}
           </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <!-- 第二行，饼图 -->
-      <el-row v-show="this.picStatus">
-        <!-- 步骤 -->
-        <el-col :span="10"
-                style="border-style:solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;border-width: 1px;"
-        >
-          <div style="height: 200px;float:left;">
-            <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
-          </div>
-          <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-            <li style="font-weight:700;font-size:16px">步骤概况</li>
-            <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-            <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
-            <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
-            <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
-            <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
-          </ol>
-        </el-col>
-
-        <!-- 用例 -->
-        <el-col :span="14" style="border-width: 1px;">
-          <div style="height: 200px;float:left;">
-            <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px"
-                     width="350px"
-            ></ve-ring>
-          </div>
-          <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-            <li style="font-weight:700;font-size:16px">用例概况</li>
-            <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.testcases.total }}
-            </li>
-            <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.testcases.success }}
-            </li>
-            <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.testcases.fail }}</li>
-          </ol>
-        </el-col>
-      </el-row>
-
-      <!-- 第三行，用例和详情 -->
-      <el-row>
-        <!-- 用例、步骤列表 -->
-        <el-col :span="6"
-                style="border-style:solid;border-color: rgb(234, 234, 234) #ffffff #ffffff #ffffff;border-width: 1px;"
-        >
-          <el-scrollbar>
-            <div :style={height:picHeight}>
-              <el-collapse accordion>
-                <!-- 遍历用例 -->
-                <el-collapse-item
-                  v-for="(item, index) in reportData['details']"
-                  :key="index"
-                  v-show="item.success === true ? showScene[0]: showScene[1]"
-                >
-                  <template slot="title">
-                    <el-tooltip class="item"
-                                effect="dark"
-                                :content="item.records ? `${item.records.length}个步骤` : ''"
-                                placement="top-start">
-                      <div style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                           :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
-                        {{ item.name }}
-                      </div>
-                    </el-tooltip>
-                  </template>
-                  <div>
-                    <ol id="test" style="padding:5px;font-family:Times New Roman">
-                      <!-- 遍历步骤 -->
-                      <li style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
-                          :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
-                          v-for="(item1, index1) in item['records']"
-                          :key="index1"
-                          @click="handleNodeClick(index, index1)"
-                      >
-                        <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
-                          <span class="test-name">{{ item1.name }}</span>
-                          <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
-                          <span class="test-status right pass">{{ item1.status }}</span>
-                        </div>
-                      </li>
-                    </ol>
-                  </div>
-
-                </el-collapse-item>
-              </el-collapse>
             </div>
-          </el-scrollbar>
-        </el-col>
-        <!-- 详情页 -->
-        <el-col :span="18"
-                style="border-style:solid;border-color:rgb(234, 234, 234) #ffffff rgb(234, 234, 234) rgb(234, 234, 234);border-width: 1px;font-family:Serif"
-        >
+          </el-col>
+        </el-row>
 
+        <!-- 第二行，饼图 -->
+        <el-row v-show="this.picStatus">
+          <!-- 步骤 -->
+          <el-col :span="10"
+                  style="border-style:solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;border-width: 1px;"
+          >
+            <div style="height: 200px;float:left;">
+              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
+            </div>
+            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
+              <li style="font-weight:700;font-size:16px">步骤概况</li>
+              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
+              <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
+              <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
+            </ol>
+          </el-col>
 
-          <el-scrollbar :wrapStyle={height:picHeight}>
-            <div :style={height:picHeight}>
+          <!-- 用例 -->
+          <el-col :span="14" style="border-width: 1px;">
+            <div style="height: 200px;float:left;">
+              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px"
+                       width="350px"
+              ></ve-ring>
+            </div>
+            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
+              <li style="font-weight:700;font-size:16px">用例概况</li>
+              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.testcases.total }}
+              </li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.testcases.success }}
+              </li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.testcases.fail }}</li>
+            </ol>
+          </el-col>
+        </el-row>
 
-              <div style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
-                   border="0" cellpadding="0" cellspacing="0">
-
-
-                <el-collapse v-model="defaultShowResponseInFo">
-
-                  <el-collapse-item name="1">
+        <!-- 第三行，用例和详情 -->
+        <el-row>
+          <!-- 用例、步骤列表 -->
+          <el-col :span="6"
+                  style="border-style:solid;border-color: rgb(234, 234, 234) #ffffff #ffffff #ffffff;border-width: 1px;"
+          >
+            <el-scrollbar>
+              <div :style={height:picHeight}>
+                <el-collapse accordion>
+                  <!-- 遍历用例 -->
+                  <el-collapse-item
+                    v-for="(item, index) in reportData['details']"
+                    :key="index"
+                    v-show="item.success === true ? showScene[0]: showScene[1]"
+                  >
                     <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "执行方式：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.execute_name }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="2">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "执行方法：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.action }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="3">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "元素定位方式：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.by_type }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="4">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "定位元素：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.element }}</div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="5">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "输入内容：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.text }}</div>
-                  </el-collapse-item>
-
-                  <!--                  <el-collapse-item name="6">-->
-                  <!--                    <template slot="title">-->
-                  <!--                      <div class="el-collapse-item-title"> {{ "执行前页面：" }}</div>-->
-                  <!--                    </template>-->
-                  <!--                    <div class="el-collapse-item-content">-->
-                  <!--                      <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].before "></el-image>-->
-                  <!--                    </div>-->
-                  <!--                  </el-collapse-item>-->
-
-                  <el-collapse-item name="7">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "执行后页面：" }}</div>
-                    </template>
-                    <div class="el-collapse-item-content">
-                      <el-image :src="'data:image/png;base64,' + this.meta_datas.data[0].after "></el-image>
-                    </div>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="8">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
-                    </template>
-                    <el-row>
-                      <el-col :span="20">
-                        <div style="margin-left: 100px" v-if="this.meta_datas.data[0].extract_msgs">
-                          <JsonViewer
-                            :value="strToJson(this.meta_datas.data[0].extract_msgs)"
-                            :expand-depth="5"
-                            copyable
-                          ></JsonViewer>
+                      <el-tooltip class="item"
+                                  effect="dark"
+                                  :content="item.records ? `${item.records.length}个步骤` : ''"
+                                  placement="top-start">
+                        <div style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
+                             :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
+                          {{ item.name }}
                         </div>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-button
-                          size="mini"
-                          v-if="this.meta_datas.data[0].extract_msgs"
-                          v-clipboard:copy="getCopyData(this.meta_datas.data[0].extract_msgs)"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError"
-                        >复制
-                        </el-button>
-                      </el-col>
-                    </el-row>
-                  </el-collapse-item>
-
-                  <el-collapse-item name="9">
-                    <template slot="title">
-                      <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
+                      </el-tooltip>
                     </template>
-                    <pre class="el-collapse-item-content" style="overflow: auto">{{ this.attachment }}</pre>
+                    <div>
+                      <ol id="test" style="padding:5px;font-family:Times New Roman">
+                        <!-- 遍历步骤 -->
+                        <li style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
+                            :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
+                            v-for="(item1, index1) in item['records']"
+                            :key="index1"
+                            @click="handleNodeClick(index, index1)"
+                        >
+                          <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
+                            <span class="test-name">{{ item1.name }}</span>
+                            <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
+                            <span class="test-status right pass">{{ item1.status }}</span>
+                          </div>
+                        </li>
+                      </ol>
+                    </div>
+
                   </el-collapse-item>
                 </el-collapse>
               </div>
-            </div>
-          </el-scrollbar>
-        </el-col>
-      </el-row>
+            </el-scrollbar>
+          </el-col>
+          <!-- 详情页 -->
+          <el-col :span="18"
+                  style="border-style:solid;border-color:rgb(234, 234, 234) #ffffff rgb(234, 234, 234) rgb(234, 234, 234);border-width: 1px;font-family:Serif"
+          >
+
+
+            <el-scrollbar :wrapStyle={height:picHeight}>
+              <div :style={height:picHeight}>
+
+                <div style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
+                     border="0" cellpadding="0" cellspacing="0">
+
+
+                  <el-collapse v-model="defaultShowResponseInFo">
+
+                    <el-collapse-item name="1">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "执行方式：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.execute_name }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="2">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "执行方法：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.action }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="3">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "元素定位方式：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.by_type }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="4">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "定位元素：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.element }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="5">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "输入内容：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.text }}</div>
+                    </el-collapse-item>
+
+                    <!--                  <el-collapse-item name="6">-->
+                    <!--                    <template slot="title">-->
+                    <!--                      <div class="el-collapse-item-title"> {{ "执行前页面：" }}</div>-->
+                    <!--                    </template>-->
+                    <!--                    <div class="el-collapse-item-content">-->
+                    <!--                      <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].before "></el-image>-->
+                    <!--                    </div>-->
+                    <!--                  </el-collapse-item>-->
+
+                    <el-collapse-item name="7">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "执行后页面：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">
+                        <el-image :src="'data:image/png;base64,' + this.meta_datas.data[0].after "></el-image>
+                      </div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="8">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].extract_msgs">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].extract_msgs)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].extract_msgs"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].extract_msgs)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="9">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
+                      </template>
+                      <pre class="el-collapse-item-content" style="overflow: auto">{{ this.attachment }}</pre>
+                    </el-collapse-item>
+                  </el-collapse>
+                </div>
+              </div>
+            </el-scrollbar>
+          </el-col>
+        </el-row>
+      </div>
+
+      <!-- 无测试报告数据 -->
+      <div class="str" v-show="reportData.details.length === 0">
+        无运行数据或所有运行数据均已跳过
+      </div>
     </div>
   </div>
 
@@ -603,5 +610,11 @@ export default {
   line-height: 150%;
   height: auto;
   padding: 10px 0;
+}
+
+.str {
+  font-size: 30px;
+  text-align: center;
+  margin-top: 10%;
 }
 </style>

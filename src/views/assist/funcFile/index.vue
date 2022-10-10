@@ -9,8 +9,12 @@
     </el-button>
 
     <el-table
-      v-loading="listLoading"
+      ref="funcTable"
+      v-loading="tableIsLoading"
+      element-loading-text="正在排序中"
+      element-loading-spinner="el-icon-loading"
       :data="funcFiles.list"
+      row-key="id"
       stripe
     >
       <el-table-column label="序号" align="center" min-width="10%">
@@ -100,11 +104,12 @@
 </template>
 
 <script>
+import Sortable from 'sortablejs'
 import funcFileDrawer from "@/views/assist/funcFile/drawer";
 import funcDataDrawer from "@/views/assist/funcFile/funcDataDrawer";
 import Pagination from '@/components/Pagination'
 
-import {funcFileList, deleteFuncFile} from '@/apis/assist/funcFile'
+import {funcFileList, deleteFuncFile, funcSort} from '@/apis/assist/funcFile'
 import {userList} from '@/apis/system/user'
 
 export default {
@@ -116,14 +121,18 @@ export default {
   },
   data() {
     return {
+      // 拖拽排序参数
+      sortable: null,
+      oldList: [],
+      newList: [],
       userList: [],
       userDict: {},
       funcDebugData: '',
-      listLoading: false,
       funcFiles: {
         list: [],
         total: 0,
       },
+      tableIsLoading: false,
       pageSize: 20,
       pageNum: 1
     }
@@ -149,9 +158,18 @@ export default {
     },
 
     getFuncFileList() {
+      this.tableIsLoading = true
       funcFileList({'pageNum': this.pageNum, 'pageSize': this.pageSize}).then(response => {
+        this.tableIsLoading = false
+
         this.funcFiles.list = response.data.data
         this.funcFiles.total = response.data.total
+
+        this.oldList = this.funcFiles.list.map(v => v.id)
+        this.newList = this.oldList.slice()
+        this.$nextTick(() => {
+          this.setSort()
+        })
       })
     },
 
@@ -179,6 +197,35 @@ export default {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getFuncFileList()
+        }
+      })
+    },
+
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.funcTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.funcFiles.list.splice(evt.oldIndex, 1)[0]
+          this.funcFiles.list.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+
+          // 发送请求，改变排序
+          this.tableIsLoading = true
+          funcSort({
+            List: this.newList,
+            pageNum: this.pageNum,
+            pageSize: this.pageSize,
+          }).then(response => {
+            this.showMessage(this, response)
+            this.tableIsLoading = false
+          })
         }
       })
     },

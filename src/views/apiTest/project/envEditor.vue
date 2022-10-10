@@ -84,6 +84,7 @@
         </el-button>
 
         <el-button
+          v-show="currentEnv"
           type="primary"
           size="mini"
           @click="saveEnv()"
@@ -142,7 +143,7 @@ export default {
         headers: [{'key': "", 'value': "", 'remark': ""}],
         variables: [{'key': "", 'value': "", 'remark': ""}]
       },
-      currentEnv: 'test',
+      currentEnv: '',
       submitButtonIsLoading: false,  // 提交按钮的loading状态
     }
   },

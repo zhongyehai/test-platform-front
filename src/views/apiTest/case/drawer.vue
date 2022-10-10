@@ -72,7 +72,16 @@
 
         <el-form :inline="true" class="demo-form-inline" size="mini">
 
-          <el-tabs>
+          <el-tabs v-model="caseInFoActiveName" style="margin-left: 20px;margin-right: 20px">
+
+            <!-- 跳过条件 -->
+            <el-tab-pane label="跳过条件" name="editSkipIf">
+              <skipIfView
+                ref="skipIfView"
+                :skipIfData="tempCase.skip_if"
+                :use_type="'case'"
+              ></skipIfView>
+            </el-tab-pane>
 
             <el-tab-pane label="自定义变量">
               <!-- 使用示例 -->
@@ -181,6 +190,7 @@
 </template>
 
 <script>
+import skipIfView from "@/components/Inputs/skipIf"
 import moduleSelectorView from "@/components/Selector/module";
 import funcFilesView from '@/components/Selector/funcFile'
 import headersView from '@/components/Inputs/changeRow'
@@ -188,7 +198,7 @@ import variablesView from '@/components/Inputs/variables'
 import stepView from '@/views/apiTest/step'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
-import {postCase, putCase, copyCase, caseRun} from "@/apis/apiTest/case";
+import {postCase, putCase, copyCase, caseRun, getCase} from "@/apis/apiTest/case";
 import {getCaseSet} from "@/apis/apiTest/caseSet";
 import {stepList} from "@/apis/apiTest/step";
 import {reportIsDone} from "@/apis/apiTest/report";
@@ -202,6 +212,7 @@ export default {
     'dataTypeMapping'
   ],
   components: {
+    skipIfView,
     moduleSelectorView,
     funcFilesView,
     headersView,
@@ -217,6 +228,7 @@ export default {
       submitLoadingIsShow: false,
       isShowDebugLoading: false,
       activeName: 'caseInFo',
+      caseInFoActiveName: 'editSkipIf',
       caseSetTree: [],
       defaultProps: {
         children: "children",
@@ -230,8 +242,16 @@ export default {
         is_run: true,
         run_times: '',
         func_files: [],
-        variables: [{key: null, value: null, remark: null}],
+        variables: [{key: null, value: null, remark: null, data_type: 'str'}],
         headers: [{key: null, value: null, remark: null}],
+        skip_if: {
+          skip_type: null,
+          data_source: null,
+          check_value: null,
+          comparator: null,
+          data_type: null,
+          expect: null
+        },
         before_case: [],
         after_case: [],
         project_id: '',
@@ -255,7 +275,15 @@ export default {
       this.tempCase.func_files = []
       this.tempCase.before_case = []
       this.tempCase.after_case = []
-      this.tempCase.variables = [{key: null, value: null, remark: null}]
+      this.tempCase.variables = [{key: null, value: null, remark: null, data_type: 'str'}]
+      this.tempCase.skip_if = {
+        skip_type: null,
+          data_source: null,
+          check_value: null,
+          comparator: null,
+          data_type: null,
+          expect: null
+      }
       this.tempCase.headers = [{key: null, value: null, remark: null}]
       this.tempCase.steps = []
       this.tempCase.project_id = this.currentProjectId || ''
@@ -279,6 +307,7 @@ export default {
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.$refs.headersView.tempData
+      caseData.skip_if = this.$refs.skipIfView.tempSkipIf
       caseData.steps = undefined
       return caseData
     },
@@ -324,7 +353,7 @@ export default {
     },
 
     // 点击调试按钮
-    clickRunDebug(){
+    clickRunDebug() {
       this.$bus.$emit(this.runEvent, false)
     },
 
@@ -381,6 +410,8 @@ export default {
               clearInterval(timer)  // 关闭定时器
             }
           }, 3000)
+        } else {
+          this.isShowDebugLoading = false
         }
       })
     },
@@ -415,6 +446,28 @@ export default {
         )
       }
       this.activeName = 'caseInFo'
+    })
+
+    // 引用用例为步骤后，后端会合并两条用例的公共变量，所以获取当前用例的最新公共变量
+    this.$bus.$on(this.$busEvents.api.apiQuoteCaseAsStepIsCommit, () => {
+      getCase({id: this.tempCase.id}).then(response => {
+        let tempCase_variables = {}, response_variables = {}
+
+        response.data.variables.forEach(variable => {
+          response_variables[variable["key"]] = variable
+        })
+
+        this.tempCase.variables.forEach(variable => {
+          tempCase_variables[variable["key"]] = variable
+        })
+
+        for (let key in response_variables){
+          if (!(key in tempCase_variables)){
+            this.tempCase.variables.push(response_variables[key])
+            // tempCase_variables[key] = response_variables[key]
+          }
+        }
+      })
     })
 
     // 监听、接收用例集树

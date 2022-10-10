@@ -316,7 +316,7 @@ export default {
         "data_form": [],
         "data_json": '',
         "data_text": '',
-        "data_driver": '',
+        "data_driver": [],
         "case_id": this.caseId,
         "project_id": ''
       }
