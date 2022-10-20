@@ -39,9 +39,21 @@
                 </template>
               </el-table-column>
 
+              <el-table-column label="触发方式" align="center" min-width="15%">
+                <template slot-scope="scope">
+                  <span> {{ scope.row.trigger_type === 'pipeline' ? '流水线' : '页面' }} </span>
+                </template>
+              </el-table-column>
+
               <el-table-column label="运行环境" align="center" min-width="15%">
                 <template slot-scope="scope">
                   <span> {{ eventDict[scope.row.env] }} </span>
+                </template>
+              </el-table-column>
+
+              <el-table-column label="运行单元" align="center" min-width="15%">
+                <template slot-scope="scope">
+                  <span> {{ runTypeDict[scope.row.run_type] }} </span>
                 </template>
               </el-table-column>
 
@@ -146,7 +158,8 @@ export default {
       reportTotal: 0,
       pageNum: 0,
       pageSize: 20,
-      eventDict: {}
+      eventDict: {},
+      runTypeDict: {}
     }
   },
   methods: {
@@ -264,6 +277,10 @@ export default {
 
     getConfigByName({'name': 'run_test_env'}).then(response => {
       this.eventDict = JSON.parse(response.data.value)
+    })
+
+    getConfigByName({'name': 'run_type'}).then(response => {
+      this.runTypeDict = JSON.parse(response.data.value)
     })
   },
 
