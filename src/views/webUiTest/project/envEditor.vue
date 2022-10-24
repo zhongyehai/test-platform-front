@@ -60,71 +60,6 @@
             ></variablesView>
           </el-tab-pane>
 
-          <!-- cookie设置 -->
-          <el-tab-pane label="cookie设置">
-            <!-- 使用示例 -->
-            <el-collapse accordion>
-              <el-collapse-item>
-                <template slot="title">
-                  <div style="color:#409eff"> 点击查看说明</div>
-                </template>
-                <div style="margin-left: 20px">
-                  1、预设cookie
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-            <cookiesView
-              ref="cookiesView"
-              :currentData="tempEnv.cookies"
-              :placeholderKey="'key'"
-              :placeholderValue="'value'"
-              :placeholderDesc="'备注'"
-            ></cookiesView>
-          </el-tab-pane>
-
-          <!-- sessionStorage设置 -->
-          <el-tab-pane label="sessionStorage设置">
-            <!-- 使用示例 -->
-            <el-collapse accordion>
-              <el-collapse-item>
-                <template slot="title">
-                  <div style="color:#409eff"> 点击查看说明</div>
-                </template>
-                <div style="margin-left: 20px">
-                  1、预设session_storage
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-            <sessionStorageView
-              ref="sessionStorageView"
-              :currentData="tempEnv.session_storage"
-              :placeholderKey="'key'"
-              :placeholderValue="'value'"
-              :placeholderDesc="'备注'"
-            ></sessionStorageView>
-          </el-tab-pane>
-
-          <!-- localStorage设置 -->
-          <el-tab-pane label="localStorage设置">
-            <!-- 使用示例 -->
-            <el-collapse accordion>
-              <el-collapse-item>
-                <template slot="title">
-                  <div style="color:#409eff"> 点击查看说明</div>
-                </template>
-                <div style="margin-left: 20px">
-                  1、预设local_storage
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-            <localStorageView
-              ref="localStorageView"
-              :currentData="tempEnv.local_storage"
-              :placeholderKey="'key'"
-              :placeholderValue="'value'"
-              :placeholderDesc="'备注'"
-            ></localStorageView>
-          </el-tab-pane>
         </el-tabs>
       </div>
 
@@ -168,12 +103,10 @@
 
 <script>
 import variablesView from '@/components/Inputs/variables'
-import cookiesView from '@/components/Inputs/changeRow'
-import sessionStorageView from '@/components/Inputs/changeRow'
-import localStorageView from '@/components/Inputs/changeRow'
 import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
 
 import {getProjectEnv, putProjectEnv} from '@/apis/webUiTest/project'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'envEditor',
@@ -183,9 +116,6 @@ export default {
   ],
   components: {
     variablesView,
-    cookiesView,
-    sessionStorageView,
-    localStorageView,
     envSynchronizer
   },
   data() {
@@ -198,12 +128,9 @@ export default {
         env: '',
         host: '',
         project_id: '',
-        variables: [{'key': "", 'value': "", 'remark': ""}],
-        cookies: [{'key': "", 'value': "", 'remark': ""}],
-        session_storage: [{'key': "", 'value': "", 'remark': ""}],
-        local_storage: [{'key': "", 'value': "", 'remark': ""}],
+        variables: [{'key': "", 'value': "", 'remark': ""}]
       },
-      currentEnv: 'test',
+      currentEnv: '',
       submitButtonIsLoading: false,  // 提交按钮的loading状态
     }
   },
@@ -213,9 +140,6 @@ export default {
     // 保存环境设置
     saveEnv() {
       this.tempEnv.env = this.currentEnv
-      this.tempEnv.cookies = this.$refs.cookiesView.tempData
-      this.tempEnv.session_storage = this.$refs.sessionStorageView.tempData
-      this.tempEnv.local_storage = this.$refs.localStorageView.tempData
       this.submitButtonIsLoading = true
       putProjectEnv(this.tempEnv).then(response => {
         this.submitButtonIsLoading = false
@@ -239,9 +163,6 @@ export default {
         this.tempEnv.env = response.data.env
         this.tempEnv.host = response.data.host
         this.tempEnv.variables = response.data.variables
-        this.tempEnv.cookies = response.data.cookies
-        this.tempEnv.session_storage = response.data.session_storage
-        this.tempEnv.local_storage = response.data.local_storage
         this.tempEnv.project_id = response.data.project_id
       })
     },
@@ -254,6 +175,11 @@ export default {
 
   mounted() {
 
+    // 获取默认环境
+    getConfigByName({'name': 'default_env'}).then(response => {
+      this.currentEnv = response.data.value
+    })
+
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.ui.uiShowProjectEnvDrawer, (proejct) => {
       this.drawerIsShow = true
@@ -264,9 +190,6 @@ export default {
     this.$bus.$on(this.$busEvents.ui.uiEnvSynchronizerIsSuccess, (envData) => {
       if (envData[this.tempEnv]) {
         this.tempEnv.variables = envData[this.tempEnv].variables
-        this.tempEnv.cookies = envData[this.tempEnv].cookies
-        this.tempEnv.session_storage = envData[this.tempEnv].session_storage
-        this.tempEnv.local_storage = envData[this.tempEnv].local_storage
       }
     })
   },
@@ -281,7 +204,7 @@ export default {
     'currentEnv': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        if (newVal) {
+        if (newVal && this.tempEnv.project_id) {
           this.getEnv(newVal, this.tempEnv.project_id)
         }
       }

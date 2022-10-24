@@ -250,7 +250,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/apiTest/project/drawer'
 import projectEnvDrawer from '@/views/apiTest/project/envEditor'
-import {getConfigByName} from "@/apis/config/config";
+import {getConfigByName, getDefaultEnvConfig} from "@/apis/config/config";
 
 export default {
   name: 'Project',

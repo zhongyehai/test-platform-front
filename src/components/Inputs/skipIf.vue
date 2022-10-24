@@ -146,7 +146,7 @@
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
-              v-show="isShowAddButton(scope.$index)"
+              v-show="scope.$index === 0"
               type="text"
               size="mini"
               icon="el-icon-plus"
@@ -276,11 +276,6 @@ export default {
         this.$set(row, 'value', 'False')
         return true
       }
-    },
-
-    // 是否显示添加按钮
-    isShowAddButton(index) {
-      return index === this.tempSkipIf.length - 1
     },
 
     // 是否显示删除按钮

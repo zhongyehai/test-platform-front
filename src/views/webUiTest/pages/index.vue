@@ -83,6 +83,14 @@
                 ></el-button>
               </el-popover>
 
+              <!--上传元素-->
+              <el-button
+                type="text"
+                style="margin-right: 8px"
+                icon="el-icon-upload"
+                @click="showUploadFileDialog(scope.row)">
+              </el-button>
+
               <!-- 删除页面 -->
               <el-popover
                 :ref="scope.row.id"
@@ -106,6 +114,32 @@
           </el-table-column>
 
         </el-table>
+
+        <el-drawer
+          :title="'上传元素'"
+          size="40%"
+          :wrapperClosable="false"
+          :visible.sync="uploadFileDrawerIsShow"
+          :direction="direction">
+          <el-row style="margin-left: 20px;margin-right: 20px">
+            <el-col :span="12">
+              <el-upload
+                class="upload-demo"
+                :action="uploadElementDir"
+                :show-file-list='false'
+                :on-success="uploadFile">
+                <el-button size="mini" type="primary">选择文件</el-button>
+              </el-upload>
+            </el-col>
+
+            <el-col :span="12">
+              <el-button size="mini" type="primary" style="float: right" @click="downloadTemplate">下载模板</el-button>
+            </el-col>
+          </el-row>
+          <div class="demo-drawer__footer">
+            <el-button size="small" @click="uploadFileDrawerIsShow = false">关闭</el-button>
+          </div>
+        </el-drawer>
 
         <pagination
           v-show="pageTotal>0"
@@ -136,6 +170,7 @@ import pageDrawer from '@/views/webUiTest/pages/drawer'
 import {userList} from '@/apis/system/user'
 import {pageList, deletePage, pageSort} from '@/apis/webUiTest/page'
 import {getFindElementOption} from "@/utils/getConfig";
+import {uploadElement, uploadElementDir, downloadElementTemplate} from "@/apis/webUiTest/element";
 
 
 export default {
@@ -152,6 +187,7 @@ export default {
   ],
   data() {
     return {
+      direction: 'rtl',  // 抽屉打开方式
       tableLoadingIsShow: false,  // 请求列表等待响应的状态
       pageTab: 'pageList',  //  tab页的显示
 
@@ -162,6 +198,12 @@ export default {
       pageList: [],
       userList: [],
       userDict: {},
+
+      // 文件上传框打开状态
+      uploadElementDir: uploadElementDir,
+      uploadFileDrawerIsShow: false,
+      fileDataList: [],
+      currentPage: '',
 
       // 拖拽排序参数
       sortable: null,
@@ -231,6 +273,12 @@ export default {
       this.$set(row, 'deletePopoverIsShow', false)
     },
 
+    // 从excel导入接口
+    showUploadFileDialog(row) {
+      this.uploadFileDrawerIsShow = true
+      this.currentPage = row
+    },
+
     // 删除页面
     delPage(row) {
       this.$set(row, 'deletePopoverIsShow', false)
@@ -264,6 +312,34 @@ export default {
         this.newList = this.oldList.slice()
       })
       this.tableLoadingIsShow = false
+    },
+
+    // 下载接口模板
+    downloadTemplate() {
+      downloadElementTemplate().then(response => {
+        let blob = new Blob([response], {
+          type: 'application/vnd.ms-excel'   //将会被放入到blob中的数组内容的MIME类型
+        });
+        // 保存文件到本地
+        let a = document.createElement('a')
+        a.href = URL.createObjectURL(blob);  //生成一个url
+        a.download = '元素导入模板'
+        a.click()
+      })
+    },
+
+    // 从excel导入元素
+    uploadFile(response, file) {
+      let form = new FormData();
+      form.append("file", file.raw);
+      form.append("id", this.currentPage.id);
+      uploadElement(form).then((response) => {
+          if (this.showMessage(this, response)) {
+            this.fileDataList = []
+            this.uploadFileDrawerIsShow = false
+          }
+        }
+      )
     },
 
     // 拖拽排序

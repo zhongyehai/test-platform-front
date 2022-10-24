@@ -28,12 +28,12 @@ export function deleteApi(data) {
   return Func('delete', data)
 }
 
-// 指定模块下接口list
+// 导入接口
 export function uploadApi(data) {
   return request({url: currentBaseDir + 'upload/', method: 'post', data: data});
 }
 
-// 下载接口模板
+// 下载导入接口模板
 export function downloadApiMsgTemplate() {
   return request({url: currentBaseDir + 'template/download/', method: 'get', responseType: 'blob'});
 }

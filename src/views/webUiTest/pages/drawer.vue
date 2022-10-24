@@ -59,10 +59,8 @@
             :currentPageId="tempPage.id"
             :currentModuleId="tempPage.module_id"
             :currentProjectId="tempPage.project_id"
-            :pageElementList="tempElementList"
             :userDict="userDict"
           ></elementManage>
-<!--          :pageElementList="tempElementLlist"-->
         </el-tab-pane>
 
       </el-tabs>
@@ -130,9 +128,6 @@ export default {
         module_id: '',
         project_id: ''
       },
-
-      // 元素列表
-      tempElementList: []
     }
   },
 
@@ -183,18 +178,7 @@ export default {
     // 点击修改页面时，初始化 dialog 数据
     initUpdateTempPage(page) {
       this.tempPage = page
-      this.getElementList()
       this.drawerIsShow = true
-    },
-
-    // 获取元素列表
-    getElementList() {
-      elementList({'pageId': this.tempPage.id,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
-        this.tempElementList = response.data.data
-      })
     },
 
     // 获取 tempPage 用于提交数据
@@ -244,6 +228,7 @@ export default {
     this.$bus.$on(this.$busEvents.ui.uiPageDrawerStatus, (command, page) => {
       // console.log('command: ', command)
       // console.log('page: ', JSON.stringify(page))
+      this.showTab = 'pageInfo'
       if (command === 'add') {
         this.tempPage.id = ''
         this.initNewTempPage()  // 新增
@@ -254,7 +239,6 @@ export default {
         copyPage({id: page.id}).then(response => {
             if (this.showMessage(this, response)) {
               this.tempPage = response.data.page
-              this.tempElementList = response.data.element
               this.drawerIsShow = true
               this.$bus.$emit(this.$busEvents.ui.uiPageDrawerCommitSuccess, 'success')
             }

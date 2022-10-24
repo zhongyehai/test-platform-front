@@ -123,7 +123,7 @@
     <elementDrawer
       :currentProjectId="currentProjectId"
       :currentModuleId="currentModuleId"
-      :currentPageId="currentPageId"
+      :currentPageId="pageId"
     ></elementDrawer>
   </div>
 </template>
@@ -150,7 +150,6 @@ export default {
     'currentProjectId',
     'currentModuleId',
     'currentPageId',
-    'pageElementList',
     'userDict'
   ],
   data() {
@@ -175,8 +174,6 @@ export default {
 
   created() {
 
-    this.elementList = this.pageElementList ? this.pageElementList : []
-
     this.oldList = this.elementList.map(v => v.id)
     this.newList = this.oldList.slice()
     this.$nextTick(() => {
@@ -184,37 +181,19 @@ export default {
     })
 
     this.pageId = this.currentPageId
+    if (this.currentPageId) {
+      this.getElementList()
+    }
   },
 
   mounted() {
-    // this.getUserList()
 
     this.$bus.$on(this.$busEvents.ui.uiElementDrawerCommitSuccess, (status) => {
       this.getElementList()
     })
-
-    // this.$bus.$on(this.$busEvents.ui.uiPageDrawerCommitSuccess, (status, pageId) => {
-    //   this.pageId = pageId
-    //   this.getElementList()
-    // })
-
-    // this.$bus.$on(this.$busEvents.ui.uiPageDrawerIsOpen, (pageId) => {
-    //   this.pageId = pageId
-    //   this.getElementList()
-    // })
-
-    // this.getElementList()
   },
 
   methods: {
-    // 获取用户信息，同步请求
-    // async getUserList() {
-    //   let response = await userList()
-    //   this.currentUserList = response.data.data
-    //   response.data.data.forEach(user => {
-    //     this.userDict[user.id] = user
-    //   })
-    // },
 
     // 解析用户
     parseUser(userId) {
@@ -308,7 +287,7 @@ export default {
     },
     renderBy (h, {column}) {
       // 悬浮提示的文字内容
-      const info = '在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处'
+      const info = '在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址'
       return h(
         'div',
         [
@@ -350,39 +329,22 @@ export default {
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.ui.uiElementDrawerCommitSuccess)
-    this.$bus.$off(this.$busEvents.ui.uiPageDrawerCommitSuccess)
-    this.$bus.$off(this.$busEvents.ui.uiPageDrawerIsOpen)
+    // this.$bus.$off(this.$busEvents.ui.uiPageDrawerCommitSuccess)
+    // this.$bus.$off(this.$busEvents.ui.uiPageDrawerIsOpen)
   },
 
   watch: {
 
-    // 监听父组件传过来的当前选中的模块，实时获取父组件传过来的模块信息对应下的元素列表
-    'currentModuleId': {
+    // 监听父组件传过来的当前选中的页面，获取对应的元素列表
+    'currentPageId': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        // console.log('currentModuleId.newVal: ', newVal)
-        // console.log('currentModuleId.oldVal: ', oldVal)
         if (newVal) {
-          this.getElementList({'moduleId': newVal, 'pageNum': this.pageNum, 'pageSize': this.pageSize
-          })
+          this.pageId = newVal
+          this.getElementList()
         } else {
           this.elementList = []
         }
-
-      }
-    },
-
-    'pageElementList': {
-
-      handler(newVal, oldVal) {
-        if (newVal && newVal.length > 0) {
-          this.elementList = newVal
-        } else {
-          this.elementList = []
-        }
-
-        this.oldList = this.elementList.map(v => v.id)
-        this.newList = this.elementList.slice()
       }
     }
   }

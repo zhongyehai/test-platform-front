@@ -92,10 +92,14 @@ export default {
 
   mounted() {
 
-    this.$bus.$on(this.event, (runModeIsShow, defaultEnv) => {
+    // 获取默认环境
+    getConfigByName({'name': 'default_env'}).then(response => {
+      this.runEnv = response.data.value
+    })
+
+    this.$bus.$on(this.event, (runModeIsShow) => {
       this.runModeIsShow = runModeIsShow
       this.dialogIsShow = true
-      this.runEnv = defaultEnv
     })
 
     this.initEnv()

@@ -125,8 +125,8 @@
     </el-tabs>
 
     <selectRunEnv
-      :callBackEvent="callBackEvent"
       :event="runEvent"
+      :callBackEvent="callBackEvent"
     ></selectRunEnv>
 
     <caseDrawer
@@ -255,7 +255,7 @@ export default {
       caseRun({
         caseId: [this.currentCase.id], env: runData.runEnv, is_async: runData.runType
       }).then(runResponse => {
-        console.log('case.index.methods.runCase.response: ', JSON.stringify(runResponse))
+        // console.log('case.index.methods.runCase.response: ', JSON.stringify(runResponse))
         if (this.showMessage(this, runResponse)) {
 
           // 触发运行成功，每三秒查询一次，

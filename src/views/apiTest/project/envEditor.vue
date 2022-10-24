@@ -118,6 +118,7 @@ import variablesView from '@/components/Inputs/variables'
 import envSynchronizer from "@/views/apiTest/project/envSynchronizer";
 
 import {getProjectEnv, putProjectEnv} from '@/apis/apiTest/project'
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'envEditor',
@@ -188,6 +189,11 @@ export default {
 
   mounted() {
 
+    // 获取默认环境
+    getConfigByName({'name': 'default_env'}).then(response => {
+      this.currentEnv = response.data.value
+    })
+
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.api.apiShowProjectEnvDrawer, (proejct) => {
       this.drawerIsShow = true
@@ -201,6 +207,7 @@ export default {
         this.tempEnv.variables = envData[this.tempEnv].variables
       }
     })
+
   },
 
   // 组件销毁前，关闭bus监听事件
@@ -213,7 +220,7 @@ export default {
     "currentEnv": {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        if (newVal) {
+        if (newVal && this.tempEnv.project_id) {
           this.getEnv(newVal, this.tempEnv.project_id)
         }
       }
