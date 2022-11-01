@@ -53,8 +53,10 @@
                 :render-header="renderHeader">
                 <template slot-scope="scope">
                   <el-switch
+                    :inactive-value="0"
+                    :active-value="1"
                     :disabled="scope.row.taskIsDisabled"
-                    v-model="scope.row.status === 1"
+                    v-model="scope.row.status"
                     @change="changeStatus(scope.row)"></el-switch>
                 </template>
               </el-table-column>
@@ -65,11 +67,11 @@
 <!--                </template>-->
 <!--              </el-table-column>-->
 
-              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人" min-width="12%">
-                <template slot-scope="scope">
-                  <span>{{ parseUser(scope.row.update_user) }}</span>
-                </template>
-              </el-table-column>
+<!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人" min-width="12%">-->
+<!--                <template slot-scope="scope">-->
+<!--                  <span>{{ parseUser(scope.row.update_user) }}</span>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
 
               <el-table-column label="操作" align="center" min-width="16%">
                 <template slot-scope="scope">
@@ -164,7 +166,7 @@ import taskDrawer from "@/views/apiTest/task/drawer";
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/apiTest/task'
-import {userList} from "@/apis/system/user";
+// import {userList} from "@/apis/system/user";
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
@@ -186,8 +188,8 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-      userList: [],
-      userDict: {},
+      // userList: [],
+      // userDict: {},
 
       currentTask: {},
       runEvent: 'runTaskEventOnIndex',
@@ -198,18 +200,18 @@ export default {
 
   methods: {
     // 获取用户信息，同步请求
-    async getUserList() {
-      let response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-    },
+    // async getUserList() {
+    //   let response = await userList()
+    //   this.currentUserList = response.data.data
+    //   response.data.data.forEach(user => {
+    //     this.userDict[user.id] = user
+    //   })
+    // },
 
     // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId].name
-    },
+    // parseUser(userId) {
+    //   return this.userDict[userId].name
+    // },
 
     // 进入编辑
     editTask(row) {
@@ -297,22 +299,19 @@ export default {
       })
     },
 
-    // 修改定时任务状态
+    // 修改定时任务状态，el-switch组件是先改变状态，再发送请求
     changeStatus(task) {
       this.$set(task, 'taskIsDisabled', true)
-      // console.log('task.taskIsDisabled: ', task.taskIsDisabled)
       if (task.status === 1) {
-        disableTask({id: task.id}).then(response => {
+        enableTask({id: task.id}).then(response => {
           this.$set(task, 'taskIsDisabled', false)
-          // console.log('task.taskIsDisabled: ', task.taskIsDisabled)
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
         })
       } else {
-        enableTask({id: task.id}).then(response => {
+        disableTask({id: task.id}).then(response => {
           this.$set(task, 'taskIsDisabled', false)
-          // console.log('task.taskIsDisabled: ', task.taskIsDisabled)
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
@@ -393,7 +392,7 @@ export default {
   },
 
   mounted() {
-    this.getUserList()
+    // this.getUserList()
 
     getRunTimeout(this)  // 初始化等待用例运行超时时间
 

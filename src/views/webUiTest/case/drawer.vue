@@ -72,7 +72,16 @@
 
         <el-form :inline="true" class="demo-form-inline" size="mini">
 
-          <el-tabs>
+          <el-tabs v-model="caseInFoActiveName" style="margin-left: 20px;margin-right: 20px">
+
+            <!-- 跳过条件 -->
+            <el-tab-pane label="跳过条件" name="editSkipIf">
+              <skipIfView
+                ref="skipIfView"
+                :skipIfData="tempCase.skip_if"
+                :use_type="'case'"
+              ></skipIfView>
+            </el-tab-pane>
 
             <el-tab-pane label="自定义变量">
               <!-- 使用示例 -->
@@ -159,6 +168,7 @@
 </template>
 
 <script>
+import skipIfView from "@/components/Inputs/skipIf"
 import moduleSelectorView from "@/components/Selector/module";
 import funcFilesView from '@/components/Selector/funcFile'
 import headersView from '@/components/Inputs/changeRow'
@@ -186,7 +196,8 @@ export default {
     headersView,
     variablesView,
     stepView,
-    selectRunEnv
+    selectRunEnv,
+    skipIfView
   },
   data() {
     return {
@@ -195,6 +206,7 @@ export default {
       submitLoadingIsShow: false,
       isShowDebugLoading: false,
       activeName: 'caseInFo',
+      caseInFoActiveName: "editSkipIf",
       caseSetTree: [],
       defaultProps: {
         children: "children",
@@ -205,10 +217,18 @@ export default {
         id: '',
         name: '',
         desc: '',
-        is_run: true,
+        status: 0,
         run_times: '',
         func_files: [],
         variables: [{key: null, value: null, remark: null, data_type: 'str'}],
+        skip_if: {
+          skip_type: null,
+          data_source: null,
+          check_value: null,
+          comparator: null,
+          data_type: null,
+          expect: null
+        },
         project_id: '',
         set_id: '',
         steps: []  // 测试步骤
@@ -237,6 +257,14 @@ export default {
       this.tempCase.run_times = ''
       this.tempCase.func_files = []
       this.tempCase.variables = [{key: null, value: null, remark: null, data_type: 'str'}]
+      this.tempCase.skip_if = {
+        skip_type: null,
+        data_source: null,
+        check_value: null,
+        comparator: null,
+        data_type: null,
+        expect: null
+      }
       this.tempCase.steps = []
       this.tempCase.project_id = this.currentProjectId || ''
       this.tempCase.set_id = this.currentSetId || ''
@@ -256,6 +284,7 @@ export default {
       caseData.set_id = this.$refs.setTree.getCheckedKeys()[0]
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
+      caseData.skip_if = this.$refs.skipIfView.tempSkipIf
       caseData.steps = undefined
       return caseData
     },

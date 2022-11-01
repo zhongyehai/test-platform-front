@@ -34,11 +34,11 @@
 <!--            </template>-->
 <!--          </el-table-column>-->
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
-            <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.update_user) }}</span>
-            </template>
-          </el-table-column>
+<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{ parseUser(scope.row.update_user) }}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
           <el-table-column
             align="center"
@@ -47,7 +47,11 @@
             :render-header="renderHeader"
           >
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_run" @change="changeCaseIsRun(scope.row)"></el-switch>
+              <el-switch
+                v-model="scope.row.status"
+                :inactive-value="0"
+                :active-value="1"
+                @change="changeCaseIsRun(scope.row)"></el-switch>
             </template>
           </el-table-column>
 
@@ -144,7 +148,7 @@ import Pagination from '@/components/Pagination'
 import caseDrawer from '@/views/apiTest/case/drawer'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 
-import {userList} from '@/apis/system/user'
+// import {userList} from '@/apis/system/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/apiTest/case'
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
@@ -184,8 +188,8 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-      userList: [],
-      userDict: {},
+      // userList: [],
+      // userDict: {},
       dataTypeMapping:[],
       runEvent: 'runCaseEventOnIndex',
       callBackEvent: 'runCaseOnIndex'
@@ -194,18 +198,18 @@ export default {
 
   methods: {
     // 获取用户信息，同步请求
-    async getUserList() {
-      let response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-    },
+    // async getUserList() {
+    //   let response = await userList()
+    //   this.currentUserList = response.data.data
+    //   response.data.data.forEach(user => {
+    //     this.userDict[user.id] = user
+    //   })
+    // },
 
     // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId].name
-    },
+    // parseUser(userId) {
+    //   return this.userDict[userId].name
+    // },
 
     // 编辑用例
     editCase(row) {
@@ -296,7 +300,7 @@ export default {
 
     // 修改用例状态
     changeCaseIsRun(row) {
-      putCaseIsRun({'id': row.id, 'is_run': row.is_run}).then(response => {
+      putCaseIsRun({'id': row.id, 'status': row.status}).then(response => {
         this.showMessage(this, response)
       })
     },
@@ -371,13 +375,12 @@ export default {
   },
 
   mounted() {
-    this.getUserList()
+    // this.getUserList()
 
     // 从后端获取数据类型映射
     getConfigByName({'name': 'data_type_mapping'}).then(response => {
       this.dataTypeMapping = JSON.parse(response.data.value)
     })
-
 
     // 监听 caseDialog 是否提交成功
     this.$bus.$on(this.$busEvents.api.apiCaseDrawerCommitSuccess, (status) => {

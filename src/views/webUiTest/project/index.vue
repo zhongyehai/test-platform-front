@@ -75,14 +75,14 @@
 
     <!-- 表格栏 -->
     <el-table
-      :key="tableKey"
+      ref="projectTable"
       v-loading="listLoading"
+      element-loading-text="正在排序中"
+      element-loading-spinner="el-icon-loading"
       :data="project_list"
-      fit
+      row-key="id"
       stripe
-      highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
@@ -195,11 +195,13 @@
 <script>
 import {deleteProject, projectList} from '@/apis/webUiTest/project'
 import {userList} from '@/apis/system/user'
+import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/webUiTest/project/drawer'
 import projectEnvDrawer from '@/views/webUiTest/project/envEditor'
 import {getConfigByName} from "@/apis/config/config";
+import {projectSort} from "@/apis/webUiTest/project";
 
 
 export default {
@@ -229,7 +231,10 @@ export default {
       downloadLoading: false,      // 下载表格状态
       listLoading: true,      // 请求加载状态
       envMapping: {},
-      dataTypeMapping: []
+      dataTypeMapping: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
     }
   },
 
@@ -274,6 +279,12 @@ export default {
       projectList(this.listQuery).then(response => {
         this.project_list = response.data.data
         this.total = response.data.total
+
+        this.oldList = this.project_list.map(v => v.id)
+        this.newList = this.oldList.slice()
+        this.$nextTick(() => {
+          this.setSort()
+        })
       })
       this.listLoading = false
     },
@@ -317,22 +328,33 @@ export default {
       this.getProjectList()
     },
 
-    // 修改排序
-    sortChange(data) {
-      const {prop, order} = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.projectTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.project_list.splice(evt.oldIndex, 1)[0]
+          this.project_list.splice(evt.newIndex, 0, targetRow)
 
-    // 修改排序
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+
+          // 发送请求，改变排序
+          this.tableIsLoading = true
+          projectSort({
+            List: this.newList,
+            pageNum: this.listQuery.pageNum,
+            pageSize: this.listQuery.pageSize,
+          }).then(response => {
+            this.showMessage(this, response)
+            this.tableIsLoading = false
+          })
+        }
+      })
     }
   },
 

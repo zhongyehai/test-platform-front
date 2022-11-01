@@ -1,7 +1,7 @@
 import request from '@/utils/request'  //加载请求配置文件
 import {baseDirWebUiTest} from "@/apis/base";
 
-const reportDir = baseDirWebUiTest + '/report/'
+const reportDir = baseDirWebUiTest + '/report'
 
 function Func(method, data = null, params = null) {
   return request({url: reportDir, method: method, data: data, params: params})
@@ -19,16 +19,16 @@ export function getReport(params) {
 
 // 报告列表
 export function reportList(params) {
-  return request({url: reportDir + 'list/', method: 'get', data: null, params: params})
+  return request({url: reportDir + '/list', method: 'get', data: null, params: params})
 }
 
 // 下载报告
 export function downloadReport(params) {
-  return request({url: reportDir + 'download/', method: 'get', data: null, params: params})
+  return request({url: reportDir + '/download', method: 'get', data: null, params: params})
 }
 
 // 报告是否生成
 export function reportIsDone(params) {
-  return request({url: reportDir + 'done/', method: 'get', data: null, params: params})
+  return request({url: reportDir + '/status', method: 'get', data: null, params: params})
 }
 

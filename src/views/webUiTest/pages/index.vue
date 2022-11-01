@@ -47,11 +47,11 @@
 <!--            </template>-->
 <!--          </el-table-column>-->
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
-            <template slot-scope="scope">
-              <span>{{ parseUser(scope.row.update_user) }}</span>
-            </template>
-          </el-table-column>
+<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{ parseUser(scope.row.update_user) }}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
           <el-table-column label="操作" align="center" min-width="14%">
             <template slot-scope="scope">
@@ -155,8 +155,9 @@
     <pageDrawer
       :currentProjectId="currentProjectId"
       :currentModuleId="currentModuleId"
-      :userDict="userDict"
+
     ></pageDrawer>
+    <!--      :userDict="userDict"-->
 
   </div>
 </template>
@@ -167,7 +168,7 @@ import Pagination from '@/components/Pagination'
 
 import pageDrawer from '@/views/webUiTest/pages/drawer'
 
-import {userList} from '@/apis/system/user'
+// import {userList} from '@/apis/system/user'
 import {pageList, deletePage, pageSort} from '@/apis/webUiTest/page'
 import {getFindElementOption} from "@/utils/getConfig";
 import {uploadElement, uploadElementDir, downloadElementTemplate} from "@/apis/webUiTest/element";
@@ -196,8 +197,8 @@ export default {
       pageSize: 20,
       pageTotal: 0,
       pageList: [],
-      userList: [],
-      userDict: {},
+      // userList: [],
+      // userDict: {},
 
       // 文件上传框打开状态
       uploadElementDir: uploadElementDir,
@@ -226,7 +227,7 @@ export default {
   },
 
   mounted() {
-    this.getUserList()
+    // this.getUserList()
 
     // 监听 页面 抽屉 框 的提交状态，提交成功，则重新请求页面列表
     this.$bus.$on(this.$busEvents.ui.uiPageDrawerCommitSuccess, () => {
@@ -247,18 +248,18 @@ export default {
 
   methods: {
     // 获取用户信息，同步请求
-    async getUserList() {
-      let response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-    },
+    // async getUserList() {
+    //   let response = await userList()
+    //   this.currentUserList = response.data.data
+    //   response.data.data.forEach(user => {
+    //     this.userDict[user.id] = user
+    //   })
+    // },
 
     // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId].name
-    },
+    // parseUser(userId) {
+    //   return this.userDict[userId].name
+    // },
 
     // 打开编辑框
     showEditForm(row) {

@@ -247,7 +247,7 @@ export default {
       currentStepCopy: '',
       currentStep: {
         'id': '',
-        "is_run": '',
+        "status": '',
         "replace_host": '',
         "name": '',
         "time_out": 60,
@@ -261,7 +261,6 @@ export default {
           data_type: null,
           check_value: null
         },
-
         "run_times": 0,
         "headers": [],
         "params": [],
@@ -287,7 +286,7 @@ export default {
     initStep() {
       return {
         'id': '',
-        "is_run": '',
+        "status": '',
         "replace_host": '',
         "name": '',
         "time_out": 60,
@@ -325,7 +324,7 @@ export default {
       var skip_if = this.$refs.skipIfView.tempSkipIf
       return {
         'id': this.currentStep.id,
-        "is_run": this.currentStep.is_run,
+        "status": this.currentStep.status,
         "replace_host": this.currentStep.replace_host,
         "name": this.currentStep.name,
         "time_out": this.currentStep.time_out,

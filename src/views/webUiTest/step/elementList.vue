@@ -100,7 +100,7 @@
               <el-button
                 type="text"
                 icon="el-icon-d-arrow-left"
-                @click.native="addApiToStep(scope.row)"></el-button>
+                @click.native="addElementToStep(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -262,7 +262,7 @@ export default {
     // },
 
     // 深拷贝元素，添加到步骤列表
-    addApiToStep(element) {
+    addElementToStep(element) {
 
       // 如果有用例id，则添加步骤，否则先保存用例
       if (this.caseId) {

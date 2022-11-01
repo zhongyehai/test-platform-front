@@ -46,7 +46,11 @@
             :render-header="renderHeader"
             min-width="15%">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_run" @change="changeCaseIsRun(scope.row)"></el-switch>
+              <el-switch
+                :inactive-value="0"
+                :active-value="1"
+                v-model="scope.row.status"
+                @change="changeCaseIsRun(scope.row)"></el-switch>
             </template>
           </el-table-column>
 
@@ -292,7 +296,7 @@ export default {
 
     // 修改用例状态
     changeCaseIsRun(row) {
-      putCaseIsRun({'id': row.id, 'is_run': row.is_run}).then(response => {
+      putCaseIsRun({'id': row.id, 'status': row.status}).then(response => {
         this.showMessage(this, response)
       })
     },

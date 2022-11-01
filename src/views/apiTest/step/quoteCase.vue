@@ -202,7 +202,7 @@ export default {
         new_api['quote_case'] = new_api['id']
         new_api['id'] = ''
         new_api['case_id'] = this.caseId
-        new_api['is_run'] = true
+        new_api['status'] = 1
         new_api['run_times'] = 1
         new_api['name'] = `引用【${name}/${row.name}】`
         new_api['headers'] = [{"key": null, "remark": null, "value": null}]

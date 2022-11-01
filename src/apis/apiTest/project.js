@@ -1,8 +1,8 @@
 import request from '@/utils/request';  //加载请求配置文件
 import {baseDirApiTest} from "@/apis/base";
 
-let currentBaseDir = baseDirApiTest + '/project/'
-let currentEnvDir = currentBaseDir + 'env/'
+let currentBaseDir = baseDirApiTest + '/project'
+let currentEnvDir = currentBaseDir + '/env'
 
 function Func(method, data = null, params = null) {
   return request({url: currentBaseDir, method: method, data: data, params: params});
@@ -30,7 +30,7 @@ export function deleteProject(data) {
 
 // 获取服务列表
 export function projectList(params) {
-  return request({url: currentBaseDir + 'list/', method: 'get', params: params});
+  return request({url: currentBaseDir + '/list', method: 'get', params: params});
 }
 
 // 获取服务的环境信息
@@ -50,10 +50,10 @@ export function postProjectEnv(data) {
 
 // 同步服务的环境信息
 export function projectEnvSynchronization(data) {
-  return request({url: currentEnvDir + 'synchronization/', method: 'post', data: data});
+  return request({url: currentEnvDir + '/synchronization', method: 'post', data: data});
 }
 
 // 修改服务排序
 export function projectSort(data) {
-  return request({url: currentBaseDir + 'sort/', method: 'put', data: data});
+  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
 }

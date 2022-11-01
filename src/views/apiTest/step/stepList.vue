@@ -27,7 +27,11 @@
         :render-header="renderHeader"
       >
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.is_run" @change="changeStepIsRun(scope.$index)"></el-switch>
+          <el-switch
+            :inactive-value="0"
+            :active-value="1"
+            v-model="scope.row.status"
+            @change="changeStepIsRun(scope.$index)"></el-switch>
         </template>
       </el-table-column>
 
@@ -232,7 +236,7 @@ export default {
     // 修改步骤的执行状态
     changeStepIsRun(index) {
       let step = this.stepList[index]
-      putStepIsRun({'id': step.id, 'is_run': step.is_run}).then(response => {
+      putStepIsRun({'id': step.id, 'status': step.status}).then(response => {
         this.showMessage(this, response)
       })
     },

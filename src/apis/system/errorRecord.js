@@ -3,5 +3,5 @@ import {baseDirSystem} from "@/apis/base";
 
 // 获取错误列表
 export function errorRecordList(params) {
-  return request({url: baseDirSystem + '/errorRecord/list/', method: 'get', params: params});
+  return request({url: baseDirSystem + '/errorRecord/list', method: 'get', params: params});
 }

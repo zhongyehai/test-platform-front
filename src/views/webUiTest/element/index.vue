@@ -52,11 +52,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="10%">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseUser(scope.row.update_user) }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 
       <el-table-column align="center" label="操作" min-width="8%">
         <template slot-scope="scope">
@@ -150,7 +150,7 @@ export default {
     'currentProjectId',
     'currentModuleId',
     'currentPageId',
-    'userDict'
+    // 'userDict'
   ],
   data() {
     return {
@@ -162,7 +162,7 @@ export default {
       pageSize: 20,
       elementTotal: 0,
       elementList: [],
-      userList: [],
+      // userList: [],
       // userDict: {},
       // 拖拽排序参数
       sortable: null,
@@ -196,9 +196,9 @@ export default {
   methods: {
 
     // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId].name
-    },
+    // parseUser(userId) {
+    //   return this.userDict[userId].name
+    // },
 
     // 打开编辑框
     showEditForm(row) {

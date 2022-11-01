@@ -235,7 +235,9 @@
                       <template slot-scope="scope">
                         <el-switch
                           :disabled="true"
-                          v-model="scope.row.is_run"
+                          :inactive-value="0"
+                          :active-value="1"
+                          v-model="scope.row.status"
                         ></el-switch>
                       </template>
                     </el-table-column>
@@ -334,7 +336,7 @@ export default {
           "json": {
             "status": "$status"
           }
-        },
+        }
       ])
     }
   },
@@ -342,7 +344,7 @@ export default {
 
     // 用例列表的选中框是否禁用
     isDisable(row) {
-      return row.is_run
+      return row.status === 1
     },
 
     // 获取执行模式配置
@@ -443,6 +445,7 @@ export default {
 
     // 获取当前数据，用于提交
     getTaskToCommit() {
+      const call_back = this.tempTask.call_back ? JSON.parse(this.tempTask.call_back) : null
       return {
         id: this.tempTask.id,
         num: this.tempTask.num,
@@ -459,7 +462,7 @@ export default {
         email_to: this.tempTask.email_to,
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
-        call_back: this.tempTask.call_back,
+        call_back: call_back,
         project_id: this.tempTask.project_id,
         set_ids: this.$refs.setTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids,
@@ -582,6 +585,7 @@ export default {
     this.$bus.$on(this.$busEvents.api.apiTaskDrawerIsShow, (status, taskOrProject) => {
       if (status === 'update') {  // 修改
         this.tempTask = taskOrProject
+        this.tempTask.call_back = taskOrProject.call_back ? JSON.stringify(taskOrProject.call_back) : null
       } else {  // 新增
         this.initNewTask()
         this.tempTask.project_id = taskOrProject.id

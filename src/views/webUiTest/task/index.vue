@@ -45,19 +45,22 @@
               <el-table-column align="center" label="是否启用" min-width="15%" :render-header="renderHeader">
                 <template slot-scope="scope">
                   <el-switch
+                    :inactive-value="0"
+                    :active-value="1"
                     :disabled="scope.row.taskIsDisabled"
-                    v-model="scope.row.status === 1"
+                    v-model="scope.row.status"
                     @change="changeStatus(scope.row)"></el-switch>
                 </template>
               </el-table-column>
 
-<!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="9%">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <span>{{ parseUser(scope.row.create_user) }}</span>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
+              <!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="9%">-->
+              <!--                <template slot-scope="scope">-->
+              <!--                  <span>{{ parseUser(scope.row.create_user) }}</span>-->
+              <!--                </template>-->
+              <!--              </el-table-column>-->
 
-              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人" min-width="12%">
+              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人"
+                               min-width="12%">
                 <template slot-scope="scope">
                   <span>{{ parseUser(scope.row.update_user) }}</span>
                 </template>
@@ -211,11 +214,11 @@ export default {
       }
     },
 
-    cancelCopyTaskPopover(task){
+    cancelCopyTaskPopover(task) {
       this.$set(task, 'copyTaskPopoverIsShow', false)
     },
 
-    cancelDeleteTaskPopover(task){
+    cancelDeleteTaskPopover(task) {
       this.$set(task, 'deletePopoverIsShow', false)
     },
 
@@ -233,7 +236,7 @@ export default {
     },
 
     // 点击运行任务
-    clickRunTask(task){
+    clickRunTask(task) {
       this.currentTask = task
       this.$bus.$emit(this.runEvent, true, task.env)
     },
@@ -293,14 +296,14 @@ export default {
     changeStatus(task) {
       this.$set(task, 'taskIsDisabled', true)
       if (task.status === 1) {
-        disableTask({id: task.id}).then(response => {
+        enableTask({id: task.id}).then(response => {
           this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
         })
       } else {
-        enableTask({id: task.id}).then(response => {
+        disableTask({id: task.id}).then(response => {
           this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
             this.getTaskList()
@@ -352,7 +355,7 @@ export default {
         }
       })
     },
-    renderHeader (h, {column}) {
+    renderHeader(h, {column}) {
       // 悬浮提示的文字内容
       const info = '启用中的任务才会定时执行；禁用中的任务才支持修改'
       return h(

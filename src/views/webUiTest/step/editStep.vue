@@ -110,6 +110,15 @@
           </el-form>
         </el-tab-pane>
 
+        <!-- 跳过条件 -->
+        <el-tab-pane label="跳过条件" name="editSkipIf">
+          <skipIfView
+            ref="skipIfView"
+            :skipIfData="currentStep.skip_if"
+            :use_type="'step'"
+          ></skipIfView>
+        </el-tab-pane>
+
         <!-- 元素信息，允许修改元素 -->
         <el-tab-pane label="元素信息" name="element">
           <el-form label-width="120px">
@@ -241,7 +250,7 @@
 </template>
 
 <script>
-
+import skipIfView from "@/components/Inputs/skipIf"
 import headersView from "@/components/Inputs/changeRow"
 import paramsView from "@/components/Inputs/changeRow"
 import bodyView from '@/components/apiBody'
@@ -268,7 +277,8 @@ export default {
     jsonEditorView,
     extractsView,
     validatesView,
-    uploadFileView
+    uploadFileView,
+    skipIfView
   },
   data() {
     return {
@@ -281,11 +291,19 @@ export default {
       tempElementList: [],
       currentStep: {
         'id': '',
-        "is_run": '',
+        "status": '',
         "name": '',
         "wait_time_out": 10,
         "up_func": '',
         "down_func": '',
+        "skip_if": {
+          skip_type: null,
+          data_source: null,
+          expect: null,
+          comparator: null,
+          data_type: null,
+          check_value: null
+        },
         "execute_type": '',
         "send_keys": '',
         "run_times": 0,
@@ -302,11 +320,19 @@ export default {
     initNewStep() {
       return {
         'id': '',
-        "is_run": '',
+        "status": '',
         "name": '',
         "wait_time_out": 10,
         "up_func": '',
         "down_func": '',
+        "skip_if": {
+          skip_type: null,
+          data_source: null,
+          expect: null,
+          comparator: null,
+          data_type: null,
+          check_value: null
+        },
         "execute_type": '',
         "run_times": 0,
         "headers": [],
@@ -323,13 +349,15 @@ export default {
     },
 
     getStepForCommit() {
+      var skip_if = this.$refs.skipIfView.tempSkipIf
       return {
         'id': this.currentStep.id,
-        "is_run": this.currentStep.is_run,
+        "status": this.currentStep.status,
         "name": this.currentStep.name,
         "wait_time_out": this.currentStep.wait_time_out,
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
+        "skip_if": skip_if,
         "run_times": this.currentStep.run_times,
         "execute_type": this.currentStep.execute_type,
         "send_keys": this.currentStep.send_keys,
@@ -401,7 +429,7 @@ export default {
 
       if (type === 'add') {  // 新增步骤
         this.currentStep.id = ''
-        this.currentStep.is_run = true
+        this.currentStep.status = 1
         this.currentStep.name = step.name
         this.currentStep.wait_time_out = step.wait_time_out
         this.currentStep.up_func = ''

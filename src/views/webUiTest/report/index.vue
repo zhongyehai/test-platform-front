@@ -24,7 +24,7 @@
               :data="reportDataList"
               stripe
             >
-              <el-table-column prop="id" align="center" label="序号" min-width="5%">
+              <el-table-column prop="id" align="center" label="序号" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
                 </template>
@@ -33,25 +33,25 @@
               <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
               </el-table-column>
 
-              <el-table-column label="生成时间" align="center" min-width="15%">
+              <el-table-column label="生成时间" align="center" min-width="20%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="触发方式" align="center" min-width="15%">
+              <el-table-column label="触发方式" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.trigger_type === 'pipeline' ? '流水线' : '页面' }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行环境" align="center" min-width="15%">
+              <el-table-column label="运行环境" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ eventDict[scope.row.env] }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行单元" align="center" min-width="15%">
+              <el-table-column label="运行单元" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ runTypeDict[scope.row.run_type] }} </span>
                 </template>
@@ -67,16 +67,16 @@
 
               <el-table-column label="是否生成" align="center" min-width="10%">
                 <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.is_done === 1 ? 'success' : 'warning'">
-                    {{ scope.row.is_done === 1 ? '已生成' : '未生成' }}
+                  <el-tag size="small" :type="scope.row.status === 1 ? 'success' : 'warning'">
+                    {{ scope.row.status === 1 ? '已生成' : '未生成' }}
                   </el-tag>
                 </template>
               </el-table-column>
 
               <el-table-column label="是否已阅" align="center" min-width="10%">
                 <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.status === '已读' ? 'success' : 'warning'">
-                    {{ scope.row.status }}
+                  <el-tag size="small" :type="scope.row.is_read === 1 ? 'success' : 'warning'">
+                    {{ scope.row.is_read === 1 ? '已读' : '未读'}}
                   </el-tag>
                 </template>
               </el-table-column>
@@ -96,13 +96,13 @@
                     type="text"
                     icon="el-icon-view"
                     style="margin-right: 10px"
-                    v-show="scope.row.is_done === 1"
+                    v-show="scope.row.status === 1"
                     @click.native="openReportById(scope.row.id)"></el-button>
 
                   <!-- 删除报告 -->
                   <el-popover
                     :ref="scope.row.id"
-                    v-show="scope.row.is_done === 1"
+                    v-show="scope.row.status === 1"
                     placement="top"
                     popper-class="down-popover"
                     v-model="scope.row.deletePopoverIsShow">

@@ -239,7 +239,7 @@ export default {
         id: '',
         name: '',
         desc: '',
-        is_run: true,
+        status: 0,
         run_times: '',
         func_files: [],
         variables: [{key: null, value: null, remark: null, data_type: 'str'}],

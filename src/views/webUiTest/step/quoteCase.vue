@@ -204,7 +204,7 @@ export default {
         new_case['quote_case'] = new_case['id']
         new_case['id'] = ''
         new_case['case_id'] = this.caseId
-        new_case['is_run'] = true
+        new_case['status'] = 1
         new_case['run_times'] = 1
         new_case['name'] = `引用【${name}/${row.name}】`
         new_case['extracts'] = [{key: null, extract_type: null, value: null, remark: null}]

@@ -56,8 +56,6 @@ import Layout from '@/layout'
 }
 */
 
-const host = window.location.protocol + "//" + window.location.hostname + ":8024"
-
 // 没有权限要求的基本页面，所有角色都可访问
 export const constantRoutes = [
 
@@ -153,12 +151,7 @@ export const constantRoutes = [
         hidden: true,
         meta: {title: '调试界面', icon: 'form'},
         component: () => import('@/views/debug/index')
-      },
-      {
-        path: `${host}/api/apiTest/swagger`,
-        name: 'apiTestSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 
@@ -206,12 +199,7 @@ export const constantRoutes = [
         name: 'WebUiReport',
         meta: {title: '测试报告', icon: 'el-icon-s-data'},
         component: () => import('@/views/webUiTest/report/index')
-      },
-      {
-        path: `${host}/api/webUiTest/swagger`,
-        name: 'WebUiTestSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 
@@ -318,12 +306,7 @@ export const constantRoutes = [
         name: 'apiErrorRecord',
         meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
         component: () => import('@/views/assist/errorRecord/index')
-      },
-      {
-        path: `${host}/api/assist/swagger`,
-        name: 'assistSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 
@@ -346,12 +329,7 @@ export const constantRoutes = [
         name: 'Args',
         meta: {title: '参数管理', icon: 'el-icon-star-on'},
         component: () => import('@/views/config/configs/index')
-      },
-      {
-        path: `${host}/api/config/swagger`,
-        name: 'configSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 
@@ -386,12 +364,7 @@ export const constantRoutes = [
         name: 'Account',
         component: () => import('@/views/testWork/account'),
         meta: {title: '测试账号', icon: 'el-icon-s-check'}
-      },
-      {
-        path: `${host}/api/testWork/swagger`,
-        name: 'testWorkSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 
@@ -414,13 +387,7 @@ export const constantRoutes = [
         name: 'MakeUserInfo',
         component: () => import('@/views/tools/makeUserInfo'),
         meta: {title: '生成用户信息', icon: 'el-icon-s-unfold'}
-      },
-      {
-        path: `${host}/api/tools/swagger`,
-        name: 'toolsSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
-
+      }
     ]
   },
 
@@ -449,12 +416,7 @@ export const constantRoutes = [
         name: 'systemErrorRecord',
         meta: {title: '系统错误记录', icon: 'el-icon-video-camera-solid', roles: [2, '2']},
         component: () => import('@/views/system/errorRecord/index')
-      },
-      {
-        path: `${host}/api/system/swagger`,
-        name: 'systemSwagger',
-        meta: {title: 'swagger', icon: 'el-icon-document'}
-      },
+      }
     ]
   },
 

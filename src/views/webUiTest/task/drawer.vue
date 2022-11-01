@@ -233,11 +233,13 @@
                       show-overflow-tooltip>
                     </el-table-column>
 
-                    <el-table-column prop="is_run" label="是否执行" min-width="20%">
+                    <el-table-column prop="status" label="是否执行" min-width="20%">
                       <template slot-scope="scope">
                         <el-switch
                           :disabled="true"
-                          v-model="scope.row.is_run"
+                          :inactive-value="0"
+                          :active-value="1"
+                          v-model="scope.row.status"
                         ></el-switch>
                       </template>
                     </el-table-column>
@@ -336,7 +338,7 @@ export default {
           "json": {
             "status": "$status"
           }
-        },
+        }
       ])
     }
   },
@@ -351,7 +353,7 @@ export default {
 
     // 用例列表的选中框是否禁用
     isDisable(row) {
-      return row.is_run
+      return row.status === 1
     },
 
     // 执行列表默认勾选，遍历用例列表，如果用例的id在task.case_id里面，则把这行标为选中状态
@@ -445,6 +447,7 @@ export default {
 
     // 获取当前数据，用于提交
     getTaskToCommit() {
+      const call_back = this.tempTask.call_back ? JSON.parse(this.tempTask.call_back) : null
       return {
         id: this.tempTask.id,
         num: this.tempTask.num,
@@ -461,7 +464,7 @@ export default {
         email_to: this.tempTask.email_to,
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
-        call_back: this.tempTask.call_back,
+        call_back: call_back,
         project_id: this.tempTask.project_id,
         set_ids: this.$refs.setTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids,
@@ -583,6 +586,7 @@ export default {
     this.$bus.$on(this.$busEvents.ui.uiTaskDrawerIsShow, (status, taskOrProject) => {
       if (status === 'update') {  // 修改
         this.tempTask = taskOrProject
+        this.tempTask.call_back = taskOrProject.call_back ? JSON.stringify(taskOrProject.call_back) : null
       } else {  // 新增
         this.initNewTask()
         this.tempTask.project_id = taskOrProject.id
