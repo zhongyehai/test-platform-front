@@ -185,16 +185,29 @@
       </el-collapse-item>
     </el-collapse>
 
-    <el-table :data="tempData" stripe :show-header="false" size="mini">
+    <el-table
+      ref="dataTable"
+      :data="tempData"
+      stripe
+      :show-header="false"
+      size="mini"
+      row-key="id">
 
-      <el-table-column label="Key" header-align="center" min-width="35%">
+      <el-table-column label="id" header-align="center" min-width="4%">
+        <template slot-scope="scope">
+          <div>{{ scope.$index + 1 }}</div>
+          <el-input v-model="scope.row.id" v-show="false"></el-input>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Key" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <el-input v-model="scope.row.key" size="mini" type="textarea" :rows="1" :placeholder="placeholderKey">
           </el-input>
         </template>
       </el-table-column>
 
-      <el-table-column label="提取方式" header-align="center" min-width="20%">
+      <el-table-column label="提取方式" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <el-row>
             <el-select
@@ -216,7 +229,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Value" header-align="center" min-width="35%">
+      <el-table-column label="Value" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <!-- 选择自定义函数，则输入自定义函数 -->
           <el-input
@@ -248,18 +261,18 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="备注" header-align="center" min-width="20%">
+      <el-table-column label="备注" header-align="center" min-width="21%">
         <template slot-scope="scope">
           <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc">
           </el-input>
         </template>
       </el-table-column>
 
-      <el-table-column label="添加" header-align="center" min-width="5%">
+      <el-table-column label="添加" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
-              v-show="isShowAddButton( scope.$index)"
+              v-show="scope.$index === 0"
               type="text"
               size="mini"
               icon="el-icon-plus"
@@ -267,11 +280,6 @@
             >
             </el-button>
           </el-tooltip>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="删除" header-align="center" min-width="5%">
-        <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
               v-show="isShowDelButton(scope.$index)"
@@ -285,12 +293,15 @@
           </el-tooltip>
         </template>
       </el-table-column>
+
     </el-table>
   </div>
 
 </template>
 
 <script>
+
+import Sortable from "sortablejs";
 
 export default {
   name: 'extract',
@@ -303,11 +314,23 @@ export default {
   ],
   data() {
     return {
-      tempData: []
+      tempData: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
     }
   },
 
   methods: {
+
+    initTempData(){
+      this.tempData = []
+      for (let index in this.currentData){
+        let data = this.currentData[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
 
     // 根据选择的数据源显示不同的提示
     getPlaceholder(_type) {
@@ -327,7 +350,7 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({key: null, extract_type: null, value: null, remark: null})
+      this.tempData.push({id: this.tempData.length, key: null, extract_type: null, value: null, remark: null})
     },
 
     // 是否显示删除按钮
@@ -339,15 +362,33 @@ export default {
     delRow(i) {
       this.tempData.splice(i, 1)
     },
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
+    },
   },
 
-  created() {
-    this.tempData = this.currentData
+  mounted() {
+    this.initTempData()
 
-    // 打开步骤编辑抽屉，则请求页面元素
-    if (this.stepDrawerStatus) {
-      this.getElementList()
-    }
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
   },
 
   watch: {
@@ -355,9 +396,9 @@ export default {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
         if (newVal) {
-          this.tempData = newVal
+          this.initTempData()
         } else {
-          this.tempData = [{key: null, extract_type: null, value: null, remark: null}]
+          this.tempData = [{id: 0, key: null, extract_type: null, value: null, remark: null}]
         }
       }
     },

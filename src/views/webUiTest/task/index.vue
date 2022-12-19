@@ -9,6 +9,7 @@
           ref="projectTree"
           :busEventClickTree="$busEvents.ui.uiProjectTreeChoiceProject"
           :busEventClickMenu="$busEvents.ui.uiTaskDrawerIsShow"
+          :sourceType="'web_ui'"
           :menuName="'添加任务'"
           :labelWidth="5"
         ></projectTreeView>
@@ -52,12 +53,6 @@
                     @change="changeStatus(scope.row)"></el-switch>
                 </template>
               </el-table-column>
-
-              <!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="9%">-->
-              <!--                <template slot-scope="scope">-->
-              <!--                  <span>{{ parseUser(scope.row.create_user) }}</span>-->
-              <!--                </template>-->
-              <!--              </el-table-column>-->
 
               <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人"
                                min-width="12%">
@@ -148,6 +143,11 @@
       :event="runEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'webUi'"
+      :busName="$busEvents.data.showRunProcessByIndex"
+    ></runProcess>
+
     <taskDrawer></taskDrawer>
   </div>
 </template>
@@ -158,6 +158,7 @@ import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 import taskDrawer from "@/views/webUiTest/task/drawer";
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/webUiTest/task'
 import {reportIsDone} from "@/apis/webUiTest/report";
@@ -167,7 +168,7 @@ import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
 export default {
   name: "index",
-  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv},
+  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess},
   data() {
     return {
       tableLoadingIsShow: false,
@@ -238,46 +239,24 @@ export default {
     // 点击运行任务
     clickRunTask(task) {
       this.currentTask = task
-      this.$bus.$emit(this.runEvent, true, task.env)
+      this.$bus.$emit(this.runEvent, 'webUi')
     },
 
     // 运行任务
-    run(runData) {
+    run(runConf) {
       this.$set(this.currentTask, 'runButtonIsLoading', true)
-      runTask({id: this.currentTask.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.$set(that.currentTask, 'runButtonIsLoading', false)
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.$set(that.currentTask, 'runButtonIsLoading', false)
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+      runTask({
+        id: this.currentTask.id,
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        browser: runConf.browser,
+        'trigger_type': 'page'
+      }).then(response => {
+        this.$set(this.currentTask, 'runButtonIsLoading', false)
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByIndex, response.data.report_id)
         }
       })
-    },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
     },
 
     // 删除任务

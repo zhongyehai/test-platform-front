@@ -49,7 +49,8 @@
 </template>
 
 <script>
-import {projectList} from '@/apis/webUiTest/project'
+import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
+import {projectList as appProjectList} from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
@@ -62,6 +63,7 @@ export default {
   props: [
     'busEventClickTree',
     'busEventClickMenu',
+    'sourceType',
     'menuName',  // 菜单名
     'labelWidth' // 树名字显示长度
   ],
@@ -97,10 +99,14 @@ export default {
 
       // 当前鼠标滑入的节点名
       currentLabel: '',
+
+      projectListUrl: ''
     }
   },
 
   created() {
+    this.projectListUrl = this.sourceType === 'web_ui' ? webUiProjectList : appProjectList
+
     // 初始化项目列表, 取20条数据
     this.getProjectList({'pageNum': this.pageNum, 'pageSize': this.pageSize})
   },
@@ -143,7 +149,7 @@ export default {
 
     // 获取项目列表
     getProjectList(params = null) {
-      projectList(params).then(response => {
+      this.projectListUrl(params).then(response => {
         this.projects.project_list = response.data.data
         this.projects.project_total = response.data.total
 

@@ -1,29 +1,19 @@
 <template>
   <div>
-    <!-- 使用示例 -->
-    <el-collapse accordion>
-      <el-collapse-item>
-        <template slot="title">
-          <div style="color:#409eff"> 点击查看示例</div>
-        </template>
-
-        <div style="margin-left: 20px">
-          <div style="margin-left: 20px; margin-bottom: 5px">
-            任意一行设置的表达式成立，都会执行跳过操作，使用方法与断言一致，详见断言示例
-          </div>
-        </div>
-      </el-collapse-item>
-    </el-collapse>
-
-
-    <!-- 断言 -->
+    <!-- 跳过条件 -->
     <el-table
-      :data="tempSkipIf"
-      size="mini"
+      ref="dataTable"
+      :data="tempData"
       stripe
       :show-header="false"
-      class="h-b-e-a-style"
-      :row-style="{'background-color': 'rgb(250, 250, 250)'}">
+      size="mini"
+      row-key="id">
+      <el-table-column label="id" header-align="center" min-width="4%">
+        <template slot-scope="scope">
+          <div>{{ scope.$index + 1 }}</div>
+          <el-input v-model="scope.row.id" v-show="false"></el-input>
+        </template>
+      </el-table-column>
 
       <el-table-column label="skip_type" header-align="center" min-width="20%">
         <template slot-scope="scope">
@@ -142,7 +132,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加一行" header-align="center" min-width="10%">
+      <el-table-column label="添加一行" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
@@ -169,20 +159,51 @@
     </el-table>
 
   </div>
-
-
 </template>
 
 <script>
 
 import {getAssertMapping} from '@/apis/apiTest/api'
 import {getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping} from '@/apis/config/config'
+import Sortable from "sortablejs";
 
 export default {
   name: "skipIf",
   props: ['skipIfData', 'use_type'],
 
+  data() {
+    return {
+      validateTypeList: [],
+
+      tempData: [
+        {
+          skip_type: null,
+          data_source: null,
+          check_value: null,
+          comparator: null,
+          data_type: null,
+          expect: null
+        }
+      ],
+
+      dataTypeMapping: [],
+      skipIfDataSourceMapping: [],
+      skipIfTypeMapping: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
+    }
+  },
+
   mounted() {
+    this.getValidates(this.skipIfData)
+
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+
     if (this.skipIfTypeMapping.length === 0) {
       this.getSkipIfTypeMappings()
     }
@@ -197,32 +218,17 @@ export default {
     }
   },
 
-  created() {
-    this.getValidates(this.skipIfData)
-  },
-
-  data() {
-    return {
-      validateTypeList: [],
-
-      tempSkipIf: [
-        {
-          skip_type: null,
-          data_source: null,
-          check_value: null,
-          comparator: null,
-          data_type: null,
-          expect: null
-        }
-      ],
-
-      dataTypeMapping: [],
-      skipIfDataSourceMapping: [],
-      skipIfTypeMapping: [],
-    }
-  },
 
   methods: {
+
+    initTempData() {
+      this.tempData = []
+      for (let index in this.skipIfData) {
+        let data = this.skipIfData[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
 
     // 从后端获取跳过数据源
     getSkipIfDataSourceMappings() {
@@ -280,12 +286,13 @@ export default {
 
     // 是否显示删除按钮
     isShowDelButton(index) {
-      return !(this.tempSkipIf.length === 1 && index === 0)
+      return !(this.tempData.length === 1 && index === 0)
     },
 
     // 添加一行
     addRow() {
-      this.tempSkipIf.push({
+      this.tempData.push({
+        id: this.tempData.length,
         skip_type: null,
         data_source: null,
         check_value: null,
@@ -297,14 +304,15 @@ export default {
 
     // 删除一行
     delRow(index) {
-      this.tempSkipIf.splice(index, 1);
+      this.tempData.splice(index, 1);
     },
 
     getValidates(validates) {
       if (validates && validates.length > 0) {
-        this.tempSkipIf = validates
+        this.initTempData()
       } else {
-        this.tempSkipIf = [        {
+        this.tempData = [{
+          id: 0,
           skip_type: null,
           data_source: null,
           check_value: null,
@@ -313,7 +321,24 @@ export default {
           expect: null
         }]
       }
-    }
+    },
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
+    },
   },
 
   watch: {

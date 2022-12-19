@@ -22,7 +22,6 @@ export default {
   props: ['dataJson'],
   data() {
     return {
-      tempDataType: '',
       tempDataJson: '',
     }
 

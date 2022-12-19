@@ -5,20 +5,20 @@
     <panel-group @handleSetLineChartData="handleSetLineChartData"/>
 
     <!-- 曲线图 -->
-    <el-row style="background:#fff;padding:16px 16px 0;">
-      <!-- 避免出现改变了数据，统计图没有重新渲染的情况，这里加一个key值，数据发生改变则前置重新渲染 -->
-      <line-chart :chart-data="detailData" :key="detailData.title"/>
-    </el-row>
+    <!--    <el-row style="background:#fff;padding:16px 16px 0;">-->
+    <!--      &lt;!&ndash; 避免出现改变了数据，统计图没有重新渲染的情况，这里加一个key值，数据发生改变则前置重新渲染 &ndash;&gt;-->
+    <!--      <line-chart :chart-data="detailData" :key="detailData.title"/>-->
+    <!--    </el-row>-->
 
 
     <!-- 柱状图 -->
-    <!--    <el-row :gutter="32">-->
-    <!--      <el-col :xs="24" :sm="24" :lg="24">-->
-    <!--        <div class="chart-wrapper">-->
-    <!--          <bar-chart :chart-data="detailData" :key="detailData.title"/>-->
-    <!--        </div>-->
-    <!--      </el-col>-->
-    <!--    </el-row>-->
+    <el-row :gutter="32">
+      <el-col :xs="24" :sm="24" :lg="24">
+        <div class="chart-wrapper">
+          <bar-chart :chart-data="detailData" :key="detailData.title"/>
+        </div>
+      </el-col>
+    </el-row>
 
   </div>
 </template>
@@ -36,7 +36,7 @@ import TransactionTable from './components/TransactionTable'
 import TodoList from './components/TodoList'
 // import BoxCard from './components/BoxCard'
 
-import { getDetailCount } from '@/apis/home/apiTest'
+import {getDetailCount} from '@/apis/home/apiTest'
 
 const lineChartData = {
   newVisitis: {
@@ -92,7 +92,7 @@ export default {
 
   created() {
     // 初始时获取定时任务的详情
-    this.handleSetLineChartData('report')
+    this.handleSetLineChartData('hit')
   }
 }
 </script>

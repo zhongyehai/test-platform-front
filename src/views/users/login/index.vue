@@ -1,11 +1,15 @@
 <template>
-  <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on"
-             label-position="left"
-    >
+  <div class="login-container login-wrap">
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      auto-complete="on"
+      label-position="left">
 
       <div class="title-container">
-        <h3 class="title">{{platformName}}</h3>
+        <h3 class="title">{{ platformName }}</h3>
       </div>
 
       <el-form-item prop="account">
@@ -127,9 +131,11 @@ export default {
               this.$store.commit(types.roles, response.data.role_id)
               this.$store.commit(types.userName, response.data.name)
               localStorage.setItem('id', response.data.id)
+              localStorage.setItem('business', JSON.stringify(response.data.business_id))
               // 重定向到指定路由
               let redirect = this.$route.query.redirect || '/'
-              this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由
+              this.$router.push({path: redirect})  // 重定向到指定路由
+              // this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由
             }
           })
           this.loading = false
@@ -157,7 +163,15 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.login-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: url(../../../assets/loginBackground.jpg);
+  background-size: 100%;
+}
+
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
@@ -249,7 +263,7 @@ $light_gray: #eee;
 
     .title {
       font-size: 26px;
-      color: $light_gray;
+      color: #454545;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;

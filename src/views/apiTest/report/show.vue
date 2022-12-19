@@ -30,17 +30,26 @@
                 </el-dropdown-menu>
               </el-dropdown>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            总共耗时: {{ this.reportData.time.duration }} 秒
-          </span>
+                <el-button
+                  v-if="!this.reportData.success"
+                  type="primary"
+                  size="mini"
+                  style="margin-left: 10px"
+                  @click.native="showHitDrawer('add')"
+                >记录问题</el-button>
+              </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            开始时间: {{ this.reportData.time.start_at }}
-          </span>
+                总共耗时: {{ this.reportData.time.duration }} 秒
+              </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
-          </span>
+                开始时间: {{ this.reportData.time.start_at }}
+              </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            运行环境: {{ runEnvDict[reportData.run_env] }}
-          </span>
+                执行模式: {{ this.reportData.is_async === 1 ? "并行运行" : "串行运行" }}
+              </span>
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+                运行环境: {{ runEnvDict[reportData.run_env] }}
+              </span>
             </div>
           </el-col>
         </el-row>
@@ -57,8 +66,14 @@
             <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
               <li style="font-weight:700;font-size:16px">步骤概况</li>
               <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
-              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{
+                  this.reportData.stat.teststeps.successes
+                }}
+              </li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{
+                  this.reportData.stat.teststeps.failures
+                }}
+              </li>
               <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
               <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
             </ol>
@@ -314,61 +329,6 @@
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="8">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "请求时间：" }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="9">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应时间：" }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="10">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="11">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应编码：" }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.encoding }}</div>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="12">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应头部信息：" }}</div>
-                      </template>
-                      <el-row>
-                        <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.headers">
-                            <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].response.headers)"
-                              :expand-depth="5"
-                              copyable
-                            ></JsonViewer>
-                          </div>
-                        </el-col>
-                        <el-col :span="4">
-                          <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].response.headers"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.headers)"
-                            v-clipboard:success="onCopy"
-                            v-clipboard:error="onError"
-                          >复制
-                          </el-button>
-                        </el-col>
-                      </el-row>
-                    </el-collapse-item>
-
                     <el-collapse-item name="13">
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ "响应json：" }}</div>
@@ -457,6 +417,61 @@
                       </el-row>
                     </el-collapse-item>
 
+                    <el-collapse-item name="8">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "请求时间：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="9">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应时间：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="10">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="11">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应编码：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.encoding }}</div>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="12">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应头部信息：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.headers">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.data[0].response.headers)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.data[0].response.headers"
+                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.headers)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
                     <el-collapse-item name="17">
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
@@ -476,6 +491,8 @@
         无运行数据或所有运行数据均已跳过
       </div>
 
+      <hitDrawer :runTestTypeList="runTestTypeList"></hitDrawer>
+
     </div>
   </div>
 
@@ -486,14 +503,16 @@
 
 import JsonViewer from "vue-json-viewer";
 import vkbeautify from "vkbeautify";
+import hitDrawer from "@/views/assist/hits/drawer";
 
 import {getConfigByName} from '@/apis/config/config'
-import {getReport} from '@/apis/apiTest/report'
+import {reportDetail} from '@/apis/apiTest/report'
 
 export default {
   name: 'reportShow',
   components: {
     JsonViewer,
+    hitDrawer
   },
   data() {
 
@@ -545,6 +564,7 @@ export default {
       }
     }
     return {
+      runTestTypeList: [],
       runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
@@ -652,6 +672,17 @@ export default {
 
   methods: {
 
+    showHitDrawer(status) {
+      this.$bus.$emit(
+        this.$busEvents.data.drawerIsShow,
+        status,
+        {
+          date: this.reportData.time.start_at,
+          test_type: this.reportData.run_type,
+          report_id: this.$route.query.id
+        })
+    },
+
     formatXml(xml) {
       var text = xml
       if (xml && xml.length > 0) {
@@ -745,7 +776,7 @@ export default {
 
     // 获取测试报告具体内容
     getReportDataById() {
-      getReport({'id': this.$route.query.id}).then((response) => {
+      reportDetail({'id': this.$route.query.id}).then((response) => {
           // console.log(response)
           if (this.showMessage(this, response)) {
             this.reportData = response['data']

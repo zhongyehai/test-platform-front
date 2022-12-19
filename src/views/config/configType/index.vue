@@ -61,7 +61,7 @@
 
     <!-- 新增/修改配置类型 -->
     <el-drawer
-      :title=" drawerType === 'add' ? '新增服务' : '修改服务'"
+      :title=" drawerType === 'add' ? '新增业务线' : '修改业务线'"
       size="40%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"

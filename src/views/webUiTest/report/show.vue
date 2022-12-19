@@ -30,13 +30,22 @@
                 </el-dropdown-menu>
               </el-dropdown>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
+                <el-button
+                  v-if="!this.reportData.success"
+                  type="primary"
+                  size="mini"
+                  style="margin-left: 10px"
+                  @click.native="showHitDrawer('add')"
+                >记录问题</el-button>
+              </span>
+              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             总共耗时: {{ this.reportData.time.duration }} 秒
           </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             开始时间: {{ this.reportData.time.start_at }}
           </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            执行模式: {{ this.reportData.run_type === 1 ? "并行运行" : "串行运行" }}
+            执行模式: {{ this.reportData.is_async === 1 ? "并行运行" : "串行运行" }}
           </span>
               <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
             运行环境: {{ runEnvDict[reportData.run_env] }}
@@ -244,6 +253,9 @@
       <div class="str" v-show="reportData.details.length === 0">
         无运行数据或所有运行数据均已跳过
       </div>
+
+      <hitDrawer :runTestTypeList="runTestTypeList"></hitDrawer>
+
     </div>
   </div>
 
@@ -254,14 +266,17 @@
 
 import JsonViewer from "vue-json-viewer";
 import vkbeautify from "vkbeautify";
+import hitDrawer from "@/views/assist/hits/drawer";
 
-import {getReport} from '@/apis/webUiTest/report'
+import {reportDetail} from '@/apis/webUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
+
 
 export default {
   name: 'reportShow',
   components: {
     JsonViewer,
+    hitDrawer
   },
   data() {
 
@@ -313,6 +328,7 @@ export default {
       }
     }
     return {
+      runTestTypeList: [],
       runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
@@ -418,6 +434,17 @@ export default {
 
   methods: {
 
+    showHitDrawer(status) {
+      this.$bus.$emit(
+        this.$busEvents.data.drawerIsShow,
+        status,
+        {
+          date: this.reportData.time.start_at,
+          test_type: this.reportData.run_type,
+          report_id: this.$route.query.id
+        })
+    },
+
     formatXml(xml) {
       var text = xml
       if (xml && xml.length > 0) {
@@ -511,7 +538,7 @@ export default {
 
     // 获取测试报告具体内容
     getReportDataById() {
-      getReport({'id': this.$route.query.id}).then((response) => {
+      reportDetail({'id': this.$route.query.id}).then((response) => {
           // console.log(response)
           if (this.showMessage(this, response)) {
             this.reportData = response['data']

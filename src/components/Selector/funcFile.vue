@@ -7,7 +7,7 @@
     default-first-option
     clearable
     size="mini"
-    style="width:98%"
+    :style="selectStyle"
     placeholder="请选择函数文件"
     class="filter-item">
     <el-option
@@ -27,22 +27,34 @@ import {funcFileList} from '@/apis/assist/funcFile'
 export default {
   name: 'funcFile',
   props: [
-      'currentFuncFileList',
-      'funcFiles'
+    'currentFuncFileList',
+    'funcFiles',
+    'cite'
   ],
+
   mounted() {
     this.funcFilesList = this.currentFuncFileList
-    if (!this.currentFuncFileList){
+    if (!this.currentFuncFileList) {
       this.getFuncFileList()
     }
   },
+
   created() {
+    if (this.cite && this.cite === 'case') {
+      this.selectStyle = {
+        width: '95%'
+      }
+    }
     this.tempFuncFiles = this.funcFiles
   },
+
   data() {
     return {
       funcFilesList: [],  // 自定义函数列表
-      tempFuncFiles: []  // 选中的自定义函数列表
+      tempFuncFiles: [],  // 选中的自定义函数列表
+      selectStyle: {
+        width: '98%'
+      }
     }
   },
   methods: {

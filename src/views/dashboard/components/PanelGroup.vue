@@ -7,9 +7,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            服务数
+            {{title.project.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.project" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.project.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -23,9 +23,9 @@
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            模块数
+            {{title.module.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.module" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.module.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -37,15 +37,15 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            接口数
+            {{title.api.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.api" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.api.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
 
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('file')">
+      <div class="card-panel" @click="handleSetLineChartData('hit')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
           <i class="el-icon-files card-panel-icon" ></i>
@@ -53,9 +53,9 @@
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            文件数
+            {{title.hit.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.file" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.hit.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -67,9 +67,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            用例数
+            {{title.case.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.case" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.case.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -83,9 +83,9 @@
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            测试步骤数
+            {{title.step.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.step" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.step.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -99,9 +99,9 @@
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            定时任务数
+            {{title.task.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.task" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.task.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -115,9 +115,9 @@
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            测试报告数
+            {{title.report.title}}
           </div>
-          <count-to :start-val="0" :end-val="title.report" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.report.total" :duration="1" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -138,9 +138,9 @@ export default {
     return {
       title: {
         'project': 0,
-        'models': 0,
+        'module': 0,
         'api': 0,
-        'file': 0,
+        'hit': 0,
         'set': 0,
         'case': 0,
         'step': 0,

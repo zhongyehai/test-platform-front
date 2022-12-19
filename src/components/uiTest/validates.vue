@@ -112,17 +112,22 @@
       </el-collapse-item>
     </el-collapse>
 
-
     <!-- 断言 -->
     <el-table
-      :data="tempValidates"
-      size="mini"
+      ref="dataTable"
+      :data="tempData"
       stripe
       :show-header="false"
-      class="h-b-e-a-style"
-      :row-style="{'background-color': 'rgb(250, 250, 250)'}">
+      size="mini"
+      row-key="id">
+      <el-table-column label="id" header-align="center" min-width="4%">
+        <template slot-scope="scope">
+          <div>{{ scope.$index + 1 }}</div>
+          <el-input v-model="scope.row.id" v-show="false"></el-input>
+        </template>
+      </el-table-column>
 
-      <el-table-column label="validate_type" header-align="center" min-width="15%">
+      <el-table-column label="validate_type" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.validate_type"
@@ -144,7 +149,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="数据源" header-align="center" min-width="15%">
+      <el-table-column label="数据源" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.element"
@@ -165,7 +170,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column property="data_type" label="数据类型" header-align="center" min-width="15%">
+      <el-table-column property="data_type" label="数据类型" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.data_type"
@@ -186,7 +191,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column property="value" label="Value" header-align="center" min-width="15%">
+      <el-table-column property="value" label="Value" header-align="center" min-width="21%">
         <template slot-scope="scope">
           <el-input
             v-model="scope.row.value"
@@ -203,22 +208,17 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加一行" header-align="center" min-width="4%">
+      <el-table-column label="添加一行" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
-              v-show="isShowAddButton(scope.$index)"
+              v-show="scope.$index === 0"
               type="text"
               size="mini"
               icon="el-icon-plus"
               @click.native="addRow(scope.$index)">
             </el-button>
           </el-tooltip>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="删除当前行" header-align="center" min-width="4%">
-        <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
               v-show="isShowDelButton(scope.$index)"
@@ -243,6 +243,7 @@
 
 import {assertMappingList} from '@/apis/webUiTest/step'
 import {getConfigByName} from '@/apis/config/config'
+import Sortable from "sortablejs";
 
 export default {
   name: "validates",
@@ -251,7 +252,28 @@ export default {
     'tempElementList'
   ],
 
+  data() {
+    return {
+      validateTypeList: [],
+      tempData: [{element: null, key: null, validate_type: null, data_type: null, value: null}],
+
+      dataTypeMapping: [],
+      responseDataSourceMapping: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
+    }
+  },
+
   mounted() {
+    this.getValidates(this.validates)
+
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+
     if (this.validateTypeList.length === 0) {
       this.getAssertMappings()
     }
@@ -260,21 +282,16 @@ export default {
     }
   },
 
-  created() {
-    this.getValidates(this.validates)
-  },
-
-  data() {
-    return {
-      validateTypeList: [],
-      tempValidates: [{element: null, key: null, validate_type: null, data_type: null, value: null}],
-
-      dataTypeMapping: [],
-      responseDataSourceMapping: [],
-    }
-  },
-
   methods: {
+
+    initTempData() {
+      this.tempData = []
+      for (let index in this.validates) {
+        let data = this.validates[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
 
     // 从后端获取断言方式
     getAssertMappings() {
@@ -316,31 +333,48 @@ export default {
 
     // 是否显示添加按钮
     isShowAddButton(index) {
-      return index === this.tempValidates.length - 1
+      return index === this.tempData.length - 1
     },
 
     // 是否显示删除按钮
     isShowDelButton(index) {
-      return !(this.tempValidates.length === 1 && index === 0)
+      return !(this.tempData.length === 1 && index === 0)
     },
 
     // 添加一行
     addRow() {
-      this.tempValidates.push({element: null, key: null, validate_type: null, data_type: null, value: null})
+      this.tempData.push({id: this.tempData.length,element: null, key: null, validate_type: null, data_type: null, value: null})
     },
 
     // 删除一行
     delRow(index) {
-      this.tempValidates.splice(index, 1);
+      this.tempData.splice(index, 1);
     },
 
     getValidates(validates) {
       if (validates && validates.length > 0) {
-        this.tempValidates = validates
+        this.initTempData()
       } else {
-        this.tempValidates = [{element: null, key: null, validate_type: null, data_type: null, value: null}]
+        this.tempData = [{id: 0, element: null, key: null, validate_type: null, data_type: null, value: null}]
       }
-    }
+    },
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
+    },
   },
 
   watch: {

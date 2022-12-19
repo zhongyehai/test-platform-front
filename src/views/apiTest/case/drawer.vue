@@ -13,16 +13,48 @@
         <el-form size="mini" label-width="100px">
 
           <el-row>
-
-            <!-- 用例名称 -->
-            <el-col :span="10">
+            <el-col :span="12">
               <el-form-item label="用例名称" class="is-required">
                 <el-input v-model="tempCase.name"></el-input>
               </el-form-item>
             </el-col>
 
+            <el-col :span="12">
+              <el-form-item label="函数文件">
+                <funcFilesView
+                  :cite="'case'"
+                  :funcFiles="tempCase.func_files"
+                  ref="funcFilesView"
+                ></funcFilesView>
+                <el-popover
+                  class="el_popover_class"
+                  placement="top-start"
+                  trigger="hover">
+                  <div>
+                    <div>1、用例下要用到自定义函数可以在这里统一引用对应的函数文件</div>
+                    <div>2、此处引用的函数文件，对于当前用例下的测试步骤均有效</div>
+                    <div>3、若此处引用了函数文件，服务处也引用了函数文件，则会把两边引用的合并去重</div>
+                  </div>
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popover>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <!-- 业务线选择 -->
+            <el-col :span="12">
+              <el-form-item label="业务线" class="is-required" style="margin-bottom: 5px">
+                <businessView
+                  ref="businessView"
+                  :currentBusiness="tempCase.business_id"
+                  :isMultiple="false"
+                ></businessView>
+              </el-form-item>
+            </el-col>
+
             <!-- 用例集选择 -->
-            <el-col :span="9">
+            <el-col :span="6">
               <el-form-item label="用例集" class="is-required" style="margin-bottom: 5px">
                 <el-select v-model="caseSetLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
@@ -44,7 +76,7 @@
             </el-col>
 
             <!-- 执行次数 -->
-            <el-col :span="5">
+            <el-col :span="6">
               <el-form-item label="执行次数" class="is-required">
                 <el-input-number v-model="tempCase.run_times" :min="1" :max="1000" controls-position="right"
                 ></el-input-number>
@@ -52,21 +84,6 @@
             </el-col>
 
           </el-row>
-
-          <el-form-item label="函数文件">
-            <funcFilesView :funcFiles="tempCase.func_files" ref="funcFilesView"></funcFilesView>
-            <el-popover
-              class="el_popover_class"
-              placement="top-start"
-              trigger="hover">
-              <div>
-                <div>1、用例下要用到自定义函数可以在这里统一引用对应的函数文件</div>
-                <div>2、此处引用的函数文件，对于当前用例下的测试步骤均有效</div>
-                <div>3、若此处引用了函数文件，服务处也引用了函数文件，则会把两边引用的合并去重</div>
-              </div>
-              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-            </el-popover>
-          </el-form-item>
 
         </el-form>
 
@@ -76,6 +93,12 @@
 
             <!-- 跳过条件 -->
             <el-tab-pane label="跳过条件" name="editSkipIf">
+              <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+                <div slot="content">
+                  任意一行设置的表达式成立，都会执行跳过操作，使用方法与断言一致，详见断言示例
+                </div>
+                <span>跳过条件</span>
+              </el-tooltip>
               <skipIfView
                 ref="skipIfView"
                 :skipIfData="tempCase.skip_if"
@@ -83,22 +106,17 @@
               ></skipIfView>
             </el-tab-pane>
 
-            <el-tab-pane label="自定义变量">
-              <!-- 使用示例 -->
-              <el-collapse accordion>
-                <el-collapse-item>
-                  <template slot="title">
-                    <div style="color:#409eff"> 点击查看说明</div>
-                  </template>
-                  <div style="margin-left: 20px">
-                    1、可用此功能设置一些预设值，比如token、账号信息 <br/>
-                    2、在此处设置的值，对于此用例下的测试步骤均可直接引用 <br/>
-                    3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
-                    5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
-                  </div>
-                </el-collapse-item>
-              </el-collapse>
+            <el-tab-pane label="自定义变量" name="editVariables">
+              <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+                <div slot="content">
+                  1、可用此功能设置一些预设值，比如token、账号信息 <br/>
+                  2、在此处设置的值，对于此用例下的测试步骤均可直接引用 <br/>
+                  3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+                  4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
+                  5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
+                </div>
+                <span>自定义变量</span>
+              </el-tooltip>
               <variablesView
                 ref="variablesView"
                 :currentData="tempCase.variables"
@@ -110,22 +128,17 @@
             </el-tab-pane>
 
             <el-tab-pane label="头部信息">
-              <!-- 使用示例 -->
-              <el-collapse accordion>
-                <el-collapse-item>
-                  <template slot="title">
-                    <div style="color:#409eff"> 点击查看说明</div>
-                  </template>
-                  <div style="margin-left: 20px">
-                    1、可用此功能设置当前用例的固定的头部参数，比如token、cookie <br/>
-                    2、在此处设置的值，在运行此用例下的测试步骤的时候，会自动加到对应的步骤的头部参数上 <br/>
-                    3、此处的value可以使用公共变量设置的值 <br/>
-                    4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    5、若在此处设置的key与服务的头部参数中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
-                    6、若在用例中，测试步骤已用相同的key设置了其他值，则会使用测试步骤中设置的值
-                  </div>
-                </el-collapse-item>
-              </el-collapse>
+              <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+                <div slot="content">
+                  1、可用此功能设置当前用例的固定的头部参数，比如token、cookie <br/>
+                  2、在此处设置的值，在运行此用例下的测试步骤的时候，会自动加到对应的步骤的头部参数上 <br/>
+                  3、此处的value可以使用公共变量设置的值 <br/>
+                  4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+                  5、若在此处设置的key与服务的头部参数中的某个key一致，则对于这个key，则会用此处设置的值 <br/>
+                  6、若在用例中，测试步骤已用相同的key设置了其他值，则会使用测试步骤中设置的值
+                </div>
+                <span>头部信息</span>
+              </el-tooltip>
               <headersView
                 ref="headersView"
                 :currentData="tempCase.headers"
@@ -147,7 +160,6 @@
           :projectId="currentProjectId || ''"
           :caseId="tempCase.id"
           :tempCase="tempCase"
-          :stepList="tempCase.steps"
         ></stepView>
       </el-tab-pane>
 
@@ -163,6 +175,11 @@
       :callBackEvent="callBackEvent"
       :event="runEvent"
     ></selectRunEnv>
+
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByDrawer"
+    ></runProcess>
 
     <div class="demo-drawer__footer">
 
@@ -197,12 +214,11 @@ import headersView from '@/components/Inputs/changeRow'
 import variablesView from '@/components/Inputs/variables'
 import stepView from '@/views/apiTest/step'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
+import businessView from '@/components/Selector/business'
 
 import {postCase, putCase, copyCase, caseRun, getCase} from "@/apis/apiTest/case";
 import {getCaseSet} from "@/apis/apiTest/caseSet";
-import {stepList} from "@/apis/apiTest/step";
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
 
 export default {
   name: 'drawer',
@@ -218,7 +234,9 @@ export default {
     headersView,
     variablesView,
     stepView,
-    selectRunEnv
+    selectRunEnv,
+    runProcess,
+    businessView
   },
   data() {
     return {
@@ -228,7 +246,7 @@ export default {
       submitLoadingIsShow: false,
       isShowDebugLoading: false,
       activeName: 'caseInFo',
-      caseInFoActiveName: 'editSkipIf',
+      caseInFoActiveName: 'editVariables',
       caseSetTree: [],
       defaultProps: {
         children: "children",
@@ -254,9 +272,9 @@ export default {
         },
         before_case: [],
         after_case: [],
+        business_id: '',
         project_id: '',
-        set_id: '',
-        steps: []  // 测试步骤
+        set_id: ''
       },
 
       runEvent: 'runCaseEventOnDialog',
@@ -278,14 +296,14 @@ export default {
       this.tempCase.variables = [{key: null, value: null, remark: null, data_type: 'str'}]
       this.tempCase.skip_if = {
         skip_type: null,
-          data_source: null,
-          check_value: null,
-          comparator: null,
-          data_type: null,
-          expect: null
+        data_source: null,
+        check_value: null,
+        comparator: null,
+        data_type: null,
+        expect: null
       }
       this.tempCase.headers = [{key: null, value: null, remark: null}]
-      this.tempCase.steps = []
+      this.tempCase.business_id = ''
       this.tempCase.project_id = this.currentProjectId || ''
       this.tempCase.set_id = this.currentSetId || ''
       this.drawerType = 'add'
@@ -295,7 +313,7 @@ export default {
     // 初始化修改用例模板
     initUpdateTempCase(currentCase) {
       this.tempCase = currentCase
-      this.getStepList()
+      // this.getStepList()
       this.drawerType = 'update'
       this.drawerIsShow = true
     },
@@ -303,12 +321,12 @@ export default {
     // 获取当前的用例数据，用于提交给后端
     getCaseDataToCommit() {
       let caseData = JSON.parse(JSON.stringify(this.tempCase))
-      caseData.set_id = this.$refs.setTree.getCheckedKeys()[0]
+      caseData.set_id = this.$refs.setTree.getCheckedKeys()[0] || this.tempCase.set_id
       caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.$refs.headersView.tempData
-      caseData.skip_if = this.$refs.skipIfView.tempSkipIf
-      caseData.steps = undefined
+      caseData.skip_if = this.$refs.skipIfView.tempData
+      caseData.business_id = this.$refs.businessView.business
       return caseData
     },
 
@@ -318,13 +336,6 @@ export default {
         this.$refs.setTree.setCheckedKeys([data.id])  // 选中
         this.caseSetLabel = data.name
       }
-    },
-
-    // 获取步骤列表
-    getStepList() {
-      stepList({'caseId': this.tempCase.id}).then(response => {
-        this.tempCase.steps = response.data
-      })
     },
 
     // 新增用例
@@ -354,18 +365,18 @@ export default {
 
     // 点击调试按钮
     clickRunDebug() {
-      this.$bus.$emit(this.runEvent, false)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
     // 保存并调试
-    debugCase(runDict) {
+    debugCase(runConf) {
       this.submitLoadingIsShow = true
       if (this.tempCase.id) {
         putCase(this.getCaseDataToCommit()).then(response => {
           this.submitLoadingIsShow = false
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.api.apiCaseDrawerCommitSuccess, 'success')
-            this.runCase(this.tempCase.id, runDict)
+            this.runCase(this.tempCase.id, runConf)
           }
         })
       } else {
@@ -374,53 +385,27 @@ export default {
           if (this.showMessage(this, response)) {
             this.tempCase.id = response.data.id
             this.$bus.$emit(this.$busEvents.api.apiCaseDrawerCommitSuccess, 'success')
-            this.runCase(this.tempCase.id, runDict)
+            this.runCase(this.tempCase.id, runConf)
           }
         })
       }
     },
 
     // 运行用例
-    runCase(caseId, runDict) {
+    runCase(caseId, runConf) {
       this.isShowDebugLoading = true
-      caseRun({caseId: [caseId], env: runDict.runEnv, is_async: runDict.runType}).then(runResponse => {
+      caseRun({
+        caseId: [caseId],
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        'trigger_type': 'page'
+      }).then(response => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询指定时间没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.isShowDebugLoading = false
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.isShowDebugLoading = false
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
-        } else {
-          this.isShowDebugLoading = false
+        this.isShowDebugLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByDrawer, response.data.report_id)
         }
       })
-    },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
     }
 
   },
@@ -437,7 +422,6 @@ export default {
         copyCase({id: currentCase.id}).then(response => {
             if (this.showMessage(this, response)) {
               this.tempCase = response.data.case
-              this.tempCase.steps = response.data.steps
               this.drawerType = 'copy'
               this.drawerIsShow = true
               this.$bus.$emit(this.$busEvents.api.apiCaseDrawerCommitSuccess, 'success')
@@ -461,8 +445,8 @@ export default {
           tempCase_variables[variable["key"]] = variable
         })
 
-        for (let key in response_variables){
-          if (!(key in tempCase_variables)){
+        for (let key in response_variables) {
+          if (!(key in tempCase_variables)) {
             this.tempCase.variables.push(response_variables[key])
             // tempCase_variables[key] = response_variables[key]
           }

@@ -124,6 +124,7 @@ export default {
       },
       user_list: [],  // 用户列表
       funcFilesList: [],
+      business_list: [],  // 业务线列表
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
       responseMessage: '',
@@ -221,7 +222,6 @@ export default {
   },
 
   mounted() {
-
     this.getFuncFileList()
 
     this.$bus.$on(this.$busEvents.api.apiShowProjectDrawer, (status, data) => {

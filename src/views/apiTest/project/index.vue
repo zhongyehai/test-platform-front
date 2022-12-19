@@ -108,7 +108,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'swagger地址'" prop="test" align="center" min-width="30%" :show-overflow-tooltip=true>
+      <el-table-column :label="'swagger地址'" prop="test" align="center" min-width="32%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
           <div v-if="scope.row.swagger">
             <span>{{ scope.row.swagger }}</span>
@@ -119,7 +119,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'最近一次拉取状态'" prop="test" align="center" min-width="20%" :show-overflow-tooltip=true>
+      <el-table-column :label="'最新拉取状态'" prop="test" align="center" min-width="10%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
           <div v-if="scope.row.last_pull_status === 0">
             <el-tag type="danger">拉取失败</el-tag>
@@ -133,13 +133,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="'负责人'" prop="id" align="center" min-width="8%">
+      <el-table-column :label="'负责人'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.manager) }}</span>
         </template>

@@ -1,5 +1,18 @@
 <template>
-  <el-table :data="tempData" stripe :show-header="false" size="mini">
+  <el-table
+    ref="dataTable"
+    :data="tempData"
+    stripe
+    :show-header="false"
+    size="mini"
+    row-key="id">
+
+    <el-table-column label="id" header-align="center" min-width="4%">
+      <template slot-scope="scope">
+        <div>{{ scope.$index + 1 }}</div>
+        <el-input v-model="scope.row.id" v-show="false"></el-input>
+      </template>
+    </el-table-column>
 
     <el-table-column label="Key" header-align="center" min-width="30%">
       <template slot-scope="scope">
@@ -15,7 +28,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="数据类型" header-align="center" min-width="15%">
+    <el-table-column label="数据类型" header-align="center" min-width="10%">
       <template slot-scope="scope">
         <el-select
           v-model="scope.row.data_type"
@@ -35,7 +48,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="备注" header-align="center" min-width="19%">
+    <el-table-column label="备注" header-align="center" min-width="20%">
       <template slot-scope="scope">
         <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc">
         </el-input>
@@ -72,6 +85,8 @@
 </template>
 
 <script>
+import Sortable from "sortablejs";
+
 export default {
   name: 'changeRow',
   props: [
@@ -83,14 +98,26 @@ export default {
   ],
   data() {
     return {
-      tempData: []
+      tempData: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
     }
   },
   methods: {
 
+    initTempData(){
+      this.tempData = []
+      for (let index in this.currentData){
+        let data = this.currentData[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
+
     // 添加一行
     addRow() {
-      this.tempData.push({key: null, value: null, remark: null, data_type: 'str'})
+      this.tempData.push({id: this.tempData.length, key: null, value: null, remark: null, data_type: 'str'})
     },
 
     // 是否显示删除按钮
@@ -99,13 +126,37 @@ export default {
     },
 
     // 删除一行
-    delRow(i) {
-      this.tempData.splice(i, 1)
-    }
+    delRow(index) {
+      this.tempData.splice(index, 1)
+    },
+
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
+    },
   },
 
-  created() {
-    this.tempData = this.currentData
+  mounted() {
+    this.initTempData()
+
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
   },
 
   watch: {
@@ -113,9 +164,9 @@ export default {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
         if (newVal) {
-          this.tempData = newVal
+          this.initTempData()
         } else {
-          this.tempData = [{key: null, value: null, remark: null, data_type: 'str'}]
+          this.tempData = [{id: 0, key: null, value: null, remark: null, data_type: 'str'}]
         }
       }
     },

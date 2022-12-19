@@ -63,7 +63,7 @@
                 type="text"
                 slot="reference"
                 icon="el-icon-video-play"
-                :loading="scope.row.isLoading"
+                :loading="scope.row.runButtonIsLoading"
                 @click="clickRunApi(scope.row)"
               ></el-button>
 
@@ -140,6 +140,11 @@
       :currentModuleId="currentModuleId"
     ></apiDrawer>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByIndex"
+    ></runProcess>
+
   </div>
 </template>
 
@@ -149,11 +154,10 @@ import Pagination from '@/components/Pagination'
 
 import apiDrawer from '@/views/apiTest/api/drawer'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {userList} from '@/apis/system/user'
 import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunTimeout} from "@/utils/getConfig";
 
 export default {
@@ -161,7 +165,8 @@ export default {
   components: {
     Pagination,
     apiDrawer,
-    selectRunEnv
+    selectRunEnv,
+    runProcess
   },
 
   // 接收父组件传参的key
@@ -227,7 +232,7 @@ export default {
 
   methods: {
 
-    renderHeader (h, {column}) {
+    renderHeader(h, {column}) {
       // 悬浮提示的文字内容
       const info = '统计有多少条用例里直接使用了此接口；被设计为用例后该用例被引用的，不纳入统计'
       return h(
@@ -279,11 +284,11 @@ export default {
       })
     },
 
-    cancelDeletePopover(row){
+    cancelDeletePopover(row) {
       this.$set(row, 'deletePopoverIsShow', false)
     },
 
-    cancelCopyPopover(api){
+    cancelCopyPopover(api) {
       this.$set(api, 'copyPopoverIsShow', false)
     },
 
@@ -314,52 +319,25 @@ export default {
     },
 
     // 点击运行接口
-    clickRunApi(row){
+    clickRunApi(row) {
       this.currentApi = row
-      this.$bus.$emit(this.runEvent, false)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
     // 运行接口
-    runApis(runData) {
-      this.$set(this.currentApi, 'isLoading', true)
+    runApis(runConf) {
+      this.$set(this.currentApi, 'runButtonIsLoading', true)
       runApi({
         'projectId': this.currentApi.project_id,
         'apis': [this.currentApi.id],
-        env: runData.runEnv
-      }).then(runResponse => {
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.$set(that.currentApi, 'isLoading', false)
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.$set(that.currentApi, 'isLoading', false)
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+        'env': runConf.runEnv,
+        'trigger_type': 'page'
+      }).then(response => {
+        this.$set(this.currentApi, 'runButtonIsLoading', false)
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByIndex, response.data.report_id)
         }
       })
-    },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      // console.log(`task.index.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
     },
 
     // 拖拽排序

@@ -9,6 +9,7 @@
         <projectTreeView
           ref="projectTree"
           :busEventClickTree="$busEvents.ui.uiProjectTreeChoiceProject"
+          :sourceType="'web_ui'"
           :busEventClickMenu="''"
           :menuName="''"
         ></projectTreeView>
@@ -41,7 +42,10 @@
 
               <el-table-column label="触发方式" align="center" min-width="10%">
                 <template slot-scope="scope">
-                  <span> {{ scope.row.trigger_type === 'pipeline' ? '流水线' : '页面' }} </span>
+                  <span> {{
+                      scope.row.trigger_type === 'pipeline' ? '流水线' :
+                        scope.row.trigger_type === 'cron' ? '定时任务' : '页面'
+                    }} </span>
                 </template>
               </el-table-column>
 
@@ -67,29 +71,14 @@
 
               <el-table-column label="是否生成" align="center" min-width="10%">
                 <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.status === 1 ? 'success' : 'warning'">
-                    {{ scope.row.status === 1 ? '已生成' : '未生成' }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-
-              <el-table-column label="是否已阅" align="center" min-width="10%">
-                <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.is_read === 1 ? 'success' : 'warning'">
-                    {{ scope.row.is_read === 1 ? '已读' : '未读'}}
+                  <el-tag size="small" :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'">
+                    {{ scope.row.process === 3 && scope.row.status === 2 ? '已生成' : '未生成' }}
                   </el-tag>
                 </template>
               </el-table-column>
 
               <el-table-column label="操作" align="center" min-width="10%">
                 <template slot-scope="scope">
-
-                  <!--下载报告-->
-<!--                  <el-button-->
-<!--                    type="text"-->
-<!--                    icon="el-icon-download"-->
-<!--                    v-show="scope.row.is_done === 1"-->
-<!--                    @click.native="downReport(scope.row.id)"></el-button>-->
 
                   <!--查看报告-->
                   <el-button

@@ -1,0 +1,211 @@
+<template>
+  <div class="app-container">
+
+    <el-button
+      class="filter-item"
+      style="float: left;margin-left: 10px"
+      type="primary"
+      size="mini"
+      @click="showAddBusinessDialog()">
+      {{ '添加业务线' }}
+    </el-button>
+
+    <el-table
+      ref="apiTree"
+      v-loading="listLoading"
+      :data="list"
+      stripe
+    >
+      <el-table-column prop="id" label="编号" align="center" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="业务线" min-width="35%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.name }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="35%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.desc }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ parseUser(scope.row.create_user) }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="操作" min-width="10%">
+        <template slot-scope="scope">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="修改"
+            placement="top-start">
+          <el-button
+            type="text"
+            icon="el-icon-edit"
+            :disabled="roles !== '2'"
+            @click.native="showAddBusinessDialog(scope.row)"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+
+    </el-table>
+
+
+    <!-- 新增/修改配置类型 -->
+    <el-drawer
+      :title=" drawerType === 'add' ? '新增业务线' : '修改业务线'"
+      size="40%"
+      :wrapperClosable="false"
+      :visible.sync="drawerIsShow"
+      :direction="direction">
+
+      <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
+
+        <el-form-item :label="'业务线名'" class="is-required">
+          <el-input v-model="tempBusiness.name" :disabled="drawerType === 'edit'" size="mini"/>
+        </el-form-item>
+
+        <el-form-item :label="'备注'">
+          <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini"/>
+        </el-form-item>
+
+      </el-form>
+      <div class="demo-drawer__footer">
+        <el-button size="mini" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          :loading="submitButtonIsLoading"
+          @click=" drawerType === 'add' ? addBusiness() : changBusiness()">
+          {{ '保存' }}
+        </el-button>
+      </div>
+    </el-drawer>
+
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="pageNum"
+      :limit.sync="pageSize"
+      @pagination="getBusinessList"
+    />
+  </div>
+</template>
+
+<script>
+import Pagination from '@/components/Pagination'
+import {businessList, postBusiness, putBusiness, deleteBusiness, getBusiness} from "@/apis/system/business";
+import {userList} from "@/apis/system/user";
+
+export default {
+  name: "index",
+  components: {
+    Pagination
+  },
+  data() {
+    return {
+      // 请求列表等待响应的状态
+      listLoading: false,
+      total: 0,
+      list: [],
+      drawerIsShow: false,
+      drawerType: '',
+      direction: 'rtl',  // 抽屉打开方式
+      submitButtonIsLoading: false,
+      tempBusiness: {
+        id: '',
+        name: '',
+        desc: ''
+      },
+      // 用户权限
+      roles: localStorage.getItem('roles'),
+      pageNum: 1,
+      pageSize: 20,
+
+      userList: [],
+      userDict: {},
+    }
+  },
+
+  methods: {
+    // 获取用户信息，同步请求
+    async getUserList(func) {
+      let response = await userList()
+      this.currentUserList = response.data.data
+      response.data.data.forEach(user => {
+        this.userDict[user.id] = user
+      })
+      if (func){
+        func()
+      }
+    },
+
+    // 解析用户
+    parseUser(userId) {
+      return this.userDict[userId].name
+    },
+
+    showAddBusinessDialog(row) {
+      if (row) {
+        this.tempBusiness = row
+        this.drawerType = 'edit'
+      } else {
+        this.tempBusiness = {name: '', desc: ''}
+        this.drawerType = 'add'
+      }
+      this.drawerIsShow = true
+    },
+
+    // 增加配置类型
+    addBusiness() {
+      this.submitButtonIsLoading = true
+      postBusiness(this.tempBusiness).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.drawerIsShow = false
+          this.getBusinessList()
+        }
+      })
+    },
+
+    // 修改配置类型
+    changBusiness() {
+      this.submitButtonIsLoading = true
+      putBusiness(this.tempBusiness).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.drawerIsShow = false
+          this.getBusinessList()
+        }
+      })
+    },
+
+    // 获取配置类型列表
+    getBusinessList() {
+      this.listLoading = true
+      businessList({'pageNum': this.pageNum, 'pageSize': this.pageSize}).then(response => {
+        this.listLoading = false
+        this.list = response.data.data
+        this.total = response.data.total
+      })
+    }
+  },
+
+  mounted() {
+    this.getUserList(this.getBusinessList)
+    // this.getBusinessList()
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

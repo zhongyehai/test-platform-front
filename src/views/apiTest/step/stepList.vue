@@ -51,7 +51,29 @@
             size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
-            @click.native="editStep(scope.row, scope.$index)"></el-button>
+            @click.native="editStep(scope.row, true)"
+          ></el-button>
+
+          <!-- 复制引用用例的步骤 -->
+          <el-popover
+            :ref="`popover-${scope.row.id}`"
+            v-if="scope.row.quote_case"
+            placement="top"
+            style="margin-right: 10px"
+            popper-class="down-popover"
+            v-model="scope.row.pullStepPopoverIsShow">
+            <p>复制此引用用例的步骤并生成新的步骤?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelPullStepPopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="pullCaseStep(scope.row)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="text"
+              icon="el-icon-bottom-left"
+              :loading="scope.row.pullIsLoading"
+            ></el-button>
+          </el-popover>
 
           <!-- 复制步骤 -->
           <el-popover
@@ -73,7 +95,7 @@
             ></el-button>
           </el-popover>
 
-          <!-- 查看用例描述 -->
+          <!-- 查看用例详情 -->
           <el-button
             v-if="scope.row.quote_case"
             slot="reference"
@@ -132,15 +154,133 @@
       </el-table-column>
     </el-table>
 
+    <!-- 引用用例详情 -->
     <el-drawer
-      title="用例描述"
+      title="用例信息"
       size="60%"
       :append-to-body="true"
       :wrapperClosable="false"
       :visible.sync="caseRemarkIsShow"
+      :before-close="beforeCloseDrawer"
       :direction="direction">
       <div class="demo-drawer__content" style="margin-left: 20px">
-        <pre class="el-collapse-item-content" style="overflow: auto">{{ caseRemarkDetail }}</pre>
+
+        <!-- 用例来源 -->
+        <div>
+          <label>用例来源:</label>
+          <div style="margin-top: 20px">
+            {{caseFromDetail}}
+            <el-button
+              v-show="caseIdList.length > 1"
+              type="primary"
+              size="mini"
+              @click="backLast()"
+            >回到上一级</el-button>
+          </div>
+        </div>
+
+        <hr style="margin-top: 20px; margin-bottom: 20px">
+
+        <!-- 用例描述 -->
+        <div>
+          <label>用例描述:</label>
+          <pre class="el-collapse-item-content" style="overflow: auto">{{ caseRemarkDetail }}</pre>
+        </div>
+
+        <hr style="margin-bottom: 20px">
+
+        <!-- 步骤列表 -->
+        <div>
+          <label>步骤列表:</label>
+          <el-table
+            ref="caseStepListTable"
+            :data="caseStepList"
+            fit
+            row-key="id"
+            highlight-current-row
+            style="width: 100%"
+          >
+            <el-table-column prop="num" label="序号" min-width="15%">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="center" label="步骤名称" min-width="35%">
+              <template slot-scope="scope">
+                <span>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="center" label="操作" min-width="30%">
+              <template slot-scope="scope">
+
+                <!-- 复制引用用例的步骤 -->
+                <el-popover
+                  :ref="`popover-${scope.row.id}`"
+                  v-if="scope.row.quote_case"
+                  placement="top"
+                  style="margin-right: 10px"
+                  popper-class="down-popover"
+                  v-model="scope.row.pullStepPopoverIsShow">
+                  <p>复制此引用用例的步骤并生成新的步骤?</p>
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="cancelPullStepPopover(scope.row)">取消</el-button>
+                    <el-button type="primary" size="mini" @click="pullCaseStep(scope.row)">确定</el-button>
+                  </div>
+                  <el-button
+                    slot="reference"
+                    type="text"
+                    icon="el-icon-bottom-left"
+                    :loading="scope.row.pullIsLoading"
+                  ></el-button>
+                </el-popover>
+
+                <!-- 复制步骤 -->
+                <el-popover
+                  :ref="scope.row.id"
+                  placement="top"
+                  style="margin-right: 10px"
+                  popper-class="down-popover"
+                  v-model="scope.row.copyStepPopoverIsShow">
+                  <p>复制此步骤并生成新的步骤?</p>
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="cancelCopyStepPopover(scope.row)">取消</el-button>
+                    <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
+                  </div>
+                  <el-button
+                    slot="reference"
+                    type="text"
+                    icon="el-icon-document-copy"
+                    :loading="scope.row.copyIsLoading"
+                  ></el-button>
+                </el-popover>
+
+                <!-- 查看用例详情 -->
+                <el-button
+                  v-if="scope.row.quote_case"
+                  slot="reference"
+                  type="text"
+                  style="margin-right: 5px"
+                  icon="el-icon-view"
+                  @click="showCaseRemark(scope.row.quote_case)"
+                ></el-button>
+
+                <!-- 查看步骤详情 -->
+                <el-button
+                  v-if="!scope.row.quote_case"
+                  slot="reference"
+                  type="text"
+                  style="margin-right: 5px"
+                  icon="el-icon-view"
+                  @click="editStep(scope.row, false)"
+                ></el-button>
+
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
       </div>
     </el-drawer>
   </div>
@@ -149,13 +289,13 @@
 <script>
 import Sortable from 'sortablejs'
 
-import {deleteStep, putStepIsRun, stepSort, stepCopy} from "@/apis/apiTest/step"
-import {getCase} from "@/apis/apiTest/case";
+import {deleteStep, putStepIsRun, stepSort, stepCopy, stepList} from "@/apis/apiTest/step"
+import {caseFrom, getCase, pullStep} from "@/apis/apiTest/case";
 
 export default {
   name: 'stepList',
   components: {},
-  props: ['caseId', 'caseStepList'],
+  props: ['caseId'],
   data() {
     return {
 
@@ -173,6 +313,9 @@ export default {
 
       direction: 'rtl',  // 抽屉打开方式
       caseRemarkDetail: '',  // 被引用用例的描述
+      caseFromDetail: '',
+      caseStepList: [],
+      caseIdList:[],  // 用于记录查看的用例的来源
       caseRemarkIsShow: false  // 是否展示被引用用例的描述
     }
   },
@@ -181,13 +324,7 @@ export default {
 
     // 新增步骤提交事件，把此步骤添加到步骤列表
     this.$bus.$on(this.$busEvents.api.apiAddStepIsCommit, (addStep) => {
-      if (Array.isArray(addStep)){
-        addStep.forEach(step => {
-          this.pushToDataList(step)
-        })
-      }else {
-        this.pushToDataList(addStep)
-      }
+      this.getStepList()
     })
 
     // 修改步骤提交事件，更改对应的步骤数据
@@ -215,22 +352,26 @@ export default {
     this.tableHeight = window.innerHeight * 0.80;
 
     // 初始化父组件传过来的步骤列表
-    this.stepList = this.caseStepList ? this.caseStepList : []
+    if (this.caseId){
+      this.getStepList()
+    }
 
-    this.oldList = this.stepList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
   },
   methods: {
 
-    // 把新加的步骤加入到列表中
-    pushToDataList(step){
-      this.stepList.push(step)
+    // 获取步骤列表
+    getStepList() {
+      this.tableIsLoading = true
+      stepList({'caseId': this.caseId}).then(response => {
+        this.stepList = response.data
 
-      this.oldList = this.stepList.map(v => v.id)
-      this.newList = this.oldList.slice()
+        this.oldList = this.stepList.map(v => v.id)
+        this.newList = this.oldList.slice()
+        this.$nextTick(() => {
+          this.setSort()
+        })
+      })
+      this.tableIsLoading = false
     },
 
     // 修改步骤的执行状态
@@ -261,35 +402,69 @@ export default {
       this.$set(row, 'copyStepPopoverIsShow', false)
     },
 
+    cancelPullStepPopover(row) {
+      this.$set(row, 'pullStepPopoverIsShow', false)
+    },
+
     // 点击编辑步骤
-    editStep(row, index) {
+    editStep(row, showSaveButton) {
       this.currentStep = row
-      this.$bus.$emit(this.$busEvents.api.apiEditStep, this.currentStep)
+      this.$bus.$emit(this.$busEvents.api.apiEditStep, this.currentStep, showSaveButton)
     },
 
     // 点击查看步骤
     showCaseRemark(caseId){
+      // 用例信息
       getCase({id:caseId}).then(response => {
-        if (this.showMessage(this, response)){
-          this.caseRemarkIsShow = true
-          this.caseRemarkDetail = response.data.desc
-        }
+        this.caseRemarkDetail = response.data.desc
       })
+
+      // 用例归属
+      caseFrom({id:caseId}).then(response => {
+        this.caseFromDetail = response.data
+      })
+
+      // 步骤列表
+      stepList({caseId:caseId}).then(response => {
+        this.caseStepList = response.data
+      })
+
+      this.caseIdList.push(caseId)
+      this.caseRemarkIsShow = true
     },
 
     // 复制步骤
     copy(row) {
       this.$set(row, 'copyStepPopoverIsShow', false)
       this.$set(row, 'copyIsLoading', true)
-      stepCopy({'id': row.id}).then(response => {
+      stepCopy({'id': row.id, 'caseId': this.caseId}).then(response => {
         this.$set(row, 'copyIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.stepList.push(response.data)
-
-          this.oldList = this.stepList.map(v => v.id)
-          this.newList = this.oldList.slice()
+          this.getStepList()
         }
       })
+    },
+
+    pullCaseStep(row){
+      this.$set(row, 'pullIsLoading', true)
+      pullStep({"current": row.id, 'caseId': this.caseId}).then(response => {
+        this.$set(row, 'pullIsLoading', false)
+        if (this.showMessage(this, response)) {
+          this.getStepList()
+        }
+      })
+    },
+
+    // 回到上一个引用
+    backLast(){
+      this.caseIdList.pop()  // 当前引用id
+      let caseId = this.caseIdList.pop()  // 上一个引用id
+      this.showCaseRemark(caseId)
+    },
+
+    beforeCloseDrawer(done){
+      this.caseIdList = []
+      done()
     },
 
     // 拖拽排序
@@ -337,17 +512,13 @@ export default {
     },
   },
   watch: {
-    'caseStepList': {
-
+    'caseId': {
       handler(newVal, oldVal) {
-        if (newVal && newVal.length > 0) {
-          this.stepList = newVal
-        } else {
+        if (newVal) {
+          this.getStepList()
+        }else {
           this.stepList = []
         }
-
-        this.oldList = this.stepList.map(v => v.id)
-        this.newList = this.oldList.slice()
       }
     }
   }

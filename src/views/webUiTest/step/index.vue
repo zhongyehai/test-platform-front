@@ -7,7 +7,6 @@
     <el-col :span="10">
       <stepListView
         ref="stepListView"
-        :caseStepList="stepList"
         :caseId="caseId"></stepListView>
     </el-col>
 
@@ -58,15 +57,12 @@ import elementList from '@/views/webUiTest/step/elementList'
 import editStepView from "@/views/webUiTest/step/editStep";
 import quoteCaseView from "@/views/webUiTest/step/quoteCase";
 
-import {postStep, stepList} from "@/apis/webUiTest/step";
-
 export default {
   name: 'index',
   props: [
     'projectId',
     'caseId',
-    'tempCase',
-    'stepList'
+    'tempCase'
   ],
   components: {
     stepListView,

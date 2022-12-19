@@ -105,6 +105,7 @@
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
+          @change="changeUrl"
           style="width: 78%;margin-right: 5px">
         </el-input>
 
@@ -116,20 +117,15 @@
 
       <!-- 头部信息 -->
       <el-tab-pane label="头部信息" name="headers">
-        <!-- 使用示例 -->
-        <el-collapse accordion>
-          <el-collapse-item>
-            <template slot="title">
-              <div style="color:#409eff"> 点击查看说明</div>
-            </template>
-            <div style="margin-left: 20px">
-              1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
-              2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
-              3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-              4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
-            </div>
-          </el-collapse-item>
-        </el-collapse>
+        <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+          <div slot="content">
+            1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
+            2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
+            3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+            4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
+          </div>
+          <span>头部信息</span>
+        </el-tooltip>
         <headersView
           ref="headersView"
           :currentData="tempApi.headers"
@@ -147,6 +143,7 @@
           :placeholder-key="'key'"
           :placeholder-value="'value'"
           :placeholder-desc="'备注'"
+          :busEvent="$busEvents.api.apiApiChangeParam"
         ></queryStringView>
       </el-tab-pane>
 
@@ -220,6 +217,11 @@
       :event="runEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByDrawer"
+    ></runProcess>
+
   </el-drawer>
 
 </template>
@@ -236,11 +238,11 @@ import bodyView from '@/components/apiBody'
 import extractsView from '@/components/Inputs/extract'
 import validatesView from '@/components/Inputs/validates'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {postApi, putApi, runApi} from '@/apis/apiTest/api'
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
 import {getModule} from "@/apis/apiTest/module";
+import {paramsListToStr} from "@/utils/parseData";
 
 export default {
   name: 'drawer',
@@ -258,7 +260,8 @@ export default {
     bodyView,
     extractsView,
     validatesView,
-    selectRunEnv
+    selectRunEnv,
+    runProcess
   },
   data() {
     return {
@@ -266,9 +269,7 @@ export default {
       drawerIsShow: false, // 抽屉是否打开
       direction: 'rtl',  // 抽屉打开方式
       drawerType: '',  // title展示创建还是编辑
-
-      // 请求方法选择组件选择的请求方法
-      methodSelectorChoiceMethod: '',
+      methodSelectorChoiceMethod: '',  // 请求方法选择组件选择的请求方法
 
       moduleTree: [],
       defaultProps: {
@@ -276,14 +277,9 @@ export default {
         label: "name"
       },
       moduleLabel: '',
-
-      // 是否展示请求接口时的等待状态
-      isShowDebugLoading: false,
-
+      isShowDebugLoading: false,  // 是否展示请求接口时的等待状态
       isShowSubmitLoading: false,
-
-      // 默认展示的tab页
-      bodyShow: 'headers',
+      bodyShow: 'headers',  // 默认展示的tab页
 
       // 接口新增/编辑临时数据
       tempApi: {
@@ -316,6 +312,33 @@ export default {
 
   methods: {
 
+    // 修改url,如果是包含了查询字符串，则自动解析
+    changeUrl(value) {
+      let queryStr = value.split("?")[1]
+
+      if (queryStr) {
+        let queryStrParam = queryStr.split("&")
+
+        let newParam = []
+        for (let i = 0; i < queryStrParam.length; i++) {
+          let param = queryStrParam[i]
+          let [key, value] = param.split("=")
+
+          if (key) {
+            newParam.push({'id': i, 'key': key, 'value': value, 'remark': null, 'data_type': 'str'})
+          }
+        }
+        if (newParam.length > 0) {
+          this.tempApi.params = newParam
+        }
+      }
+    },
+
+    // 初始化解析查询字符串参数
+    paramsToStr(paramsList){
+      this.tempApi.addr = this.tempApi.addr.split('?')[0] + paramsListToStr(paramsList)
+    },
+
     // 解析字符串为json
     strToJson(str) {
       try {
@@ -331,12 +354,6 @@ export default {
         this.$refs.moduleTree.setCheckedKeys([data.id])  // 选中
         this.moduleLabel = data.name
       }
-    },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
     },
 
     // 调试api，先保存，走数据校验，再发送请求
@@ -364,42 +381,20 @@ export default {
     },
 
     clickDebugApi() {
-      this.$bus.$emit(this.runEvent, false)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
-    runApis(runDict) {
+    runApis(runConf) {
       this.isShowDebugLoading = true
       runApi({
         'projectId': this.tempApi.project_id,
         'apis': [this.tempApi.id],
-        env: runDict.runEnv
-      }).then(runResponse => {
+        env: runConf.runEnv,
+        'trigger_type': 'page'
+      }).then(response => {
         this.isShowDebugLoading = false
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.isShowDebugLoading = false
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.isShowDebugLoading = false
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByDrawer, response.data.report_id)
         } else {
           this.isShowDebugLoading = false
         }
@@ -459,6 +454,7 @@ export default {
     // 点击修改接口时，初始化 dialog 数据
     initUpdateTempApi(api) {
       this.tempApi = api
+      this.paramsToStr(this.tempApi.params)
       this.drawerIsShow = true
     },
 
@@ -472,16 +468,16 @@ export default {
         desc: this.tempApi.desc,
         up_func: this.tempApi.up_func,
         down_func: this.tempApi.down_func,
-        addr: this.tempApi.addr,
+        addr: this.tempApi.addr.split('?')[0],
         time_out: this.tempApi.time_out,
         method: this.$refs.methodsSelectorView.tempMethod,
         headers: this.$refs.headersView.tempData,
         params: this.$refs.queryStringView.tempData,
         extracts: this.$refs.extractsView.tempData,
-        validates: this.$refs.validatesView.tempValidates,
+        validates: this.$refs.validatesView.tempData,
         // response: this.tempApi.response,
         data_type: this.$refs.bodyView.tempDataType,
-        data_form: this.$refs.bodyView.$refs.dataFormView.tempDataForm,
+        data_form: this.$refs.bodyView.$refs.dataFormView.tempData,
         data_json: json_data ? JSON.parse(json_data) : {},
         data_urlencoded: data_urlencoded ? JSON.parse(data_urlencoded) : {},
         data_text: this.$refs.bodyView.tempDataText,
@@ -520,11 +516,16 @@ export default {
     this.$bus.$on(this.callBackEvent, (runDict) => {
       this.debugApi(runDict)
     })
+
+    this.$bus.$on(this.$busEvents.api.apiApiChangeParam, (param) => {
+      this.paramsToStr(param)
+    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.callBackEvent)
+    this.$bus.$off(this.$busEvents.api.apiApiChangeParam)
     this.$bus.$off(this.$busEvents.api.apiApiDrawerStatus)
     this.$bus.$off(this.$busEvents.api.apiModuleTreeIsDone)
     this.$bus.$off(this.$busEvents.api.apiMethodSelectorChoiceMethod)

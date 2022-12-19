@@ -173,6 +173,11 @@
       :event="runEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByTree"
+    ></runProcess>
+
   </div>
 
 
@@ -182,6 +187,7 @@
 import waves from "@/directive/waves";
 import caseManage from '@/views/apiTest/case'  // 用例管理组件
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
@@ -196,7 +202,8 @@ export default {
   name: 'index',
   components: {
     caseManage,
-    selectRunEnv
+    selectRunEnv,
+    runProcess
   },
   directives: {waves},
   data() {
@@ -385,36 +392,19 @@ export default {
     showRunCaseSet(node, data) {
       this.runSetNode = node
       this.runSetData = data
-      this.$bus.$emit(this.runEvent, true)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
     // 运行用例集的用例
-    runCaseSet(runData) {
-
-      caseSetRun({'id': this.runSetData.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+    runCaseSet(runConf) {
+      caseSetRun({
+        'id': this.runSetData.id,
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        'trigger_type': 'page'
+      }).then(response => {
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByTree, response.data.report_id)
         }
       })
     },

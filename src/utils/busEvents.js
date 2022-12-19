@@ -21,6 +21,7 @@ export default {
     apiShowProjectEnvDrawer: 'apiShowProjectEnvDrawer',  // 服务环境编辑
     // 接口
     apiApiDrawerStatus: 'apiApiDrawerStatus',  // 接口抽屉的状态，新增/编辑
+    apiApiChangeParam: 'apiApiChangeParam',  //修改param参数
     apiApiDrawerCommitSuccess: 'apiApiDrawerCommitSuccess',  // 接口抽屉的提交状态
     // 用例集
     apiCaseSetTreeIsDone: 'apiCaseSetTreeIsDone',  // 用例集树组装完成事件
@@ -105,6 +106,11 @@ export default {
 
   // 缓存数据
   data: {
+    showRunProcessByIndex: 'showRunProcessByIndex',
+    showRunProcessByDrawer: 'showRunProcessByDrawer',
+    showRunProcessByTree: 'showRunProcessByTree',
+    drawerIsShow: 'drawerIsShow',
+    drawerIsCommit: 'drawerIsCommit',
     configTypeList: [], // 配置类型列表
     userDict: {},  // 用户数据
     executeTypeList: [],  // ui自动化步骤的执行方式

@@ -28,18 +28,6 @@
             </template>
           </el-table-column>
 
-<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">-->
-<!--            <template slot-scope="scope">-->
-<!--              <span>{{ parseUser(scope.row.create_user) }}</span>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
-
-<!--          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">-->
-<!--            <template slot-scope="scope">-->
-<!--              <span>{{ parseUser(scope.row.update_user) }}</span>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
-
           <el-table-column
             align="center"
             label="是否执行"
@@ -63,7 +51,7 @@
                 type="text"
                 slot="reference"
                 icon="el-icon-video-play"
-                :loading="scope.row.isShowRunLoading"
+                :loading="scope.row.runButtonIsLoading"
                 @click="clickRunCase(scope.row)"
               ></el-button>
 
@@ -133,6 +121,11 @@
       :callBackEvent="callBackEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByIndex"
+    ></runProcess>
+
     <caseDrawer
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
@@ -147,11 +140,9 @@ import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import caseDrawer from '@/views/apiTest/case/drawer'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
-// import {userList} from '@/apis/system/user'
 import {caseList, caseRun, deleteCase, putCaseIsRun, caseSort} from '@/apis/apiTest/case'
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
 import {getConfigByName} from "@/apis/config/config";
 
 export default {
@@ -159,7 +150,8 @@ export default {
   components: {
     Pagination,
     selectRunEnv,
-    caseDrawer
+    caseDrawer,
+    runProcess
   },
 
   // 接收父组件传参的key
@@ -188,8 +180,6 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-      // userList: [],
-      // userDict: {},
       dataTypeMapping:[],
       runEvent: 'runCaseEventOnIndex',
       callBackEvent: 'runCaseOnIndex'
@@ -197,19 +187,6 @@ export default {
   },
 
   methods: {
-    // 获取用户信息，同步请求
-    // async getUserList() {
-    //   let response = await userList()
-    //   this.currentUserList = response.data.data
-    //   response.data.data.forEach(user => {
-    //     this.userDict[user.id] = user
-    //   })
-    // },
-
-    // 解析用户
-    // parseUser(userId) {
-    //   return this.userDict[userId].name
-    // },
 
     // 编辑用例
     editCase(row) {
@@ -250,53 +227,26 @@ export default {
     // 点击运行用例
     clickRunCase(row) {
       this.currentCase = row
-      this.$bus.$emit(this.runEvent, false)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
     // 运行用例
-    runCase(runData) {
-      this.$set(this.currentCase, 'isShowRunLoading', true)
+    runCase(runConf) {
+      this.$set(this.currentCase, 'runButtonIsLoading', true)
       caseRun({
-        caseId: [this.currentCase.id], env: runData.runEnv, is_async: runData.runType
-      }).then(runResponse => {
-        // console.log('case.index.methods.runCase.response: ', JSON.stringify(runResponse))
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询指定时间没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.$set(that.currentCase, 'isShowRunLoading', false)
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.$set(that.currentCase, 'isShowRunLoading', false)
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
-        }else {
-          this.$set(this.currentCase, 'isShowRunLoading', false)
+        caseId: [this.currentCase.id],
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        'trigger_type': 'page'
+      }).then(response => {
+        this.$set(this.currentCase, 'runButtonIsLoading', false)
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByIndex, response.data.report_id)
         }
       })
     },
 
-    // 打开测试报告
-    openReportById(reportId) {
-      // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
-    },
+
 
     // 修改用例状态
     changeCaseIsRun(row) {

@@ -1,14 +1,20 @@
 <template>
 
   <el-table
-    :data="tempDataForm"
-    size="mini"
+    ref="dataTable"
+    :data="tempData"
     stripe
     :show-header="false"
-    style="background-color: rgb(250, 250, 250)"
-    :row-style="{'background-color': 'rgb(250, 250, 250)'}">
+    size="mini"
+    row-key="id">
+    <el-table-column label="id" header-align="center" min-width="4%">
+      <template slot-scope="scope">
+        <div>{{ scope.$index + 1 }}</div>
+        <el-input v-model="scope.row.id" v-show="false"></el-input>
+      </template>
+    </el-table-column>
 
-    <el-table-column label="Key" header-align="center" min-width="24%">
+    <el-table-column label="Key" header-align="center" min-width="20%">
       <template slot-scope="scope">
         <el-input v-model="scope.row.key" size="mini" type="textarea" autosize placeholder="key">
         </el-input>
@@ -17,14 +23,14 @@
 
     <el-table-column label="type" header-align="center" min-width="20%">
       <template slot-scope="scope">
-        <el-select v-model="scope.row.data_type" size="mini" placeholder="选择数据类型">
+        <el-select v-model="scope.row.data_type" size="mini" placeholder="选择数据类型" style="width: 100%">
           <el-option v-for="item in formDataTypes" :label="item.label" :key="item.value" :value="item.value">
           </el-option>
         </el-select>
       </template>
     </el-table-column>
 
-    <el-table-column label="Value" header-align="center" min-width="38%">
+    <el-table-column label="Value" header-align="center" min-width="30%">
       <template slot-scope="scope">
         <!-- 文件 -->
         <div v-if="scope.row.data_type === 'file'">
@@ -54,20 +60,19 @@
             :id="'data_input' + scope.$index "
             type="textarea"
             :rows=1
-            size="mini"
-            resize="none">
+            size="mini">
           </el-input>
         </div>
       </template>
     </el-table-column>
 
-    <el-table-column label="备注" header-align="center" min-width="12%">
+    <el-table-column label="备注" header-align="center" min-width="20%">
       <template slot-scope="scope">
         <el-input v-model="scope.row.remark" size="mini" type="textarea" autosize placeholder="备注"></el-input>
       </template>
     </el-table-column>
 
-    <el-table-column label="添加" header-align="center" min-width="4%">
+    <el-table-column label="操作" header-align="center" min-width="6%">
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button
@@ -77,11 +82,6 @@
             icon="el-icon-plus"
             @click.native="addRow(scope.$index)"></el-button>
         </el-tooltip>
-      </template>
-    </el-table-column>
-
-    <el-table-column label="删除" header-align="center" min-width="4%">
-      <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
           <el-button
             v-show="isShowDelButton(scope.$index)"
@@ -99,16 +99,16 @@
 
 <script>
 import {fileCheck, fileUpload, uploadAddr} from "@/apis/assist/file";
+import Sortable from "sortablejs";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: "dataForm",
   props: ['dataForm'],
   data() {
     return {
-      // form-data的类型，文本还是文件
-      // formDataTypes: ['string', 'file'],
-      formDataTypes: [{label: '字符串', value: 'string'}, {label: '文件', value: 'file'}],
-      tempDataForm: '',
+      formDataTypes: [{label: '', value: ''}],
+      tempData: [],
       fileType: 'case',
       uploadAddr: uploadAddr
     }
@@ -116,11 +116,28 @@ export default {
 
   methods: {
 
+    // 从后端获取数据类型映射
+    getDataTypeMapping(){
+      getConfigByName({'name': 'data_type_mapping'}).then(response => {
+        this.formDataTypes = JSON.parse(response.data.value)
+        this.formDataTypes.push({label: '文件', value: 'file'})
+      })
+    },
+
+    initTempData(){
+      this.tempData = []
+      for (let index in this.dataForm){
+        let data = this.dataForm[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
+
     // 上传文件到服务器
     uploadFileToServer(form) {
       fileUpload(form).then((response) => {
           if (this.showMessage(this, response)) {
-            this.tempDataForm[this.currentTempApiDataFormIndex]['value'] = response['data']  // 修改页面上的文件名
+            this.tempData[this.currentTempApiDataFormIndex]['value'] = response['data']  // 修改页面上的文件名
           }
         }
       )
@@ -159,29 +176,58 @@ export default {
 
     // 是否显示删除按钮
     isShowDelButton(index) {
-      return !(this.tempDataForm.length === 1 && index === 0)
+      return !(this.tempData.length === 1 && index === 0)
     },
 
     // 添加一行
     addRow() {
-      this.tempDataForm.push({key: null, value: null, remark: null})
+      this.tempData.push({id: this.tempData.length, key: null, value: null, remark: null})
     },
 
     // 删除一行
     delRow(index) {
-      this.tempDataForm.splice(index, 1);
+      this.tempData.splice(index, 1);
+    },
+
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
     },
   },
 
-  created() {
-    this.tempDataForm = this.dataForm
+  mounted() {
+    this.initTempData()
+    this.getDataTypeMapping()
+
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
   },
 
   watch: {
 
     'dataForm': {
       handler(newVal, oldVal) {
-        this.tempDataForm = newVal
+        if (newVal) {
+          this.initTempData()
+        } else {
+          this.tempData = [{id: 0, key: null, value: null, remark: null, data_type: 'str'}]
+        }
       }
     },
   }

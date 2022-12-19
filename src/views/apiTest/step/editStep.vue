@@ -2,7 +2,7 @@
 
   <el-drawer
     :title=" drawerType === 'update' ? '修改步骤' : '新增步骤'"
-    size="65%"
+    size="70%"
     :append-to-body="true"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
@@ -104,6 +104,15 @@
 
       <!-- 头部信息 -->
       <el-tab-pane label="头部信息" name="editHeaders">
+        <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+          <div slot="content">
+            1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
+            2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
+            3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+            4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
+          </div>
+          <span>头部信息</span>
+        </el-tooltip>
         <headersView
           ref="headersView"
           :currentData="currentStep.headers"
@@ -187,7 +196,7 @@
       </el-tab-pane>
     </el-tabs>
 
-    <div class="demo-drawer__footer">
+    <div class="demo-drawer__footer" v-show="showSaveButton">
       <el-button
         style="float: right; margin-left: 10px"
         size="mini"
@@ -197,7 +206,7 @@
       </el-button>
 
       <el-button
-        style="float: right"
+        style="float: left"
         v-show="currentStep.id"
         size="mini"
         @click="rowBackStep()"> {{ '还原步骤' }}
@@ -241,6 +250,7 @@ export default {
       drawerIsShow: false,
       drawerType: 'add',
       direction: 'rtl',  // 抽屉打开方式
+      showSaveButton: true,
       submitButtonIsLoading: false,
       putStepHostIsLoading: false,
       activeName: 'editStepInfo',
@@ -321,7 +331,7 @@ export default {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
       var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
       var data_driver = this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson
-      var skip_if = this.$refs.skipIfView.tempSkipIf
+      var skip_if = this.$refs.skipIfView.tempData
       return {
         'id': this.currentStep.id,
         "status": this.currentStep.status,
@@ -335,9 +345,9 @@ export default {
         "headers": this.$refs.headersView.tempData,
         "params": this.$refs.paramsView.tempData,
         "extracts": this.$refs.extractsView.tempData,
-        "validates": this.$refs.validatesView.tempValidates,
+        "validates": this.$refs.validatesView.tempData,
         "data_type": this.$refs.bodyView.tempDataType,
-        "data_form": this.$refs.bodyView.$refs.dataFormView.tempDataForm,
+        "data_form": this.$refs.bodyView.$refs.dataFormView.tempData,
         "data_json": json_data ? JSON.parse(json_data) : {},
         "data_urlencoded": data_urlencoded ? JSON.parse(data_urlencoded) : {},
         "data_text": this.$refs.bodyView.tempDataText,
@@ -426,7 +436,7 @@ export default {
     })
 
     // 编辑步骤
-    this.$bus.$on(this.$busEvents.api.apiEditStep, (step) => {
+    this.$bus.$on(this.$busEvents.api.apiEditStep, (step, showSaveButton) => {
       // 获取接口的地址和请求方法
       getApi({id: step.api_id}).then(response => {
         this.$set(this.currentStep, 'addr', response.data.addr)
@@ -443,6 +453,7 @@ export default {
       this.currentStepCopy = JSON.parse(JSON.stringify(step))  // 深拷贝
       this.drawerType = 'update'
       this.drawerIsShow = true
+      this.showSaveButton = showSaveButton
     })
 
     // 打开用例caseDialog的时候，初始化步骤编辑栏，定位到步骤信息栏

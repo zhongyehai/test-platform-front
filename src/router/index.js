@@ -118,7 +118,7 @@ export const constantRoutes = [
         path: 'api',
         name: 'apiApi',
         component: () => import('@/views/apiTest/module/index'),
-        meta: {title: '接口管理', icon: 'el-icon-s-order'}
+        meta: {title: '接口管理', icon: 'el-icon-rank'}
       },
       {
         path: 'case',
@@ -209,50 +209,51 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/appUiTest/project',
     name: 'AppUiTest',
-    meta: {title: 'appUi自动化', icon: 'el-icon-connection'},
+    meta: {title: 'app自动化', icon: 'el-icon-mobile'},
     children: [
+      {
+        path: 'env',
+        name: 'AppUiEnv',
+        component: () => import('@/views/appUiTest/env/index'),
+        meta: {title: '运行环境', icon: 'el-icon-monitor'}
+      },
       {
         path: 'project',
         name: 'AppUiProject',
         component: () => import('@/views/appUiTest/project/index'),
-        meta: {title: 'appUi自动化', icon: 'el-icon-folder-opened'}
+        meta: {title: 'app管理', icon: 'el-icon-folder-opened'}
       },
-      // {
-      //   path: 'page',
-      //   name: 'uiPage',
-      //   component: () => import('@/views/uiTest/module/index'),
-      //   meta: {title: '页面管理', icon: 'el-icon-s-operation'}
-      // },
-      // {
-      //   path: 'case',
-      //   name: 'uiCase',
-      //   component: () => import('@/views/uiTest/caseSet/index'),
-      //   meta: {title: '用例管理', icon: 'el-icon-tickets'}
-      // },
-      // {
-      //   path: 'task',
-      //   name: 'uiTask',
-      //   component: () => import('@/views/uiTest/task/index'),
-      //   meta: {title: '任务管理', icon: 'el-icon-date'}
-      // },
-      // {
-      //   path: 'reportShow',
-      //   name: 'uiReportShow',
-      //   hidden: true,
-      //   meta: {title: '查看测试报告', icon: 'form'},
-      //   component: () => import('@/views/uiTest/report/show')
-      // },
-      // {
-      //   path: 'report',
-      //   name: 'uiReport',
-      //   meta: {title: '测试报告', icon: 'el-icon-s-data'},
-      //   component: () => import('@/views/uiTest/report/index')
-      // },
-      // {
-      //   path: 'http://localhost:8024/api/uiTest/swagger',
-      //   name: 'uiTestSwagger',
-      //   meta: {title: 'swagger', icon: 'el-icon-document'}
-      // },
+      {
+        path: 'page',
+        name: 'AppUiPage',
+        component: () => import('@/views/appUiTest/module/index'),
+        meta: {title: '页面管理', icon: 'el-icon-s-operation'}
+      },
+      {
+        path: 'case',
+        name: 'AppUiCase',
+        component: () => import('@/views/appUiTest/caseSet/index'),
+        meta: {title: '用例管理', icon: 'el-icon-tickets'}
+      },
+      {
+        path: 'task',
+        name: 'AppUiTask',
+        component: () => import('@/views/appUiTest/task/index'),
+        meta: {title: '任务管理', icon: 'el-icon-date'}
+      },
+      {
+        path: 'reportShow',
+        name: 'AppUiReportShow',
+        hidden: true,
+        meta: {title: '查看测试报告', icon: 'form'},
+        component: () => import('@/views/appUiTest/report/show')
+      },
+      {
+        path: 'report',
+        name: 'AppUiReport',
+        meta: {title: '测试报告', icon: 'el-icon-s-data'},
+        component: () => import('@/views/appUiTest/report/index')
+      }
     ]
   },
 
@@ -269,6 +270,18 @@ export const constantRoutes = [
         name: 'apiFuncFile',
         component: () => import('@/views/assist/funcFile/index'),
         meta: {title: '函数文件', icon: 'el-icon-help'}
+      },
+      {
+        path: 'hit',
+        name: 'Hit',
+        component: () => import('@/views/assist/hits'),
+        meta: {title: '触发问题', icon: 'el-icon-circle-close'}
+      },
+      {
+        path: 'callBack',
+        name: 'CallBack',
+        component: () => import('@/views/assist/callBack'),
+        meta: {title: '回调记录', icon: 'el-icon-refresh'}
       },
       {
         path: 'file',
@@ -379,6 +392,7 @@ export const constantRoutes = [
       {
         path: 'examination',
         name: 'Examination',
+        hidden: true,
         component: () => import('@/views/tools/examination'),
         meta: {title: '征信考试', icon: 'form'}
       },
@@ -387,6 +401,12 @@ export const constantRoutes = [
         name: 'MakeUserInfo',
         component: () => import('@/views/tools/makeUserInfo'),
         meta: {title: '生成用户信息', icon: 'el-icon-s-unfold'}
+      },
+      {
+        path: 'makeUserInfo1',
+        name: 'MakeUserInfo1',
+        component: () => import('@/views/tools/makeUserInfo'),
+        meta: {title: '生成用户信息1', icon: 'el-icon-s-unfold'}
       }
     ]
   },
@@ -397,19 +417,26 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/manage/user',
     name: 'Manage',
-    meta: {title: '系统管理', icon: 'el-icon-s-custom', roles: [2, '2']},
+    hidden: localStorage.getItem('roles') !== '2',  // 非管理员直接隐藏菜单
+    meta: {title: '系统管理', icon: 'el-icon-s-management', roles: [2, '2']},
     children: [
       {
-        path: 'user',
-        name: 'User',
-        component: () => import('@/views/users/user/index'),
-        meta: {title: '用户管理', icon: 'el-icon-user-solid', roles: [2, '2']}
+        path: 'business',
+        name: 'Business',
+        meta: {title: '业务线管理', icon: 'el-icon-s-operation', roles: [2, '2']},
+        component: () => import('@/views/users/business/index')
       },
       {
         path: 'role',
         name: 'Role',
         component: () => import('@/views/users/role/index'),
         meta: {title: '权限管理', icon: 'el-icon-user', roles: [2, '2']}
+      },
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/users/user/index'),
+        meta: {title: '用户管理', icon: 'el-icon-user-solid', roles: [2, '2']}
       },
       {
         path: 'errorRecord',
@@ -426,15 +453,24 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/help/gitee',
     name: 'Help',
+    hidden: true,
     meta: {title: '帮助', icon: 'el-icon-document'},
     children: [
       {
+        hidden: true,
         path: 'https://gitee.com/Xiang-Qian-Zou/api-test-api/blob/master/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
         meta: {title: '操作手册：gitee', icon: 'el-icon-document'}
       },
       {
+        hidden: true,
         path: 'https://github.com/zhongyehai/api-test-api/blob/main/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
         meta: {title: '操作手册：GitHub', icon: 'el-icon-document'}
+      },
+      {
+        path: 'debug',
+        name: 'Debug',
+        component: () => import('@/views/debug/index'),
+        meta: {title: '调试页面'}
       },
     ]
   },

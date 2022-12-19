@@ -12,7 +12,10 @@
     </div>
 
     <div v-show="tempDataType === 'form'">
-      <dataFormView :data-form="tempDataForm" ref="dataFormView"></dataFormView>
+      <dataFormView
+        ref="dataFormView"
+        :data-form="tempDataForm"
+      ></dataFormView>
     </div>
 
     <div v-show="tempDataType === 'urlencoded'">
@@ -103,15 +106,6 @@ export default {
   props: ['dataType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'],
   data() {
     return {
-      // form-data的类型，文本还是文件
-      formDataTypes: ['string', 'file'],
-
-      // form-data 的 空数据格式
-      formDataFormat: {key: null, data_type: null, remark: null, value: null},
-
-      // 当前上传文件的数据的索引值，上传文件后直接修改
-      currentTempApiDataFormIndex: '',
-
       tempDataType: 'json',
       tempDataJson: {},
       tempDataForm: '',
@@ -144,17 +138,7 @@ export default {
     this.tempDataText = this.dataText || null
   },
 
-  methods: {
-
-    // 格式化json字符串
-    formatDataToJson() {
-      try {
-        this.tempDataJson = JSON.stringify(JSON.parse(this.$refs.dataJsonView.tempDataJson), null, 4)
-      } catch (err) {
-        this.$notify.error('json格式错误')
-      }
-    },
-  },
+  methods: {},
   watch: {
 
     'dataType': {

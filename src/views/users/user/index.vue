@@ -183,6 +183,14 @@
           <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改"/>
         </el-form-item>
 
+        <el-form-item :label="'业务线'" class="is-required" size="mini">
+          <businessView
+            ref="businessView"
+            :currentBusiness="tempUser.business_id"
+            :isMultiple="true"
+          ></businessView>
+        </el-form-item>
+
         <el-form-item :label="'角色'" class="is-required" size="mini">
           <el-select v-model="tempUser.role_id" placeholder="请选择角色" style="width:100%">
             <el-option
@@ -210,14 +218,20 @@
 </template>
 
 <script>
-import {userList, deleteUser, postUser, putUser, getUser, userStatus} from '@/apis/system/user'
-import {roleList} from '@/apis/system/role'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
+import businessView from '@/components/Selector/business'
+
+import {userList, deleteUser, postUser, putUser, getUser, userStatus} from '@/apis/system/user'
+import {roleList} from '@/apis/system/role'
+import {businessList} from '@/apis/system/business'
 
 export default {
   name: 'index',
-  components: {Pagination},
+  components: {
+    Pagination,
+    businessView
+  },
   directives: {waves},
   data() {
     return {
@@ -238,6 +252,7 @@ export default {
         name: undefined,
         account: undefined,
         role_id: undefined,
+        business_id: [],
         password: undefined,
       },
 
@@ -247,6 +262,7 @@ export default {
       user_list: [],  // 用户列表
       role_list: [{'id': 1, name: '启用'}, {'id': 2, name: '冻结'}],  // 角色列表
       status_list: [],  // 状态列表
+      business_list: [],  // 业务线列表
       tableKey: 0,  // 服务数据表格起始
       total: 0,  // 服务数据表格总条数
       drawerIsShow: false,  // 编辑框的显示状态
@@ -257,15 +273,18 @@ export default {
   },
 
   created() {
+    this.getBusinessList()
     this.getAllUserList(this.getUserList)
     this.initStatus()  // 初始化用户状态
     this.getRoleList()  // 初始化角色列表
     // this.getUserList()  // 初始化用户列表
     this.initTempUser()  // 初始化临时数据
   },
+
   mounted() {
 
   },
+
   methods: {
 
     // 获取所有用户信息，同步请求
@@ -297,7 +316,8 @@ export default {
         name: undefined,
         account: undefined,
         password: undefined,
-        role_id: undefined
+        role_id: undefined,
+        business_id: []
       }
     },
 
@@ -316,6 +336,7 @@ export default {
       this.tempUser.account = row.account
       this.tempUser.password = row.password
       this.tempUser.role_id = row.role_id
+      this.tempUser.business_id = row.business_id
       this.drawerIsShow = true
     },
 
@@ -329,6 +350,13 @@ export default {
         create_user: undefined, // 创建人
       }
       this.getUserList()
+    },
+
+    // 获取业务线列表
+    getBusinessList() {
+      businessList().then(response => {
+        this.business_list = response.data.data
+      })
     },
 
     // 获取角色列表
@@ -350,6 +378,7 @@ export default {
     // 新增用户
     addUser() {
       this.submitButtonIsLoading = true
+      this.tempUser.business_id = this.$refs.businessView.business
       postUser(this.tempUser).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
@@ -363,6 +392,7 @@ export default {
     // 修改用户
     changUser() {
       this.submitButtonIsLoading = true
+      this.tempUser.business_id = this.$refs.businessView.business
       putUser(this.tempUser).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {

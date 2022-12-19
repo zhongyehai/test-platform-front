@@ -37,6 +37,7 @@
                 <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
               </el-popover>
             </el-form-item>
+
           </el-form>
         </div>
 
@@ -78,6 +79,7 @@ import funcFileView from '@/components/Selector/funcFile'
 
 import {postProject, putProject} from '@/apis/webUiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
+import {businessList} from "@/apis/system/business";
 
 export default {
   name: 'drawer',
@@ -103,6 +105,7 @@ export default {
       },
       user_list: [],  // 用户列表
       funcFilesList: [],
+      business_list: [],  // 业务线列表
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
       responseMessage: '',
@@ -111,6 +114,14 @@ export default {
   },
 
   methods: {
+
+    // 获取业务线列表
+    getBusinessList() {
+      businessList().then(response => {
+        this.business_list = response.data.data
+      })
+    },
+
     // 关闭dialog
     closeDialog(done) {
       this.dialogIsShow = false  // 关闭dialog
@@ -196,7 +207,6 @@ export default {
   },
 
   mounted() {
-
     this.getFuncFileList()
 
     this.$bus.$on(this.$busEvents.ui.uiShowApiProjectDrawer, (status, data) => {

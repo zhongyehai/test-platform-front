@@ -7,8 +7,8 @@
     <el-col :span="10">
       <stepListView
         ref="stepListView"
-        :caseStepList="stepList"
-        :caseId="caseId"></stepListView>
+        :caseId="caseId">
+      </stepListView>
     </el-col>
 
     <!-- 添加步骤/引用用例 -->
@@ -63,8 +63,7 @@ export default {
   props: [
     'projectId',
     'caseId',
-    'tempCase',
-    'stepList'
+    'tempCase'
   ],
   components: {
     stepListView,

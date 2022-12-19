@@ -1,6 +1,6 @@
 <template>
   <el-drawer
-    :title="tempEnv.id ? '修改环境' : '新增服务'"
+    :title="tempEnv.id ? '修改环境' : '新增环境'"
     size="70%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
@@ -34,7 +34,7 @@
         <el-tabs style="margin-left: 20px">
           <!-- 公用变量 -->
           <el-tab-pane label="自定义变量">
-            <el-tooltip class="item" effect="dark" placement="top-end">
+            <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
               <div slot="content">
                 1、可用此功能设置一些预设值，比如token、账号信息 <br/>
                 2、在此处设置的值，对于此服务下的接口、用例均可直接引用 <br/>
@@ -42,32 +42,36 @@
                 4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
                 5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
               </div>
-              <variablesView
-                :currentData="tempEnv.variables"
-                :dataTypeMapping="dataTypeMapping"
-                :placeholderKey="'key'"
-                :placeholderValue="'value'"
-                :placeholderDesc="'备注'"
-              ></variablesView>
+              <span>自定义变量</span>
             </el-tooltip>
+            <variablesView
+              ref="variablesView"
+              :currentData="tempEnv.variables"
+              :dataTypeMapping="dataTypeMapping"
+              :placeholderKey="'key'"
+              :placeholderValue="'value'"
+              :placeholderDesc="'备注'"
+            ></variablesView>
           </el-tab-pane>
 
           <!-- 头部信息 -->
           <el-tab-pane label="头部信息">
-            <el-tooltip class="item" effect="dark" placement="top-end">
+            <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
               <div slot="content">
                 1、可用此功能设置当前服务的固定的头部参数，比如token、cookie <br/>
                 2、在此处设置的值，在运行此服务下的接口、用例的时候，会自动加到对应的接口/步骤的头部参数上 <br/>
                 3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
                 4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
               </div>
-              <headersView
-                :currentData="tempEnv.headers"
-                :placeholderKey="'key'"
-                :placeholderValue="'value'"
-                :placeholderDesc="'备注'"
-              ></headersView>
+              <span>头部信息</span>
             </el-tooltip>
+            <headersView
+              ref="headersView"
+              :currentData="tempEnv.headers"
+              :placeholderKey="'key'"
+              :placeholderValue="'value'"
+              :placeholderDesc="'备注'"
+            ></headersView>
           </el-tab-pane>
         </el-tabs>
 
@@ -155,6 +159,8 @@ export default {
     saveEnv() {
       this.submitButtonIsLoading = true
       this.tempEnv.env = this.currentEnv
+      this.tempEnv.variables = this.$refs.variablesView.tempData
+      this.tempEnv.headers = this.$refs.headersView.tempData
       putProjectEnv(this.tempEnv).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {

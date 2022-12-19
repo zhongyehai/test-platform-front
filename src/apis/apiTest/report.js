@@ -32,3 +32,7 @@ export function reportIsDone(params) {
   return request({url: currentBaseDir + '/status', method: 'get', data: null, params: params})
 }
 
+// 报告详情
+export function reportDetail(params) {
+  return request({url: currentBaseDir + '/detail', method: 'get', data: null, params: params})
+}

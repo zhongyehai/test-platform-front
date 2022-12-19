@@ -1,6 +1,6 @@
 <template>
   <el-drawer
-    :title="tempEnv.id ? '修改环境' : '新增服务'"
+    :title="tempEnv.id ? '修改环境' : '新增环境'"
     size="70%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
@@ -52,6 +52,7 @@
             </el-collapse>
 
             <variablesView
+              ref="variablesView"
               :currentData="tempEnv.variables"
               :dataTypeMapping="dataTypeMapping"
               :placeholderKey="'key'"
@@ -140,6 +141,7 @@ export default {
     // 保存环境设置
     saveEnv() {
       this.tempEnv.env = this.currentEnv
+      this.tempEnv.variables = this.$refs.variablesView.tempData
       this.submitButtonIsLoading = true
       putProjectEnv(this.tempEnv).then(response => {
         this.submitButtonIsLoading = false

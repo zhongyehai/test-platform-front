@@ -62,7 +62,18 @@ export function copyCaseStep(data) {
   return request({url: currentBaseDir + '/copy/step', method: 'post', data: data});
 }
 
+// 拉取用例的步骤
+export function pullStep(data) {
+  return request({url: currentBaseDir + '/pull/step', method: 'post', data: data});
+}
+
 // 修改用例排序
 export function caseSort(data) {
   return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+}
+
+
+// 获取用例的来源
+export function caseFrom(params) {
+  return request({url: currentBaseDir + '/from', method: 'get', params: params});
 }

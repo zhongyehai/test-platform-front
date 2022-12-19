@@ -214,7 +214,7 @@
         </el-tab-pane>
       </el-tabs>
 
-      <div class="demo-drawer__footer">
+      <div class="demo-drawer__footer" v-show="showSaveButton">
 
         <el-button
           v-show="activeName === 'element'"
@@ -236,7 +236,7 @@
 
         <el-button
           v-show="activeName !== 'element' && currentStep.id"
-          style="float: right"
+          style="float: left"
           size="mini"
           @click="rowBackStep()"> {{ '还原步骤' }}
         </el-button>
@@ -284,6 +284,7 @@ export default {
     return {
       drawerIsShow: false,
       direction: 'rtl',  // 抽屉打开方式
+      showSaveButton: true,
       submitButtonIsLoading: false,
       activeName: 'editStepInfo',
       currentStepCopy: {},
@@ -349,7 +350,6 @@ export default {
     },
 
     getStepForCommit() {
-      var skip_if = this.$refs.skipIfView.tempSkipIf
       return {
         'id': this.currentStep.id,
         "status": this.currentStep.status,
@@ -357,12 +357,12 @@ export default {
         "wait_time_out": this.currentStep.wait_time_out,
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
-        "skip_if": skip_if,
+        "skip_if": this.$refs.skipIfView.tempData,
         "run_times": this.currentStep.run_times,
         "execute_type": this.currentStep.execute_type,
         "send_keys": this.currentStep.send_keys,
         "extracts": this.$refs.extractsView.tempData,
-        "validates": this.$refs.validatesView.tempValidates,
+        "validates": this.$refs.validatesView.tempData,
         "quote_case": null,
         "case_id": this.currentStep.case_id,
         "element_id": this.currentElement.id,
@@ -424,7 +424,7 @@ export default {
   mounted() {
 
     // 新增步骤（把元素转为步骤）
-    this.$bus.$on(this.$busEvents.ui.uiShowStepDrawer, (type, step) => {
+    this.$bus.$on(this.$busEvents.ui.uiShowStepDrawer, (type, step, showSaveButton) => {
       this.currentElement = step
 
       if (type === 'add') {  // 新增步骤
@@ -445,6 +445,7 @@ export default {
         this.currentStep.page_id = this.currentElement.page_id
         this.currentStep.element_id = this.currentElement.id
         this.drawerIsShow = true
+        this.showSaveButton = true
 
       } else if (type === 'update') {  // 修改步骤
 
@@ -466,6 +467,7 @@ export default {
         this.currentStep = step
         this.currentStepCopy = JSON.parse(JSON.stringify(step))  // 深拷贝
         this.drawerIsShow = true
+        this.showSaveButton = showSaveButton
       }
 
       // 获取当前步骤对应元素所在页面的所有元素

@@ -49,7 +49,9 @@
                   ref="environmentSelectorView"
                 ></environmentSelectorView>
                 <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                  <div>触发次定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名</div>
+                  <div>
+                    触发此定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名
+                  </div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
                 </el-popover>
               </el-form-item>
@@ -73,8 +75,14 @@
                   type="textarea"
                   size="mini"
                   autosize
+                  style="width: 95%"
                   v-model="tempTask.we_chat"
-                  placeholder="企业微信机器人地址"></el-input>
+                  placeholder="企业微信机器人地址, 若要回调多个地址，使用英文的分号隔开（';'）"
+                ></el-input>
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>若要回调多个地址，使用英文的分号隔开（';'）</div>
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popover>
               </el-form-item>
             </div>
             <div v-show="tempTask.send_type === 'ding_ding'">
@@ -83,8 +91,14 @@
                   type="textarea"
                   size="mini"
                   autosize
+                  style="width: 95%"
                   v-model="tempTask.ding_ding"
-                  placeholder="钉钉机器人地址"></el-input>
+                  placeholder="钉钉机器人地址, 若要回调多个地址，使用英文的分号隔开（';'）"
+                ></el-input>
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>若要回调多个地址，使用英文的分号隔开（';'）</div>
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popover>
               </el-form-item>
             </div>
             <div v-show="tempTask.send_type === 'email'">
@@ -133,7 +147,8 @@
             <el-radio
               v-model="tempTask.is_async"
               :label="parseInt(key)" v-for="(value, key) in runModeData" :key="key">
-              {{ value }}</el-radio>
+              {{ value }}
+            </el-radio>
             <el-popover class="el_popover_class" placement="top-start" trigger="hover">
               <div>1、串行执行: 用例一条一条顺序串行执行</div>
               <div>2、并行执行: 每条用例一个线程并行执行</div>
@@ -143,33 +158,26 @@
           </el-form-item>
 
           <el-form-item label="回调流水线" size="mini">
-            <el-input
-              type="textarea"
-              size="mini"
-              autosize
-              v-model="tempTask.call_back"
-              style="width: 98%"
-              placeholder='[
-            {
-              "url": "https://xxx",
-              "method": "post",
-              "headers": {
-                "token": "xxx"
-              },
-              "json": {
-                "status": "$status"
-              }
-            }
-          ]'></el-input>
-            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-              <div>1、用于回调流水线自动化测试的执行结果，流水线根据结果判断是否往下走</div>
-              <div>2、json参数的$status会被替换为运行结果，全部通过为true，否则为false</div>
-              <div>3、请严格按照示例填写内容，否则回调会不成功</div>
-              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-            </el-popover>
+            <el-row>
+              <el-col :span="23">
+                <jsonEditorView
+                  ref="jsonEditorView"
+                  :dataJson="tempTask.call_back"
+                ></jsonEditorView>
+              </el-col>
+              <el-col :span="1">
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>1、用于回调流水线自动化测试的执行结果，流水线根据结果判断是否往下走</div>
+                  <div>2、json参数会添加参数：status=运行结果，全部通过为true，否则为false</div>
+                  <div>3、json参数会添加参数：taskId=任务id</div>
+                  <div>4、json参数会添加参数extend字段，来源于触发请求时传的extend字段，接收的什么就返回什么</div>
+                  <div>5、请严格按照示例填写内容，否则回调会不成功</div>
+                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                </el-popover>
+              </el-col>
+            </el-row>
           </el-form-item>
         </el-tab-pane>
-
 
         <el-tab-pane label="配置任务用例" name="case">
           <!-- 使用示例 -->
@@ -256,6 +264,11 @@
       :event="runEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByDrawer"
+    ></runProcess>
+
     <div class="demo-drawer__footer">
       <el-button
         slot="reference"
@@ -282,7 +295,9 @@
 <script>
 import environmentSelectorView from "@/components/Selector/environment";
 import emailServerSelector from "@/components/Selector/email";
+import jsonEditorView from "@/components/jsonView";
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {postTask, putTask, runTask} from '@/apis/apiTest/task'
 import {caseSetList} from "@/apis/apiTest/caseSet";
@@ -297,7 +312,9 @@ export default {
   components: {
     environmentSelectorView,
     emailServerSelector,
-    selectRunEnv
+    selectRunEnv,
+    runProcess,
+    jsonEditorView
   },
   data() {
     return {
@@ -314,7 +331,16 @@ export default {
       submitButtonIsLoading: false,
       drawerIsShow: false,
       isShowDebugLoading: false,
-      tempTask: {},
+      tempTask: {
+        call_back: [
+          {
+            "url": "https://xxx",
+            "method": "post",
+            "headers": {},
+            "json": {}
+          }
+        ]
+      },
 
       projectLists: '',  // 服务列表
       projectSelectedId: '',  // 服务选择框选择的服务id
@@ -326,18 +352,14 @@ export default {
       runModeData: {},
       runEvent: 'runTaskEventOnDialog',
       callBackEvent: 'runTaskOnDialog',
-      callBackPlaceholder: JSON.stringify([
+      callBackPlaceholder: [
         {
           "url": "https://xxx",
           "method": "post",
-          "headers": {
-            "token": "xxx"
-          },
-          "json": {
-            "status": "$status"
-          }
+          "headers": {},
+          "json": {}
         }
-      ])
+      ]
     }
   },
   methods: {
@@ -445,7 +467,6 @@ export default {
 
     // 获取当前数据，用于提交
     getTaskToCommit() {
-      const call_back = this.tempTask.call_back ? JSON.parse(this.tempTask.call_back) : null
       return {
         id: this.tempTask.id,
         num: this.tempTask.num,
@@ -462,7 +483,7 @@ export default {
         email_to: this.tempTask.email_to,
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
-        call_back: call_back,
+        call_back: JSON.parse(this.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson),
         project_id: this.tempTask.project_id,
         set_ids: this.$refs.setTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids,
@@ -499,17 +520,17 @@ export default {
     },
 
     // 点击调试按钮
-    clickRunDebug(){
-      this.$bus.$emit(this.runEvent, true, this.tempTask.env)
+    clickRunDebug() {
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
-    debugTask(runData) {
+    debugTask(runConf) {
       this.submitButtonIsLoading = true
       if (this.tempTask.id) {
         putTask(this.getTaskToCommit()).then(response => {
           this.submitButtonIsLoading = false
           if (this.showMessage(this, response)) {
-            this.run(this.tempTask.id, runData)
+            this.run(this.tempTask.id, runConf)
           }
         })
       } else {
@@ -517,7 +538,7 @@ export default {
           this.submitButtonIsLoading = false
           if (this.showMessage(this, response)) {
             this.tempTask.id = response.data.id
-            this.run(this.tempTask.id, runData)
+            this.run(this.tempTask.id, runConf)
           }
         })
       }
@@ -525,44 +546,20 @@ export default {
 
 
     // 运行任务
-    run(taskId, runData) {
+    run(taskId, runConf) {
       this.isShowDebugLoading = true
-      runTask({id: taskId, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.isShowDebugLoading = false
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.isShowDebugLoading = false
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+      runTask({
+        id: taskId,
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        'trigger_type': 'page'
+      }).then(response => {
+        this.isShowDebugLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByDrawer, response.data.report_id)
         }
       })
     },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
-    }
 
   },
 
@@ -585,7 +582,7 @@ export default {
     this.$bus.$on(this.$busEvents.api.apiTaskDrawerIsShow, (status, taskOrProject) => {
       if (status === 'update') {  // 修改
         this.tempTask = taskOrProject
-        this.tempTask.call_back = taskOrProject.call_back ? JSON.stringify(taskOrProject.call_back) : null
+        this.tempTask.call_back = taskOrProject.call_back || this.callBackPlaceholder
       } else {  // 新增
         this.initNewTask()
         this.tempTask.project_id = taskOrProject.id

@@ -61,18 +61,6 @@
                 </template>
               </el-table-column>
 
-<!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="9%">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <span>{{ parseUser(scope.row.create_user) }}</span>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
-
-<!--              <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="最后修改人" min-width="12%">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <span>{{ parseUser(scope.row.update_user) }}</span>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
-
               <el-table-column label="操作" align="center" min-width="16%">
                 <template slot-scope="scope">
 
@@ -154,6 +142,11 @@
       :event="runEvent"
     ></selectRunEnv>
 
+    <runProcess
+      :runType="'api'"
+      :busName="$busEvents.data.showRunProcessByIndex"
+    ></runProcess>
+
     <taskDrawer></taskDrawer>
   </div>
 </template>
@@ -164,16 +157,16 @@ import projectTreeView from '@/components/Trees/projectTree'
 import Pagination from '@/components/Pagination'
 import taskDrawer from "@/views/apiTest/task/drawer";
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/apiTest/task'
-// import {userList} from "@/apis/system/user";
 import {reportIsDone} from "@/apis/apiTest/report";
 import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
 export default {
   name: "index",
-  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv},
+  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess},
   data() {
     return {
       tableLoadingIsShow: false,
@@ -199,19 +192,6 @@ export default {
 
 
   methods: {
-    // 获取用户信息，同步请求
-    // async getUserList() {
-    //   let response = await userList()
-    //   this.currentUserList = response.data.data
-    //   response.data.data.forEach(user => {
-    //     this.userDict[user.id] = user
-    //   })
-    // },
-
-    // 解析用户
-    // parseUser(userId) {
-    //   return this.userDict[userId].name
-    // },
 
     // 进入编辑
     editTask(row) {
@@ -220,11 +200,11 @@ export default {
       }
     },
 
-    cancelCopyPopover(task){
+    cancelCopyPopover(task) {
       this.$set(task, 'copyPopoverIsShow', false)
     },
 
-    cancelDeletePopover(task){
+    cancelDeletePopover(task) {
       this.$set(task, 'deletePopoverIsShow', false)
     },
 
@@ -242,49 +222,25 @@ export default {
     },
 
     // 点击运行任务
-    clickRunTask(task){
+    clickRunTask(task) {
       this.currentTask = task
-      this.$bus.$emit(this.runEvent, true, task.env)
+      this.$bus.$emit(this.runEvent, 'api')
     },
 
     // 运行任务
-    run(runData) {
+    run(runConf) {
       this.$set(this.currentTask, 'runButtonIsLoading', true)
-      runTask({id: this.currentTask.id, env: runData.runEnv, is_async: runData.runType}).then(runResponse => {
-        if (this.showMessage(this, runResponse)) {
-
-          // 触发运行成功，每三秒查询一次，
-          // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-          // 已出结果，则停止查询，展示测试报告
-          var that = this
-          // 初始化运行超时时间
-          var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-          var queryCount = 1
-          var timer = setInterval(function () {
-            if (queryCount <= runTimeoutCount) {
-              reportIsDone({'id': runResponse.data.report_id}).then(queryResponse => {
-                if (queryResponse.data === 1) {
-                  that.$set(that.currentTask, 'runButtonIsLoading', false)
-                  that.openReportById(runResponse.data.report_id)
-                  clearInterval(timer)  // 关闭定时器
-                }
-              })
-              queryCount += 1
-            } else {
-              that.$set(that.currentTask, 'runButtonIsLoading', false)
-              that.$notify(runTestTimeOutMessage(that));
-              clearInterval(timer)  // 关闭定时器
-            }
-          }, 3000)
+      runTask({
+        id: this.currentTask.id,
+        env: runConf.runEnv,
+        is_async: runConf.runType,
+        'trigger_type': 'page'
+      }).then(response => {
+        this.$set(this.currentTask, 'runButtonIsLoading', false)
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.data.showRunProcessByIndex, response.data.report_id)
         }
       })
-    },
-
-    // 打开测试报告
-    openReportById(reportId) {
-      // console.log(`task.index.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
-      window.open(href, '_blank')
     },
 
     // 删除任务
@@ -362,7 +318,7 @@ export default {
         }
       })
     },
-    renderHeader (h, {column}) {
+    renderHeader(h, {column}) {
       // 悬浮提示的文字内容
       const info = '启用中的任务才会定时执行；禁用中的任务才支持修改'
       return h(

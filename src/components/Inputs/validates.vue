@@ -103,7 +103,8 @@
               </el-col>
               <el-col :span="7">
                 <el-input size="mini" disabled :placeholder="'自定义函数'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'${do_something($extract_name_2)}'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'${do_something($extract_name_2)}'"
+                          style="width: 90%"></el-input>
               </el-col>
             </el-row>
           </div>
@@ -111,17 +112,22 @@
       </el-collapse-item>
     </el-collapse>
 
-
     <!-- 断言 -->
     <el-table
-      :data="tempValidates"
-      size="mini"
+      ref="dataTable"
+      :data="tempData"
       stripe
       :show-header="false"
-      class="h-b-e-a-style"
-      :row-style="{'background-color': 'rgb(250, 250, 250)'}">
+      size="mini"
+      row-key="id">
+      <el-table-column label="id" header-align="center" min-width="4%">
+        <template slot-scope="scope">
+          <div>{{ scope.$index + 1 }}</div>
+          <el-input v-model="scope.row.id" v-show="false"></el-input>
+        </template>
+      </el-table-column>
 
-      <el-table-column label="数据源" header-align="center" min-width="20%">
+      <el-table-column label="数据源" header-align="center" min-width="30%">
         <template slot-scope="scope">
           <el-row>
             <el-row>
@@ -154,7 +160,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="validate_type" header-align="center" min-width="20%">
+      <el-table-column label="validate_type" header-align="center" min-width="30%">
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.validate_type"
@@ -176,7 +182,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column property="value" label="Value" header-align="center" min-width="29%">
+      <el-table-column property="value" label="Value" header-align="center" min-width="30%">
         <template slot-scope="scope">
           <el-row>
             <el-row>
@@ -215,7 +221,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加一行" header-align="center" min-width="4%">
+      <el-table-column label="添加一行" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
@@ -226,11 +232,6 @@
               @click.native="addRow(scope.$index)">
             </el-button>
           </el-tooltip>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="删除当前行" header-align="center" min-width="4%">
-        <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
               v-show="isShowDelButton(scope.$index)"
@@ -255,12 +256,34 @@
 
 import {getAssertMapping} from '@/apis/apiTest/api'
 import {getConfigByName} from '@/apis/config/config'
+import Sortable from "sortablejs";
 
 export default {
   name: "validates",
   props: ['validates'],
 
+  data() {
+    return {
+      validateTypeList: [],
+      tempData: [{data_source: null, key: null, validate_type: null, data_type: null, value: null}],
+
+      dataTypeMapping: [],
+      responseDataSourceMapping: [],
+      sortable: null,
+      oldList: [],
+      newList: [],
+    }
+  },
+
   mounted() {
+    this.getValidates(this.validates)
+
+    this.oldList = this.tempData.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+
     if (this.validateTypeList.length === 0) {
       this.getAssertMappings()
     }
@@ -272,21 +295,17 @@ export default {
     }
   },
 
-  created() {
-    this.getValidates(this.validates)
-  },
-
-  data() {
-    return {
-      validateTypeList: [],
-      tempValidates: [{data_source: null, key: null, validate_type: null, data_type: null, value: null}],
-
-      dataTypeMapping: [],
-      responseDataSourceMapping: [],
-    }
-  },
 
   methods: {
+
+    initTempData() {
+      this.tempData = []
+      for (let index in this.validates) {
+        let data = this.validates[index]
+        data["id"] = `${index}_${data.key}`
+        this.tempData.push(data)
+      }
+    },
 
     // 从后端获取断言方式
     getAssertMappings() {
@@ -296,37 +315,37 @@ export default {
     },
 
     // 从后端获取数据类型映射
-    getDataTypeMapping(){
+    getDataTypeMapping() {
       getConfigByName({'name': 'data_type_mapping'}).then(response => {
         this.dataTypeMapping = JSON.parse(response.data.value)
       })
     },
 
     // 从后端获取响应数据源映射
-    getResponseDataSourceMapping(){
+    getResponseDataSourceMapping() {
       getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
         this.responseDataSourceMapping = JSON.parse(response.data.value)
       })
     },
 
     // 根据选择的数据源显示不同的提示
-    getDataSourcePlaceholder(_type){
-      if (!_type){
+    getDataSourcePlaceholder(_type) {
+      if (!_type) {
         return '实际结果提取表达式'
-      }else if (_type === 'regexp'){
+      } else if (_type === 'regexp') {
         return '请填写正确的正则表达式'
-      }else{
+      } else {
         return 'jsonpath表达式，若要提取整个对象，则不填写'
       }
     },
 
     // 选中断言类型事件
-    selectValidateType(data, row){
-      if (data === '值为真'){
+    selectValidateType(data, row) {
+      if (data === '值为真') {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'True')
         return true
-      }else if (data === '值为假'){
+      } else if (data === '值为假') {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'False')
         return true
@@ -335,26 +354,52 @@ export default {
 
     // 是否显示删除按钮
     isShowDelButton(index) {
-      return !(this.tempValidates.length === 1 && index === 0)
+      return !(this.tempData.length === 1 && index === 0)
     },
 
     // 添加一行
     addRow() {
-      this.tempValidates.push({data_source: null, key: null, validate_type: null, data_type: null, value: null})
+      this.tempData.push({
+        id: this.tempData.length,
+        data_source: null,
+        key: null,
+        validate_type: null,
+        data_type: null,
+        value: null
+      })
     },
 
     // 删除一行
     delRow(index) {
-      this.tempValidates.splice(index, 1);
+      this.tempData.splice(index, 1);
     },
 
     getValidates(validates) {
       if (validates && validates.length > 0) {
-        this.tempValidates = validates
+        this.initTempData()
       } else {
-        this.tempValidates = [{data_source: null, key: null, validate_type: null, data_type: null, value: null}]
+        this.tempData = [{id: 0, data_source: null, key: null, validate_type: null, data_type: null, value: null}]
       }
-    }
+    },
+
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function (dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.tempData.splice(evt.oldIndex, 1)[0]
+          this.tempData.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+        }
+      })
+    },
+
   },
 
   watch: {
