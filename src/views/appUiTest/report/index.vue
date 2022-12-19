@@ -85,13 +85,13 @@
                     type="text"
                     icon="el-icon-view"
                     style="margin-right: 10px"
-                    v-show="scope.row.status === 1"
+                    v-show="scope.row.process === 3 && scope.row.status === 2"
                     @click.native="openReportById(scope.row.id)"></el-button>
 
                   <!-- 删除报告 -->
                   <el-popover
                     :ref="scope.row.id"
-                    v-show="scope.row.status === 1"
+                    v-show="scope.row.process === 3 && scope.row.status === 2"
                     placement="top"
                     popper-class="down-popover"
                     v-model="scope.row.deletePopoverIsShow">
