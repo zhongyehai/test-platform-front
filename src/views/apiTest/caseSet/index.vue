@@ -392,7 +392,7 @@ export default {
     showRunCaseSet(node, data) {
       this.runSetNode = node
       this.runSetData = data
-      this.$bus.$emit(this.runEvent, 'api')
+      this.$bus.$emit(this.runEvent, 'api', true)
     },
 
     // 运行用例集的用例

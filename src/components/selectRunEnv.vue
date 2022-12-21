@@ -40,7 +40,7 @@
     </div>
 
     <!-- 执行模式 -->
-    <div v-if="triggerRunType === 'api'">
+    <div v-if="showSelectRunModel">
       <div style="margin-top: 40px">
         <label>执行模式： </label>
       </div>
@@ -155,6 +155,7 @@ export default {
       runType: '0',
       runServerList: [],
       runPhoneList: [],
+      showSelectRunModel: false
     }
   },
   methods: {
@@ -221,13 +222,15 @@ export default {
       this.runEnv = response.data.value
     })
 
-    this.$bus.$on(this.event, (triggerRunType) => {
+    this.$bus.$on(this.event, (triggerRunType, showSelectRunModel) => {
       this.triggerRunType = triggerRunType
+      this.showSelectRunModel = showSelectRunModel
       if (triggerRunType === 'api'){
         this.initRunMode()
       }else if(triggerRunType === 'appUi'){
         this.getRunAppEnv()
       }else {
+        this.initRunMode()
         this.initBrowserName()
       }
       this.dialogIsShow = true

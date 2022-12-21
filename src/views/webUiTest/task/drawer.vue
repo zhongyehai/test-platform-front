@@ -509,7 +509,7 @@ export default {
 
     // 点击调试按钮
     clickRunDebug(){
-      this.$bus.$emit(this.runEvent, 'webUi')
+      this.$bus.$emit(this.runEvent, 'webUi', true)
     },
 
     debugTask(runData) {

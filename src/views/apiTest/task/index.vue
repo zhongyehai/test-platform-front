@@ -224,7 +224,7 @@ export default {
     // 点击运行任务
     clickRunTask(task) {
       this.currentTask = task
-      this.$bus.$emit(this.runEvent, 'api')
+      this.$bus.$emit(this.runEvent, 'api', true)
     },
 
     // 运行任务

@@ -521,7 +521,7 @@ export default {
 
     // 点击调试按钮
     clickRunDebug() {
-      this.$bus.$emit(this.runEvent, 'api')
+      this.$bus.$emit(this.runEvent, 'api', true)
     },
 
     debugTask(runConf) {

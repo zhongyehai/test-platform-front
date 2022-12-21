@@ -239,7 +239,7 @@ export default {
     // 点击运行任务
     clickRunTask(task) {
       this.currentTask = task
-      this.$bus.$emit(this.runEvent, 'webUi')
+      this.$bus.$emit(this.runEvent, 'webUi', true)
     },
 
     // 运行任务
