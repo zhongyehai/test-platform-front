@@ -68,6 +68,7 @@
           <!-- 下载文件 -->
           <el-button
             type="text"
+            size="mini"
             style="margin-right: 10px"
             icon="el-icon-download"
             :loading="scope.row.downloadLoadingIsShow"
@@ -89,6 +90,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>

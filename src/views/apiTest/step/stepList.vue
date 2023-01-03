@@ -70,6 +70,7 @@
             <el-button
               slot="reference"
               type="text"
+              size="mini"
               icon="el-icon-bottom-left"
               :loading="scope.row.pullIsLoading"
             ></el-button>
@@ -90,6 +91,7 @@
             <el-button
               slot="reference"
               type="text"
+              size="mini"
               icon="el-icon-document-copy"
               :loading="scope.row.copyIsLoading"
             ></el-button>
@@ -100,6 +102,7 @@
             v-if="scope.row.quote_case"
             slot="reference"
             type="text"
+            size="mini"
             style="margin-right: 5px"
             icon="el-icon-view"
             @click="showCaseRemark(scope.row.quote_case)"
@@ -123,6 +126,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
             ></el-button>
           </el-popover>
@@ -146,6 +150,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
             ></el-button>
           </el-popover>
@@ -231,6 +236,7 @@
                   <el-button
                     slot="reference"
                     type="text"
+                    size="mini"
                     icon="el-icon-bottom-left"
                     :loading="scope.row.pullIsLoading"
                   ></el-button>
@@ -251,6 +257,7 @@
                   <el-button
                     slot="reference"
                     type="text"
+                    size="mini"
                     icon="el-icon-document-copy"
                     :loading="scope.row.copyIsLoading"
                   ></el-button>
@@ -261,6 +268,7 @@
                   v-if="scope.row.quote_case"
                   slot="reference"
                   type="text"
+                  size="mini"
                   style="margin-right: 5px"
                   icon="el-icon-view"
                   @click="showCaseRemark(scope.row.quote_case)"
@@ -271,6 +279,7 @@
                   v-if="!scope.row.quote_case"
                   slot="reference"
                   type="text"
+                  size="mini"
                   style="margin-right: 5px"
                   icon="el-icon-view"
                   @click="editStep(scope.row, false)"

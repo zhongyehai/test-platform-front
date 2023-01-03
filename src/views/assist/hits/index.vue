@@ -107,6 +107,7 @@
           <!--查看报告-->
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-view"
             @click="showReport(scope.row)">
           </el-button>
@@ -114,6 +115,7 @@
           <!--修改问题记录-->
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-edit"
             style="margin-right: 8px"
             @click="showHitDrawer('update', scope.row)">
@@ -134,6 +136,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>

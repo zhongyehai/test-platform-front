@@ -53,6 +53,7 @@
           <!--修改文件信息-->
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-edit"
             @click="sendEditEmit(scope.row, 'file')">
           </el-button>
@@ -60,6 +61,7 @@
           <!--修改函数内容-->
           <el-button
             type="text"
+            size="mini"
             style="margin-right: 5px"
             icon="el-icon-edit-outline"
             @click="sendEditEmit(scope.row, 'data')">
@@ -80,6 +82,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>

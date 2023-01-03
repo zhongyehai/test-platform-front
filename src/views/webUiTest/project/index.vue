@@ -160,6 +160,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="row.deleteButtonIsLoading"
             ></el-button>

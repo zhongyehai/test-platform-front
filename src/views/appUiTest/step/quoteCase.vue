@@ -69,6 +69,7 @@
               placement="top-start">
               <el-button
                 type="text"
+                size="mini"
                 icon="el-icon-document-copy"
                 @click.native="copyCaseStepAsStep(scope.row)">
               </el-button>
@@ -82,6 +83,7 @@
               placement="top-start">
               <el-button
                 type="text"
+                size="mini"
                 icon="el-icon-d-arrow-left"
                 @click.native="addQuote(scope.row)">
               </el-button>

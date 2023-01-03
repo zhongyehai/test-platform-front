@@ -104,6 +104,11 @@ export default {
     uiTaskDrawerIsCommit: 'uiTaskDrawerIsCommit',  // 定时任务已提交
   },
 
+  app:{
+    showEditeServerDrawer: 'showEditeServerDrawer',
+    showEditePhoneDrawer: 'showEditePhoneDrawer'
+  },
+
   // 缓存数据
   data: {
     showRunProcessByIndex: 'showRunProcessByIndex',
@@ -115,8 +120,6 @@ export default {
     userDict: {},  // 用户数据
     executeTypeList: [],  // ui自动化步骤的执行方式
     executeTypeDict: {},  // ui自动化步骤的执行方式
-    // extractTypeList: [],  // ui自动化数据提取方式
-    // extractTypeDict: {},  // ui自动化数据提取方式
     extractMappingList: [],  // ui自动化数据提取方法映射
     extractMappingDict: {},  // ui自动化数据提取方法映射
     assertMappingList: [],  // ui自动化断言方法映射

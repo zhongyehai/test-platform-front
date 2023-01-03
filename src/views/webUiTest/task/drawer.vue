@@ -288,10 +288,8 @@ import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {postTask, putTask, runTask} from '@/apis/webUiTest/task'
 import {caseSetList} from "@/apis/webUiTest/caseSet";
-import {caseList, caseRun, postCase, putCase} from '@/apis/webUiTest/case'
-import {reportIsDone} from "@/apis/webUiTest/report";
+import {caseList} from '@/apis/webUiTest/case'
 import {arrayToTree} from "@/utils/parseData";
-import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunModel} from "@/apis/config/config";
 import jsonEditorView from "@/components/jsonView";
 

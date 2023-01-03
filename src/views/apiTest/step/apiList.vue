@@ -9,23 +9,23 @@
             class="input-with-select"
             placeholder="请输入接口地址，如 /mock/{projectSystemId}"
             size="mini"
-            style="width: 80%">
+            style="width: 75%">
           </el-input>
           <el-button
             v-show="queryAddr"
             type="primary"
             size="mini"
-            style="margin-left: 10px"
+            style="margin-left: 5px"
             @click.native="getApiMsgBelongTo()"
-          >归属
+          >查归属
           </el-button>
           <el-button
             v-show="queryAddr"
             type="primary"
             size="mini"
-            style="margin-left: 10px"
+            style="margin-left: 5px"
             @click.native="getApiMsgBelongToStep()"
-          >使用情况
+          >查使用情况
           </el-button>
         </el-form-item>
       </el-row>
@@ -42,7 +42,7 @@
           </el-form-item>
         </el-col>
 
-        <!-- 选则用例集 -->
+        <!-- 选择模块 -->
         <el-col :span="13">
           <el-form-item label="模块" style="margin-bottom: 5px">
             <el-cascader

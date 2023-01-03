@@ -121,15 +121,9 @@
 
       <el-table-column :label="'最新拉取状态'" prop="test" align="center" min-width="10%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
-          <div v-if="scope.row.last_pull_status === 0">
-            <el-tag type="danger">拉取失败</el-tag>
-          </div>
-          <div v-else-if="scope.row.last_pull_status === 2">
-            <el-tag type="success">拉取成功</el-tag>
-          </div>
-          <div v-else>
-            <el-tag type="warning">未拉取</el-tag>
-          </div>
+          <el-tag :type="pullStatusTagType[scope.row.last_pull_status]">
+            {{ pullStatusContent[scope.row.last_pull_status] }}
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -157,14 +151,16 @@
             style="margin-right: 5px"
             popper-class="down-popover"
             v-model="row.pullPopoverIsShow">
-            <p>从{{row.yapi_id ? 'yapi' : 'swagger'}}拉取此服务下的模块、接口信息?</p>
+            <p>从{{ row.yapi_id ? 'yapi' : 'swagger' }}拉取此服务下的模块、接口信息?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelPull(row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="row.yapi_id ? pullByYapi(row) : pullBySwagger(row)">确定</el-button>
+              <el-button type="primary" size="mini" @click="row.yapi_id ? pullByYapi(row) : pullBySwagger(row)">确定
+              </el-button>
             </div>
             <el-button
               slot="reference"
               type="text"
+              size="mini"
               icon="el-icon-bottom-left"
               :loading="row.pullPopoverLoadingIsShow"
             ></el-button>
@@ -202,6 +198,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="row.deleteButtonIsLoading"
             ></el-button>
@@ -228,8 +225,8 @@
 
     <!-- 服务环境抽屉 -->
     <projectEnvDrawer
-    :env-mapping="envMapping"
-    :dataTypeMapping="dataTypeMapping"
+      :env-mapping="envMapping"
+      :dataTypeMapping="dataTypeMapping"
     ></projectEnvDrawer>
   </div>
 </template>
@@ -245,6 +242,7 @@ import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/apiTest/project/drawer'
 import projectEnvDrawer from '@/views/apiTest/project/envEditor'
 import {getConfigByName, getDefaultEnvConfig} from "@/apis/config/config";
+import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/utils/mapping";
 
 export default {
   name: 'Project',
@@ -278,6 +276,9 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
+
+      pullStatusContent: swaggerPullStatusMappingContent,
+      pullStatusTagType: swaggerPullStatusMappingTagType
     }
   },
 
@@ -295,7 +296,7 @@ export default {
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
       })
-      if (func){
+      if (func) {
         func()
       }
     },
@@ -374,11 +375,11 @@ export default {
       })
     },
 
-    cancelPull(row){
+    cancelPull(row) {
       this.$set(row, 'pullPopoverIsShow', false)
     },
 
-    cancelDeletePopover(row){
+    cancelDeletePopover(row) {
       this.$set(row, 'deletePopoverIsShow', false)
     },
 
@@ -452,7 +453,7 @@ export default {
 
     // test环境修改后，前端页面也跟随修改域名
     this.$bus.$on(this.$busEvents.api.apiEnvIsCommit, (projectId, host, env) => {
-      if (env === 'test'){
+      if (env === 'test') {
         try {
           this.project_list.forEach(row => {
             if (row.id === projectId) {

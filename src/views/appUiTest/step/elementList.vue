@@ -99,6 +99,7 @@
               placement="top-start">
               <el-button
                 type="text"
+                size="mini"
                 icon="el-icon-d-arrow-left"
                 @click.native="addElementToStep(scope.row)"></el-button>
             </el-tooltip>

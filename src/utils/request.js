@@ -34,7 +34,11 @@ service.interceptors.response.use(
   response => {
     // 如果返回状态码为401，则跳转到登录页面
     if (response.data.status === 401) {
-      router.push({path: `/login?redirect=${router.history.current.fullPath}`});
+      if (router.history.current.fullPath.indexOf('redirect') !== -1){
+        router.push({path: router.history.current.fullPath});
+      }else {
+        router.push({path: `/login?redirect=${router.history.current.fullPath}`});
+      }
     }
     return response.data
   }

@@ -56,6 +56,15 @@
               </el-popover>
             </el-form-item>
 
+            <!-- 业务线 -->
+            <el-form-item label="业务线" prop="business_id" size="mini" class="is-required">
+              <businessView
+                ref="businessView"
+                :isMultiple="false"
+                :currentBusiness="tempProject.business_id"
+              ></businessView>
+            </el-form-item>
+
           </el-form>
         </div>
 
@@ -95,6 +104,7 @@
 <script>
 import userSelector from "@/components/Selector/user";
 import funcFileView from '@/components/Selector/funcFile'
+import businessView from '@/components/Selector/business'
 
 import {postProject, putProject} from '@/apis/apiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
@@ -107,7 +117,8 @@ export default {
   ],
   components: {
     userSelector,
-    funcFileView
+    funcFileView,
+    businessView
   },
   data() {
     return {
@@ -119,6 +130,7 @@ export default {
         name: null,
         manager: null,
         swagger: '',
+        business_id: '',
         func_files: [],
         create_user: null
       },
@@ -172,6 +184,7 @@ export default {
       this.tempProject.name = row.name
       this.tempProject.manager = row.manager
       this.tempProject.swagger = row.swagger
+      this.tempProject.business_id = row.business_id
       this.tempProject.func_files = row.func_files
       this.submitButtonIsShow = true
     },
@@ -182,6 +195,7 @@ export default {
         id: this.tempProject.id,
         name: this.tempProject.name,
         manager: this.$refs.userSelect.tempData,
+        business_id: this.$refs.businessView.business,
         swagger: this.tempProject.swagger,
         func_files: this.$refs.funcFiles.tempFuncFiles
       }

@@ -40,7 +40,7 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongTo()"
-        >归属
+        >查归属
         </el-button>
         <el-button
           v-show="queryAddr"
@@ -48,7 +48,7 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongToStep()"
-        >使用情况
+        >查使用情况
         </el-button>
       </el-form-item>
     </el-form>
@@ -193,9 +193,6 @@ import {ellipsis, arrayToTree} from "@/utils/parseData"
 
 import {projectList} from "@/apis/apiTest/project";
 import {caseSetTree, caseSetRun, deleteCaseSet, postCaseSet, putCaseSet} from "@/apis/apiTest/caseSet";
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
-import {getRunTimeout} from "@/utils/getConfig";
 import {apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";  // 初始化超时时间
 
 export default {
@@ -392,7 +389,7 @@ export default {
     showRunCaseSet(node, data) {
       this.runSetNode = node
       this.runSetData = data
-      this.$bus.$emit(this.runEvent, 'api', true)
+      this.$bus.$emit(this.runEvent, 'api', true, 'set')
     },
 
     // 运行用例集的用例
@@ -401,6 +398,7 @@ export default {
         'id': this.runSetData.id,
         env: runConf.runEnv,
         is_async: runConf.runType,
+        business_id: runConf.businessId,
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
@@ -443,7 +441,6 @@ export default {
 
   created() {
     this.getProjectList()
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
   },
 
   mounted() {

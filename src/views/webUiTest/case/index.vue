@@ -48,6 +48,7 @@
               <!-- 运行用例 -->
               <el-button
                 type="text"
+                size="mini"
                 slot="reference"
                 icon="el-icon-video-play"
                 :loading="scope.row.isShowRunLoading"
@@ -57,6 +58,7 @@
               <!--修改用例-->
               <el-button
                 type="text"
+                size="mini"
                 style="margin-right: 8px"
                 icon="el-icon-edit"
                 @click="editCase(scope.row)">
@@ -77,6 +79,7 @@
                 <el-button
                   slot="reference"
                   type="text"
+                  size="mini"
                   icon="el-icon-document-copy"
                 ></el-button>
               </el-popover>
@@ -96,6 +99,7 @@
                   slot="reference"
                   style="color: red"
                   type="text"
+                  size="mini"
                   icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
                 ></el-button>

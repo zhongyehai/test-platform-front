@@ -168,9 +168,6 @@ import {ellipsis, arrayToTree} from "@/utils/parseData"
 
 import {projectList} from "@/apis/webUiTest/project";
 import {caseSetTree, caseSetRun, deleteCaseSet, postCaseSet, putCaseSet} from "@/apis/webUiTest/caseSet";
-import {reportIsDone} from "@/apis/webUiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
-import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
 export default {
   name: 'index',
@@ -398,7 +395,6 @@ export default {
 
   created() {
     this.getProjectList()
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
   },
 
   mounted() {

@@ -66,8 +66,14 @@
             <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
               <li style="font-weight:700;font-size:16px">步骤概况</li>
               <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
-              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{
+                  this.reportData.stat.teststeps.successes
+                }}
+              </li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{
+                  this.reportData.stat.teststeps.failures
+                }}
+              </li>
               <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
               <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
             </ol>
@@ -129,7 +135,22 @@
                           <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
                             <span class="test-name">{{ item1.name }}</span>
                             <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
-                            <span class="test-status right pass">{{ item1.status }}</span>
+                            <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">
+                              <el-button
+                                size="mini"
+                                type="text"
+                                icon="el-icon-document-copy"
+                                class="test-status right pass"
+                                v-clipboard:copy="getCopyData({
+                                extract_msgs: item1.meta_datas.data[0].extract_msgs,
+                                request: item1.meta_datas.data[0].request,
+                                test_action: item1.meta_datas.data[0].test_action
+                                })"
+                                v-clipboard:success="onCopy"
+                                v-clipboard:error="onError"
+                              ></el-button>
+                            </el-tooltip>
+                            <span class="test-status right pass">{{ resultMapping[item1.status] }}</span>
                           </div>
                         </li>
                       </ol>
@@ -270,6 +291,7 @@ import hitDrawer from "@/views/assist/hits/drawer";
 
 import {reportDetail} from '@/apis/appUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
+import {reportStepResultMapping} from "@/utils/mapping";
 
 export default {
   name: 'reportShow',
@@ -426,8 +448,9 @@ export default {
           'testcases': {'fail': '', 'success': '', 'total': ''}
         },
         'time': {'start_at': '', 'duration': 1, 'start_datetime': ''}
+      },
 
-      }
+      resultMapping: reportStepResultMapping
     }
   },
 

@@ -173,6 +173,7 @@
               <!--修改-->
               <el-button
                 type="text"
+                size="mini"
                 style="margin-right: 8px"
                 icon="el-icon-edit"
                 @click="showEditForm(scope.row)">
@@ -193,6 +194,7 @@
                 <el-button
                   slot="reference"
                   type="text"
+                  size="mini"
                   icon="el-icon-document-copy"
                 ></el-button>
               </el-popover>
@@ -213,6 +215,7 @@
                   slot="reference"
                   style="color: red"
                   type="text"
+                  size="mini"
                   icon="el-icon-delete"
                   :disabled="scope.row.status === 1"
                   :loading="scope.row.isShowDeleteLoading"

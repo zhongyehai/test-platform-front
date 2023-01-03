@@ -49,6 +49,7 @@
                   ref="businessView"
                   :currentBusiness="tempCase.business_id"
                   :isMultiple="false"
+                  :selectWidth="'97%'"
                 ></businessView>
               </el-form-item>
             </el-col>

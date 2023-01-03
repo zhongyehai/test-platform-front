@@ -1,8 +1,6 @@
 <template>
   <div class="app-container">
 
-    <el-button size="mini" type="primary" @click="showDrawer()">添加手机</el-button>
-
     <el-table
       ref="taskTable"
       v-loading="tableLoadingIsShow"
@@ -43,6 +41,7 @@
           <!-- 修改手机 -->
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-edit"
             style="margin-right: 10px"
             @click.native="showDrawer(scope.row)"></el-button>
@@ -62,6 +61,7 @@
             <el-button
               slot="reference"
               type="text"
+              size="mini"
               icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
             ></el-button>
@@ -82,6 +82,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>
@@ -336,6 +337,9 @@ export default {
   },
 
   mounted() {
+    this.$bus.$on(this.$busEvents.app.showEditePhoneDrawer, () => {
+      this.showDrawer()
+    })
 
     getConfigByName({"name": "phone_os_mapping"}).then(response => {
       this.phoneOsMapping = JSON.parse(response.data.value)
@@ -350,7 +354,12 @@ export default {
     this.$nextTick(() => {
       this.setSort()
     })
-  }
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.app.showEditePhoneDrawer)
+  },
 }
 </script>
 

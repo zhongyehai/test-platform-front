@@ -49,6 +49,7 @@
             placement="top-start">
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-edit"
             :disabled="roles !== '2'"
             @click.native="showAddBusinessDialog(scope.row)"></el-button>

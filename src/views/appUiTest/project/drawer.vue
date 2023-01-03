@@ -46,6 +46,15 @@
               </el-popover>
             </el-form-item>
 
+            <!-- 业务线 -->
+            <el-form-item label="业务线" prop="business_id" size="mini" class="is-required">
+              <businessView
+                ref="businessView"
+                :isMultiple="false"
+                :currentBusiness="tempProject.business_id"
+              ></businessView>
+            </el-form-item>
+
           </el-form>
         </div>
 
@@ -84,6 +93,7 @@
 <script>
 import userSelector from "@/components/Selector/user";
 import funcFileView from '@/components/Selector/funcFile'
+import businessView from '@/components/Selector/business'
 
 import {postProject, putProject} from '@/apis/appUiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
@@ -96,7 +106,8 @@ export default {
   ],
   components: {
     userSelector,
-    funcFileView
+    funcFileView,
+    businessView
   },
   data() {
     return {
@@ -109,6 +120,7 @@ export default {
         app_package: null,
         app_activity: null,
         manager: null,
+        business_id: '',
         func_files: [],
         create_user: null
       },
@@ -149,6 +161,7 @@ export default {
         name: null,
         app_package: null,
         app_activity: null,
+        business_id: null,
         manager: null,
         func_files: []
       }
@@ -161,6 +174,7 @@ export default {
       this.tempProject.name = row.name
       this.tempProject.app_package = row.app_package
       this.tempProject.app_activity = row.app_activity
+      this.tempProject.business_id = row.business_id
       this.tempProject.manager = row.manager
       this.tempProject.func_files = row.func_files
       this.submitButtonIsShow = true
@@ -173,6 +187,7 @@ export default {
         name: this.tempProject.name,
         app_package: this.tempProject.app_package,
         app_activity: this.tempProject.app_activity,
+        business_id: this.$refs.businessView.business,
         manager: this.$refs.userSelect.tempData,
         func_files: this.$refs.funcFiles.tempFuncFiles
       }

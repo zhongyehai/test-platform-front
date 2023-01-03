@@ -12,10 +12,31 @@
         align-center
         finish-status="success"
         :process-status="statusMapping[activeStatus]">
-        <el-step title="触发执行" description="触发执行"></el-step>
-        <el-step title="解析数据" description="解析测试数据"></el-step>
-        <el-step title="执行测试" description="执行测试用例，时间会稍久，取决于用例设计"></el-step>
-        <el-step title="写入报告" description="用例执行完毕，写入测试报告"></el-step>
+        <el-step title="触发执行">
+          <template slot="description">
+            <span>触发执行测试</span><br>
+          </template>
+        </el-step>
+        <el-step title="解析数据">
+          <template slot="description">
+            <span>若一直卡在此节点</span><br>
+            <span>1、可能是数据较多，解析确实需要花一些时间</span><br>
+            <span>2、可能是解析的时候报错了，此情况请查看日志</span>
+          </template>
+        </el-step>
+        <el-step title="执行测试">
+          <template slot="description">
+            <span>若一直卡在此节点</span><br>
+            <span>1、可能是用例设计的测试步骤耗时较多，确实需要花一些时间</span><br>
+            <span>2、可能是执行测试的时候报错了，此情况请查看日志</span>
+          </template>
+        </el-step>
+        <el-step title="写入报告">
+          <template slot="description">
+            <span>用例执行完毕，写入测试报告</span><br>
+            <span>写入完毕后会自动打开测试报告</span>
+          </template>
+        </el-step>
       </el-steps>
     </div>
   </el-dialog>
@@ -74,16 +95,16 @@ export default {
             that.activeStatus = response.data.status
 
             if (response.data.process === 3 && response.data.status === 2) {
-              clearInterval(timer)  // 关闭定时器
-              that.openReportById(reportId)
               this.processIsShow = false  // 关闭进度框
+              that.openReportById(reportId)
+              clearInterval(timer)  // 关闭定时器
             }
           })
           queryCount += 1
         } else {
           that.$notify(runTestTimeOutMessage(that));
-          clearInterval(timer)  // 关闭定时器
           this.processIsShow = false  // 关闭进度框
+          clearInterval(timer)  // 关闭定时器
         }
       }, 3000)
     },
@@ -98,8 +119,8 @@ export default {
   mounted() {
     // 监听 接口 Dialog 框 的提交状态，提交成功，则重新请求接口列表
     this.$bus.$on(this.busName, (reportId) => {
-      this.activeProcess=0
-      this.activeStatus=1
+      this.activeProcess = 0
+      this.activeStatus = 1
       this.processIsShow = true
       this.getReport(reportId)
     })

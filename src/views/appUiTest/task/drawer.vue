@@ -289,10 +289,8 @@ import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {postTask, putTask, runTask} from '@/apis/appUiTest/task'
 import {caseSetList} from "@/apis/appUiTest/caseSet";
-import {caseList, caseRun, postCase, putCase} from '@/apis/appUiTest/case'
-import {reportIsDone} from "@/apis/appUiTest/report";
+import {caseList} from '@/apis/appUiTest/case'
 import {arrayToTree} from "@/utils/parseData";
-import {runTestTimeOutMessage} from "@/utils/message";
 import {getRunModel} from "@/apis/config/config";
 
 export default {

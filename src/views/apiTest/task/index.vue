@@ -67,6 +67,7 @@
                   <!-- 运行任务 -->
                   <el-button
                     type="text"
+                    size="mini"
                     slot="reference"
                     icon="el-icon-video-play"
                     :loading="scope.row.runButtonIsLoading"
@@ -76,6 +77,7 @@
                   <!-- 修改任务 -->
                   <el-button
                     type="text"
+                    size="mini"
                     icon="el-icon-edit"
                     style="margin-right: 10px"
                     :disabled="scope.row.status === 1"
@@ -96,6 +98,7 @@
                     <el-button
                       slot="reference"
                       type="text"
+                      size="mini"
                       icon="el-icon-document-copy"
                       :loading="scope.row.copyButtonIsLoading"
                     ></el-button>
@@ -116,6 +119,7 @@
                       slot="reference"
                       style="color: red"
                       type="text"
+                      size="mini"
                       icon="el-icon-delete"
                       :disabled="scope.row.status === 1"
                       :loading="scope.row.deleteLoadingIsShow"
@@ -160,9 +164,6 @@ import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {taskList, disableTask, enableTask, runTask, deleteTask, copyTask, taskSort} from '@/apis/apiTest/task'
-import {reportIsDone} from "@/apis/apiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
-import {getRunTimeout} from "@/utils/getConfig";  // 初始化超时时间
 
 export default {
   name: "index",
@@ -348,9 +349,6 @@ export default {
   },
 
   mounted() {
-    // this.getUserList()
-
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
 
     this.$bus.$on(this.$busEvents.api.apiTaskDrawerIsCommit, (status) => {
       this.getTaskList()

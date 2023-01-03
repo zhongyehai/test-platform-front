@@ -72,18 +72,20 @@
       <el-table-column label="操作" align="center" min-width="20%">
         <template slot-scope="scope">
 
-          <el-button type="primary"
-                     size="mini"
-                     v-show="scope.row.is_changed === 1"
-                     @click.native="showDetail(scope.row)">查看详情
+          <el-button
+            type="primary"
+            size="mini"
+            v-show="scope.row.is_changed === 1"
+            @click.native="showDetail(scope.row)">查看详情
           </el-button>
 
           <el-tooltip class="item" effect="dark" content="下载后需用xmind8打开" placement="top-start">
-            <el-button type="primary"
-                       size="mini"
-                       :loading="scope.row.downloadLoadingIsShow"
-                       v-show="scope.row.is_changed === 1"
-                       @click.native="exportDiffRecordAsXmind(scope.row)">导出为xmind
+            <el-button
+              type="primary"
+              size="mini"
+              :loading="scope.row.downloadLoadingIsShow"
+              v-show="scope.row.is_changed === 1"
+              @click.native="exportDiffRecordAsXmind(scope.row)">导出为xmind
             </el-button>
           </el-tooltip>
 

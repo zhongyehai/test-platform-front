@@ -72,25 +72,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'用户名'" prop="id" align="center" min-width="20%">
+      <el-table-column :label="'用户名'" prop="name" align="center" min-width="20%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'账号'" prop="id" align="center" min-width="20%">
+      <el-table-column :label="'账号'" prop="account" align="center" min-width="20%">
         <template slot-scope="scope">
           <span>{{ scope.row.account }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'角色'" prop="id" align="center" min-width="10%">
+      <el-table-column :label="'角色'" prop="role_id" align="center" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.role_id === 1 ? '测试人员' : '管理人员' }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="启用状态" min-width="15%">
+      <el-table-column align="center" prop="status" label="启用状态" min-width="15%">
         <template slot-scope="scope">
           <el-switch
             :disabled="scope.row.changStatusIsDisabled"
@@ -99,24 +99,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建人'" prop="id" align="center" min-width="12%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :show-overflow-tooltip=true prop="create_user" label="最后修改人" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="'操作'" align="center" min-width="10%" class-name="small-padding fixed-width">
+      <el-table-column :label="'操作'" align="center" min-width="15%">
         <template slot-scope="{row, $index}">
 
           <!--编辑用户-->
           <el-button
             type="text"
+            size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
             @click="handleUpdate(row)"></el-button>
@@ -188,6 +177,7 @@
             ref="businessView"
             :currentBusiness="tempUser.business_id"
             :isMultiple="true"
+            :selectWidth="'97%'"
           ></businessView>
         </el-form-item>
 

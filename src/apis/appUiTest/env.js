@@ -44,6 +44,11 @@ export function sortServer(data) {
   return request({url: serverBaseDir + '/sort', method: 'put', data: data});
 }
 
+// 修改排序
+export function runEnvServer(params) {
+  return request({url: serverBaseDir + '/run', method: 'get', params: params});
+}
+
 
 function phoneFunc(method, data = null, params = null) {
   return request({url: phoneBaseDir, method: method, data: data, params: params});

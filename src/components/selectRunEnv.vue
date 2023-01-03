@@ -35,7 +35,29 @@
       <div style="margin-top: 10px">
         <el-radio
           v-model="runBrowser"
-          :label="key" v-for="(value, key) in runBrowserNameData " :key="key">{{ value }}</el-radio>
+          :label="key" v-for="(value, key) in runBrowserNameData " :key="key">{{ value }}
+        </el-radio>
+      </div>
+    </div>
+
+    <!-- 业务线，接口自动化，且运行的是用例集，才显示此选项 -->
+    <div v-if="showSelectBusiness">
+      <div style="margin-top: 40px">
+        <label>业务线： </label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>
+          <span style="color: red">
+            仅运行当前用例集下，业务线为当前选中的业务线的测试用例
+          </span>
+        </label>
+      </div>
+      <div style="margin-top: 10px">
+        <businessView
+          ref="businessView"
+          :isMultiple="false"
+          :selectType="'radio'"
+        ></businessView>
       </div>
     </div>
 
@@ -91,7 +113,7 @@
               <el-option
                 v-for="server in runServerList"
                 :key="server.id"
-                :label="server.name"
+                :label="`${server.name}   (最近一次访问：${statusContentMapping[server.status]})`"
                 :value="server.id"
               >
               </el-option>
@@ -133,14 +155,20 @@
 </template>
 
 <script>
+import businessView from '@/components/Selector/business'
+
+import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
 
 import {getConfigByName, getRunModel} from "@/apis/config/config";
 import {phoneList, serverList} from "@/apis/appUiTest/env";  // 初始化超时时间
-
+import {getRunTimeout} from "@/utils/getConfig";
 
 export default {
   name: "selectRunEnv",
   props: ['event', 'callBackEvent'],
+  components: {
+    businessView
+  },
   data() {
     return {
       dialogIsShow: false,
@@ -155,7 +183,11 @@ export default {
       runType: '0',
       runServerList: [],
       runPhoneList: [],
-      showSelectRunModel: false
+      showSelectRunModel: false,
+      showSelectBusiness: false,
+
+      statusContentMapping: appiumServerRequestStatusMappingContent,
+      statusTagTypeMapping: appiumServerRequestStatusMappingTagType
     }
   },
   methods: {
@@ -165,6 +197,7 @@ export default {
       this.$bus.$emit(this.callBackEvent, {
         runEnv: this.runEnv,
         browser: this.runBrowser,
+        businessId: this.showSelectBusiness ? this.$refs.businessView.business : '',
         runServer: this.runServer,
         runPhone: this.runPhone,
         runType: parseInt(this.runType)
@@ -184,7 +217,7 @@ export default {
       getConfigByName({'name': 'browser_name'}).then(response => {
         this.runBrowserNameData = JSON.parse(response.data.value)
         let keys = Object.keys(this.runBrowserNameData)
-        if (keys.length > 0){
+        if (keys.length > 0) {
           this.runBrowser = keys[0]
         }
       })
@@ -198,17 +231,17 @@ export default {
     },
 
     // 获取app测试的运行环境
-    getRunAppEnv(){
+    getRunAppEnv() {
       serverList().then(response => {
         this.runServerList = response.data.data
-        if (this.runServerList.length > 0){
+        if (this.runServerList.length > 0) {
           this.runServer = this.runServerList[0].id
         }
       })
 
       phoneList().then(response => {
         this.runPhoneList = response.data.data
-        if (this.runPhoneList.length > 0){
+        if (this.runPhoneList.length > 0) {
           this.runPhone = this.runPhoneList[0].id
         }
       })
@@ -222,14 +255,19 @@ export default {
       this.runEnv = response.data.value
     })
 
-    this.$bus.$on(this.event, (triggerRunType, showSelectRunModel) => {
+    getRunTimeout(this)  // 初始化等待用例运行超时时间
+
+    this.$bus.$on(this.event, (triggerRunType, showSelectRunModel, runType) => {
       this.triggerRunType = triggerRunType
       this.showSelectRunModel = showSelectRunModel
-      if (triggerRunType === 'api'){
+      if (triggerRunType === 'api') {
         this.initRunMode()
-      }else if(triggerRunType === 'appUi'){
+        if (runType === 'set'){
+          this.showSelectBusiness=true
+        }
+      } else if (triggerRunType === 'appUi') {
         this.getRunAppEnv()
-      }else {
+      } else {
         this.initRunMode()
         this.initBrowserName()
       }

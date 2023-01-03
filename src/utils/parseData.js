@@ -73,7 +73,6 @@ export function tryParseString(data) {
 
 // 列表格式的查询字符串参数转为字符串
 export function paramsListToStr(paramsList) {
-  console.log('paramsList: ', paramsList)
   let queryStrList = []
   paramsList.forEach((param) => {
     let key = param["key"], value = param["value"]

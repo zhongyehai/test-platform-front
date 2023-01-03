@@ -87,6 +87,7 @@
           <!--修改账号信息-->
           <el-button
             type="text"
+            size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
             @click="showDialog(scope.row)">
@@ -107,6 +108,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteButtonIsLoading"
             ></el-button>
@@ -381,7 +383,7 @@ export default {
         account: this.currentAccount.account,
         password: this.currentAccount.password,
         desc: this.currentAccount.desc,
-        event: this.currentEvent
+        event: this.currentAccount.event
       }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
@@ -408,7 +410,7 @@ export default {
         account: this.currentAccount.account,
         password: this.currentAccount.password,
         desc: this.currentAccount.desc,
-        event: this.currentEvent
+        event: this.currentAccount.event
       }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {

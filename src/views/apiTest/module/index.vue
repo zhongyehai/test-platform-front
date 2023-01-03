@@ -41,7 +41,7 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongTo()"
-        >归属
+        >查归属
         </el-button>
         <el-button
           v-show="queryAddr"
@@ -49,7 +49,7 @@
           size="mini"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongToStep()"
-        >使用情况
+        >查使用情况
         </el-button>
       </el-form-item>
 

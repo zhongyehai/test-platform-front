@@ -2,6 +2,44 @@
 
   <div class="app-container">
 
+    <el-form label-width="150px" inline>
+      <el-form-item :label="'报告名：'" size="mini">
+        <el-input
+          v-model="projectName"
+          class="input-with-select"
+          placeholder="报告名，模糊查询"
+          size="mini"
+          style="width: 400px"
+          clearable
+        >
+        </el-input>
+
+      </el-form-item>
+
+      <el-form-item :label="'创建人：'" size="mini">
+        <el-select
+          v-model="createUser"
+          placeholder="创建人"
+          size="mini"
+          style="width: 400px"
+          filterable
+          clearable
+          default-first-option
+        >
+          <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+
+      </el-form-item>
+
+      <el-button
+        type="primary"
+        size="mini"
+        @click="getReportList">
+        {{ '查询' }}
+      </el-button>
+
+    </el-form>
+
     <el-row>
       <!-- 服务树 -->
       <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
@@ -34,44 +72,42 @@
               <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
               </el-table-column>
 
-              <el-table-column label="生成时间" align="center" min-width="20%">
+              <el-table-column label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="触发方式" align="center" min-width="10%">
+              <el-table-column label="触发方式" align="center" min-width="8%">
                 <template slot-scope="scope">
-                  <span> {{
-                      scope.row.trigger_type === 'pipeline' ? '流水线' :
-                        scope.row.trigger_type === 'cron' ? '定时任务' : '页面'
-                    }} </span>
+                  <span> {{reportTriggerType[scope.row.trigger_type]}} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行环境" align="center" min-width="10%">
+              <el-table-column label="运行环境" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <span> {{ eventDict[scope.row.env] }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行单元" align="center" min-width="10%">
+              <el-table-column label="运行单元" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <span> {{ runTypeDict[scope.row.run_type] }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否通过" align="center" min-width="10%">
+              <el-table-column label="是否通过" align="center" min-width="8%">
                 <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.is_passed === 1 ? 'success' : 'danger'">
-                    {{ scope.row.is_passed === 1 ? '全部通过' : '有报错' }}
+                  <el-tag size="small" :type="reportStatusTagType[scope.row.is_passed]">
+                    {{ reportStatusContent[scope.row.is_passed]}}
                   </el-tag>
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否生成" align="center" min-width="10%">
+              <el-table-column label="是否生成" align="center" min-width="8%">
                 <template slot-scope="scope">
-                  <el-tag size="small" :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'">
+                  <el-tag size="small"
+                          :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'">
                     {{ scope.row.process === 3 && scope.row.status === 2 ? '已生成' : '未生成' }}
                   </el-tag>
                 </template>
@@ -83,6 +119,7 @@
                   <!--查看报告-->
                   <el-button
                     type="text"
+                    size="mini"
                     icon="el-icon-view"
                     style="margin-right: 10px"
                     v-show="scope.row.process === 3 && scope.row.status === 2"
@@ -102,9 +139,10 @@
                     </div>
                     <el-button
                       slot="reference"
-                      style="color: red"
                       type="text"
+                      size="mini"
                       icon="el-icon-delete"
+                      style="color: red"
                     ></el-button>
                   </el-popover>
 
@@ -135,6 +173,8 @@ import Pagination from '@/components/Pagination'
 
 import {reportList, deleteReport, downloadReport} from '@/apis/webUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
+import {userList} from "@/apis/system/user";
+import {reportStatusMappingContent, reportStatusMappingTagType, reportTriggerTypeMappingContent} from "@/utils/mapping";
 
 export default {
   name: 'index',
@@ -147,15 +187,33 @@ export default {
       reportTotal: 0,
       pageNum: 0,
       pageSize: 20,
+      projectName: '',
+      createUser: '',
+      userList: [],
       eventDict: {},
-      runTypeDict: {}
+      runTypeDict: {},
+      reportStatusContent: reportStatusMappingContent,
+      reportStatusTagType: reportStatusMappingTagType,
+      reportTriggerType: reportTriggerTypeMappingContent
     }
   },
   methods: {
 
+    // 获取用户信息，同步请求
+    async getUserList() {
+      let response = await userList()
+      this.userList = response.data.data
+    },
+
     // 获取服务对应的报告列表
     getReportList() {
-      reportList({projectId: this.projectId, pageNum: this.pageNum, pageSize: this.pageSize}).then(response => {
+      reportList({
+        projectId: this.projectId,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        projectName: this.projectName,
+        createUser: this.createUser
+      }).then(response => {
         this.reportDataList = response.data.data
         this.reportTotal = response.data.total
       })
@@ -243,7 +301,7 @@ export default {
       return true;
     },
 
-    cancelDeletePopover(report){
+    cancelDeletePopover(report) {
       this.$set(report, 'deletePopoverIsShow', false)
     },
 
@@ -259,6 +317,8 @@ export default {
   },
 
   mounted() {
+    this.getUserList()
+
     this.$bus.$on(this.$busEvents.ui.uiProjectTreeChoiceProject, (project) => {
       this.projectId = project.id
       this.getReportList()

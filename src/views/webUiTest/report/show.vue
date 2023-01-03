@@ -129,7 +129,22 @@
                           <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
                             <span class="test-name">{{ item1.name }}</span>
                             <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
-                            <span class="test-status right pass">{{ item1.status }}</span>
+                            <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">
+                              <el-button
+                                size="mini"
+                                type="text"
+                                icon="el-icon-document-copy"
+                                class="test-status right pass"
+                                v-clipboard:copy="getCopyData({
+                                extract_msgs: item1.meta_datas.data[0].extract_msgs,
+                                request: item1.meta_datas.data[0].request,
+                                test_action: item1.meta_datas.data[0].test_action
+                                })"
+                                v-clipboard:success="onCopy"
+                                v-clipboard:error="onError"
+                              ></el-button>
+                            </el-tooltip>
+                            <span class="test-status right pass">{{ resultMapping[item1.status] }}</span>
                           </div>
                         </li>
                       </ol>
@@ -270,6 +285,7 @@ import hitDrawer from "@/views/assist/hits/drawer";
 
 import {reportDetail} from '@/apis/webUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
+import {reportStepResultMapping} from "@/utils/mapping";
 
 
 export default {
@@ -428,7 +444,8 @@ export default {
         },
         'time': {'start_at': '', 'duration': 1, 'start_datetime': ''}
 
-      }
+      },
+      resultMapping: reportStepResultMapping
     }
   },
 

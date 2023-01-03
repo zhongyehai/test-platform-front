@@ -7,11 +7,11 @@
       <!-- inline="true"，el-form-item不自动换行 -->
       <el-form label-width="100px" :inline="true">
 
-        <el-form-item :label="'项目名：'" size="mini">
+        <el-form-item :label="'APP名：'" size="mini">
           <el-select
             ref="projectSelector"
             v-model="listQuery.projectId"
-            :placeholder="'选择项目名'"
+            :placeholder="'选择APP名'"
             filterable
             default-first-option
             clearable
@@ -160,6 +160,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="row.deleteButtonIsLoading"
             ></el-button>

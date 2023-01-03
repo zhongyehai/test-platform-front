@@ -51,7 +51,7 @@
             min-width="10%">
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
-              <el-tag type="danger" v-else>0</el-tag>
+              <el-tag type="warning" v-else>0</el-tag>
             </template>
           </el-table-column>
 
@@ -61,6 +61,7 @@
               <!-- 运行接口 -->
               <el-button
                 type="text"
+                size="mini"
                 slot="reference"
                 icon="el-icon-video-play"
                 :loading="scope.row.runButtonIsLoading"
@@ -70,6 +71,7 @@
               <!--修改接口-->
               <el-button
                 type="text"
+                size="mini"
                 style="margin-right: 8px"
                 icon="el-icon-edit"
                 @click="showEditForm(scope.row)">
@@ -90,6 +92,7 @@
                 <el-button
                   slot="reference"
                   type="text"
+                  size="mini"
                   icon="el-icon-document-copy"
                 ></el-button>
               </el-popover>
@@ -109,6 +112,7 @@
                   slot="reference"
                   style="color: red"
                   type="text"
+                  size="mini"
                   icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
                 ></el-button>
@@ -158,7 +162,6 @@ import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {userList} from '@/apis/system/user'
 import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
-import {getRunTimeout} from "@/utils/getConfig";
 
 export default {
   name: 'index',
@@ -221,7 +224,6 @@ export default {
       this.runApis(runDict)
     })
 
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
   },
 
   // 页面销毁的时候，关闭bus监听事件
@@ -330,8 +332,7 @@ export default {
       runApi({
         'projectId': this.currentApi.project_id,
         'apis': [this.currentApi.id],
-        'env': runConf.runEnv,
-        'trigger_type': 'page'
+        'env': runConf.runEnv
       }).then(response => {
         this.$set(this.currentApi, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {

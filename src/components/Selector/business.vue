@@ -1,22 +1,48 @@
 <template>
+  <div>
 
-  <el-select
-    v-model="business"
-    :multiple="isMultiple"
-    filterable
-    default-first-option
-    clearable
-    size="mini"
-    style="width:98%"
-    placeholder="请选择业务线"
-    class="filter-item">
-    <el-option
-      v-for="business in currentBusinessList"
-      :key="business.id"
-      :label="business.name"
-      :value="business.id"
-    ></el-option>
-  </el-select>
+    <div v-if="selectType === 'radio'">
+      <div style="margin-top: 10px">
+        <el-radio
+          v-model="business"
+          :label="businessItem.id"
+          v-for="businessItem in currentBusinessList" :key="businessItem.id">{{ businessItem.name }}
+        </el-radio>
+      </div>
+    </div>
+
+    <div v-else>
+      <el-select
+        v-model="business"
+        :multiple="isMultiple"
+        filterable
+        default-first-option
+        clearable
+        size="mini"
+        :style="selectStyle"
+        placeholder="请选择业务线"
+        class="filter-item">
+        <el-option
+          v-for="business in currentBusinessList"
+          :key="business.id"
+          :label="business.name"
+          :value="business.id"
+        ></el-option>
+      </el-select>
+      <el-popover
+        class="el_popover_class"
+        placement="top-start"
+        trigger="hover">
+        <div>
+          <div>1、仅有当前业务线权限的用户才能看到此服务</div>
+          <div>2、若要修改用户业务线权限，需登录管理员账号，在用户管理处修改</div>
+        </div>
+        <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+      </el-popover>
+    </div>
+
+  </div>
+
 
 </template>
 
@@ -27,13 +53,18 @@ import {businessList} from '@/apis/system/business'
 export default {
   name: 'business',
   props: [
+    'selectType',
     'isMultiple',
-    'currentBusiness'
+    'currentBusiness',
+    'selectWidth'
   ],
 
   data() {
     return {
       business: '',
+      selectStyle: {
+        width: '98%'
+      },
       currentBusinessList: []
     }
   },
@@ -47,6 +78,12 @@ export default {
       this.business = this.currentBusiness ? this.currentBusiness : [this.initBusiness()]
     }else {
       this.business = this.currentBusiness ? this.currentBusiness : this.initBusiness()
+    }
+
+    if (this.selectWidth) {
+      this.selectStyle = {
+        width: this.selectWidth
+      }
     }
   },
 

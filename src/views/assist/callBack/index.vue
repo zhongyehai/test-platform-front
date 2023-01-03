@@ -31,14 +31,12 @@
 
       <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip=true>
         <template slot-scope="{row, $index}">
-
           <el-button
             size="mini"
             icon="el-icon-view"
             type="text"
             @click="showDetail(row)">
           </el-button>
-
         </template>
       </el-table-column>
 

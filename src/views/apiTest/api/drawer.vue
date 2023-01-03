@@ -389,8 +389,7 @@ export default {
       runApi({
         'projectId': this.tempApi.project_id,
         'apis': [this.tempApi.id],
-        env: runConf.runEnv,
-        'trigger_type': 'page'
+        env: runConf.runEnv
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {

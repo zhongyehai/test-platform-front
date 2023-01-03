@@ -1,8 +1,6 @@
 <template>
   <div class="app-container">
 
-    <el-button size="mini" type="primary" @click="showDrawer()">添加服务器</el-button>
-
     <el-table
       ref="taskTable"
       v-loading="tableLoadingIsShow"
@@ -12,7 +10,7 @@
       row-key="id"
       stripe
     >
-      <el-table-column prop="num" label="序号" align="center" min-width="7%">
+      <el-table-column prop="num" label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
@@ -24,30 +22,50 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="os" align="center" label="服务器系统类型" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true prop="os" align="center" label="服务器系统类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="ip" align="center" label="服务器ip地址" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true prop="ip" align="center" label="服务器ip地址" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.ip }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="port" align="center" label="服务器端口" min-width="25%">
+      <el-table-column :show-overflow-tooltip=true prop="port" align="center" label="服务器端口" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.port }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="16%">
+      <el-table-column :show-overflow-tooltip=true prop="status" align="center" label="最近一次访问状态"
+                       min-width="15%">
         <template slot-scope="scope">
+          <el-tag size="small" :type="statusTagTypeMapping[scope.row.status]">
+            {{ statusContentMapping[scope.row.status] }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="操作" min-width="15%">
+        <template slot-scope="scope">
+
+          <!-- 访问服务器 -->
+          <el-button
+            slot="reference"
+            type="text"
+            size="mini"
+            icon="el-icon-video-play"
+            :loading="scope.row.isShowRunLoading"
+            @click="runServer(scope.row)"
+          ></el-button>
 
           <!-- 修改服务器 -->
           <el-button
             type="text"
+            size="mini"
             icon="el-icon-edit"
             style="margin-right: 10px"
             @click.native="showDrawer(scope.row)"></el-button>
@@ -67,6 +85,7 @@
             <el-button
               slot="reference"
               type="text"
+              size="mini"
               icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
             ></el-button>
@@ -87,6 +106,7 @@
               slot="reference"
               style="color: red"
               type="text"
+              size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
             ></el-button>
@@ -129,7 +149,7 @@
         </el-form-item>
 
         <el-form-item label="服务器ip" class="is-required">
-          <el-input v-model="tempData.ip" size="mini" placeholder="服务器ip"></el-input>
+          <el-input v-model="tempData.ip" size="mini" placeholder="服务器ip，如 196.128.123.123"></el-input>
         </el-form-item>
 
         <el-form-item label="服务器端口" class="is-required">
@@ -167,8 +187,17 @@ import Sortable from 'sortablejs'
 import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 
-import {serverList, postServer, putServer, getServer, deleteServer, sortServer, copyServer} from '@/apis/appUiTest/env'
+import {
+  serverList,
+  postServer,
+  putServer,
+  runEnvServer,
+  deleteServer,
+  sortServer,
+  copyServer
+} from '@/apis/appUiTest/env'
 import {getConfigByName} from "@/apis/config/config";
+import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
 
 
 export default {
@@ -200,12 +229,25 @@ export default {
       submitButtonIsLoading: false,
       drawerIsShow: false,
 
-      serverOsMapping: []
+      serverOsMapping: [],
+
+      statusContentMapping: appiumServerRequestStatusMappingContent,
+      statusTagTypeMapping: appiumServerRequestStatusMappingTagType
     }
   },
 
 
   methods: {
+
+    // 复制用例
+    runServer(row) {
+      this.$set(row, 'isShowRunLoading', true)
+      runEnvServer({'id': row.id}).then(response => {
+        this.$set(row, 'isShowRunLoading', false)
+        this.showMessage(this, response)
+        this.getServerList()
+      })
+    },
 
     // 获取服务器列表
     getServerList() {
@@ -243,7 +285,9 @@ export default {
 
     // 新增服务
     addServer() {
+      this.submitButtonIsLoading = true
       postServer(this.tempData).then(response => {
+        this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
           this.getServerList()
@@ -253,7 +297,9 @@ export default {
 
     // 编辑服务
     changeServer() {
+      this.submitButtonIsLoading = true
       putServer(this.tempData).then(response => {
+        this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
           this.getServerList()
@@ -348,6 +394,10 @@ export default {
 
   mounted() {
 
+    this.$bus.$on(this.$busEvents.app.showEditeServerDrawer, () => {
+      this.showDrawer()
+    })
+
     getConfigByName({"name": "server_os_mapping"}).then(response => {
       this.serverOsMapping = JSON.parse(response.data.value)
     })
@@ -361,7 +411,12 @@ export default {
     this.$nextTick(() => {
       this.setSort()
     })
-  }
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.app.showEditeServerDrawer)
+  },
 }
 </script>
 
