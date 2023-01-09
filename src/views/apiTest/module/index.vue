@@ -33,6 +33,7 @@
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
+          clearable
           style="width: 400px">
         </el-input>
         <el-button

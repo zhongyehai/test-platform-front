@@ -10,7 +10,6 @@
     <el-table-column label="id" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
-        <el-input v-model="scope.row.id" v-show="false"></el-input>
       </template>
     </el-table-column>
 
@@ -117,20 +116,15 @@ export default {
   methods: {
 
     // 从后端获取数据类型映射
-    getDataTypeMapping(){
+    getDataTypeMapping() {
       getConfigByName({'name': 'data_type_mapping'}).then(response => {
         this.formDataTypes = JSON.parse(response.data.value)
         this.formDataTypes.push({label: '文件', value: 'file'})
       })
     },
 
-    initTempData(){
-      this.tempData = []
-      for (let index in this.dataForm){
-        let data = this.dataForm[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
+    initTempData() {
+      this.tempData = this.dataForm
     },
 
     // 上传文件到服务器
@@ -181,7 +175,7 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: this.tempData.length, key: null, value: null, remark: null})
+      this.tempData.push({id: `${Date.now()}`, key: null, value: null, remark: null})
     },
 
     // 删除一行
@@ -226,7 +220,7 @@ export default {
         if (newVal) {
           this.initTempData()
         } else {
-          this.tempData = [{id: 0, key: null, value: null, remark: null, data_type: 'str'}]
+          this.tempData = [{id: `${Date.now()}`, key: null, value: null, remark: null, data_type: 'str'}]
         }
       }
     },

@@ -6,7 +6,7 @@
 
         <el-form-item :label="'选择配置类型：'" size="mini">
           <el-select
-            v-model="queryType"
+            v-model="listQuery.queryType"
             :placeholder="'选择配置类型'"
             clearable
             filterable
@@ -14,11 +14,52 @@
             style="margin-left: 10px; width: 100%"
             size="mini"
             class="filter-item"
-            @change="getConfigList"
           >
             <el-option v-for="type in currentConfigTypeList" :key="type.id" :label="type.name" :value="type.id"/>
           </el-select>
         </el-form-item>
+
+        <el-form-item :label="'配置名：'" size="mini">
+          <el-input
+            v-model="listQuery.name"
+            class="input-with-select"
+            placeholder="配置名，支持模糊搜索"
+            size="mini"
+            clearable
+            style="width: 200px">
+          </el-input>
+        </el-form-item>
+
+        <el-form-item :label="'配置值：'" size="mini">
+          <el-input
+            v-model="listQuery.value"
+            class="input-with-select"
+            placeholder="配置值，支持模糊搜索"
+            size="mini"
+            clearable
+            style="width: 200px">
+          </el-input>
+        </el-form-item>
+
+        <el-form-item :label="'创建人：'" size="mini">
+          <el-select
+            v-model="listQuery.create_user"
+            :placeholder="'选择创建人'"
+            filterable
+            default-first-option
+            clearable
+            size="mini"
+            class="filter-item">
+            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+          </el-select>
+        </el-form-item>
+
+        <el-button
+          type="primary"
+          size="mini"
+          @click="getConfigList()">
+          搜索
+        </el-button>
 
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" size="mini" @click="addConfig">
           {{ '添加配置' }}
@@ -35,7 +76,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -97,8 +138,8 @@
     <pagination
       v-show="mailService.total>0"
       :total="mailService.total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="listQuery.pageNum"
+      :limit.sync="listQuery.pageSize"
       @pagination="getConfigList"
     />
 
@@ -127,7 +168,14 @@ export default {
   data() {
     return {
 
-      queryType: '',
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+        queryType: '',
+        create_user: '',
+        name: '',
+        value: ''
+      },
 
       // 请求列表等待响应的状态
       listLoading: false,
@@ -139,17 +187,13 @@ export default {
         currentService: undefined
       },
 
-      // 初始化数据默认的数据
-      pageNum: 1,
-      pageSize: 20,
-
       // 配置类型列表
       currentConfigTypeList: [],
       currentConfigTypeDict: {},
 
       // 用户权限
       roles: localStorage.getItem('roles'),
-      userList: [],
+      currentUserList: [],
       userDict: {},
     }
   },
@@ -202,11 +246,7 @@ export default {
     },
 
     getConfigList() {
-      configList({
-        'type': this.queryType,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
+      configList(this.listQuery).then(response => {
         this.mailService.list = response.data.data
         this.mailService.total = response.data.total
       })

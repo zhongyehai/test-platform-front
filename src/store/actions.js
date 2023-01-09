@@ -78,7 +78,7 @@ export const actions = {
   }, key) {
     var value = window.localStorage.getItem(key);
     var result = null || JSON.parse(value)
-    console.log('action:' + result);
+    // console.log('action:' + result);
     return result;
   },
 

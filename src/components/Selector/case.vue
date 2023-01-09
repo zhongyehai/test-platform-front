@@ -36,7 +36,6 @@ export default {
   },
   methods: {
     getCaseList() {
-      console.log('moduleId1111111: ', this.tempModuleId)
       caseList({moduleId: this.tempModuleId}).then(response => {
         this.tempCaseList = response.data.data
       })

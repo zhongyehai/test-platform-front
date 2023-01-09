@@ -11,7 +11,6 @@
       <el-table-column label="id" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
-          <el-input v-model="scope.row.id" v-show="false"></el-input>
         </template>
       </el-table-column>
 
@@ -222,12 +221,7 @@ export default {
   methods: {
 
     initTempData() {
-      this.tempData = []
-      for (let index in this.skipIfData) {
-        let data = this.skipIfData[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
+      this.tempData = this.skipIfData
     },
 
     // 从后端获取跳过数据源
@@ -252,32 +246,32 @@ export default {
     },
 
     // 从后端获取数据类型映射
-    getDataTypeMapping(){
+    getDataTypeMapping() {
       getConfigByName({'name': 'data_type_mapping'}).then(response => {
         this.dataTypeMapping = JSON.parse(response.data.value)
       })
     },
 
     // 根据选择的数据源显示不同的提示
-    getDataSourcePlaceholder(_type){
-      if (!_type){
+    getDataSourcePlaceholder(_type) {
+      if (!_type) {
         return '请选择数据源'
-      }else if (_type === 'variable'){
+      } else if (_type === 'variable') {
         return '请填写自定义变量表达式'
-      }else if (_type === 'func'){
+      } else if (_type === 'func') {
         return '请填写自定义函数表达式'
-      }else{
+      } else {
         return ''
       }
     },
 
     // 选中断言类型事件
-    selectValidateType(data, row){
-      if (data === '值为真'){
+    selectValidateType(data, row) {
+      if (data === '值为真') {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'True')
         return true
-      }else if (data === '值为假'){
+      } else if (data === '值为假') {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'False')
         return true
@@ -292,7 +286,7 @@ export default {
     // 添加一行
     addRow() {
       this.tempData.push({
-        id: this.tempData.length,
+        id: `${Date.now()}`,
         skip_type: null,
         data_source: null,
         check_value: null,
@@ -312,7 +306,7 @@ export default {
         this.initTempData()
       } else {
         this.tempData = [{
-          id: 0,
+          id: `${Date.now()}`,
           skip_type: null,
           data_source: null,
           check_value: null,

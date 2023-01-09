@@ -116,7 +116,6 @@ export default {
 
   mounted() {
     this.$bus.$on(this.$busEvents.api.apiApiDrawerStatus, (command, api) => {
-      console.log(api)
       this.tempDataType = api.data_type
       this.tempDataJson = JSON.stringify(api.data_json)
       this.tempDataForm = api.data_form

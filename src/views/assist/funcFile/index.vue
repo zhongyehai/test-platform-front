@@ -1,12 +1,61 @@
 <template>
   <div class="app-container">
-    <el-button
-      type="primary"
-      size="mini"
-      style="margin-left: 10px"
-      @click.native="showAddFuncFileDrawer()"
-    >新增函数文件
-    </el-button>
+
+    <el-form label-width="100px" :inline="true">
+
+      <el-form-item :label="'函数名：'" size="mini">
+        <el-input
+          v-model="listQuery.file_name"
+          class="input-with-select"
+          placeholder="函数名，支持模糊搜索"
+          size="mini"
+          clearable
+          style="width: 400px">
+        </el-input>
+      </el-form-item>
+
+      <el-form-item :label="'创建人：'" size="mini">
+        <el-select
+          v-model="listQuery.create_user"
+          :placeholder="'选择创建人'"
+          filterable
+          default-first-option
+          clearable
+          size="mini"
+          class="filter-item">
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item :label="'最近修改人：'" size="mini">
+        <el-select
+          v-model="listQuery.update_user"
+          :placeholder="'选择负责人'"
+          filterable
+          default-first-option
+          clearable
+          size="mini"
+          class="filter-item">
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+        </el-select>
+      </el-form-item>
+
+      <el-button
+        type="primary"
+        size="mini"
+        @click="getFuncFileList()">
+        搜索
+      </el-button>
+
+      <el-button
+        type="primary"
+        size="mini"
+        style="margin-left: 10px"
+        @click.native="showAddFuncFileDrawer()"
+      >新增函数文件
+      </el-button>
+
+    </el-form>
 
     <el-table
       ref="funcTable"
@@ -19,7 +68,7 @@
     >
       <el-table-column label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -96,8 +145,8 @@
     <pagination
       v-show="funcFiles.total>0"
       :total="funcFiles.total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="listQuery.pageNum"
+      :limit.sync="listQuery.pageSize"
       @pagination="getFuncFileList"
     />
 
@@ -124,20 +173,26 @@ export default {
   },
   data() {
     return {
+      listQuery: {
+        file_name: '',
+        create_user: '',
+        update_user: '',
+        pageNum: 1,
+        pageSize: 20
+      },
+
       // 拖拽排序参数
       sortable: null,
       oldList: [],
       newList: [],
-      userList: [],
+      currentUserList: [],
       userDict: {},
       funcDebugData: '',
       funcFiles: {
         list: [],
         total: 0,
       },
-      tableIsLoading: false,
-      pageSize: 20,
-      pageNum: 1
+      tableIsLoading: false
     }
   },
 
@@ -162,7 +217,7 @@ export default {
 
     getFuncFileList() {
       this.tableIsLoading = true
-      funcFileList({'pageNum': this.pageNum, 'pageSize': this.pageSize}).then(response => {
+      funcFileList(this.listQuery).then(response => {
         this.tableIsLoading = false
 
         this.funcFiles.list = response.data.data

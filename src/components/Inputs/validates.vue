@@ -123,7 +123,6 @@
       <el-table-column label="id" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
-          <el-input v-model="scope.row.id" v-show="false"></el-input>
         </template>
       </el-table-column>
 
@@ -299,12 +298,7 @@ export default {
   methods: {
 
     initTempData() {
-      this.tempData = []
-      for (let index in this.validates) {
-        let data = this.validates[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
+      this.tempData = this.validates
     },
 
     // 从后端获取断言方式
@@ -360,7 +354,7 @@ export default {
     // 添加一行
     addRow() {
       this.tempData.push({
-        id: this.tempData.length,
+        id: `${Date.now()}`,
         data_source: null,
         key: null,
         validate_type: null,
@@ -378,7 +372,14 @@ export default {
       if (validates && validates.length > 0) {
         this.initTempData()
       } else {
-        this.tempData = [{id: 0, data_source: null, key: null, validate_type: null, data_type: null, value: null}]
+        this.tempData = [{
+          id: `${Date.now()}`,
+          data_source: null,
+          key: null,
+          validate_type: null,
+          data_type: null,
+          value: null
+        }]
       }
     },
 

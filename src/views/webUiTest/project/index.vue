@@ -8,17 +8,14 @@
       <el-form label-width="100px" :inline="true">
 
         <el-form-item :label="'项目名：'" size="mini">
-          <el-select
-            ref="projectSelector"
-            v-model="listQuery.projectId"
-            :placeholder="'选择项目名'"
-            filterable
-            default-first-option
-            clearable
+          <el-input
+            v-model="listQuery.name"
+            class="input-with-select"
+            placeholder="项目名，支持关键字查询"
             size="mini"
-            class="filter-item">
-            <el-option v-for="project in project_list" :key="project.id" :label="project.name" :value="project.id"/>
-          </el-select>
+            clearable
+            style="width: 200px">
+          </el-input>
         </el-form-item>
 
         <el-form-item :label="'创建人：'" size="mini">
@@ -219,7 +216,7 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 20,
-        projectId: '',  // 服务id
+        name: '',
         manager: '',  // 负责人
         create_user: '', // 创建人
       },

@@ -10,7 +10,6 @@
     <el-table-column label="id" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
-        <el-input v-model="scope.row.id" v-show="false"></el-input>
       </template>
     </el-table-column>
 
@@ -106,18 +105,13 @@ export default {
   },
   methods: {
 
-    initTempData(){
-      this.tempData = []
-      for (let index in this.currentData){
-        let data = this.currentData[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
+    initTempData() {
+      this.tempData = this.currentData
     },
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: this.tempData.length, key: null, value: null, remark: null, data_type: 'str'})
+      this.tempData.push({id: `${Date.now()}`, key: null, value: null, remark: null, data_type: 'str'})
     },
 
     // 是否显示删除按钮
@@ -166,7 +160,7 @@ export default {
         if (newVal) {
           this.initTempData()
         } else {
-          this.tempData = [{id: 0, key: null, value: null, remark: null, data_type: 'str'}]
+          this.tempData = [{id: `${Date.now()}`, key: null, value: null, remark: null, data_type: 'str'}]
         }
       }
     },

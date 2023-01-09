@@ -174,7 +174,8 @@
                 <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'${do_something($extract_name_8, a=status)}'" style="width: 95%"></el-input>
+                <el-input size="mini" disabled :placeholder="'${do_something($extract_name_8, a=status)}'"
+                          style="width: 95%"></el-input>
               </el-col>
               <span style="margin-top: 5px"><span style="color: red">注</span>：自定义函数提取值，不支持传常量，只支持自定义变量或者提取表达式</span>
             </el-row>
@@ -195,7 +196,6 @@
       <el-table-column label="id" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
-          <el-input v-model="scope.row.id" v-show="false"></el-input>
         </template>
       </el-table-column>
 
@@ -313,13 +313,8 @@ export default {
   },
   methods: {
 
-    initTempData(){
-      this.tempData = []
-      for (let index in this.currentData){
-        let data = this.currentData[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
+    initTempData() {
+      this.tempData = this.currentData
     },
 
     // 从后端获取响应数据源映射
@@ -342,7 +337,14 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: this.tempData.length, key: null, data_source: null, value: null, remark: null, update_to_header: null})
+      this.tempData.push({
+        id: `${Date.now()}`,
+        key: null,
+        data_source: null,
+        value: null,
+        remark: null,
+        update_to_header: null
+      })
     },
 
     // 是否显示删除按钮
@@ -392,7 +394,14 @@ export default {
         if (newVal) {
           this.initTempData()
         } else {
-          this.tempData = [{id: 0, key: null, data_source: null, value: null, remark: null, update_to_header: null}]
+          this.tempData = [{
+            id: `${Date.now()}`,
+            key: null,
+            data_source: null,
+            value: null,
+            remark: null,
+            update_to_header: null
+          }]
         }
       }
     },

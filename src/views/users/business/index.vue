@@ -1,14 +1,60 @@
 <template>
   <div class="app-container">
 
-    <el-button
-      class="filter-item"
-      style="float: left;margin-left: 10px"
-      type="primary"
-      size="mini"
-      @click="showAddBusinessDialog()">
-      {{ '添加业务线' }}
-    </el-button>
+    <el-form label-width="120px" :inline="true">
+
+      <el-form-item :label="'业务线：'" size="mini">
+        <el-input
+          v-model="listQuery.name"
+          class="input-with-select"
+          placeholder="业务线，支持模糊搜索"
+          size="mini"
+          clearable
+          style="width: 200px">
+        </el-input>
+      </el-form-item>
+
+      <el-form-item :label="'code：'" size="mini">
+        <el-input
+          v-model="listQuery.code"
+          class="input-with-select"
+          placeholder="业务线code，支持模糊搜索"
+          size="mini"
+          clearable
+          style="width: 200px">
+        </el-input>
+      </el-form-item>
+
+      <el-form-item :label="'创建人：'" size="mini">
+        <el-select
+          v-model="listQuery.create_user"
+          :placeholder="'选择创建人'"
+          filterable
+          default-first-option
+          clearable
+          size="mini"
+          class="filter-item">
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+        </el-select>
+      </el-form-item>
+
+      <el-button
+        type="primary"
+        size="mini"
+        @click="getBusinessList()">
+        搜索
+      </el-button>
+
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="primary"
+        size="mini"
+        @click="showAddBusinessDialog()">
+        添加业务线
+      </el-button>
+
+    </el-form>
 
     <el-table
       ref="apiTree"
@@ -18,7 +64,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -28,7 +74,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="35%">
+      <el-table-column :show-overflow-tooltip=true prop="code" align="center" label="code" min-width="15%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.code }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
@@ -71,7 +123,10 @@
       <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item :label="'业务线名'" class="is-required">
-          <el-input v-model="tempBusiness.name" :disabled="drawerType === 'edit'" size="mini"/>
+          <el-input v-model="tempBusiness.name" size="mini"/>
+        </el-form-item>
+        <el-form-item :label="'code'" class="is-required">
+          <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini"/>
         </el-form-item>
 
         <el-form-item :label="'备注'">
@@ -94,8 +149,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="listQuery.pageNum"
+      :limit.sync="listQuery.pageSize"
       @pagination="getBusinessList"
     />
   </div>
@@ -113,6 +168,14 @@ export default {
   },
   data() {
     return {
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+        create_user: '',
+        name: '',
+        code: ''
+      },
+
       // 请求列表等待响应的状态
       listLoading: false,
       total: 0,
@@ -124,14 +187,12 @@ export default {
       tempBusiness: {
         id: '',
         name: '',
+        code: '',
         desc: ''
       },
       // 用户权限
       roles: localStorage.getItem('roles'),
-      pageNum: 1,
-      pageSize: 20,
-
-      userList: [],
+      currentUserList: [],
       userDict: {},
     }
   },
@@ -192,7 +253,7 @@ export default {
     // 获取配置类型列表
     getBusinessList() {
       this.listLoading = true
-      businessList({'pageNum': this.pageNum, 'pageSize': this.pageSize}).then(response => {
+      businessList(this.listQuery).then(response => {
         this.listLoading = false
         this.list = response.data.data
         this.total = response.data.total
