@@ -15,7 +15,7 @@
       </label>
     </div>
     <div style="margin-top: 10px">
-      <el-radio v-model="runEnv" :label="key" v-for="(value, key) in runEnvData " :key="key">{{ value }}</el-radio>
+      <el-radio v-model="runEnv" :label="env.code" v-for="(env) in runEnvData " :key="env.code">{{ env.name }}</el-radio>
     </div>
 
     <!-- 选择运行浏览器 -->
@@ -160,6 +160,7 @@ import businessView from '@/components/Selector/business'
 import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
 
 import {getConfigByName, getRunModel} from "@/apis/config/config";
+import {runEnvList} from "@/apis/config/runEnv";
 import {phoneList, serverList} from "@/apis/appUiTest/env";  // 初始化超时时间
 import {getRunTimeout} from "@/utils/getConfig";
 
@@ -172,7 +173,7 @@ export default {
   data() {
     return {
       dialogIsShow: false,
-      runEnvData: {},
+      runEnvData: [],
       runModeData: {},
       runBrowserNameData: {},
       runEnv: '',
@@ -206,9 +207,13 @@ export default {
     },
 
     // 获取环境配置
-    initEnv() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.runEnvData = JSON.parse(response.data.value)
+    initEnvList() {
+      // 初始化运行环境
+      runEnvList({test_type: this.triggerRunType}).then(response => {
+        this.runEnvData = response.data.data
+        if (this.runEnvData && this.runEnvData.length > 0){
+          this.runEnv = this.runEnvData[0].code
+        }
       })
     },
 
@@ -250,17 +255,13 @@ export default {
 
   mounted() {
 
-    // 获取默认环境
-    getConfigByName({'name': 'default_env'}).then(response => {
-      this.runEnv = response.data.value
-    })
-
     getRunTimeout(this)  // 初始化等待用例运行超时时间
 
     this.$bus.$on(this.event, (triggerRunType, showSelectRunModel, runType) => {
       this.triggerRunType = triggerRunType
       this.showSelectRunModel = showSelectRunModel
       if (triggerRunType === 'api') {
+        this.initEnvList()
         this.initRunMode()
         if (runType === 'set'){
           this.showSelectBusiness=true
@@ -268,13 +269,12 @@ export default {
       } else if (triggerRunType === 'appUi') {
         this.getRunAppEnv()
       } else {
+        this.initEnvList()
         this.initRunMode()
         this.initBrowserName()
       }
       this.dialogIsShow = true
     })
-
-    this.initEnv()
 
   },
 

@@ -13,12 +13,9 @@ export default {
     // 服务
     apiShowProjectDrawer: 'apiShowProjectDrawer',  // 服务抽屉的状态，新增/编辑
     apiClickProjectEnv: 'apiClickProjectEnv',  // 服务环境编辑
-    apiShowEnvSynchronizer: 'apiShowEnvSynchronizer',  // 服务环境同步编辑
     apiEnvSynchronizerIsSuccess: 'apiEnvSynchronizerIsSuccess',  // 服务环境同步完成
     apiProjectDrawerCommitSuccess: 'apiProjectDrawerCommitSuccess',  // 服务抽屉的提交状态
-    apiEnvIsCommit: 'apiEnvIsCommit',  // 服务环境的提交状态
     apiSaveProjectEnv: 'apiSaveProjectEnv',  // 服务环境的提交状态
-    apiShowProjectEnvDrawer: 'apiShowProjectEnvDrawer',  // 服务环境编辑
     // 接口
     apiApiDrawerStatus: 'apiApiDrawerStatus',  // 接口抽屉的状态，新增/编辑
     apiApiChangeParam: 'apiApiChangeParam',  //修改param参数
@@ -71,12 +68,10 @@ export default {
     // 项目
     uiShowApiProjectDrawer: 'uiShowApiProjectDrawer',  // 服务抽屉的状态，新增/编辑
     uiClickApiProjectEnv: 'uiClickApiProjectEnv',  // 服务环境编辑
-    uiShowEnvSynchronizer: 'uiShowEnvSynchronizer',  // 服务环境同步编辑
     uiEnvSynchronizerIsSuccess: 'uiEnvSynchronizerIsSuccess',  // 服务环境同步完成
     uiProjectDialogCommitSuccess: 'uiProjectDialogCommitSuccess',  // 服务抽屉的提交状态
     uiSaveProjectEnv: 'uiSaveProjectEnv',  // 保存服务环境
     uiEnvIsCommit: 'uiEnvIsCommit',  // 服务环境的提交状态
-    uiShowProjectEnvDrawer: 'uiShowProjectEnvDrawer',  // 服务环境编辑
     // 页面
     uiPageDrawerIsOpen: 'uiPageDrawerIsOpen',  // 页面抽屉打开
     uiPageDrawerStatus: 'uiPageDrawerStatus',  // 页面抽屉的状态，新增/编辑
@@ -128,4 +123,6 @@ export default {
     findElementOptionDict: {},  // ui自动化的定位方式
   },
 
+  showProjectEnvDrawer: 'showProjectEnvDrawer',  // 打开服务环境编辑抽屉
+  showEnvSynchronizer: 'showEnvSynchronizer'  // 服务环境数据同步编辑抽屉
 }

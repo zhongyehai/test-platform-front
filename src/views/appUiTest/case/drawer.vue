@@ -378,7 +378,7 @@ export default {
       this.isShowDebugLoading = true
       caseRun({
         caseId: [caseId],
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,

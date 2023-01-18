@@ -229,6 +229,17 @@
               @click.native="delRow(scope.$index)">
             </el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+            <el-button
+              v-show="tempData.length === 1"
+              type="text"
+              size="mini"
+              icon="el-icon-circle-close"
+              style="color: red"
+              @click.native="clearData()"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -255,7 +266,7 @@ export default {
   data() {
     return {
       validateTypeList: [],
-      tempData: [{element: null, key: null, validate_type: null, data_type: null, value: null}],
+      tempData: [],
 
       dataTypeMapping: [],
       responseDataSourceMapping: [],
@@ -266,7 +277,16 @@ export default {
   },
 
   mounted() {
-    this.getValidates(this.validates)
+
+    if (this.validateTypeList.length === 0) {
+      this.getAssertMappings()
+    }
+
+    if (this.dataTypeMapping.length === 0) {
+      this.getDataTypeMapping()
+    }
+
+    this.initValidates(this.validates)
 
     this.oldList = this.tempData.map(v => v.id)
     this.newList = this.oldList.slice()
@@ -274,24 +294,9 @@ export default {
       this.setSort()
     })
 
-    if (this.validateTypeList.length === 0) {
-      this.getAssertMappings()
-    }
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
   },
 
   methods: {
-
-    initTempData() {
-      this.tempData = []
-      for (let index in this.validates) {
-        let data = this.validates[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
-      }
-    },
 
     // 从后端获取断言方式
     getAssertMappings() {
@@ -343,7 +348,13 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: this.tempData.length,element: null, key: null, validate_type: null, data_type: null, value: null})
+      this.tempData.push({
+        id: `${Date.now()}`,
+        validate_type: this.validateTypeList[0].value,
+        element: null,
+        data_type: this.dataTypeMapping[0].value,
+        value: null
+      })
     },
 
     // 删除一行
@@ -351,13 +362,22 @@ export default {
       this.tempData.splice(index, 1);
     },
 
-    getValidates(validates) {
+    // 清除数据
+    clearData() {
+      this.tempData[0].validate_type = null
+      this.tempData[0].element = null
+      this.tempData[0].data_type = null
+      this.tempData[0].value = null
+    },
+
+    initValidates(validates) {
       if (validates && validates.length > 0) {
-        this.initTempData()
+        this.tempData = this.validates
       } else {
-        this.tempData = [{id: 0, element: null, key: null, validate_type: null, data_type: null, value: null}]
+        this.addRow()
       }
     },
+
     // 拖拽排序
     setSort() {
       const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
@@ -380,7 +400,7 @@ export default {
   watch: {
     'validates': {
       handler(newVal, oldVal) {
-        this.getValidates(newVal)
+        this.initValidates(newVal)
       }
     }
   }

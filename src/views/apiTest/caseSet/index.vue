@@ -397,7 +397,7 @@ export default {
     runCaseSet(runConf) {
       caseSetRun({
         'id': this.runSetData.id,
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         business_id: runConf.businessId,
         'trigger_type': 'page'

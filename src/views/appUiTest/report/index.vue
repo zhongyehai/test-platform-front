@@ -173,7 +173,10 @@ import Pagination from '@/components/Pagination'
 import {reportList, deleteReport, downloadReport} from '@/apis/appUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
 import {userList} from "@/apis/system/user";
+import {runEnvList} from "@/apis/config/runEnv";
+
 import {reportStatusMappingContent, reportStatusMappingTagType, reportTriggerTypeMappingContent} from "@/utils/mapping";
+
 
 export default {
   name: 'index',
@@ -323,8 +326,11 @@ export default {
       this.getReportList()
     })
 
-    getConfigByName({'name': 'run_test_env'}).then(response => {
-      this.eventDict = JSON.parse(response.data.value)
+    // 获取环境列表
+    runEnvList({test_type: 'api'}).then(response => {
+      response.data.data.forEach(env => {
+        this.eventDict[env.code] = env.name
+      })
     })
 
     getConfigByName({'name': 'run_type'}).then(response => {

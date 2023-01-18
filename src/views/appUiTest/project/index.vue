@@ -86,7 +86,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'项目名'" prop="name" align="center" min-width="40%" :show-overflow-tooltip=true>
+      <el-table-column :label="'APP名'" prop="name" align="center" min-width="40%" :show-overflow-tooltip=true>
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -124,7 +124,7 @@
       <el-table-column :label="'操作'" align="center" min-width="10%" class-name="small-padding fixed-width">
         <template slot-scope="{row, $index}">
 
-          <!-- 编辑项目 -->
+          <!-- 编辑App -->
           <el-button
             type="text"
             size="mini"
@@ -141,7 +141,7 @@
             @click="showEditEnvForm(row)">
           </el-button>
 
-          <!--删除项目-->
+          <!--删除App-->
           <el-popover
             :ref="row.id"
             placement="top"
@@ -175,15 +175,15 @@
       :limit.sync="listQuery.pageSize"
       @pagination="getProjectList"/>
 
-    <!-- 项目信息抽屉 -->
+    <!-- App信息抽屉 -->
     <projectDrawer
       :currentProject="currentProject"
       :currentUserList="currentUserList"
     ></projectDrawer>
 
-    <!-- 项目环境抽屉 -->
+    <!-- App环境抽屉 -->
     <projectEnvDrawer
-      :env-mapping="envMapping"
+      :envType="'app'"
       :dataTypeMapping="dataTypeMapping"
     ></projectEnvDrawer>
   </div>
@@ -196,7 +196,7 @@ import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/appUiTest/project/drawer'
-import projectEnvDrawer from '@/views/appUiTest/project/envEditor'
+import projectEnvDrawer from '@/components/projectEnvEditor/envEditor.vue'
 import {getConfigByName} from "@/apis/config/config";
 import {projectSort} from "@/apis/appUiTest/project";
 
@@ -227,7 +227,6 @@ export default {
       total: 0,      // 服务数据表格总条数
       downloadLoading: false,      // 下载表格状态
       listLoading: true,      // 请求加载状态
-      envMapping: {},
       dataTypeMapping: [],
       sortable: null,
       oldList: [],
@@ -260,14 +259,14 @@ export default {
       return this.userDict[userId].name
     },
 
-    // 编辑按钮
+    // 编辑app信息
     showEditForm(row) {
       this.$bus.$emit(this.$busEvents.ui.uiShowApiProjectDrawer, 'edit', row)
     },
 
     // 编辑环境
     showEditEnvForm(row) {
-      this.$bus.$emit(this.$busEvents.ui.uiShowProjectEnvDrawer, row)
+      this.$bus.$emit(this.$busEvents.showProjectEnvDrawer, row)
     },
 
     // 获取服务列表
@@ -363,11 +362,6 @@ export default {
     // 从后端获取数据类型映射
     getConfigByName({'name': 'data_type_mapping'}).then(response => {
       this.dataTypeMapping = JSON.parse(response.data.value)
-    })
-
-    // 获取环境配置
-    getConfigByName({'name': 'run_test_env'}).then(response => {
-      this.envMapping = JSON.parse(response.data.value)
     })
 
     // test环境修改后，前端页面也跟随修改域名

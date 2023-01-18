@@ -108,7 +108,7 @@ export default {
     return {
       tempDataType: 'json',
       tempDataJson: {},
-      tempDataForm: '',
+      tempDataForm: [],
       tempDataUrlencoded: {},
       tempDataText: null,
     }
@@ -133,7 +133,7 @@ export default {
     this.tempDataType = this.dataType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
     this.tempDataUrlencoded = JSON.stringify(this.dataUrlencoded) || JSON.stringify({})
-    this.tempDataForm = this.dataForm || [{key: null, data_type: null, remark: null, value: null}]
+    this.tempDataForm = this.dataForm
     this.tempDataText = this.dataText || null
   },
 
@@ -160,7 +160,7 @@ export default {
 
     'dataForm': {
       handler(newVal, oldVal) {
-        this.tempDataForm = newVal || [{key: null, data_type: null, remark: null, value: null}]
+        this.tempDataForm = newVal
       }
     },
 

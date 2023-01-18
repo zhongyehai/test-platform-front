@@ -100,6 +100,35 @@ export const constantRoutes = [
       }]
   },
 
+  // 配置管理
+  {
+    path: '/config',
+    component: Layout,
+    redirect: '/config',
+    name: 'Config',
+    meta: {title: '配置管理', icon: 'el-icon-setting'},
+    children: [
+      {
+        path: 'type',
+        name: 'ConfigType',
+        meta: {title: '类型管理', icon: 'el-icon-star-off'},
+        component: () => import('@/views/config/configType/index')
+      },
+      {
+        path: 'args',
+        name: 'Args',
+        meta: {title: '参数管理', icon: 'el-icon-star-on'},
+        component: () => import('@/views/config/configs/index')
+      },
+      {
+        path: 'runEnv',
+        name: 'RunEnv',
+        meta: {title: '运行环境', icon: 'el-icon-orange'},
+        component: () => import('@/views/config/runEnv/index')
+      }
+    ]
+  },
+
   // 接口测试
   {
     path: '/apiTest',
@@ -290,12 +319,6 @@ export const constantRoutes = [
         meta: {title: '文件管理', icon: 'el-icon-files'}
       },
       {
-        path: 'dataPool',
-        name: 'DataPool',
-        component: () => import('@/views/assist/dataPool'),
-        meta: {title: '自动化测试数据池', icon: 'el-icon-s-operation'}
-      },
-      {
         path: 'autoTestUser',
         name: 'AutoTestUser',
         component: () => import('@/views/assist/autoTestUser'),
@@ -319,29 +342,6 @@ export const constantRoutes = [
         name: 'apiErrorRecord',
         meta: {title: '执行错误记录', icon: 'el-icon-video-camera-solid'},
         component: () => import('@/views/assist/errorRecord/index')
-      }
-    ]
-  },
-
-  // 配置管理
-  {
-    path: '/config',
-    component: Layout,
-    redirect: '/config',
-    name: 'Config',
-    meta: {title: '配置管理', icon: 'el-icon-setting'},
-    children: [
-      {
-        path: 'type',
-        name: 'ConfigType',
-        meta: {title: '类型管理', icon: 'el-icon-star-off'},
-        component: () => import('@/views/config/configType/index')
-      },
-      {
-        path: 'args',
-        name: 'Args',
-        meta: {title: '参数管理', icon: 'el-icon-star-on'},
-        component: () => import('@/views/config/configs/index')
       }
     ]
   },

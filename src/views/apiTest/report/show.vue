@@ -367,6 +367,13 @@
                       </el-row>
                     </el-collapse-item>
 
+                    <el-collapse-item name="18">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "响应状态码：" }}</div>
+                      </template>
+                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
+                    </el-collapse-item>
+
                     <el-collapse-item name="14">
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ "响应文本：" }}</div>
@@ -516,8 +523,9 @@ import JsonViewer from "vue-json-viewer";
 import vkbeautify from "vkbeautify";
 import hitDrawer from "@/views/assist/hits/drawer";
 
-import {getConfigByName} from '@/apis/config/config'
 import {reportDetail} from '@/apis/apiTest/report'
+import {runEnvList} from "@/apis/config/runEnv";
+
 import {reportStepResultMapping} from "@/utils/mapping";
 
 export default {
@@ -780,17 +788,16 @@ export default {
 
     },
 
-    // 获取环境配置
-    getEnvDict() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.runEnvDict = JSON.parse(response.data.value)
-      })
-    },
-
     // 获取测试报告具体内容
     getReportDataById() {
+      const loading = this.$loading({
+        lock: true,
+        text: '测试报告数据较大，所以数据传输会稍久，请耐心等待',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
       reportDetail({'id': this.$route.query.id}).then((response) => {
-          // console.log(response)
+          loading.close()
           if (this.showMessage(this, response)) {
             this.reportData = response['data']
             this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
@@ -817,12 +824,15 @@ export default {
     }
   },
 
-  // mounted() {
-  //   this.getReportDataById()
-  // },
-
   created() {
-    this.getEnvDict()
+
+    // 获取环境列表
+    runEnvList({test_type: 'api'}).then(response => {
+      response.data.data.forEach(env => {
+        this.runEnvDict[env.code] = env.name
+      })
+    })
+
     this.getReportDataById()
   },
 }

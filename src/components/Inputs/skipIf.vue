@@ -152,6 +152,17 @@
               @click.native="delRow(scope.$index)">
             </el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+            <el-button
+              v-show="tempData.length === 1"
+              type="text"
+              size="mini"
+              icon="el-icon-circle-close"
+              style="color: red"
+              @click.native="clearData()"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -173,18 +184,7 @@ export default {
   data() {
     return {
       validateTypeList: [],
-
-      tempData: [
-        {
-          skip_type: null,
-          data_source: null,
-          check_value: null,
-          comparator: null,
-          data_type: null,
-          expect: null
-        }
-      ],
-
+      tempData: [],
       dataTypeMapping: [],
       skipIfDataSourceMapping: [],
       skipIfTypeMapping: [],
@@ -195,34 +195,32 @@ export default {
   },
 
   mounted() {
-    this.getValidates(this.skipIfData)
+    if (this.skipIfTypeMapping.length === 0) {
+      this.getSkipIfTypeMappings()
+    }
 
+    if (this.skipIfDataSourceMapping.length === 0) {
+      this.getSkipIfDataSourceMappings()
+    }
+
+    if (this.validateTypeList.length === 0) {
+      this.getAssertMappings()
+    }
+
+    if (this.dataTypeMapping.length === 0) {
+      this.getDataTypeMapping()
+    }
+
+    this.initTempData(this.skipIfData)
     this.oldList = this.tempData.map(v => v.id)
     this.newList = this.oldList.slice()
     this.$nextTick(() => {
       this.setSort()
     })
-
-    if (this.skipIfTypeMapping.length === 0) {
-      this.getSkipIfTypeMappings()
-    }
-    if (this.skipIfDataSourceMapping.length === 0) {
-      this.getSkipIfDataSourceMappings()
-    }
-    if (this.validateTypeList.length === 0) {
-      this.getAssertMappings()
-    }
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
   },
 
 
   methods: {
-
-    initTempData() {
-      this.tempData = this.skipIfData
-    },
 
     // 从后端获取跳过数据源
     getSkipIfDataSourceMappings() {
@@ -301,21 +299,24 @@ export default {
       this.tempData.splice(index, 1);
     },
 
-    getValidates(validates) {
-      if (validates && validates.length > 0) {
-        this.initTempData()
+    // 清除数据
+    clearData() {
+      this.tempData[0].skip_type = null
+      this.tempData[0].data_source = null
+      this.tempData[0].check_value = null
+      this.tempData[0].comparator = null
+      this.tempData[0].data_type = null
+      this.tempData[0].expect = null
+    },
+
+    initTempData(skipIfs) {
+      if (skipIfs && skipIfs.length > 0) {
+        this.tempData = this.skipIfData
       } else {
-        this.tempData = [{
-          id: `${Date.now()}`,
-          skip_type: null,
-          data_source: null,
-          check_value: null,
-          comparator: null,
-          data_type: null,
-          expect: null
-        }]
+        this.addRow()
       }
     },
+
     // 拖拽排序
     setSort() {
       const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
@@ -338,7 +339,7 @@ export default {
   watch: {
     'skipIfData': {
       handler(newVal, oldVal) {
-        this.getValidates(newVal)
+        this.initTempData(newVal)
       }
     }
   }

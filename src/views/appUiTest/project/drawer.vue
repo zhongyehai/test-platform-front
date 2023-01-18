@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-drawer
-      :title="tempProject.id ? '修改项目' : '新增项目'"
+      :title="tempProject.id ? '修改App' : '新增App'"
       size="70%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
@@ -11,7 +11,7 @@
         <div style="margin-left: 20px">
           <el-form ref="dataForm" :model="tempProject" label-width="100px"
                    style="min-width: 200px;margin-left: 20px;margin-right: 20px">
-            <el-form-item :label="'项目名'" prop="name" size="mini" class="is-required">
+            <el-form-item :label="'App名'" prop="name" size="mini" class="is-required">
               <el-input v-model="tempProject.name"/>
             </el-form-item>
 
@@ -65,7 +65,7 @@
             size="mini"
             @click="tempProject.id ? changProject() : addProject() "
             :loading="submitButtonIsLoading"
-          >{{ tempProject.id ? '保存项目信息' : '新增项目信息' }}
+          >{{ tempProject.id ? '保存App信息' : '新增App信息' }}
           </el-button>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default {
     showEnvDrawer() {
       this.dialogIsShow = false  // 关闭dialog
       this.drawerIsShow = false  // 关闭抽屉
-      this.$bus.$emit(this.$busEvents.ui.uiShowProjectEnvDrawer, this.tempProject)
+      this.$bus.$emit(this.$busEvents.showProjectEnvDrawer, this.tempProject)
     },
 
     // 获取自定义函数列表
@@ -154,7 +154,7 @@ export default {
       })
     },
 
-    // 初始化临时项目数据 (新增)
+    // 初始化临时App数据 (新增)
     initTempProject() {
       this.tempProject = {
         id: null,
@@ -168,7 +168,7 @@ export default {
       this.submitButtonIsShow = true
     },
 
-    // 初始化临时项目数据 (修改)
+    // 初始化临时App数据 (修改)
     updateTempProject(row) {
       this.tempProject.id = row.id
       this.tempProject.name = row.name
@@ -193,7 +193,7 @@ export default {
       }
     },
 
-    // 新增项目
+    // 新增App
     addProject() {
       this.submitButtonIsLoading = true
       postProject(this.getProjectForCommit()).then(response => {
@@ -207,7 +207,7 @@ export default {
       })
     },
 
-    // 修改项目
+    // 修改App
     changProject() {
       this.submitButtonIsLoading = true
       putProject(this.getProjectForCommit()).then(response => {
@@ -220,7 +220,7 @@ export default {
       })
     },
 
-    // 数据提交成功后，向父组件发送提交成功的消息，父组件重新请求项目列表
+    // 数据提交成功后，向父组件发送提交成功的消息，父组件重新请求App列表
     sendIsCommitStatus() {
       this.$bus.$emit(this.$busEvents.ui.uiProjectDialogCommitSuccess, 'success')
     },

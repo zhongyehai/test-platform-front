@@ -66,8 +66,14 @@
             <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
               <li style="font-weight:700;font-size:16px">步骤概况</li>
               <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.teststeps.successes }}</li>
-              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.teststeps.failures }}</li>
+              <li style="color: rgb(25,212,174);font-weight:600">成功:{{
+                  this.reportData.stat.teststeps.successes
+                }}
+              </li>
+              <li style="color: rgb(250,110,134);font-weight:600">失败:{{
+                  this.reportData.stat.teststeps.failures
+                }}
+              </li>
               <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
               <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
             </ol>
@@ -284,7 +290,8 @@ import vkbeautify from "vkbeautify";
 import hitDrawer from "@/views/assist/hits/drawer";
 
 import {reportDetail} from '@/apis/webUiTest/report'
-import {getConfigByName} from "@/apis/config/config";
+import {runEnvList} from "@/apis/config/runEnv";
+
 import {reportStepResultMapping} from "@/utils/mapping";
 
 
@@ -546,17 +553,16 @@ export default {
 
     },
 
-    // 获取环境配置
-    getEnvDict() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.runEnvDict = JSON.parse(response.data.value)
-      })
-    },
-
     // 获取测试报告具体内容
     getReportDataById() {
+      const loading = this.$loading({
+        lock: true,
+        text: 'ui自动化测试报告包含截图，数据较大，所以数据传输会稍久，请耐心等待',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
       reportDetail({'id': this.$route.query.id}).then((response) => {
-          // console.log(response)
+          loading.close()
           if (this.showMessage(this, response)) {
             this.reportData = response['data']
             this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
@@ -583,7 +589,14 @@ export default {
   },
 
   created() {
-    this.getEnvDict()
+
+    // 获取环境列表
+    runEnvList({test_type: 'webUi'}).then(response => {
+      response.data.data.forEach(env => {
+        this.runEnvDict[env.code] = env.name
+      })
+    })
+
     this.getReportDataById()
   },
 }

@@ -46,6 +46,7 @@
               <el-form-item label="选择环境" class="is-required">
                 <environmentSelectorView
                   :env="tempTask.env"
+                  :env_type="'app'"
                   ref="environmentSelectorView"
                 ></environmentSelectorView>
                 <el-popover class="el_popover_class" placement="top-start" trigger="hover">

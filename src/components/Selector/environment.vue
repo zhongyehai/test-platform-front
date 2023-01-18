@@ -8,42 +8,36 @@
     size="mini"
   >
     <el-option
-      v-for="(value, key) in environments"
-      :key="key"
-      :label="value"
-      :value="key"
+      v-for="(env) in env_list"
+      :key="env.code"
+      :label="env.name"
+      :value="env.code"
     >
     </el-option>
   </el-select>
 </template>
 
 <script>
-import {getConfigByName} from "@/apis/config/config";
+import {runEnvList} from "@/apis/config/runEnv";
 
 export default {
   name: "environment",
-  props: ['env'],
+  props: ['env', 'env_type'],
   data() {
     return {
       current_env: '',
-      environments: []
+      env_list: []
     }
   },
 
-  methods: {
-    // 获取环境配置
-    initEnv() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.environments = JSON.parse(response.data.value)
-      })
-    },
+  mounted() {
+    // 获取环境列表
+    runEnvList({test_type: this.env_type}).then(response => {
+      this.env_list = response.data.data
+    })
   },
 
-  mounted(){
-    this.initEnv()
-  },
-
-  created(){
+  created() {
     this.current_env = this.env
   },
 

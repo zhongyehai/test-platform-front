@@ -90,6 +90,17 @@
             style="color: red"
             @click.native="delRow(scope.$index)"></el-button>
         </el-tooltip>
+        <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+          <el-button
+            v-show="tempData.length === 1"
+            type="text"
+            size="mini"
+            icon="el-icon-circle-close"
+            style="color: red"
+            @click.native="clearData()"
+          >
+          </el-button>
+        </el-tooltip>
       </template>
     </el-table-column>
 
@@ -123,8 +134,12 @@ export default {
       })
     },
 
-    initTempData() {
-      this.tempData = this.dataForm
+    initTempData(data) {
+      if (data && data.length > 0) {
+        this.tempData = this.dataForm
+      } else {
+        this.addRow()
+      }
     },
 
     // 上传文件到服务器
@@ -175,12 +190,26 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: `${Date.now()}`, key: null, value: null, remark: null})
+      this.tempData.push({
+        id: `${Date.now()}`,
+        key: null,
+        value: null,
+        data_type: this.formDataTypes[0].value,
+        remark: null
+      })
     },
 
     // 删除一行
     delRow(index) {
       this.tempData.splice(index, 1);
+    },
+
+    // 清除数据
+    clearData() {
+      this.tempData[0].key = null
+      this.tempData[0].value = null
+      this.tempData[0].data_type = null
+      this.tempData[0].remark = null
     },
 
     // 拖拽排序
@@ -203,9 +232,9 @@ export default {
   },
 
   mounted() {
-    this.initTempData()
     this.getDataTypeMapping()
 
+    this.initTempData(this.dataForm)
     this.oldList = this.tempData.map(v => v.id)
     this.newList = this.oldList.slice()
     this.$nextTick(() => {
@@ -217,11 +246,7 @@ export default {
 
     'dataForm': {
       handler(newVal, oldVal) {
-        if (newVal) {
-          this.initTempData()
-        } else {
-          this.tempData = [{id: `${Date.now()}`, key: null, value: null, remark: null, data_type: 'str'}]
-        }
+        this.initTempData(newVal)
       }
     },
   }

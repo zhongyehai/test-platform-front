@@ -264,7 +264,7 @@ export default {
       this.$set(this.currentCase, 'isShowRunLoading', true)
       caseRun({
         caseId: [this.currentCase.id],
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,

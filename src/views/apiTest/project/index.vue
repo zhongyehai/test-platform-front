@@ -222,7 +222,7 @@
 
     <!-- 服务环境抽屉 -->
     <projectEnvDrawer
-      :env-mapping="envMapping"
+      :envType="'api'"
       :dataTypeMapping="dataTypeMapping"
     ></projectEnvDrawer>
   </div>
@@ -237,8 +237,8 @@ import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import projectDrawer from '@/views/apiTest/project/drawer'
-import projectEnvDrawer from '@/views/apiTest/project/envEditor'
-import {getConfigByName, getDefaultEnvConfig} from "@/apis/config/config";
+import projectEnvDrawer from '@/components/projectEnvEditor/envEditor.vue'
+import {getConfigByName} from "@/apis/config/config";
 import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/utils/mapping";
 
 export default {
@@ -268,7 +268,6 @@ export default {
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
-      envMapping: {},
       dataTypeMapping: [],
       sortable: null,
       oldList: [],
@@ -310,7 +309,7 @@ export default {
 
     // 编辑环境
     showEditEnvForm(row) {
-      this.$bus.$emit(this.$busEvents.api.apiShowProjectEnvDrawer, row)
+      this.$bus.$emit(this.$busEvents.showProjectEnvDrawer, row)
     },
 
     // 从yapi同步服务信息
@@ -443,32 +442,11 @@ export default {
       this.dataTypeMapping = JSON.parse(response.data.value)
     })
 
-    // 获取环境配置
-    getConfigByName({'name': 'run_test_env'}).then(response => {
-      this.envMapping = JSON.parse(response.data.value)
-    })
-
-    // test环境修改后，前端页面也跟随修改域名
-    this.$bus.$on(this.$busEvents.api.apiEnvIsCommit, (projectId, host, env) => {
-      if (env === 'test') {
-        try {
-          this.project_list.forEach(row => {
-            if (row.id === projectId) {
-              this.$set(row, 'test', host)
-              throw new Error('遍历结束')
-            }
-          })
-        } catch (error) {
-          if (error.message !== '遍历结束') throw error
-        }
-      }
-    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.api.apiProjectDrawerCommitSuccess)
-    this.$bus.$off(this.$busEvents.api.apiEnvIsCommit)
   },
 
 }

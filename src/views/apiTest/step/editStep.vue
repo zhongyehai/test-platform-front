@@ -230,6 +230,7 @@ import {postStep, putStep, putStepHost} from "@/apis/apiTest/step"
 import {getApi, getAssertMapping} from "@/apis/apiTest/api";
 import {getProject} from "@/apis/apiTest/project";
 import {getConfigByName} from "@/apis/config/config";
+import {assertStrIsJson} from "@/utils/validate";
 
 export default {
   name: "editStep",
@@ -329,8 +330,11 @@ export default {
 
     getStepForCommit() {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      assertStrIsJson(json_data, 'json请求体格式错误')
       var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
+      assertStrIsJson(data_urlencoded, 'form-urlencoded请求体格式错误')
       var data_driver = this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson
+      assertStrIsJson(data_driver, '数据驱动格式错误')
       var skip_if = this.$refs.skipIfView.tempData
       return {
         'id': this.currentStep.id,
@@ -361,8 +365,9 @@ export default {
 
     // 新增步骤信息
     addStep() {
+      let data = this.getStepForCommit()
       this.submitButtonIsLoading = true
-      postStep(this.getStepForCommit()).then(response => {
+      postStep(data).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           // 避免重复请求步骤列表，新建完步骤过后，把新增的步骤给步骤列表更新
@@ -374,8 +379,9 @@ export default {
 
     // 修改步骤信息
     editStep() {
+      let data = this.getStepForCommit()
       this.submitButtonIsLoading = true
-      putStep(this.getStepForCommit()).then(response => {
+      putStep(data).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           // 避免重复请求步骤列表，新建完步骤过后，把新增的步骤给步骤列表更新

@@ -9,13 +9,12 @@
           size="mini"
           filterable
           default-first-option
-          @change="getAutoTestUserData()"
         >
           <el-option
-            v-for="(value, key) in envDict"
-            :key="key"
-            :label="value"
-            :value="key"
+            v-for="(env) in envList"
+            :key="env.code"
+            :label="env.name"
+            :value="env.code"
           >
           </el-option>
         </el-select>
@@ -67,7 +66,7 @@
       </el-table-column>
       <el-table-column :show-overflow-tooltip=true label="所属环境" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ getEnv(scope.row.env) }} </span>
+          <span> {{ envDict[scope.row.env] }} </span>
         </template>
       </el-table-column>
     </el-table>
@@ -79,7 +78,7 @@
 import Pagination from '@/components/Pagination'
 
 import {getAutoTestUser} from "@/apis/assist/dataPool";
-import {getConfigByName} from "@/apis/config/config";  // 初始化超时时间
+import {runEnvList} from "@/apis/config/runEnv";  // 初始化超时时间
 
 export default {
   name: 'dataPool',
@@ -88,19 +87,13 @@ export default {
     return {
       listLoading: false,  // 加载状态
       currentDataList: [],  // 数据列表
-      currentEnv: 'test',  // 选择的环境
+      currentEnv: '',  // 选择的环境
+      envList: [],
       envDict: {}  // 环境字典
     }
   },
 
   methods: {
-
-    // 获取环境列表
-    getAllEnv(){
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.envDict = JSON.parse(response.data.value)
-      })
-    },
 
     // 获取数据池数据
     getAutoTestUserData() {
@@ -109,15 +102,38 @@ export default {
       })
     },
 
-    getEnv(env){
-      return this.envDict[env]
-    }
   },
 
   mounted() {
-    this.getAllEnv()
-    this.getAutoTestUserData()
+
+    // 获取环境配置
+    runEnvList({'test_type': this.envType}).then(response => {
+
+      if (response.data.data.length > 0) {
+        this.currentEnv = response.data.data[0].code
+      }
+
+      response.data.data.forEach(env => {
+        if (!(env.code in this.envDict)) {
+          this.envList.push(env)
+        }
+        this.envDict[env.code] = env.name
+      })
+    })
+
   },
+
+  watch: {
+    "currentEnv": {
+      deep: true,  // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.getAutoTestUserData()
+        }
+      }
+    }
+  }
+
 }
 </script>
 

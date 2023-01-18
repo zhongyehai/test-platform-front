@@ -282,6 +282,17 @@
             >
             </el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+            <el-button
+              v-show="tempData.length === 1"
+              type="text"
+              size="mini"
+              icon="el-icon-circle-close"
+              style="color: red"
+              @click.native="clearData()"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -305,7 +316,7 @@ export default {
   data() {
     return {
       tempData: [],
-      responseDataSourceMapping: [],
+      responseDataSourceMapping: [{label: '', value: ''}],
       sortable: null,
       oldList: [],
       newList: [],
@@ -313,8 +324,12 @@ export default {
   },
   methods: {
 
-    initTempData() {
-      this.tempData = this.currentData
+    initTempData(data) {
+      if (data && data.length > 0) {
+        this.tempData = this.currentData
+      } else {
+        this.addRow()
+      }
     },
 
     // 从后端获取响应数据源映射
@@ -340,7 +355,7 @@ export default {
       this.tempData.push({
         id: `${Date.now()}`,
         key: null,
-        data_source: null,
+        data_source: this.responseDataSourceMapping[0].value,
         value: null,
         remark: null,
         update_to_header: null
@@ -355,6 +370,15 @@ export default {
     // 删除一行
     delRow(i) {
       this.tempData.splice(i, 1)
+    },
+
+    // 清除数据
+    clearData() {
+      this.tempData[0].key = null
+      this.tempData[0].value = null
+      this.tempData[0].remark = null
+      this.tempData[0].data_source = null
+      this.tempData[0].update_to_header = null
     },
 
     // 拖拽排序
@@ -378,8 +402,8 @@ export default {
 
   mounted() {
     this.getResponseDataSourceMapping()
-    this.initTempData()
 
+    this.initTempData(this.currentData)
     this.oldList = this.tempData.map(v => v.id)
     this.newList = this.oldList.slice()
     this.$nextTick(() => {
@@ -391,28 +415,7 @@ export default {
     'currentData': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        if (newVal) {
-          this.initTempData()
-        } else {
-          this.tempData = [{
-            id: `${Date.now()}`,
-            key: null,
-            data_source: null,
-            value: null,
-            remark: null,
-            update_to_header: null
-          }]
-        }
-      }
-    },
-
-    // 如果临时数据长度为0，则添加一行
-    'tempData': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal.length === 0) {
-          this.addRow()
-        }
+        this.initTempData(newVal)
       }
     }
 

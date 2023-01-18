@@ -397,7 +397,7 @@ export default {
       this.isShowDebugLoading = true
       caseRun({
         caseId: [caseId],
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         'trigger_type': 'page'
       }).then(response => {

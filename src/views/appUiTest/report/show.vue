@@ -290,8 +290,10 @@ import vkbeautify from "vkbeautify";
 import hitDrawer from "@/views/assist/hits/drawer";
 
 import {reportDetail} from '@/apis/appUiTest/report'
-import {getConfigByName} from "@/apis/config/config";
+import {runEnvList} from "@/apis/config/runEnv";
+
 import {reportStepResultMapping} from "@/utils/mapping";
+
 
 export default {
   name: 'reportShow',
@@ -551,17 +553,16 @@ export default {
 
     },
 
-    // 获取环境配置
-    getEnvDict() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.runEnvDict = JSON.parse(response.data.value)
-      })
-    },
-
     // 获取测试报告具体内容
     getReportDataById() {
+      const loading = this.$loading({
+        lock: true,
+        text: 'ui自动化测试报告包含截图，数据较大，所以数据传输会稍久，请耐心等待',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
       reportDetail({'id': this.$route.query.id}).then((response) => {
-          // console.log(response)
+          loading.close()
           if (this.showMessage(this, response)) {
             this.reportData = response['data']
             this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
@@ -588,7 +589,14 @@ export default {
   },
 
   created() {
-    this.getEnvDict()
+
+    // 获取环境列表
+    runEnvList({test_type: 'app'}).then(response => {
+      response.data.data.forEach(env => {
+        this.runEnvDict[env.code] = env.name
+      })
+    })
+
     this.getReportDataById()
   },
 }

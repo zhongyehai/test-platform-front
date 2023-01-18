@@ -243,6 +243,7 @@ import runProcess from '@/components/runProcess'  // 测试执行进度组件
 import {postApi, putApi, runApi} from '@/apis/apiTest/api'
 import {getModule} from "@/apis/apiTest/module";
 import {paramsListToStr} from "@/utils/parseData";
+import {assertStrIsJson} from "@/utils/validate";
 
 export default {
   name: 'drawer',
@@ -294,7 +295,7 @@ export default {
         headers: [{key: null, value: null, remark: null}],
         params: [{key: null, value: null}],
         data_type: '',
-        data_form: [{key: null, form_data_type: null, remark: null, value: null}],
+        data_form: [],
         data_json: JSON.stringify({}),
         data_urlencoded: JSON.stringify({}),
         data_text: '',
@@ -389,7 +390,7 @@ export default {
       runApi({
         'projectId': this.tempApi.project_id,
         'apis': [this.tempApi.id],
-        env: runConf.runEnv
+        env_code: runConf.runEnv
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
@@ -402,8 +403,9 @@ export default {
 
     // 提交添加接口
     addApi() {
+      const api_data = this.getTempApi()
       this.isShowSubmitLoading = true
-      postApi(this.getTempApi()).then(response => {
+      postApi(api_data).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
@@ -414,8 +416,9 @@ export default {
 
     // 提交修改接口
     changApi() {
+      const api_data = this.getTempApi()
       this.isShowSubmitLoading = true
-      putApi(this.getTempApi()).then(response => {
+      putApi(api_data).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
@@ -437,7 +440,7 @@ export default {
       this.tempApi.headers = [{key: null, value: null, remark: null}]
       this.tempApi.params = [{key: null, value: null}]
       this.tempApi.data_type = ''
-      this.tempApi.data_form = [{key: null, data_type: null, remark: null, value: null}]
+      this.tempApi.data_form = []
       this.tempApi.data_json = {}
       this.tempApi.data_urlencoded = {}
       this.tempApi.data_text = ''
@@ -460,7 +463,9 @@ export default {
     // 获取 tempApi 用于提交数据
     getTempApi() {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      assertStrIsJson(json_data, 'json请求体格式错误')
       var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
+      assertStrIsJson(data_urlencoded, 'form-urlencoded请求体格式错误')
       return {
         id: this.tempApi.id,
         name: this.tempApi.name,

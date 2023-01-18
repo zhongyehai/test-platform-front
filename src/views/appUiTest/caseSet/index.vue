@@ -369,7 +369,7 @@ export default {
     runCaseSet(runConf) {
       caseSetRun({
         'id': this.runSetData.id,
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,

@@ -291,6 +291,17 @@
             >
             </el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+            <el-button
+              v-show="tempData.length === 1"
+              type="text"
+              size="mini"
+              icon="el-icon-circle-close"
+              style="color: red"
+              @click.native="clearData()"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -323,12 +334,11 @@ export default {
 
   methods: {
 
-    initTempData(){
-      this.tempData = []
-      for (let index in this.currentData){
-        let data = this.currentData[index]
-        data["id"] = `${index}_${data.key}`
-        this.tempData.push(data)
+    initExtract(extract){
+      if (extract && extract.length > 0) {
+        this.tempData = this.currentData
+      } else {
+        this.addRow()
       }
     },
 
@@ -350,7 +360,13 @@ export default {
 
     // 添加一行
     addRow() {
-      this.tempData.push({id: this.tempData.length, key: null, extract_type: null, value: null, remark: null})
+      this.tempData.push({
+        id: `${Date.now()}`,
+        key: null,
+        extract_type: this.$busEvents.data.extractMappingList[0].value,
+        value: null,
+        remark: null
+      })
     },
 
     // 是否显示删除按钮
@@ -362,6 +378,15 @@ export default {
     delRow(i) {
       this.tempData.splice(i, 1)
     },
+
+    // 清除数据
+    clearData() {
+      this.tempData[0].key = null
+      this.tempData[0].value = null
+      this.tempData[0].remark = null
+      this.tempData[0].extract_type = null
+    },
+
     // 拖拽排序
     setSort() {
       const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
@@ -382,7 +407,7 @@ export default {
   },
 
   mounted() {
-    this.initTempData()
+    this.initExtract(this.currentData)
 
     this.oldList = this.tempData.map(v => v.id)
     this.newList = this.oldList.slice()
@@ -395,11 +420,7 @@ export default {
     'currentData': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        if (newVal) {
-          this.initTempData()
-        } else {
-          this.tempData = [{id: 0, key: null, extract_type: null, value: null, remark: null}]
-        }
+        this.initExtract(newVal)
       }
     },
 

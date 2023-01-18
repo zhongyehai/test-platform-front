@@ -330,9 +330,9 @@ export default {
     runApis(runConf) {
       this.$set(this.currentApi, 'runButtonIsLoading', true)
       runApi({
-        'projectId': this.currentApi.project_id,
-        'apis': [this.currentApi.id],
-        'env': runConf.runEnv
+        projectId: this.currentApi.project_id,
+        apis: [this.currentApi.id],
+        env_code: runConf.runEnv
       }).then(response => {
         this.$set(this.currentApi, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {

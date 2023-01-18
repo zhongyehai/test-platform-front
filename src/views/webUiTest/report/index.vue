@@ -80,7 +80,7 @@
 
               <el-table-column label="触发方式" align="center" min-width="8%">
                 <template slot-scope="scope">
-                  <span> {{reportTriggerType[scope.row.trigger_type]}} </span>
+                  <span> {{ reportTriggerType[scope.row.trigger_type] }} </span>
                 </template>
               </el-table-column>
 
@@ -99,7 +99,7 @@
               <el-table-column label="是否通过" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="reportStatusTagType[scope.row.is_passed]">
-                    {{ reportStatusContent[scope.row.is_passed]}}
+                    {{ reportStatusContent[scope.row.is_passed] }}
                   </el-tag>
                 </template>
               </el-table-column>
@@ -174,6 +174,8 @@ import Pagination from '@/components/Pagination'
 import {reportList, deleteReport, downloadReport} from '@/apis/webUiTest/report'
 import {getConfigByName} from "@/apis/config/config";
 import {userList} from "@/apis/system/user";
+import {runEnvList} from "@/apis/config/runEnv";
+
 import {reportStatusMappingContent, reportStatusMappingTagType, reportTriggerTypeMappingContent} from "@/utils/mapping";
 
 export default {
@@ -324,8 +326,11 @@ export default {
       this.getReportList()
     })
 
-    getConfigByName({'name': 'run_test_env'}).then(response => {
-      this.eventDict = JSON.parse(response.data.value)
+    // 获取环境列表
+    runEnvList({test_type: 'api'}).then(response => {
+      response.data.data.forEach(env => {
+        this.eventDict[env.code] = env.name
+      })
     })
 
     getConfigByName({'name': 'run_type'}).then(response => {

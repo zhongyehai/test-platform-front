@@ -239,7 +239,7 @@ export default {
       this.$set(this.currentCase, 'runButtonIsLoading', true)
       caseRun({
         caseId: [this.currentCase.id],
-        env: runConf.runEnv,
+        env_code: runConf.runEnv,
         is_async: runConf.runType,
         'trigger_type': 'page'
       }).then(response => {
