@@ -327,7 +327,7 @@ export default {
     })
 
     // 获取环境列表
-    runEnvList({test_type: 'api'}).then(response => {
+    runEnvList({}).then(response => {
       response.data.data.forEach(env => {
         this.eventDict[env.code] = env.name
       })

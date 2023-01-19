@@ -216,6 +216,7 @@
 
     <!-- 服务信息抽屉 -->
     <projectDrawer
+      :testType="'api'"
       :currentProject="currentProject"
       :currentUserList="currentUserList"
     ></projectDrawer>
@@ -236,8 +237,8 @@ import {userList} from '@/apis/system/user'
 import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import projectDrawer from '@/views/apiTest/project/drawer'
-import projectEnvDrawer from '@/components/projectEnvEditor/envEditor.vue'
+import projectDrawer from '@/components/project/drawer.vue'
+import projectEnvDrawer from '@/components/project/envEditor.vue'
 import {getConfigByName} from "@/apis/config/config";
 import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/utils/mapping";
 
@@ -304,7 +305,7 @@ export default {
 
     // 编辑按钮
     showEditForm(row) {
-      this.$bus.$emit(this.$busEvents.api.apiShowProjectDrawer, 'edit', row)
+      this.$bus.$emit(this.$busEvents.showProjectInfoDrawer, 'edit', row)
     },
 
     // 编辑环境
@@ -387,7 +388,7 @@ export default {
 
     // 点击添加服务
     addProject() {
-      this.$bus.$emit(this.$busEvents.api.apiShowProjectDrawer, 'add')
+      this.$bus.$emit(this.$busEvents.showProjectInfoDrawer, 'add')
     },
 
     // 初始化查询数据
@@ -433,7 +434,7 @@ export default {
   },
   mounted() {
 
-    this.$bus.$on(this.$busEvents.api.apiProjectDrawerCommitSuccess, (status) => {
+    this.$bus.$on(this.$busEvents.projectDrawerCommitSuccess, (status) => {
       this.getProjectList()
     })
 
@@ -446,7 +447,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiProjectDrawerCommitSuccess)
+    this.$bus.$off(this.$busEvents.projectDrawerCommitSuccess)
   },
 
 }

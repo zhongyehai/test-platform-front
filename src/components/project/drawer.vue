@@ -11,7 +11,11 @@
         <div style="margin-left: 20px">
           <el-form ref="dataForm" :model="tempProject" label-width="100px"
                    style="min-width: 200px;margin-left: 20px;margin-right: 20px">
-            <el-form-item :label="'服务名'" prop="name" size="mini" class="is-required">
+            <el-form-item
+              :label="testType === 'api' ? '服务名' : testType === 'app' ? 'app名' : '项目名'"
+              prop="name"
+              size="mini"
+              class="is-required">
               <el-input v-model="tempProject.name"/>
             </el-form-item>
 
@@ -19,7 +23,12 @@
               <userSelector ref="userSelect" :user="tempProject.manager"></userSelector>
             </el-form-item>
 
-            <el-form-item :label="'swagger地址'" prop="swagger" class="filter-item" size="mini">
+            <el-form-item
+              v-if="testType==='api'"
+              :label="'swagger地址'"
+              prop="swagger"
+              class="filter-item"
+              size="mini">
               <el-input
                 v-model="tempProject.swagger"
                 style="width: 98%"
@@ -40,25 +49,21 @@
             </el-form-item>
 
             <el-form-item
-              :label="'服务地址'"
-              prop="service_addr"
+              v-if="testType==='app'"
+              label="app包名"
+              prop="app_package"
               size="mini"
               class="is-required">
-              <el-input
-                v-model="tempProject.service_addr"
-                style="width: 98%"
-                placeholder="当前服务的地址，勿填写域名"/>
-              <el-popover
-                class="el_popover_class"
-                placement="top-start"
-                trigger="hover">
-                <div>
-                  此处填写当前服务的地址，勿填写域名，方便测试时随意切换要跑的环境域名 <br>
-                  如：用户服务为 http://127.0.0.1:8080/user/，则此处填写 /user，若没有设置服务地址，则填写 / 即可 <br>
-                  运行测试时将使用【选择的环境对应的域名+此处的服务地址+接口地址】组装为完整的请求地址
-                </div>
-                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-              </el-popover>
+              <el-input v-model="tempProject.app_package"/>
+            </el-form-item>
+
+            <el-form-item
+              v-if="testType==='app'"
+              label="activity"
+              prop="app_activity"
+              size="mini"
+              class="is-required">
+              <el-input v-model="tempProject.app_activity"/>
             </el-form-item>
 
             <!-- 函数文件 -->
@@ -87,29 +92,6 @@
                 :isMultiple="false"
                 :currentBusiness="tempProject.business_id"
               ></businessView>
-            </el-form-item>
-
-            <!-- 运行时使用域名设置 -->
-            <el-form-item label="使用域名" prop="business_id" size="mini" class="is-required">
-              <el-radio v-model="tempProject.use_host" label="env">环境设置</el-radio>
-              <el-radio v-model="tempProject.use_host" label="project">服务设置</el-radio>
-              <el-popover
-                class="el_popover_class"
-                placement="top-start"
-                trigger="hover">
-                <div>
-                  <div>1、环境设置，此服务下的接口运行时，会使用 <span style="color: red">选择的环境处设置的域名</span>
-                    来进行拼接为完全的请求地址
-                  </div>
-                  <div>2、服务设置，此服务下的接口运行时，会使用 <span style="color: red">当前服务对应环境设置的域名</span>
-                    来进行拼接为完全的请求地址
-                  </div>
-                  <div><span
-                    style="color: red">注：若选择使用服务设置的域名，则服务环境管理处的域名需设置为http请求域名，而不是服务地址</span>
-                  </div>
-                </div>
-                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-              </el-popover>
             </el-form-item>
 
           </el-form>
@@ -149,18 +131,21 @@
 </template>
 
 <script>
-import userSelector from "@/components/Selector/user";
-import funcFileView from '@/components/Selector/funcFile'
-import businessView from '@/components/Selector/business'
+import userSelector from "@/components/Selector/user.vue";
+import funcFileView from '@/components/Selector/funcFile.vue'
+import businessView from '@/components/Selector/business.vue'
 
-import {postProject, putProject} from '@/apis/apiTest/project'
+import {postProject as apiPostProject, putProject as apiPutProject} from '@/apis/apiTest/project'
+import {postProject as webUiPostProject, putProject as webUiPutProject} from '@/apis/webUiTest/project'
+import {postProject as AppPostProject, putProject as AppPutProject} from '@/apis/appUiTest/project'
 import {funcFileList} from "@/apis/assist/funcFile";
 
 export default {
   name: 'drawer',
   props: [
     'currentProject',
-    'currentUserList'
+    'currentUserList',
+    'testType'
   ],
   components: {
     userSelector,
@@ -177,11 +162,11 @@ export default {
         name: null,
         manager: null,
         swagger: '',
-        service_addr: '',
         business_id: '',
+        app_package: '',
+        app_activity: '',
         func_files: [],
-        create_user: null,
-        use_host: 'env'
+        create_user: null
       },
       user_list: [],  // 用户列表
       funcFilesList: [],
@@ -189,7 +174,9 @@ export default {
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
       responseMessage: '',
-      dialogIsShow: false
+      dialogIsShow: false,
+      postUrl: '',
+      putUrl: ''
     }
   },
 
@@ -222,8 +209,8 @@ export default {
         name: null,
         manager: null,
         swagger: '',
-        service_addr: '',
-        use_host: 'env',
+        app_package: '',
+        app_activity: '',
         func_files: []
       }
       this.submitButtonIsShow = true
@@ -235,10 +222,10 @@ export default {
       this.tempProject.name = row.name
       this.tempProject.manager = row.manager
       this.tempProject.swagger = row.swagger
-      this.tempProject.service_addr = row.service_addr
       this.tempProject.business_id = row.business_id
+      this.tempProject.app_package = row.app_package
+      this.tempProject.app_activity = row.app_activity
       this.tempProject.func_files = row.func_files
-      this.tempProject.use_host = row.use_host
       this.submitButtonIsShow = true
     },
 
@@ -248,8 +235,8 @@ export default {
         id: this.tempProject.id,
         name: this.tempProject.name,
         swagger: this.tempProject.swagger,
-        service_addr: this.tempProject.service_addr,
-        use_host: this.tempProject.use_host,
+        app_package: this.tempProject.app_package,
+        app_activity: this.tempProject.app_activity,
         manager: this.$refs.userSelect.tempData,
         business_id: this.$refs.businessView.business,
         func_files: this.$refs.funcFiles.tempFuncFiles
@@ -259,7 +246,7 @@ export default {
     // 新增服务
     addProject() {
       this.submitButtonIsLoading = true
-      postProject(this.getProjectForCommit()).then(response => {
+      this.postUrl(this.getProjectForCommit()).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.responseMessage = response.message
@@ -273,7 +260,7 @@ export default {
     // 修改服务
     changProject() {
       this.submitButtonIsLoading = true
-      putProject(this.getProjectForCommit()).then(response => {
+      this.putUrl(this.getProjectForCommit()).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.responseMessage = response.message
@@ -285,15 +272,28 @@ export default {
 
     // 数据提交成功后，向父组件发送提交成功的消息，父组件重新请求服务列表
     sendIsCommitStatus() {
-      this.$bus.$emit(this.$busEvents.api.apiProjectDrawerCommitSuccess, 'success')
+      this.$bus.$emit(this.$busEvents.projectDrawerCommitSuccess, 'success')
     },
 
+  },
+
+  created() {
+    if (this.testType === 'api') {
+      this.postUrl = apiPostProject
+      this.putUrl = apiPutProject
+    } else if (this.testType === 'app') {
+      this.postUrl = AppPostProject
+      this.putUrl = AppPutProject
+    } else {
+      this.postUrl = webUiPostProject
+      this.putUrl = webUiPutProject
+    }
   },
 
   mounted() {
     this.getFuncFileList()
 
-    this.$bus.$on(this.$busEvents.api.apiShowProjectDrawer, (status, data) => {
+    this.$bus.$on(this.$busEvents.showProjectInfoDrawer, (status, data) => {
       this.activeName = 'info'
       if (status === 'add') {
         this.initTempProject()  // 新增
@@ -306,7 +306,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiShowProjectDrawer)
+    this.$bus.$off(this.$busEvents.showProjectInfoDrawer)
   },
 
   watch: {

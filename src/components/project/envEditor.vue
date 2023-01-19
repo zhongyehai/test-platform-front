@@ -22,68 +22,19 @@
         <el-col :span="envType !== 'app' ? 21 : 24">
           <div>
             <el-form label-width="120px" v-show="envType !== 'app'">
-              <el-form-item :label="'环境域名'" :class="{'is-required': project_use_host !== 'env' }" size="mini">
+              <el-form-item :label="'环境域名'" class="is-required" size="mini">
                 <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%"/>
                 <el-popover
                   class="el_popover_class"
                   placement="top-start"
                   trigger="hover">
-                  <div v-show="envType === 'api'">
-                    此处填写当前服务在当前环境的域名 <br>
-                    如：用户服务为 http://127.0.0.1:8080/user/，则此处填写 http://127.0.0.1:8080<br>
-                    运行测试时将使用【选择的环境对应的域名+服务地址+接口地址】组装为完整的请求地址
-                  </div>
-                  <div v-show="envType === 'webUi'">
-                    此处填写当前项目在当前环境的域名 <br>
-                    如：用户服务为 http://127.0.0.1:8080/#/user/，则此处填写 http://127.0.0.1:8080/#<br>
-                    运行测试时将使用【选择的环境对应的域名+服务地址+页面地址】组装为完整的请求地址
-                  </div>
-                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popover>
-              </el-form-item>
-
-              <!-- 运行时使用服务地址设置 -->
-              <el-form-item label="使用服务地址" prop="business_id" size="mini" class="is-required">
-                <el-radio v-model="tempEnv.use_service" label="env">环境设置</el-radio>
-                <el-radio v-model="tempEnv.use_service" label="project">服务设置</el-radio>
-                <el-popover
-                  class="el_popover_class"
-                  placement="top-start"
-                  trigger="hover">
-                  <div>
-                    <div>1、环境设置，执行此服务的测试时，会使用 <span style="color: red">此处设置的服务地址</span>
-                      来进行拼接为完全的请求地址
-                    </div>
-                    <div>2、服务设置，执行此服务的测试时，会使用 <span style="color: red">当前服务设置的服务地址</span>
-                      来进行拼接为完全的请求地址
-                    </div>
-                  </div>
-                  <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-                </el-popover>
-              </el-form-item>
-
-              <el-form-item :label="'服务地址'" v-show="tempEnv.use_service === 'env'" class="is-required" size="mini">
-                <el-input v-model="tempEnv.env_service_addr" placeholder="服务地址" style="width: 98%"/>
-                <el-popover
-                  class="el_popover_class"
-                  placement="top-start"
-                  trigger="hover">
-                  <div v-show="envType === 'api'">
-                    此处填写当前服务在当前环境的域名 <br>
-                    如：用户服务为 http://127.0.0.1:8080/user/list，则此处填写 /user<br>
-                    运行测试时将使用【选择的环境对应的域名+服务地址+接口地址】组装为完整的请求地址
-                  </div>
-                  <div v-show="envType === 'webUi'">
-                    此处填写当前项目在当前环境的域名 <br>
-                    如：用户服务为 http://127.0.0.1:8080/#/user/list，则此处填写 /user<br>
-                    运行测试时将使用【选择的环境对应的域名+服务地址+页面地址】组装为完整的请求地址
-                  </div>
+                  <div>当前服务在当前环境的域名</div>
                   <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
                 </el-popover>
               </el-form-item>
             </el-form>
 
-            <el-tabs>
+            <el-tabs style="margin-left: 10px">
               <!-- 公用变量 -->
               <el-tab-pane label="自定义变量">
                 <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
@@ -176,7 +127,7 @@
 <script>
 import headersView from '@/components/Inputs/changeRow.vue'
 import variablesView from '@/components/Inputs/variables.vue'
-import envSynchronizer from "@/components/projectEnvEditor/envSynchronizer.vue";
+import envSynchronizer from "@/components/project/synchronizer.vue";
 
 import {getProjectEnv as apiGetProjectEnv, putProjectEnv as apiPutProjectEnv} from '@/apis/apiTest/project'
 import {getProjectEnv as webUiGetProjectEnv, putProjectEnv as webUiPutProjectEnv} from '@/apis/webUiTest/project'
@@ -208,12 +159,9 @@ export default {
         id: '',
         host: '',
         project_id: '',
-        use_service: 'project',
-        env_service_addr: '',
         headers: [{'key': "", 'value': "", 'remark': ""}],
         variables: [{'key': "", 'value': "", 'remark': ""}]
       },
-      project_use_host: 'env',
       runEnvList: [],
       submitButtonIsLoading: false,  // 提交按钮的loading状态
     }
@@ -261,8 +209,6 @@ export default {
         this.tempEnv.id = response.data.id
         this.tempEnv.env_id = response.data.env_id
         this.tempEnv.host = response.data.host
-        this.tempEnv.use_service = response.data.use_service
-        this.tempEnv.env_service_addr = response.data.env_service_addr
         this.tempEnv.headers = response.data.headers
         this.tempEnv.variables = response.data.variables
         this.tempEnv.project_id = response.data.project_id
@@ -278,7 +224,7 @@ export default {
   mounted() {
 
     // 获取环境配置
-    runEnvList({'test_type': this.envType}).then(response => {
+    runEnvList({}).then(response => {
       this.runEnvList = response.data.data
       if (this.runEnvList.length > 0) {
         this.activeName = this.runEnvList[0].id.toString()
@@ -299,12 +245,11 @@ export default {
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.showProjectEnvDrawer, (project) => {
       this.drawerIsShow = true
-      this.project_use_host = project.use_host
       this.getEnv(this.activeName, project.id)
     })
 
     // 监听 环境同步是否完成 的状态
-    this.$bus.$on(this.$busEvents.api.apiEnvSynchronizerIsSuccess, (envData) => {
+    this.$bus.$on(this.$busEvents.envSynchronizerIsSuccess, (envData) => {
       if (envData[this.tempEnv]) {
         this.tempEnv.headers = envData[this.tempEnv].headers
         this.tempEnv.variables = envData[this.tempEnv].variables
@@ -316,7 +261,7 @@ export default {
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.showProjectEnvDrawer)
-    this.$bus.$off(this.$busEvents.api.apiEnvSynchronizerIsSuccess)
+    this.$bus.$off(this.$busEvents.envSynchronizerIsSuccess)
   },
 
   watch: {

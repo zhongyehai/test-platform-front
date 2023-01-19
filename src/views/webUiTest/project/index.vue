@@ -93,17 +93,6 @@
         </template>
       </el-table-column>
 
-<!--      <el-table-column :label="'测试环境'" prop="test" align="center" min-width="32%" :show-overflow-tooltip=true>-->
-<!--        <template slot-scope="scope">-->
-<!--          <div v-if="scope.row.test">-->
-<!--            <span>{{ scope.row.test }}</span>-->
-<!--          </div>-->
-<!--          <div v-else>-->
-<!--            <el-tag type="danger">请设置测试环境地址</el-tag>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-
       <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
         <template slot-scope="scope">
           <span>{{ scope.row.created_time }}</span>
@@ -178,6 +167,7 @@
 
     <!-- 项目信息抽屉 -->
     <projectDrawer
+      :testType="'webUi'"
       :currentProject="currentProject"
       :currentUserList="currentUserList"
     ></projectDrawer>
@@ -196,8 +186,8 @@ import {userList} from '@/apis/system/user'
 import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import projectDrawer from '@/views/webUiTest/project/drawer'
-import projectEnvDrawer from '@/components/projectEnvEditor/envEditor.vue'
+import projectDrawer from '@/components/project/drawer.vue'
+import projectEnvDrawer from '@/components/project/envEditor.vue'
 import {getConfigByName} from "@/apis/config/config";
 import {projectSort} from "@/apis/webUiTest/project";
 
@@ -262,7 +252,7 @@ export default {
 
     // 编辑按钮
     showEditForm(row) {
-      this.$bus.$emit(this.$busEvents.ui.uiShowApiProjectDrawer, 'edit', row)
+      this.$bus.$emit(this.$busEvents.showProjectInfoDrawer, 'edit', row)
     },
 
     // 编辑环境
@@ -310,7 +300,7 @@ export default {
 
     // 点击添加服务
     addProject() {
-      this.$bus.$emit(this.$busEvents.ui.uiShowApiProjectDrawer, 'add')
+      this.$bus.$emit(this.$busEvents.showProjectInfoDrawer, 'add')
     },
 
     // 初始化查询数据
@@ -356,7 +346,7 @@ export default {
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.ui.uiProjectDialogCommitSuccess, (status) => {
+    this.$bus.$on(this.$busEvents.projectDrawerCommitSuccess, (status) => {
       this.getProjectList()
     })
 
@@ -365,27 +355,11 @@ export default {
       this.dataTypeMapping = JSON.parse(response.data.value)
     })
 
-    // test环境修改后，前端页面也跟随修改域名
-    this.$bus.$on(this.$busEvents.ui.uiEnvIsCommit, (projectId, host, env) => {
-      if (env === 'test'){
-        try {
-          this.project_list.forEach(row => {
-            if (row.id === projectId) {
-              this.$set(row, 'test', host)
-              throw new Error('遍历结束')
-            }
-          })
-        } catch (error) {
-          if (error.message !== '遍历结束') throw error
-        }
-      }
-    })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.ui.uiProjectDialogCommitSuccess)
-    this.$bus.$off(this.$busEvents.ui.uiEnvIsCommit)
+    this.$bus.$off(this.$busEvents.projectDrawerCommitSuccess)
   },
 
 }

@@ -11,11 +11,6 @@ export default {
     apiModuleSelectorChoiceModule: 'apiModuleSelectorChoiceModule',  // 模块下拉框选中模块事件
     apiMethodSelectorChoiceMethod: 'apiMethodSelectorChoiceMethod',  // 请求方法下拉框选中请求方法事件
     // 服务
-    apiShowProjectDrawer: 'apiShowProjectDrawer',  // 服务抽屉的状态，新增/编辑
-    apiClickProjectEnv: 'apiClickProjectEnv',  // 服务环境编辑
-    apiEnvSynchronizerIsSuccess: 'apiEnvSynchronizerIsSuccess',  // 服务环境同步完成
-    apiProjectDrawerCommitSuccess: 'apiProjectDrawerCommitSuccess',  // 服务抽屉的提交状态
-    apiSaveProjectEnv: 'apiSaveProjectEnv',  // 服务环境的提交状态
     // 接口
     apiApiDrawerStatus: 'apiApiDrawerStatus',  // 接口抽屉的状态，新增/编辑
     apiApiChangeParam: 'apiApiChangeParam',  //修改param参数
@@ -65,13 +60,7 @@ export default {
     // 树组件 监听事件
     uiModuleTreeIsDone: 'uiModuleTreeIsDone',  // 模块树组装完成事件
     uiProjectTreeChoiceProject: 'uiProjectTreeChoiceProject',  // 项目树选择事件
-    // 项目
-    uiShowApiProjectDrawer: 'uiShowApiProjectDrawer',  // 服务抽屉的状态，新增/编辑
-    uiClickApiProjectEnv: 'uiClickApiProjectEnv',  // 服务环境编辑
-    uiEnvSynchronizerIsSuccess: 'uiEnvSynchronizerIsSuccess',  // 服务环境同步完成
-    uiProjectDialogCommitSuccess: 'uiProjectDialogCommitSuccess',  // 服务抽屉的提交状态
-    uiSaveProjectEnv: 'uiSaveProjectEnv',  // 保存服务环境
-    uiEnvIsCommit: 'uiEnvIsCommit',  // 服务环境的提交状态
+
     // 页面
     uiPageDrawerIsOpen: 'uiPageDrawerIsOpen',  // 页面抽屉打开
     uiPageDrawerStatus: 'uiPageDrawerStatus',  // 页面抽屉的状态，新增/编辑
@@ -123,6 +112,10 @@ export default {
     findElementOptionDict: {},  // ui自动化的定位方式
   },
 
+  // 服务/项目/app
+  showProjectInfoDrawer: 'showProjectInfoDrawer',  // 打开服务编辑抽屉
   showProjectEnvDrawer: 'showProjectEnvDrawer',  // 打开服务环境编辑抽屉
-  showEnvSynchronizer: 'showEnvSynchronizer'  // 服务环境数据同步编辑抽屉
+  showEnvSynchronizer: 'showEnvSynchronizer',  // 服务环境数据同步编辑抽屉
+  projectDrawerCommitSuccess: 'projectDrawerCommitSuccess',  // 服务抽屉的提交状态
+  envSynchronizerIsSuccess: 'envSynchronizerIsSuccess',  // 服务环境同步完成
 }

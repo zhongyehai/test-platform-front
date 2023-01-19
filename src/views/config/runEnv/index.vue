@@ -3,19 +3,6 @@
 
     <el-form label-width="100px" :inline="true">
 
-      <el-form-item :label="'环境类型：'" size="mini">
-        <el-select
-          v-model="listQuery.test_type"
-          :placeholder="'选择环境类型'"
-          filterable
-          default-first-option
-          clearable
-          size="mini"
-          class="filter-item">
-          <el-option v-for="(val, key) in testTypeList" :key="key" :label="val" :value="key"/>
-        </el-select>
-      </el-form-item>
-
       <el-form-item :label="'环境名字：'" size="mini">
         <el-input
           v-model="listQuery.name"
@@ -23,7 +10,7 @@
           placeholder="环境名字，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 200px">
+          style="width: 300px">
         </el-input>
       </el-form-item>
 
@@ -32,17 +19,6 @@
           v-model="listQuery.code"
           class="input-with-select"
           placeholder="环境code，支持模糊搜索"
-          size="mini"
-          clearable
-          style="width: 200px">
-        </el-input>
-      </el-form-item>
-
-      <el-form-item :label="'环境地址：'" size="mini">
-        <el-input
-          v-model="listQuery.addr"
-          class="input-with-select"
-          placeholder="环境地址，支持模糊搜索"
           size="mini"
           clearable
           style="width: 300px">
@@ -82,12 +58,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="测试类型" min-width="35%">
-        <template slot-scope="scope">
-          <span> {{ testTypeList[scope.row.test_type] }} </span>
-        </template>
-      </el-table-column>
-
       <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="环境名字" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
@@ -97,12 +67,6 @@
       <el-table-column :show-overflow-tooltip=true prop="code" align="center" label="环境code" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.code }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="环境地址" min-width="35%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.addr }} </span>
         </template>
       </el-table-column>
 
@@ -143,21 +107,6 @@
         ref="envForm"
         label-width="80px"
         style="min-width: 400px;margin-left: 20px;margin-right: 20px">
-
-        <el-form-item :label="'环境类型'" class="is-required" size="mini">
-          <el-select
-            v-model="tempRunEnv.test_type"
-            :placeholder="'选择环境类型'"
-            filterable
-            default-first-option
-            clearable
-            style="width: 100%"
-            size="mini"
-            class="filter-item">
-            <el-option v-for="(val, key) in testTypeList" :key="key" :label="val" :value="key"/>
-          </el-select>
-        </el-form-item>
-
         <el-form-item :label="'环境名字'" class="is-required" size="mini">
           <el-input
             v-model="tempRunEnv.name"
@@ -171,20 +120,6 @@
             v-model="tempRunEnv.code"
             placeholder="环境code"
             size="mini"/>
-        </el-form-item>
-
-        <el-form-item :label="'环境地址'" class="is-required" size="mini">
-          <el-input
-            v-model="tempRunEnv.addr"
-            placeholder="正确的环境地址"
-            style="width: 97%"
-            size="mini"/>
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>正确的格式：【协议】+【域名 或 ip+端口】</div>
-            <div>http://localhost:8080</div>
-            <div>https://www.baidu.com</div>
-            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
-          </el-popover>
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
@@ -233,9 +168,7 @@ export default {
         pageSize: 20,
         create_user: '',
         name: '',
-        code: '',
-        addr: '',
-        test_type: ''
+        code: ''
       },
       // 请求列表等待响应的状态
       tableLoadingIsShow: false,
@@ -246,7 +179,6 @@ export default {
       direction: 'rtl',  // 抽屉打开方式
       submitButtonIsLoading: false,
       tempRunEnv: {},
-      testTypeList: {'api': '接口测试', 'webUi': 'webUi测试', 'app': 'app测试'},
 
       // 拖拽排序参数
       sortable: null,
@@ -266,8 +198,6 @@ export default {
           id: '',
           name: '',
           code: '',
-          addr: '',
-          test_type: '',
           desc: ''
         }
         this.drawerType = 'add'

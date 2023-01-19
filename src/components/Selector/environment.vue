@@ -22,7 +22,7 @@ import {runEnvList} from "@/apis/config/runEnv";
 
 export default {
   name: "environment",
-  props: ['env', 'env_type'],
+  props: ['env'],
   data() {
     return {
       current_env: '',
@@ -32,7 +32,7 @@ export default {
 
   mounted() {
     // 获取环境列表
-    runEnvList({test_type: this.env_type}).then(response => {
+    runEnvList({}).then(response => {
       this.env_list = response.data.data
     })
   },

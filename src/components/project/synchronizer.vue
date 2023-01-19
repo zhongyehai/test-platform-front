@@ -13,11 +13,11 @@
           <el-tab-pane label="从" name="from">
             <el-radio
               v-model="dataSourceFrom"
-              v-for="(value, key, index) in envMapping"
-              :label="key"
-              :key="key"
+              v-for="(runEnv) in runEnvList"
+              :label="runEnv.id"
+              :key="runEnv.id"
               @change="changeRadio()"
-            >{{ value }}
+            >{{ runEnv.name }}
             </el-radio>
           </el-tab-pane>
         </el-tabs>
@@ -28,17 +28,15 @@
           <el-tab-pane label="同步到" name="to">
             <el-checkbox-group v-model="dataSourceTo">
               <el-checkbox
-                :disabled="key === dataSourceFrom"
-                :label="key"
-                v-for="(value, key, index) in envMapping"
-                :key="key"
-              >{{ value }}
+                :disabled="runEnv.id === dataSourceFrom"
+                :label="runEnv.id"
+                v-for="(runEnv) in runEnvList"
+                :key="runEnv.id"
+              >{{ runEnv.name }}
               </el-checkbox>
             </el-checkbox-group>
           </el-tab-pane>
         </el-tabs>
-
-
       </div>
 
       <div class="demo-drawer__footer">
@@ -59,34 +57,33 @@
 
 <script>
 
-import {projectEnvSynchronization} from '@/apis/apiTest/project'
+import {projectEnvSynchronization as apiProjectEnvSynchronization} from '@/apis/apiTest/project'
+import {projectEnvSynchronization as webUiProjectEnvSynchronization} from '@/apis/webUiTest/project'
+import {projectEnvSynchronization as appProjectEnvSynchronization} from '@/apis/appUiTest/project'
 import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'envSynchronizer',
+  props: [
+    'envType'
+  ],
   data() {
     return {
       drawerIsShow: false,  // 抽屉的显示状态
       direction: 'rtl',  // 抽屉打开方式
+      projectEnvSynchronizationUrl: '',
       // 环境映射
-      envMapping: {},
+      runEnvList: [],
       projectId: '',
       fromActiveName: 'from',
       toActiveName: 'to',
-      dataSourceFrom: 'test',
+      dataSourceFrom: '',
       dataSourceTo: [],
       submitButtonIsLoading: false  // 提交按钮的loading状态
     }
   },
 
   methods: {
-
-    // 获取环境配置
-    initEnv() {
-      getConfigByName({'name': 'run_test_env'}).then(response => {
-        this.envMapping = JSON.parse(response.data.value)
-      })
-    },
 
     // 单选钮选中时，如果复选框已选中了单选的值，则去除多选按钮的选中状态
     changeRadio(value){
@@ -99,13 +96,13 @@ export default {
     // 保存环境设置
     saveEventSynchronizer() {
       this.submitButtonIsLoading = true
-      projectEnvSynchronization({
+      this.projectEnvSynchronizationUrl({
         projectId: this.projectId,
         envFrom: this.dataSourceFrom,
         envTo: this.dataSourceTo}).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.api.apiEnvSynchronizerIsSuccess, response.data)
+          this.$bus.$emit(this.$busEvents.envSynchronizerIsSuccess, response.data)
           this.drawerIsShow = false
         }
       })
@@ -114,17 +111,24 @@ export default {
 
   mounted() {
 
-    this.initEnv()
+    if (this.envType === 'api'){
+      this.projectEnvSynchronizationUrl = apiProjectEnvSynchronization
+    }else if (this.envType === 'app'){
+      this.projectEnvSynchronizationUrl = appProjectEnvSynchronization
+    }else{
+      this.projectEnvSynchronizationUrl = webUiProjectEnvSynchronization
+    }
 
-    this.$bus.$on(this.$busEvents.api.apiShowEnvSynchronizer, (projectId) => {
+    this.$bus.$on(this.$busEvents.showEnvSynchronizer, (projectId, runEnvList) => {
       this.projectId = projectId
+      this.runEnvList = runEnvList
       this.drawerIsShow = true
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiShowEnvSynchronizer)
+    this.$bus.$off(this.$busEvents.showEnvSynchronizer)
   },
 }
 </script>
