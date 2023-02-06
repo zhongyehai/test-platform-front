@@ -3,38 +3,11 @@
 export default {
   // 接口测试
   api: {
-    // 树组件
-    apiProjectTreeChoiceProject: 'apiProjectTreeChoiceProject',  // 服务树选中服务事件
-    apiModuleTreeIsDone: 'apiModuleTreeIsDone',  // 模块树组装完成事件
-    // 下拉框
-    apiProjectSelectorChoiceProject: 'apiProjectSelectorChoiceProject',  // 服务下拉框选中服务事件
-    apiModuleSelectorChoiceModule: 'apiModuleSelectorChoiceModule',  // 模块下拉框选中模块事件
-    apiMethodSelectorChoiceMethod: 'apiMethodSelectorChoiceMethod',  // 请求方法下拉框选中请求方法事件
-    // 服务
-    // 接口
-    apiApiDrawerStatus: 'apiApiDrawerStatus',  // 接口抽屉的状态，新增/编辑
-    apiApiChangeParam: 'apiApiChangeParam',  //修改param参数
-    apiApiDrawerCommitSuccess: 'apiApiDrawerCommitSuccess',  // 接口抽屉的提交状态
-    // 用例集
-    apiCaseSetTreeIsDone: 'apiCaseSetTreeIsDone',  // 用例集树组装完成事件
-    // 用例
-    apiCaseDrawerStatus: 'apiCaseDrawerStatus',  // 用例抽屉的状态，新增/编辑
-    apiCaseDrawerCommitSuccess: 'apiCaseDrawerCommitSuccess',  // 用例抽屉的提交状态
-    // 步骤
-    apiIsAddStepTriggerSaveCase: 'apiIsAddStepTriggerSaveCase',  // 在添加步骤时触发的 保存用例，这个时候保存后不关闭 用例的抽屉
-    apiAddApiToStep: 'apiAddApiToStep', // 接口转为步骤
-    apiEditStep: 'apiEditStep', // 编辑步骤
-    apiAddStepIsCommit: 'apiAddStepIsCommit', // 新增步骤提交
-    apiEditStepIsCommit: 'apiEditStepIsCommit', // 编辑步骤提交
-    apiQuoteCaseAsStepIsCommit: 'apiQuoteCaseAsStepIsCommit', // 引用用例为步骤成功
     // 函数文件
     apiAddFuncFileDrawerIsShow: 'apiAddFuncFileDrawerIsShow',  // 打开新增函数文件框
     apiEditFuncFileData: 'apiEditFuncFileData',  // 编辑函数文件内容
     apiEditFuncFileIsCommit: 'apiEditFuncFileIsCommit',  // 编辑函数文件已经提交
     apiAddFuncFileIsCommit: 'apiAddFuncFileIsCommit',  // 新增函数文件已经提交
-    // 定时任务
-    apiTaskDrawerIsShow: 'apiTaskDrawerIsShow',  // 打开定时任务编辑框
-    apiTaskDrawerIsCommit: 'apiTaskDrawerIsCommit',  // 定时任务已提交
   },
 
   // 配置管理
@@ -43,65 +16,20 @@ export default {
     configDrawerIsCommit: 'configDrawerIsCommit',  // 配置已提交
   },
 
-  // 文件管理
-  file: {
-    uploadFileDialogIsShow: 'uploadFileDialogIsShow',  // 打开文件上传
-    uploadFileIsCommit: 'uploadFileIsCommit',  // 文件上传已提交
-  },
-
   // 测试管理
   testWork: {
     clickProductTree: 'clickProductTree',  // 点击树
     weeklyDrawerStatus: 'weeklyDrawerStatus',  // 周报编辑框
   },
 
-  // ui测试
-  ui: {
-    // 树组件 监听事件
-    uiModuleTreeIsDone: 'uiModuleTreeIsDone',  // 模块树组装完成事件
-    uiProjectTreeChoiceProject: 'uiProjectTreeChoiceProject',  // 项目树选择事件
-
-    // 页面
-    uiPageDrawerIsOpen: 'uiPageDrawerIsOpen',  // 页面抽屉打开
-    uiPageDrawerStatus: 'uiPageDrawerStatus',  // 页面抽屉的状态，新增/编辑
-    uiPageDrawerCommitSuccess: 'uiPageDrawerCommitSuccess',  // 页面抽屉的提交状态
-    // 元素
-    uiElementDrawerStatus: 'uiElementDrawerStatus',  // 元素抽屉的状态，新增/编辑
-    uiElementDrawerCommitSuccess: 'uiElementDrawerCommitSuccess',  // 元素抽屉的提交状态
-    uiElementIsUrl: 'uiElementIsUrl',  // 元素是url
-    // 用例集
-    uiCaseSetTreeIsDone: 'uiCaseSetTreeIsDone',
-    // 用例
-    uiCaseDrawerStatus: 'uiCaseDrawerStatus',
-    uiCaseDrawerCommitSuccess: 'uiCaseDrawerCommitSuccess',
-    uiIsAddStepTriggerSaveCase: 'uiIsAddStepTriggerSaveCase',
-    uiQuoteCaseToStep: 'uiQuoteCaseToStep',
-    // 步骤
-    uiShowStepDrawer: 'uiShowStepDrawer',
-    uiAddStepIsCommit: 'uiAddStepIsCommit', // 新增步骤提交事件，把此步骤添加到步骤列表
-    uiEditStepIsCommit: 'uiEditStepIsCommit', // 修改步骤提交事件，更改对应的步骤数据
-    uiGetElementByPage: 'uiGetElementByPage', // 根据页面id获取元素
-    uiQuoteCaseAsStepIsCommit: 'uiQuoteCaseAsStepIsCommit', // 根据页面id获取元素
-
-    // 定时任务
-    uiTaskDrawerIsShow: 'uiTaskDrawerIsShow',  // 打开定时任务编辑框
-    uiTaskDrawerIsCommit: 'uiTaskDrawerIsCommit',  // 定时任务已提交
-  },
-
-  app:{
+  app: {
     showEditeServerDrawer: 'showEditeServerDrawer',
     showEditePhoneDrawer: 'showEditePhoneDrawer'
   },
 
   // 缓存数据
   data: {
-    showRunProcessByIndex: 'showRunProcessByIndex',
-    showRunProcessByDrawer: 'showRunProcessByDrawer',
-    showRunProcessByTree: 'showRunProcessByTree',
-    drawerIsShow: 'drawerIsShow',
-    drawerIsCommit: 'drawerIsCommit',
     configTypeList: [], // 配置类型列表
-    userDict: {},  // 用户数据
     executeTypeList: [],  // ui自动化步骤的执行方式
     executeTypeDict: {},  // ui自动化步骤的执行方式
     extractMappingList: [],  // ui自动化数据提取方法映射
@@ -112,10 +40,18 @@ export default {
     findElementOptionDict: {},  // ui自动化的定位方式
   },
 
-  // 服务/项目/app
-  showProjectInfoDrawer: 'showProjectInfoDrawer',  // 打开服务编辑抽屉
-  showProjectEnvDrawer: 'showProjectEnvDrawer',  // 打开服务环境编辑抽屉
-  showEnvSynchronizer: 'showEnvSynchronizer',  // 服务环境数据同步编辑抽屉
-  projectDrawerCommitSuccess: 'projectDrawerCommitSuccess',  // 服务抽屉的提交状态
-  envSynchronizerIsSuccess: 'envSynchronizerIsSuccess',  // 服务环境同步完成
+  // 抽屉
+  drawerIsShow: 'drawerIsShow',  // 打开抽屉
+  drawerIsCommit: 'drawerIsCommit',  // 抽屉已提交
+  drawerIsOpen: 'drawerIsOpen',  // 同步抽屉打开状态
+
+  // 下拉框
+  selectorChoice: 'selectorChoice',  // 下拉框选中事件
+
+  // 树
+  treeIsChoice: 'treeIsChoice', // 树选中事件
+  treeIsDone: 'treeIsDone',  // 树组装完成事件
+
+  quoteCaseToStep: 'quoteCaseToStep',  // 引用用例事件
+  changeData: 'changeData',  // 监听的数据发生了改变
 }

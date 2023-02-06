@@ -2,10 +2,10 @@
   <!-- 新增/修改接口表单 -->
   <el-drawer
     :title=" drawerType === 'update' ? '修改接口' : '新增接口'"
-    size="80%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+    size="80%">
     <!-- 接口所属信息 -->
     <el-form style="margin-left: 20px;margin-right: 20px" label-width="100px">
 
@@ -96,7 +96,6 @@
         <methodsSelectorView
           ref="methodsSelectorView"
           :method="tempApi.method"
-          :busEmitEventName="$busEvents.api.apiMethodSelectorChoiceMethod"
         ></methodsSelectorView>
 
         <!-- 接口地址 -->
@@ -143,7 +142,7 @@
           :placeholder-key="'key'"
           :placeholder-value="'value'"
           :placeholder-desc="'备注'"
-          :busEvent="$busEvents.api.apiApiChangeParam"
+          :busEventName="busEventName"
         ></queryStringView>
       </el-tab-pane>
 
@@ -212,16 +211,6 @@
 
     </div>
 
-    <selectRunEnv
-      :callBackEvent="callBackEvent"
-      :event="runEvent"
-    ></selectRunEnv>
-
-    <runProcess
-      :runType="'api'"
-      :busName="$busEvents.data.showRunProcessByDrawer"
-    ></runProcess>
-
   </el-drawer>
 
 </template>
@@ -237,8 +226,6 @@ import queryStringView from '@/components/Inputs/changeRow'
 import bodyView from '@/components/apiBody'
 import extractsView from '@/components/Inputs/extract'
 import validatesView from '@/components/Inputs/validates'
-import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
-import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {postApi, putApi, runApi} from '@/apis/apiTest/api'
 import {getModule} from "@/apis/apiTest/module";
@@ -260,9 +247,7 @@ export default {
     headersView,
     bodyView,
     extractsView,
-    validatesView,
-    selectRunEnv,
-    runProcess
+    validatesView
   },
   data() {
     return {
@@ -305,9 +290,7 @@ export default {
         module_id: '',
         project_id: ''
       },
-
-      runEvent: 'runApiEventOnDialog',
-      callBackEvent: 'runApiOnDialog'
+      busEventName: 'param'
     }
   },
 
@@ -336,7 +319,7 @@ export default {
     },
 
     // 初始化解析查询字符串参数
-    paramsToStr(paramsList){
+    paramsToStr(paramsList) {
       this.tempApi.addr = this.tempApi.addr.split('?')[0] + paramsListToStr(paramsList)
     },
 
@@ -364,7 +347,7 @@ export default {
         putApi(this.getTempApi()).then(response => {
           this.isShowDebugLoading = false
           if (this.showMessage(this, response)) {
-            this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
+            this.drawerIsCommit()
             this.runApis(runDict)
           }
         })
@@ -373,7 +356,7 @@ export default {
           this.isShowDebugLoading = false
           if (this.showMessage(this, response)) {
             this.tempApi = response.data
-            this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
+            this.drawerIsCommit()
             this.runApis(runDict)
           }
         })
@@ -382,7 +365,7 @@ export default {
     },
 
     clickDebugApi() {
-      this.$bus.$emit(this.runEvent, 'api')
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'apiDrawer', false)
     },
 
     runApis(runConf) {
@@ -394,7 +377,7 @@ export default {
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.data.showRunProcessByDrawer, response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
         } else {
           this.isShowDebugLoading = false
         }
@@ -408,8 +391,7 @@ export default {
       postApi(api_data).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
-          this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
+          this.drawerIsCommit()
         }
       })
     },
@@ -421,10 +403,14 @@ export default {
       putApi(api_data).then(response => {
         this.isShowSubmitLoading = false
         if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
-          this.$bus.$emit(this.$busEvents.api.apiApiDrawerCommitSuccess, 'success')
+          this.drawerIsCommit()
         }
       })
+    },
+
+    drawerIsCommit() {
+      this.drawerIsShow = false
+      this.$bus.$emit(this.$busEvents.drawerIsCommit, 'apiInfo')
     },
 
     // 点击新增接口时，初始化 dialog 数据
@@ -495,44 +481,53 @@ export default {
   mounted() {
 
     // 监听、接收模块树
-    this.$bus.$on(this.$busEvents.api.apiModuleTreeIsDone, (moduleTree) => {
-      this.moduleTree = moduleTree
-    })
-
-    // 监听请求方法选择器的选中事件
-    this.$bus.$on(this.$busEvents.api.apiMethodSelectorChoiceMethod, (method) => {
-      this.methodSelectorChoiceMethod = method
-    })
-
-    // 监听 接口编辑框命令事件
-    this.$bus.$on(this.$busEvents.api.apiApiDrawerStatus, (command, api) => {
-      if (command === 'add') {
-        this.initNewTempApi()  // 新增
-      } else if (command === 'edit') {
-        this.initUpdateTempApi(api)  // 修改
-        this.drawerType = 'update'
-      } else if (command === 'copy') {
-        this.initUpdateTempApi(api)  // 复制
-        this.drawerType = 'add'
+    this.$bus.$on(this.$busEvents.treeIsDone, (_type, moduleTree) => {
+      if (_type === 'module') {
+        this.moduleTree = moduleTree
       }
     })
 
-    this.$bus.$on(this.callBackEvent, (runDict) => {
-      this.debugApi(runDict)
+    // 监听请求方法选择器的选中事件
+    this.$bus.$on(this.$busEvents.selectorChoice, (_type, method) => {
+      if (_type === 'method') {
+        this.methodSelectorChoiceMethod = method
+      }
     })
 
-    this.$bus.$on(this.$busEvents.api.apiApiChangeParam, (param) => {
-      this.paramsToStr(param)
+    // 监听 接口编辑框命令事件
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, api) => {
+      if (_type === 'apiInfo') {
+        if (command === 'add') {
+          this.initNewTempApi()  // 新增
+        } else if (command === 'edit') {
+          this.initUpdateTempApi(api)  // 修改
+          this.drawerType = 'update'
+        } else if (command === 'copy') {
+          this.initUpdateTempApi(api)  // 复制
+          this.drawerType = 'add'
+        }
+      }
+    })
+
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'selectRunEnv' && _runUnit === 'apiDrawer'){
+        this.runApis(runDict)
+      }
+    })
+
+    this.$bus.$on(this.$busEvents.changeData, (_type, param) => {
+      if (_type === this.busEventName) {
+        this.paramsToStr(param)
+      }
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.callBackEvent)
-    this.$bus.$off(this.$busEvents.api.apiApiChangeParam)
-    this.$bus.$off(this.$busEvents.api.apiApiDrawerStatus)
-    this.$bus.$off(this.$busEvents.api.apiModuleTreeIsDone)
-    this.$bus.$off(this.$busEvents.api.apiMethodSelectorChoiceMethod)
+    this.$bus.$off(this.$busEvents.changeData)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+    this.$bus.$off(this.$busEvents.treeIsDone)
+    this.$bus.$off(this.$busEvents.selectorChoice)
   },
 
   watch: {

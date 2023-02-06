@@ -109,22 +109,24 @@ export default {
         this.fileUploadDialogIsShow = false
         this.tempFileList = []
         // 发送上传成功的消息
-        this.$bus.$emit(this.$busEvents.file.uploadFileIsCommit, true, response.data)
+        this.$bus.$emit(this.$busEvents.drawerIsCommit, 'uploadFile', true, response.data)
       }
     }
   },
 
   mounted() {
     // 监听 Dialog 打开事件
-    this.$bus.$on(this.$busEvents.file.uploadFileDialogIsShow, (fileType) => {
-      this.fileType = fileType
-      this.fileUploadDialogIsShow = true
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, fileType) => {
+      if (_type === 'uploadFile'){
+        this.fileType = fileType
+        this.fileUploadDialogIsShow = true
+      }
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.file.uploadFileDialogIsShow)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 }
 </script>

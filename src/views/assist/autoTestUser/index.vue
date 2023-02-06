@@ -107,7 +107,7 @@ export default {
   mounted() {
 
     // 获取环境配置
-    runEnvList({'test_type': this.envType}).then(response => {
+    runEnvList().then(response => {
 
       if (response.data.data.length > 0) {
         this.currentEnv = response.data.data[0].code

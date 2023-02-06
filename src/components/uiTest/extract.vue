@@ -276,7 +276,7 @@
               type="text"
               size="mini"
               icon="el-icon-plus"
-              @click.native="addRow(scope.$index)"
+              @click.native="addRow(true)"
             >
             </el-button>
           </el-tooltip>
@@ -359,14 +359,25 @@ export default {
     },
 
     // 添加一行
-    addRow() {
-      this.tempData.push({
-        id: `${Date.now()}`,
-        key: null,
-        extract_type: this.$busEvents.data.extractMappingList[0].value,
-        value: null,
-        remark: null
-      })
+    addRow(isRow) {
+      if (isRow){
+        this.tempData.push({
+          id: `${Date.now()}`,
+          key: null,
+          extract_type: this.$busEvents.data.extractMappingList[0].value,
+          value: null,
+          remark: null
+        })
+      }else {
+        this.tempData = [{
+          id: `${Date.now()}`,
+          key: null,
+          extract_type: null,
+          value: null,
+          remark: null
+        }]
+      }
+
     },
 
     // 是否显示删除按钮

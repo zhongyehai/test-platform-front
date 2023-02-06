@@ -54,7 +54,7 @@
             type="text"
             size="mini"
             icon="el-icon-plus"
-            @click.native="addRow(scope.$index)"
+            @click.native="addRow(true)"
           >
           </el-button>
         </el-tooltip>
@@ -95,7 +95,7 @@ export default {
     'placeholderKey',
     'placeholderValue',
     'placeholderDesc',
-    'busEvent'
+    'busEventName'
   ],
   data() {
     return {
@@ -109,8 +109,8 @@ export default {
 
     // 修改数据时，如果传了bus事件，则发送
     changeData(value) {
-      if (this.busEvent) {
-        this.$bus.$emit(this.busEvent, this.tempData)
+      if (this.busEventName) {
+        this.$bus.$emit(this.$busEvents.changeData, this.busEventName, this.tempData)
       }
     },
 
@@ -123,14 +123,24 @@ export default {
     },
 
     // 添加一行
-    addRow() {
-      this.tempData.push({
-        id: `${Date.now()}`,
-        key: null,
-        value: null,
-        remark: null,
-        data_type: 'str'
-      })
+    addRow(isRow) {
+      if (isRow){
+        this.tempData.push({
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: 'str'
+        })
+      }else {
+        this.tempData = [{
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: null
+        }]
+      }
     },
 
     // 是否显示删除按钮
@@ -185,16 +195,6 @@ export default {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
         this.initTempData(newVal)
-      }
-    },
-
-    // 如果临时数据长度为0，则添加一行
-    'tempData': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal.length === 0) {
-          this.addRow()
-        }
       }
     }
 

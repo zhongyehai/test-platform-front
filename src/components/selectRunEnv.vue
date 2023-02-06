@@ -3,23 +3,28 @@
   <el-dialog title="选择运行环境" append-to-body :visible.sync="dialogIsShow" :close-on-click-modal="false" width="50%">
 
     <!-- 选择运行环境 -->
-    <div>
-      <label>选择环境：</label>
-    </div>
-    <div style="margin-top: 10px">
-      <label>
+    <div v-if="dataType !== 'appUi'">
+      <div>
+        <label>选择环境：</label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>
         <span style="color: red">
           注：请确保此次运行中涉及到的所有服务都设置了当前选中环境的域名 <br>
           比如选择的测试环境，那么在运行的时候所有步骤都会找自己所在服务的测试环境的域名
         </span>
-      </label>
-    </div>
-    <div style="margin-top: 10px">
-      <el-radio v-model="runEnv" :label="env.code" v-for="(env) in runEnvData " :key="env.code">{{ env.name }}</el-radio>
+        </label>
+      </div>
+      <div style="margin-top: 10px">
+        <el-radio v-model="runEnv" :label="env.code" v-for="(env) in runEnvData " :key="env.code">{{
+            env.name
+          }}
+        </el-radio>
+      </div>
     </div>
 
     <!-- 选择运行浏览器 -->
-    <div v-if="triggerRunType === 'webUi'">
+    <div v-if="dataType === 'webUi'">
       <div style="margin-top: 20px">
         <label>选择浏览器：</label>
       </div>
@@ -62,7 +67,7 @@
     </div>
 
     <!-- 执行模式 -->
-    <div v-if="showSelectRunModel">
+    <div v-if="dataType !== 'appUi' && showSelectRunModel">
       <div style="margin-top: 40px">
         <label>执行模式： </label>
       </div>
@@ -84,7 +89,7 @@
     </div>
 
     <!-- 运行app的配置 -->
-    <div v-if="triggerRunType === 'appUi'">
+    <div v-if="dataType === 'appUi'">
       <div style="margin-top: 40px">
         <label>运行终端： </label>
       </div>
@@ -166,7 +171,9 @@ import {getRunTimeout} from "@/utils/getConfig";
 
 export default {
   name: "selectRunEnv",
-  props: ['event', 'callBackEvent'],
+  props: [
+    'dataType'
+  ],
   components: {
     businessView
   },
@@ -176,11 +183,11 @@ export default {
       runEnvData: [],
       runModeData: {},
       runBrowserNameData: {},
-      runEnv: '',
-      runBrowser: '',
-      runServer: '',
-      runPhone: '',
-      triggerRunType: 'api',
+      runEnv: null,
+      runBrowser: null,
+      runServer: null,
+      runPhone: null,
+      runUnit: 'api',
       runType: '0',
       runServerList: [],
       runPhoneList: [],
@@ -195,7 +202,7 @@ export default {
 
     // 点确定
     runData() {
-      this.$bus.$emit(this.callBackEvent, {
+      this.$bus.$emit(this.$busEvents.drawerIsCommit, 'selectRunEnv', this.runUnit, {
         runEnv: this.runEnv,
         browser: this.runBrowser,
         businessId: this.showSelectBusiness ? this.$refs.businessView.business : '',
@@ -209,9 +216,9 @@ export default {
     // 获取环境配置
     initEnvList() {
       // 初始化运行环境
-      runEnvList({test_type: this.triggerRunType}).then(response => {
+      runEnvList().then(response => {
         this.runEnvData = response.data.data
-        if (this.runEnvData && this.runEnvData.length > 0){
+        if (this.runEnvData && this.runEnvData.length > 0) {
           this.runEnv = this.runEnvData[0].code
         }
       })
@@ -257,30 +264,32 @@ export default {
 
     getRunTimeout(this)  // 初始化等待用例运行超时时间
 
-    this.$bus.$on(this.event, (triggerRunType, showSelectRunModel, runType) => {
-      this.triggerRunType = triggerRunType
-      this.showSelectRunModel = showSelectRunModel
-      if (triggerRunType === 'api') {
-        this.initEnvList()
-        this.initRunMode()
-        if (runType === 'set'){
-          this.showSelectBusiness=true
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel) => {
+      if (_type === 'selectRunEnv'){
+        this.runUnit = runUnit
+        this.showSelectRunModel = showSelectRunModel
+        if (this.dataType === 'api') {
+          this.initEnvList()
+          this.initRunMode()
+          if (runUnit === 'set') {
+            this.showSelectBusiness = true
+          }
+        } else if (this.dataType === 'appUi') {
+          this.getRunAppEnv()
+        } else {
+          this.initEnvList()
+          this.initRunMode()
+          this.initBrowserName()
         }
-      } else if (triggerRunType === 'appUi') {
-        this.getRunAppEnv()
-      } else {
-        this.initEnvList()
-        this.initRunMode()
-        this.initBrowserName()
+        this.dialogIsShow = true
       }
-      this.dialogIsShow = true
     })
 
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.event)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 }
 </script>

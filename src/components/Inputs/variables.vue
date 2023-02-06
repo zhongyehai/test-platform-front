@@ -35,7 +35,6 @@
           style="width: 100%"
           filterable
           clearable
-          default-first-option
           size="mini">
           <el-option
             v-for="(item) in dataTypeMapping"
@@ -62,7 +61,7 @@
             type="text"
             size="mini"
             icon="el-icon-plus"
-            @click.native="addRow(scope.$index)"
+            @click.native="addRow(true)"
           >
           </el-button>
         </el-tooltip>
@@ -125,14 +124,24 @@ export default {
     },
 
     // 添加一行
-    addRow() {
-      this.tempData.push({
-        id: `${Date.now()}`,
-        key: null,
-        value: null,
-        remark: null,
-        data_type: 'str'
-      })
+    addRow(isRow) {
+      if (isRow){
+        this.tempData.push({
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: 'str'
+        })
+      }else {
+        this.tempData = [{
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: null
+        }]
+      }
     },
 
     // 是否显示删除按钮

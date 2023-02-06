@@ -51,10 +51,8 @@ import {runTestTimeOutMessage} from "@/utils/message";
 
 export default {
   name: 'runStep',
-
   props: [
-    'runType',
-    'busName'
+    'dataType'
   ],
 
   data() {
@@ -67,7 +65,8 @@ export default {
         4: "finish"
       },
       activeProcess: 0,
-      activeStatus: 1
+      activeStatus: 1,
+      getReportUrl: ''
     };
   },
 
@@ -77,20 +76,13 @@ export default {
       // 触发运行成功，每三秒查询一次，
       // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
       // 已出结果，则停止查询，展示测试报告
-      // 根据运行类型初始化接口
-      let getReportUrl = appUiTestGetReport
-      if (this.runType === "api") {
-        getReportUrl = apiTestGetReport
-      } else if (this.runType === "webUi") {
-        getReportUrl = webUiTestGetReport
-      }
 
       var that = this
       var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
       var queryCount = 1
       var timer = setInterval(function () {
         if (queryCount <= runTimeoutCount) {
-          getReportUrl({'id': reportId}).then(response => {
+          that.getReportUrl({'id': reportId}).then(response => {
             that.activeProcess = response.data.process
             that.activeStatus = response.data.status
 
@@ -116,18 +108,30 @@ export default {
     },
   },
 
+  created() {
+    if (this.dataType === 'api'){
+      this.getReportUrl = apiTestGetReport
+    }else if (this.dataType === "webUi"){
+      this.getReportUrl = webUiTestGetReport
+    }else {
+      this.getReportUrl = appUiTestGetReport
+    }
+  },
+
   mounted() {
-    // 监听 接口 Dialog 框 的提交状态，提交成功，则重新请求接口列表
-    this.$bus.$on(this.busName, (reportId) => {
-      this.activeProcess = 0
-      this.activeStatus = 1
-      this.processIsShow = true
-      this.getReport(reportId)
+    // 监听运行申请的提交状态，提交成功，则获取对应的测试报告
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, reportId) => {
+      if (_type === 'process'){
+        this.activeProcess = 0
+        this.activeStatus = 1
+        this.processIsShow = true
+        this.getReport(reportId)
+      }
     })
   },
 
   beforeDestroy() {
-    this.$bus.$off(this.busName)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 };
 </script>

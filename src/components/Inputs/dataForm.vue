@@ -54,8 +54,10 @@
         <!-- 文本 -->
         <div v-else>
           <el-input
+            :disabled="['True', 'False'].indexOf(scope.row.data_type) !== -1"
             v-model="scope.row.value"
-            placeholder="value"
+            :placeholder="
+            scope.row.data_type === 'True' ? 'True' : scope.row.data_type === 'False' ? 'False' : 'value'"
             :id="'data_input' + scope.$index "
             type="textarea"
             :rows=1
@@ -79,7 +81,7 @@
             type="text"
             size="mini"
             icon="el-icon-plus"
-            @click.native="addRow(scope.$index)"></el-button>
+            @click.native="addRow(true)"></el-button>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
           <el-button
@@ -189,14 +191,24 @@ export default {
     },
 
     // 添加一行
-    addRow() {
-      this.tempData.push({
-        id: `${Date.now()}`,
-        key: null,
-        value: null,
-        data_type: this.formDataTypes[0].value,
-        remark: null
-      })
+    addRow(isRow) {
+      if (isRow){
+        this.tempData.push({
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: 'str'
+        })
+      }else {
+        this.tempData = [{
+          id: `${Date.now()}`,
+          key: null,
+          value: null,
+          remark: null,
+          data_type: null
+        }]
+      }
     },
 
     // 删除一行

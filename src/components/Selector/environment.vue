@@ -32,13 +32,10 @@ export default {
 
   mounted() {
     // 获取环境列表
-    runEnvList({}).then(response => {
+    runEnvList().then(response => {
       this.env_list = response.data.data
+      this.current_env = this.env || this.env_list[0].code  // 默认选择第一个
     })
-  },
-
-  created() {
-    this.current_env = this.env
   },
 
   watch: {
@@ -46,7 +43,7 @@ export default {
     'env': {
       deep: true,  // 深度监听
       handler(newVal, oldVal) {
-        this.current_env = newVal
+        this.current_env = newVal || this.env_list[0].code  // 默认选择第一个
       }
     },
   }

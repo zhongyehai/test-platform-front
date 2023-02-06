@@ -460,7 +460,7 @@ export default {
 
     showHitDrawer(status) {
       this.$bus.$emit(
-        this.$busEvents.data.drawerIsShow,
+        this.$busEvents.drawerIsShow,
         status,
         {
           date: this.reportData.time.start_at,
@@ -591,7 +591,7 @@ export default {
   created() {
 
     // 获取环境列表
-    runEnvList({test_type: 'webUi'}).then(response => {
+    runEnvList().then(response => {
       response.data.data.forEach(env => {
         this.runEnvDict[env.code] = env.name
       })

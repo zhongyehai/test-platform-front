@@ -197,15 +197,17 @@ export default {
 
     // 打开文件上传窗口
     openFileUploadDialog() {
-      this.$bus.$emit(this.$busEvents.file.uploadFileDialogIsShow, this.fileType)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'uploadFile', this.fileType)
     }
   },
 
   mounted() {
 
     // 监听 Dialog 打开事件
-    this.$bus.$on(this.$busEvents.file.uploadFileIsCommit, (status) => {
-      this.getFileList()
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+      if (_type === 'uploadFile'){
+        this.getFileList()
+      }
     })
 
     this.getFileList()
@@ -213,7 +215,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.file.uploadFileIsCommit)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   }
 }
 </script>

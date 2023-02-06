@@ -49,7 +49,9 @@
 </template>
 
 <script>
-import {projectList} from '@/apis/apiTest/project'
+import {projectList as apiProjectList} from '@/apis/apiTest/project'
+import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
+import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
@@ -60,8 +62,7 @@ export default {
     Pagination
   },
   props: [
-    'busEventClickTree',
-    'busEventClickMenu',
+    'dataType',
     'menuName',  // 菜单名
     'labelWidth' // 树名字显示长度
   ],
@@ -97,10 +98,20 @@ export default {
 
       // 当前鼠标滑入的节点名
       currentLabel: '',
+
+      projectListUrl: ''
     }
   },
 
   created() {
+    if (this.dataType === "api") {
+      this.projectListUrl = apiProjectList
+    } else if (this.dataType === "webUi") {
+      this.projectListUrl = webUiProjectList
+    } else {
+      this.projectListUrl = appUiProjectList
+    }
+
     // 初始化服务列表, 取20条数据
     this.getProjectList({'pageNum': this.pageNum, 'pageSize': this.pageSize})
   },
@@ -143,7 +154,7 @@ export default {
 
     // 获取服务列表
     getProjectList(params = null) {
-      projectList(params).then(response => {
+      this.projectListUrl(params).then(response => {
         this.projects.project_list = response.data.data
         this.projects.project_total = response.data.total
 
@@ -156,21 +167,17 @@ export default {
 
     // 点击服务时，提交单击的bus事件，当前选中的服务，当前所在页的服务列表
     projectClick(project) {
-      if (this.busEventClickTree) {
-        this.$bus.$emit(this.busEventClickTree, project, this.projects.project_list)
-      }
+      this.$bus.$emit(this.$busEvents.treeIsChoice, 'project', project, this.projects.project_list)
       this.currentProjectId = project.id
     },
 
     // 点击菜单时，提交点击菜单触发的bus事件
     clickMenu(node, data) {
-      if (this.busEventClickMenu) {
-        // 如果当前任务列表的服务id不为当前点击的服务id，则请求当前点击的服务的任务列表
-        if (this.busEventClickTree && this.currentProjectId !== data.id) {
-          this.$bus.$emit(this.busEventClickTree, data)
-        }
-        this.$bus.$emit(this.busEventClickMenu, 'add', data)
+      // 如果当前任务列表的服务id不为当前点击的服务id，则请求当前点击的服务的任务列表
+      if (this.currentProjectId !== data.id) {
+        this.$bus.$emit(this.$busEvents.treeIsChoice, 'project', data)
       }
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', data)
       this.currentProjectId = data.id
     }
   },

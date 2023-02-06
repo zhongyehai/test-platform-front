@@ -123,11 +123,6 @@
 
         </el-table>
 
-        <selectRunEnv
-          :callBackEvent="callBackEvent"
-          :event="runEvent"
-        ></selectRunEnv>
-
         <pagination
           v-show="api_total>0"
           :total="api_total"
@@ -144,9 +139,12 @@
       :currentModuleId="currentModuleId"
     ></apiDrawer>
 
+    <selectRunEnv
+      :dataType="'api'"
+    ></selectRunEnv>
+
     <runProcess
-      :runType="'api'"
-      :busName="$busEvents.data.showRunProcessByIndex"
+      :dataType="'api'"
     ></runProcess>
 
   </div>
@@ -172,11 +170,6 @@ export default {
     runProcess
   },
 
-  // 接收父组件传参的key
-  props: [
-    'currentProjectId',
-    'currentModuleId'
-  ],
   data() {
     return {
 
@@ -184,6 +177,9 @@ export default {
       isLoading: false,  // 运行接口按钮的loading状态
       apiTab: 'api',  //  tab页的显示
       tempApi: {},  // 接口新增/编辑临时数据
+
+      currentModuleId: '',
+      currentProjectId: '',
 
       // 接口数据列表
       pageNum: 1,
@@ -197,9 +193,7 @@ export default {
       newList: [],
       userList: [],
       userDict: {},
-      currentApi: {},
-      runEvent: 'runApiEventOnIndex',
-      callBackEvent: 'runApiOnIndex'
+      currentApi: {}
     }
   },
 
@@ -213,23 +207,32 @@ export default {
   },
 
   mounted() {
+
+    // 点击树时，请求对应的接口列表
+    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId) => {
+      if (_type === 'module'){
+        this.currentModuleId = moduleId
+        this.currentProjectId = projectId
+        this.getApiList()
+      }
+    })
+
     this.getUserList()
 
-    // 监听 接口 Dialog 框 的提交状态，提交成功，则重新请求接口列表
-    this.$bus.$on(this.$busEvents.api.apiApiDrawerCommitSuccess, () => {
-      this.getApiList()
+    // 接口提交成功，则重新请求接口列表
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'apiInfo'){
+        this.getApiList()
+      }else if (_type === 'selectRunEnv' && _runUnit === 'apiIndex'){
+        this.runApis(runDict)
+      }
     })
-
-    this.$bus.$on(this.callBackEvent, (runDict) => {
-      this.runApis(runDict)
-    })
-
   },
 
   // 页面销毁的时候，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.callBackEvent)
-    this.$bus.$off(this.$busEvents.api.apiApiDrawerCommitSuccess)
+    this.$bus.$off(this.$busEvents.treeIsChoice)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
@@ -271,7 +274,7 @@ export default {
     // 打开编辑框
     showEditForm(row) {
       this.tempApi = JSON.parse(JSON.stringify(row))
-      this.$bus.$emit(this.$busEvents.api.apiApiDrawerStatus, 'edit', this.tempApi)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', this.tempApi)
     },
 
     // 删除接口
@@ -299,7 +302,7 @@ export default {
       this.tempApi = api
       this.tempApi.id = ''
       this.tempApi.quote_count = 0
-      this.$bus.$emit(this.$busEvents.api.apiApiDrawerStatus, 'copy', JSON.parse(JSON.stringify(this.tempApi)))
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'copy', JSON.parse(JSON.stringify(this.tempApi)))
       this.$set(api, 'copyPopoverIsShow', false)
     },
 
@@ -323,7 +326,7 @@ export default {
     // 点击运行接口
     clickRunApi(row) {
       this.currentApi = row
-      this.$bus.$emit(this.runEvent, 'api')
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'apiIndex', false)
     },
 
     // 运行接口
@@ -336,7 +339,7 @@ export default {
       }).then(response => {
         this.$set(this.currentApi, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.data.showRunProcessByIndex, response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
         }
       })
     },

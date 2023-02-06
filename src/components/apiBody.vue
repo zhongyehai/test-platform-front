@@ -115,7 +115,7 @@ export default {
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.api.apiApiDrawerStatus, (command, api) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (command, api) => {
       this.tempDataType = api.data_type
       this.tempDataJson = JSON.stringify(api.data_json)
       this.tempDataForm = api.data_form
@@ -126,7 +126,7 @@ export default {
 
   // 组件销毁前，关闭bus监听请求方法选中事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiApiDrawerStatus)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   created() {

@@ -138,7 +138,7 @@ export default {
 
   mounted() {
 
-    this.$bus.$on(this.$busEvents.data.drawerIsShow, (status, data) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (status, data) => {
 
       this.initHitTypeList()  // 获取问题类型列表
 
@@ -168,7 +168,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.data.drawerIsShow)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   methods: {
@@ -178,7 +178,7 @@ export default {
       postHit(this.tempHit).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.data.drawerIsCommit)
+          this.$bus.$emit(this.$busEvents.drawerIsCommit)
           this.drawerIsShow = false
         }
       })
@@ -190,7 +190,7 @@ export default {
       putHit(this.tempHit).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.data.drawerIsCommit)
+          this.$bus.$emit(this.$busEvents.drawerIsCommit)
           this.drawerIsShow = false
         }
       })

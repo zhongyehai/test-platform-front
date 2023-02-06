@@ -225,7 +225,7 @@ export default {
 
     // 新增问题记录
     showHitDrawer(status, row) {
-      this.$bus.$emit(this.$busEvents.data.drawerIsShow, status, row)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, status, row)
     },
 
     // 查看报告
@@ -266,14 +266,14 @@ export default {
     this.getHitList()
 
     // 修改成功，重新请求列表
-    this.$bus.$on(this.$busEvents.data.drawerIsCommit, (status) => {
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (status) => {
       this.getHitList()
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.data.drawerIsCommit)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
 }

@@ -38,7 +38,7 @@ export default {
         })
 
         // 获取对应的配置
-        configList({'type': configTypeData}).then(response => {
+        configList({'queryType': configTypeData}).then(response => {
           this.configEmailServerList = response.data.data
         })
       })

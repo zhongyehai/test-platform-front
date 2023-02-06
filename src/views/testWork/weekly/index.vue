@@ -362,12 +362,7 @@ export default {
     // 添加周报
     addWeekly(node, data) {
       this.$bus.$emit(this.$busEvents.testWork.weeklyDrawerStatus, 'add')
-    },
-
-    // 发送产品树数据
-    // sendModuleTreeIsDone(moduleTree) {
-    //   this.$bus.$emit(this.$busEvents.api.apiModuleTreeIsDone, JSON.parse(JSON.stringify(moduleTree)))
-    // },
+    }
   },
 
   watch: {

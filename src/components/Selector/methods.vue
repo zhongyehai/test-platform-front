@@ -18,9 +18,7 @@ import {getMethodsMapping} from "@/apis/apiTest/api";
 export default {
   name: "methods",
   props: [
-    'method',
-    'busOnEventName',
-    'busEmitEventName',
+    'method'
   ],
   data() {
     return {
@@ -35,7 +33,7 @@ export default {
 
   created() {
     this.tempMethod = this.method ? this.method : 'POST'
-    this.emitMethodSelectorChoiceMethod(this.tempMethod)
+    this.emitSelectorChoice(this.tempMethod)
   },
 
   methods: {
@@ -47,14 +45,12 @@ export default {
       })
     },
 
-    emitMethodSelectorChoiceMethod(method) {
-      if (this.busOnEventName){
-        this.$bus.$emit(this.busOnEventName, method)
-      }
+    emitSelectorChoice(method) {
+      this.$bus.$emit(this.$busEvents.selectorChoice, 'method', method)
     },
 
     choiceMethod() {
-      this.emitMethodSelectorChoiceMethod(this.tempMethod)
+      this.emitSelectorChoice(this.tempMethod)
     }
   },
 
@@ -62,8 +58,7 @@ export default {
     'method': {
       handler(newVal, oldVal) {
         this.tempMethod = newVal ? newVal : 'POST'
-        this.emitMethodSelectorChoiceMethod(newVal)
-        // this.tempMethod = newVal
+        this.emitSelectorChoice(newVal)
       }
     }
   }

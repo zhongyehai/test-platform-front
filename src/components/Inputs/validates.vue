@@ -227,7 +227,7 @@
               type="text"
               size="mini"
               icon="el-icon-plus"
-              @click.native="addRow(scope.$index)">
+              @click.native="addRow(true)">
             </el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
@@ -360,15 +360,27 @@ export default {
     },
 
     // 添加一行
-    addRow() {
-      this.tempData.push({
-        id: `${Date.now()}`,
-        data_source: this.responseDataSourceMapping[0].value,
-        key: null,
-        validate_type: this.validateTypeList[0].value,
-        data_type: this.dataTypeMapping[0].value,
-        value: null
-      })
+    addRow(isRow) {
+      if (isRow){
+        this.tempData.push({
+          id: `${Date.now()}`,
+          data_source: this.responseDataSourceMapping[0].value,
+          key: null,
+          validate_type: this.validateTypeList[0].value,
+          data_type: this.dataTypeMapping[0].value,
+          value: null
+        })
+      }else {
+        this.tempData = [{
+          id: `${Date.now()}`,
+          data_source: null,
+          key: null,
+          validate_type: null,
+          data_type: null,
+          value: null
+        }]
+      }
+
     },
 
     // 删除一行

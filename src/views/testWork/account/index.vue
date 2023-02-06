@@ -437,7 +437,7 @@ export default {
   mounted() {
 
     // 获取环境配置
-    runEnvList({'test_type': this.envType}).then(response => {
+    runEnvList().then(response => {
       this.eventList = response.data.data
     })
 
