@@ -30,12 +30,22 @@
           </el-table-column>
 
           <el-table-column
+            v-if="dataType==='webUi'"
             :show-overflow-tooltip=true
             prop="addr"
             align="center"
-            label="页面地址"
-            :render-header="renderHeader"
             min-width="47%">
+            <template slot="header">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                placement="top-start">
+                <div slot="content">
+                  <div>在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处</div>
+                </div>
+                <span> 页面地址 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <span> {{ scope.row.addr || '未设置' }} </span>
             </template>
@@ -397,25 +407,6 @@ export default {
           })
         }
       })
-    },
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
     }
   },
 

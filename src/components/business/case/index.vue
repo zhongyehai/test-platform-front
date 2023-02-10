@@ -30,10 +30,20 @@
 
           <el-table-column
             align="center"
-            label="是否执行"
             min-width="15%"
-            :render-header="renderHeader"
           >
+            <template slot="header">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                placement="top-start">
+                <div slot="content">
+                  <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
+                  <div>2: 请务必将用例调试通过后再设为要运行</div>
+                </div>
+                <span> 是否执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
@@ -317,27 +327,7 @@ export default {
           })
         }
       })
-    },
-
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例；请务必将用例调试通过后再设为要运行'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
   },
 
   mounted() {

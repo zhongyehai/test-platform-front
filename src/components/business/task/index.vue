@@ -47,9 +47,19 @@
 
               <el-table-column
                 align="center"
-                label="是否启用"
-                min-width="15%"
-                :render-header="renderHeader">
+                min-width="15%">
+                <template slot="header">
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    placement="top-start">
+                    <div slot="content">
+                      <div>1: 启用中的任务才会定时执行</div>
+                      <div>2: 禁用中的任务才支持修改</div>
+                    </div>
+                    <span> 是否启用 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                  </el-tooltip>
+                </template>
                 <template slot-scope="scope">
                   <el-switch
                     :inactive-value="0"
@@ -355,26 +365,7 @@ export default {
           })
         }
       })
-    },
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '启用中的任务才会定时执行；禁用中的任务才支持修改'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
   },
 
   created() {

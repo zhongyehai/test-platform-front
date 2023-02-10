@@ -369,33 +369,15 @@ export default {
           })
         }
       })
-    },
-
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '启用中的服务器才会定时执行；禁用中的服务器才支持修改'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
   },
 
   mounted() {
 
-    this.$bus.$on(this.$busEvents.app.showEditeServerDrawer, () => {
-      this.showDrawer()
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
+      if (_type === 'appServer'){
+        this.showDrawer()
+      }
     })
 
     getConfigByName({"name": "server_os_mapping"}).then(response => {
@@ -415,7 +397,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.app.showEditeServerDrawer)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 }
 </script>

@@ -499,25 +499,29 @@ export default {
   mounted() {
     this.getWeeklyList()
 
-    this.$bus.$on(this.$busEvents.testWork.clickProductTree, (dataDict) => {
-      this.getWeeklyList({
-        'product_id': dataDict.product_id,
-        'project_id': dataDict.project_id,
-        'pageNum': this.listQuery.pageNum,
-        'pageSize': this.listQuery.pageSize
-      })
+    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, dataDict) => {
+      if (_type === 'testWork'){
+        this.getWeeklyList({
+          'product_id': dataDict.product_id,
+          'project_id': dataDict.project_id,
+          'pageNum': this.listQuery.pageNum,
+          'pageSize': this.listQuery.pageSize
+        })
+      }
     })
 
-    // this.$bus.$on(this.$busEvents.testWork.weeklyDrawerStatus, (_type) => {
-    //   this.openDrawer(_type)
-    // })
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType) => {
+      if (_type === 'weekly'){
+        this.openDrawer(drawerType)
+      }
+    })
 
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.testWork.clickProductTree)
-    // this.$bus.$off(this.$busEvents.testWork.weeklyDrawerStatus)
+    this.$bus.$off(this.$busEvents.treeIsChoice)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   methods: {
@@ -632,11 +636,11 @@ export default {
       let tempWeekly_start_time = this.thisFormatTime(this.tempWeekly.start_time)
       if (tempWeekly_start_time > this.nextWeekStart) {  // 数据开始时间大于下周的开始时间，则说明是以后的周计划
         this.weekPosition = 99
-      } else if (tempWeekly_start_time == this.nextWeekStart) {  // 数据开始时间等于下周的开始时间，则说明是下周的周计划
+      } else if (tempWeekly_start_time === this.nextWeekStart) {  // 数据开始时间等于下周的开始时间，则说明是下周的周计划
         this.weekPosition = 7
-      } else if (tempWeekly_start_time == this.currentWeekStart) {  // 数据开始时间等于当前时间所在周的开始时间，则说明是本周的周计划
+      } else if (tempWeekly_start_time === this.currentWeekStart) {  // 数据开始时间等于当前时间所在周的开始时间，则说明是本周的周计划
         this.weekPosition = 0
-      } else if (tempWeekly_start_time == this.lastWeekStart) {  // 数据开始时间等于上周的开始时间，则说明是上周的周计划
+      } else if (tempWeekly_start_time === this.lastWeekStart) {  // 数据开始时间等于上周的开始时间，则说明是上周的周计划
         this.weekPosition = -7
       } else {  // 超出时间范围，则说明是以前的周计划
         this.weekPosition = -99

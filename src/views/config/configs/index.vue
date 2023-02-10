@@ -237,12 +237,12 @@ export default {
 
     // 点击编辑参数，把被点击的用例信息赋值给临时模板
     editConfig(row) {
-      this.$bus.$emit(this.$busEvents.config.configDrawerIsShow, 'edit', JSON.parse(JSON.stringify(row)))
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'configInfo', 'edit', JSON.parse(JSON.stringify(row)))
     },
 
     // 添加参数
     addConfig() {
-      this.$bus.$emit(this.$busEvents.config.configDrawerIsShow, 'add')
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'configInfo', 'add')
     },
 
     getConfigList() {
@@ -265,14 +265,16 @@ export default {
   mounted() {
     this.getUserList(this.getConfigTypeList)
 
-    this.$bus.$on(this.$busEvents.config.configDrawerIsCommit, () => {
-      this.getConfigList()
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+      if (_type === 'configInfo'){
+        this.getConfigList()
+      }
     })
   },
 
   // 页面销毁前，关闭bus监听服务选中事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.config.configDrawerIsCommit)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 }
 </script>

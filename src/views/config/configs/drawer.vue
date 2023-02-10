@@ -90,19 +90,21 @@ export default {
   mounted() {
 
     // 监听 bus 配置操作指令
-    this.$bus.$on(this.$busEvents.config.configDrawerIsShow, (status, config) => {
-      if (status === 'add') {
-        this.initTempConfig()
-      } else if (status === 'edit') {
-        this.editTempConfig(config)
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, config) => {
+      if (_type === 'configInfo'){
+        if (status === 'add') {
+          this.initTempConfig()
+        } else if (status === 'edit') {
+          this.editTempConfig(config)
+        }
+        this.drawerIsShow = true
       }
-      this.drawerIsShow = true
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.config.configDrawerIsShow)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   methods: {
@@ -163,7 +165,7 @@ export default {
     // 向父组件发送form表单提交状态
     sendIsCommitStatus() {
       this.drawerIsShow = false
-      this.$bus.$emit(this.$busEvents.config.configDrawerIsCommit, 'success')
+      this.$bus.$emit(this.$busEvents.drawerIsCommit, 'configInfo')
     },
   },
 

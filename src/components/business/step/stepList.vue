@@ -22,10 +22,19 @@
 
       <el-table-column
         align="center"
-        label="执行"
         min-width="20%"
-        :render-header="renderHeader"
       >
+        <template slot="header">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            placement="top-start">
+            <div slot="content">
+              <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
+            </div>
+            <span> 执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+          </el-tooltip>
+        </template>
         <template slot-scope="scope">
           <el-switch
             :inactive-value="0"
@@ -561,27 +570,7 @@ export default {
           })
         }
       })
-    },
-
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '若此处设置为不运行，则执行测试时将不会运行此步骤'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
   },
   watch: {
     'caseId': {

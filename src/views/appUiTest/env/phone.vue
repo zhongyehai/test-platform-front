@@ -149,7 +149,7 @@
       :total="dataTotal"
       :page.sync="pageNum"
       :limit.sync="pageSize"
-      @pagination="getServerList"
+      @pagination="gePhoneList"
     />
   </div>
 </template>
@@ -199,7 +199,7 @@ export default {
   methods: {
 
     // 获取手机列表
-    getServerList() {
+    gePhoneList() {
       phoneList({
         pageNum: this.pageNum,
         pageSize: this.pageSize
@@ -236,7 +236,7 @@ export default {
       postPhone(this.tempData).then(response => {
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.getServerList()
+          this.gePhoneList()
         }
       })
     },
@@ -246,7 +246,7 @@ export default {
       putPhone(this.tempData).then(response => {
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.getServerList()
+          this.gePhoneList()
         }
       })
     },
@@ -259,7 +259,7 @@ export default {
         deletePhone({id: row.id}).then(response => {
           this.$set(row, 'deleteLoadingIsShow', false)
           if (this.showMessage(this, response)) {
-            this.getServerList()
+            this.gePhoneList()
           }
         })
       })
@@ -313,39 +313,21 @@ export default {
           })
         }
       })
-    },
-
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '启用中的手机才会定时执行；禁用中的手机才支持修改'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.app.showEditePhoneDrawer, () => {
-      this.showDrawer()
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
+      if (_type === 'appPhone'){
+        this.showDrawer()
+      }
     })
 
     getConfigByName({"name": "phone_os_mapping"}).then(response => {
       this.phoneOsMapping = JSON.parse(response.data.value)
     })
 
-    this.getServerList()
+    this.gePhoneList()
   },
 
   created() {
@@ -358,7 +340,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.app.showEditePhoneDrawer)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 }
 </script>

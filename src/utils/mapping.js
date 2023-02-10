@@ -10,7 +10,7 @@ export const swaggerPullStatusMappingTagType = {
 
 // appium服务器请求状态
 export const appiumServerRequestStatusMappingContent = {
-  0: '未访问', 1: '访问失败', 2: '访问成功',
+  0: '未尝试访问', 1: '访问失败', 2: '访问成功',
 }
 
 // appium服务器请求状态tagType

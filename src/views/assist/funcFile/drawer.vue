@@ -56,23 +56,25 @@ export default {
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.api.apiAddFuncFileDrawerIsShow, (status, data) => {
-      if (status === 'add') {
-        this.tempFunc.name = ''
-        this.tempFunc.desc = ''
-        this.tempFunc.id = ''
-      } else if (status === 'update') {
-        this.tempFunc.id = data.id
-        this.tempFunc.name = data.name
-        this.tempFunc.desc = data.desc
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
+      if (_type === 'funcFileInfo'){
+        if (status === 'add') {
+          this.tempFunc.name = ''
+          this.tempFunc.desc = ''
+          this.tempFunc.id = ''
+        } else if (status === 'update') {
+          this.tempFunc.id = data.id
+          this.tempFunc.name = data.name
+          this.tempFunc.desc = data.desc
+        }
+        this.funcFileDrawerIsShow = true
       }
-      this.funcFileDrawerIsShow = true
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiAddFuncFileDrawerIsShow)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   methods: {
@@ -82,7 +84,7 @@ export default {
       postFuncFile({'name': this.tempFunc.name, 'desc': this.tempFunc.desc}).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.api.apiAddFuncFileIsCommit, 'addFuncFileIsCommit')
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
           this.funcFileDrawerIsShow = false
         }
       })
@@ -94,7 +96,7 @@ export default {
       putFuncFile({'id': this.tempFunc.id, 'name': this.tempFunc.name, 'desc': this.tempFunc.desc}).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.api.apiAddFuncFileIsCommit, 'addFuncFileIsCommit')
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
           this.funcFileDrawerIsShow = false
         }
       })

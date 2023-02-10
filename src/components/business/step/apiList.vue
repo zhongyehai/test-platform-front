@@ -273,8 +273,6 @@ export default {
         new_api['run_times'] = 1
         new_api['replace_host'] = false
         new_api['skip_if'] = {"expect": null, "comparator": "", "data_type": "", "check_value": null}
-        new_api['projectName'] = this.$refs.projectSelectorView.$refs.projectSelectorView.selected.label
-        new_api['apiName'] = new_api.name
         this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
       } else {
         this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')

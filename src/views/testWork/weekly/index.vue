@@ -239,7 +239,7 @@ export default {
         this.currentProductId = data.id
         this.currentProjectId = null
       }
-      this.$bus.$emit(this.$busEvents.testWork.clickProductTree, {
+      this.$bus.$emit(this.$busEvents.treeIsChoice, 'testWork', {
         product_id: this.currentProductId,
         project_id: this.currentProjectId
       })
@@ -361,7 +361,7 @@ export default {
 
     // 添加周报
     addWeekly(node, data) {
-      this.$bus.$emit(this.$busEvents.testWork.weeklyDrawerStatus, 'add')
+      this.$bus.$emit(this.$busEvents.drawerIsShow,'weekly', 'add')
     }
   },
 

@@ -44,11 +44,21 @@
 
           <el-table-column
             :show-overflow-tooltip=true
-            :render-header="renderHeader"
             prop="create_user"
-            label="使用次数"
             align="center"
             min-width="10%">
+            <template slot="header">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                placement="top-start">
+                <div slot="content">
+                  <div>1: 统计有多少条用例里直接使用了此接口</div>
+                  <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
+                </div>
+                <span> 使用次数 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
               <el-tag type="warning" v-else>0</el-tag>
@@ -236,26 +246,6 @@ export default {
   },
 
   methods: {
-
-    renderHeader(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '统计有多少条用例里直接使用了此接口；被设计为用例后该用例被引用的，不纳入统计'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
 
     // 获取用户信息，同步请求
     async getUserList() {

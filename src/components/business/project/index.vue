@@ -140,28 +140,14 @@
         <template slot-scope="{row, $index}">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
-          <el-popover
+          <el-button
             v-show="row.yapi_id || row.swagger"
-            :ref="row.id"
-            placement="top"
-            width="160"
-            style="margin-right: 5px"
-            popper-class="down-popover"
-            v-model="row.pullPopoverIsShow">
-            <p>从{{ row.yapi_id ? 'yapi' : 'swagger' }}拉取此服务下的模块、接口信息?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelPull(row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="row.yapi_id ? pullByYapi(row) : pullBySwagger(row)">确定
-              </el-button>
-            </div>
-            <el-button
-              slot="reference"
-              type="text"
-              size="mini"
-              icon="el-icon-bottom-left"
-              :loading="row.pullPopoverLoadingIsShow"
-            ></el-button>
-          </el-popover>
+            slot="reference"
+            type="text"
+            size="mini"
+            icon="el-icon-bottom-left"
+            @click="clickPullButton(row)"
+          ></el-button>
 
           <!-- 编辑服务 -->
           <el-button
@@ -214,6 +200,9 @@
       :limit.sync="listQuery.pageSize"
       @pagination="getProjectList"/>
 
+    <!-- 接口拉取参数选择 -->
+    <pullDrawerView></pullDrawerView>
+
     <!-- 服务信息抽屉 -->
     <projectDrawer
       :dataType="dataType"
@@ -245,13 +234,13 @@ import {
   projectList as appUiProjectList,
   projectSort as appUiProjectSort
 } from '@/apis/appUiTest/project'
-import {yapiPull, yapiPullProject} from '@/apis/assist/yapi'
-import {swaggerPull} from '@/apis/assist/swagger'
+import {yapiPullProject} from '@/apis/assist/yapi'
 import {userList} from '@/apis/system/user'
 import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination/index.vue'
 import projectDrawer from '@/components/business/project/drawer.vue'
+import pullDrawerView from '@/components/business/project/pullDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
 import {getConfigByName} from "@/apis/config/config";
 import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/utils/mapping";
@@ -262,6 +251,7 @@ export default {
   components: {
     Pagination,
     projectDrawer,
+    pullDrawerView,
     projectEnvDrawer
   },
   directives: {waves},
@@ -285,8 +275,6 @@ export default {
       currentProject: {},  // 当前选中的服务
       project_list: [],  // 服务列表
       total: 0,  // 服务数据表格总条数
-      dialogStatus: '',  // dialog框状态，edit 为编辑数据, create 为新增数据
-      downloadLoading: false,  // 下载表格状态
       tableIsLoading: true,  // 请求加载状态
       pullYapiProjectIsLoading: false,
       currentUserList: [],
@@ -298,7 +286,6 @@ export default {
 
       pullStatusContent: swaggerPullStatusMappingContent,
       pullStatusTagType: swaggerPullStatusMappingTagType,
-
       deleteProjectUrl: '',
       projectListUrl: '',
       projectSortUrl: ''
@@ -307,7 +294,7 @@ export default {
 
   created() {
 
-    if (this.dataType === "api"){
+    if (this.dataType === "api") {
       this.deleteProjectUrl = apiDeleteProject
       this.projectListUrl = apiProjectList
       this.projectSortUrl = apiProjectSort
@@ -319,11 +306,11 @@ export default {
         {fieldName: 'manager', label: '负责人', minWidth: '10%'},
         {fieldName: 'update_user', label: '最后修改人', minWidth: '15%'}
       ]
-    }else if (this.dataType === "webUi"){
+    } else if (this.dataType === "webUi") {
       this.deleteProjectUrl = webUiDeleteProject
       this.projectListUrl = webUiProjectList
       this.projectSortUrl = webUiProjectSort
-    }else {
+    } else {
       this.deleteProjectUrl = appUiDeleteProject
       this.projectListUrl = appUiProjectList
       this.projectSortUrl = appUiProjectSort
@@ -360,16 +347,6 @@ export default {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'env', row)
     },
 
-    // 从yapi同步服务信息
-    pullByYapi(row) {
-      this.$set(row, 'pullPopoverIsShow', false)
-      this.$set(row, 'pullPopoverLoadingIsShow', true)
-      yapiPull({id: row.id}).then(response => {
-        this.showMessage(this, response)
-        this.$set(row, 'pullPopoverLoadingIsShow', false)
-      })
-    },
-
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
       let that = this, data = row[column.property]
@@ -382,7 +359,11 @@ export default {
       }
     },
 
-    // 从yapi同步服务信息
+    clickPullButton(row) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'pullProjectData', row)
+    },
+
+    // 从yapi拉取服务列表
     pullYapiProject(row) {
       this.pullYapiProjectIsLoading = true
       yapiPullProject({}).then(response => {
@@ -390,16 +371,6 @@ export default {
         if (this.showMessage(this, response)) {
           this.getProjectList()
         }
-      })
-    },
-
-    // 从swagger同步服务信息
-    pullBySwagger(row) {
-      this.$set(row, 'pullPopoverIsShow', false)
-      this.$set(row, 'pullPopoverLoadingIsShow', true)
-      swaggerPull({id: row.id}).then(response => {
-        this.showMessage(this, response)
-        this.$set(row, 'pullPopoverLoadingIsShow', false)
       })
     },
 
@@ -429,10 +400,6 @@ export default {
           this.getProjectList(); // 重新从后台获取服务列表
         }
       })
-    },
-
-    cancelPull(row) {
-      this.$set(row, 'pullPopoverIsShow', false)
     },
 
     cancelDeletePopover(row) {
@@ -494,7 +461,7 @@ export default {
   mounted() {
 
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (_type === 'projectInfo'){
+      if (['projectInfo', 'pullProjectData'].indexOf(_type) !== -1) {
         this.getProjectList()
       }
     })

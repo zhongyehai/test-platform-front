@@ -104,7 +104,7 @@
             type="text"
             size="mini"
             icon="el-icon-edit"
-            @click="sendEditEmit(scope.row, 'file')">
+            @click="sendEditEmit(scope.row, 'funcFileInfo')">
           </el-button>
 
           <!--修改函数内容-->
@@ -113,7 +113,7 @@
             size="mini"
             style="margin-right: 5px"
             icon="el-icon-edit-outline"
-            @click="sendEditEmit(scope.row, 'data')">
+            @click="sendEditEmit(scope.row, 'funcFileData')">
           </el-button>
 
           <!-- 删除文件 -->
@@ -233,15 +233,11 @@ export default {
 
     // 新增函数文件
     showAddFuncFileDrawer() {
-      this.$bus.$emit(this.$busEvents.api.apiAddFuncFileDrawerIsShow, 'add')
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', 'add')
     },
 
-    sendEditEmit(funcFile, _type) {
-      if (_type === 'file') {  // 编辑函数文件
-        this.$bus.$emit(this.$busEvents.api.apiAddFuncFileDrawerIsShow, 'update', funcFile)
-      } else if (_type === 'data') {  // 编辑函数文件内容
-        this.$bus.$emit(this.$busEvents.api.apiEditFuncFileData, funcFile)
-      }
+    sendEditEmit(row, _type) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, _type, 'update', row)
     },
 
     cancelDeletePopover(row){
@@ -294,20 +290,16 @@ export default {
     this.getUserList(this.getFuncFileList)
 
     // 修改函数文件成功，重新请求列表
-    this.$bus.$on(this.$busEvents.api.apiEditFuncFileIsCommit, (status) => {
-      this.getFuncFileList()
-    })
-
-    // 新增函数文件成功，重新请求列表
-    this.$bus.$on(this.$busEvents.api.apiAddFuncFileIsCommit, (status) => {
-      this.getFuncFileList()
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
+      if (['funcFileInfo', 'funcFileData'].indexOf(_type) !== -1){
+        this.getFuncFileList()
+      }
     })
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiAddFuncFileIsCommit)
-    this.$bus.$off(this.$busEvents.api.apiEditFuncFileIsCommit)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
 }

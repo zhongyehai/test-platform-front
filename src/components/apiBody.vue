@@ -114,21 +114,6 @@ export default {
     }
   },
 
-  mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (command, api) => {
-      this.tempDataType = api.data_type
-      this.tempDataJson = JSON.stringify(api.data_json)
-      this.tempDataForm = api.data_form
-      this.tempDataUrlencoded = JSON.stringify(api.data_urlencoded)
-      this.tempDataText = api.data_text
-    })
-  },
-
-  // 组件销毁前，关闭bus监听请求方法选中事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
-
   created() {
     this.tempDataType = this.dataType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})

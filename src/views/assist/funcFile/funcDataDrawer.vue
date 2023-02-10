@@ -124,7 +124,7 @@ export default {
         this.saveButtonIsLoading = false
         if (res.status === 200) {
           this.showMessage(this, res)
-          this.$bus.$emit(this.$busEvents.api.apiEditFuncFileIsCommit, 'success')
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileData', 'success')
           this.funcFileDrawerIsShow = false
         } else {
           this.debugResultDetail = res.message.result
@@ -165,18 +165,20 @@ export default {
   mounted() {
 
     // 点击编辑函数文件事件
-    this.$bus.$on(this.$busEvents.api.apiEditFuncFileData, (funcFile) => {
-      this.funcData = funcFile.func_data
-      this.id = funcFile.id
-      this.funcFileName = funcFile.name
-      this.funcFileDrawerIsShow = true
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, funcFile) => {
+      if (_type === 'funcFileData'){
+        this.funcData = funcFile.func_data
+        this.id = funcFile.id
+        this.funcFileName = funcFile.name
+        this.funcFileDrawerIsShow = true
+      }
     })
 
   },
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
-    this.$bus.$off(this.$busEvents.api.apiEditFuncFileData)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
 }

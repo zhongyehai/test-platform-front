@@ -67,22 +67,14 @@ export default {
     return {
       makeLoadingIsShow: false,
       isIndeterminate: true,
-      // 全选状态
-      checkAll: false,
-      // 数量
-      count: 1,
-      // 用户选中的项
-      checkedData: ["姓名", "身份证号", "手机号", "银行卡", "邮箱", "公司名", "地址"],
-      // 所有项和对应的值
-      allOptionsMapping: [],
-      // 所有项的key
-      allOptionKeys: [],
-      // 接口返回的生成的用户信息
-      makedUserDictList: [],
-      // 接口返回的生成的用户信息的value
-      makedUserValueList: [],
-      // 获取表格能渲染的高度, 屏幕的70%
-      autoHeight: window.innerHeight * 0.7,
+      checkAll: false,      // 全选状态
+      count: 1,      // 数量
+      checkedData: ["姓名", "身份证号", "手机号", "银行卡", "邮箱", "公司名", "地址"],  // 用户选中的项
+      allOptionsMapping: [],      // 所有项和对应的值
+      allOptionKeys: [],      // 所有项的key
+      makedUserDictList: [],      // 接口返回的生成的用户信息
+      makedUserValueList: [],      // 接口返回的生成的用户信息的value
+      autoHeight: window.innerHeight * 0.7,      // 获取表格能渲染的高度, 屏幕的70%
     };
   },
   methods: {

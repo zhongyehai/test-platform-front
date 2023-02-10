@@ -16,12 +16,8 @@
             <el-input v-model="currentStep.name" placeholder="步骤名称"></el-input>
           </el-form-item>
 
-          <el-form-item label="所属服务" prop="projectName" size="small">
-            <el-input disabled v-model="currentStep.projectName"></el-input>
-          </el-form-item>
-
-          <el-form-item label="所属接口" prop="apiName" size="small">
-            <el-input disabled v-model="currentStep.apiName"></el-input>
+          <el-form-item label="所属接口" prop="apiFrom" size="small">
+            <el-input disabled v-model="currentStep.apiFrom"></el-input>
           </el-form-item>
 
           <el-form-item label="请求方法" prop="name" size="small">
@@ -228,7 +224,7 @@ import extractsView from "@/components/Inputs/extract"
 import validatesView from "@/components/Inputs/validates";
 
 import {postStep, putStep, putStepHost} from "@/apis/apiTest/step"
-import {getApi, getAssertMapping} from "@/apis/apiTest/api";
+import {getApi, getAssertMapping, apiMsgBelongTo} from "@/apis/apiTest/api";
 import {getProject} from "@/apis/apiTest/project";
 import {getConfigByName} from "@/apis/config/config";
 import {assertStrIsJson} from "@/utils/validate";
@@ -435,15 +431,16 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType, step) => {
       if (_type === 'stepInfo') {
         if (drawerType === 'edit') {  // 修改
+
           // 获取接口的地址和请求方法
           getApi({id: step.api_id}).then(response => {
             this.$set(this.currentStep, 'addr', response.data.addr)
             this.$set(this.currentStep, 'method', response.data.method)
-            this.$set(this.currentStep, 'apiName', response.data.name)
           })
 
-          getProject({id: step.project_id}).then(response => {
-            this.$set(this.currentStep, 'projectName', response.data.name)
+          // 获取接口的所属信息
+          apiMsgBelongTo({id: step.api_id}).then(response => {
+            this.$set(this.currentStep, 'apiFrom', response.message)
           })
 
           this.currentStep = step
@@ -453,7 +450,13 @@ export default {
         } else {  // 新增
           step.case_id = this.caseId
           this.currentStep = JSON.parse(JSON.stringify(step))  // 深拷贝
-          this.currentStepCopy = JSON.parse(JSON.stringify(step))  // 深拷贝
+
+          // 获取接口的所属信息
+          apiMsgBelongTo({id: step.api_id}).then(response => {
+            this.$set(this.currentStep, 'apiFrom', response.message)
+          })
+
+          this.currentStepCopy = JSON.parse(JSON.stringify(this.currentStep))  // 深拷贝
           this.drawerType = 'add'
           this.drawerIsShow = true
         }
