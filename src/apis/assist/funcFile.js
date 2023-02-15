@@ -28,11 +28,6 @@ export function deleteFuncFile(data) {
   return Func('delete', data)
 }
 
-// 保存自定义函数内容
-export function saveFuncFileData(data) {
-  return request({url: currentBaseDir + '/data', method: 'put', data: data});
-}
-
 // 获取所有自定函数文件名
 export function funcFileList(params) {
   return request({url: currentBaseDir + '/list', method: 'get', params: params});

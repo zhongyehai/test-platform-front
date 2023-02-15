@@ -149,14 +149,6 @@
       :currentModuleId="currentModuleId"
     ></apiDrawer>
 
-    <selectRunEnv
-      :dataType="'api'"
-    ></selectRunEnv>
-
-    <runProcess
-      :dataType="'api'"
-    ></runProcess>
-
   </div>
 </template>
 
@@ -165,8 +157,6 @@ import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
 import apiDrawer from '@/views/apiTest/api/drawer'
-import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
-import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {userList} from '@/apis/system/user'
 import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
@@ -175,9 +165,7 @@ export default {
   name: 'index',
   components: {
     Pagination,
-    apiDrawer,
-    selectRunEnv,
-    runProcess
+    apiDrawer
   },
 
   data() {
@@ -362,26 +350,6 @@ export default {
       })
     }
 
-  },
-
-  watch: {
-
-    // 监听父组件传过来的当前选中的模块，实时获取父组件传过来的模块信息对应下的接口列表
-    'currentModuleId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.getApiList({
-            'moduleId': newVal,
-            'pageNum': this.pageNum,
-            'pageSize': this.pageSize
-          })
-        } else {
-          this.api_list = []
-        }
-
-      }
-    }
   }
 }
 </script>

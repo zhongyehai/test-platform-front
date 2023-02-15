@@ -133,7 +133,7 @@
       :dataType="dataType"
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
-      :dataTypeMapping="dataTypeMapping"
+      :dataTypeMapping="$busEvents.data.dataTypeMappingList"
     ></caseDrawer>
 
   </div>
@@ -144,7 +144,6 @@ import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import caseDrawer from '@/components/business/case/drawer'
 
-import {getConfigByName} from "@/apis/config/config";
 import {
   caseList as apiCaseList,
   caseRun as apiCaseRun,
@@ -206,7 +205,6 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-      dataTypeMapping: [],
 
       caseListUrl: '',
       caseRunUrl: '',
@@ -331,11 +329,6 @@ export default {
   },
 
   mounted() {
-
-    // 从后端获取数据类型映射
-    getConfigByName({'name': 'data_type_mapping'}).then(response => {
-      this.dataTypeMapping = JSON.parse(response.data.value)
-    })
 
     // 如果是ui测试用例，则获取步骤执行方式
     if (this.dataType !== 'api') {

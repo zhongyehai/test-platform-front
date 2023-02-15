@@ -97,17 +97,7 @@
 
         <el-table-column align="center" label="操作" min-width="10%">
           <template slot-scope="scope">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="添加为步骤"
-              placement="top-start">
-              <el-button
-                type="text"
-                size="mini"
-                icon="el-icon-d-arrow-left"
-                @click.native="addElementToStep(scope.row)"></el-button>
-            </el-tooltip>
+            <el-button type="primary" size="mini" @click.native="addElementToStep(scope.row)">转步骤</el-button>
           </template>
         </el-table-column>
       </el-table>

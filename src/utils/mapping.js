@@ -1,3 +1,8 @@
+// title
+export const dataTypeTitleMappingContent = {
+  'api': '服务','webUi': '项目','appUi': 'APP',
+}
+
 // swagger拉取状态
 export const swaggerPullStatusMappingContent = {
   0: '拉取失败', 1: '未拉取', 2: '拉取成功',

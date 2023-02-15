@@ -224,9 +224,7 @@ import extractsView from "@/components/Inputs/extract"
 import validatesView from "@/components/Inputs/validates";
 
 import {postStep, putStep, putStepHost} from "@/apis/apiTest/step"
-import {getApi, getAssertMapping, apiMsgBelongTo} from "@/apis/apiTest/api";
-import {getProject} from "@/apis/apiTest/project";
-import {getConfigByName} from "@/apis/config/config";
+import {getApi, apiMsgBelongTo} from "@/apis/apiTest/api";
 import {assertStrIsJson} from "@/utils/validate";
 
 export default {
@@ -400,31 +398,12 @@ export default {
       this.currentStep = this.currentStepCopy
     },
 
-    // 从后端获取断言方式
-    getAssertMappings() {
-      getAssertMapping().then(response => {
-        this.validateTypeList = response.data
-      })
-    },
-
-    // 从后端获取数据类型映射
-    getDataTypeMapping() {
-      getConfigByName({'name': 'data_type_mapping'}).then(response => {
-        this.dataTypeMapping = JSON.parse(response.data.value)
-      })
-    },
-
   },
 
   mounted() {
 
-    if (this.validateTypeList.length === 0) {
-      this.getAssertMappings()
-    }
-
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
+    this.validateTypeList = this.$busEvents.data.apiAssertMappingList
+    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList
 
 
     // 新增/编辑步骤

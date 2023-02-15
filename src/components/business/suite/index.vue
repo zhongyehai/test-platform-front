@@ -8,7 +8,7 @@
           v-model="currentProjectId"
           placeholder="选择服务"
           size="mini"
-          style="width: 400px"
+          style="width: 250px"
           filterable
           default-first-option
           @change="getSetList"
@@ -188,9 +188,10 @@ import caseManage from '@/components/business/case'  // 用例管理组件
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
+import {getFindElementOption} from "@/utils/getConfig";
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
-import {apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";  // 接口引用
+import {apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping} from "@/apis/apiTest/api";  // 接口引用
 import {projectList as apiProjectList} from "@/apis/apiTest/project";
 import {
   caseSetTree as apiCaseSetTree,
@@ -217,6 +218,8 @@ import {
   postCaseSet as appUiPostCaseSet,
   putCaseSet as appUiPutCaseSet
 } from "@/apis/appUiTest/caseSet";
+import {getConfigByName, getSkipIfTypeMapping} from "@/apis/config/config";
+import {extractMappingList} from "@/apis/webUiTest/step";
 
 
 export default {
@@ -480,6 +483,7 @@ export default {
       this.deleteCaseSetUrl = webUiDeleteCaseSet
       this.postCaseSetUrl = webUiPostCaseSet
       this.putCaseSetUrl = webUiPutCaseSet
+      getFindElementOption(this)  // 获取定位方式
     } else {
       this.projectListUrl = appUiProjectList
       this.caseSetTreeUrl = appUiCaseSetTree
@@ -487,12 +491,41 @@ export default {
       this.deleteCaseSetUrl = appUiDeleteCaseSet
       this.postCaseSetUrl = appUiPostCaseSet
       this.putCaseSetUrl = appUiPutCaseSet
+      getFindElementOption(this)  // 获取定位方式
     }
 
     this.getProjectList()
   },
 
   mounted() {
+
+    // 从后端获取数据类型映射
+    getConfigByName({'name': 'data_type_mapping'}).then(response => {
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取响应对象数据源映射
+    if (this.dataType === 'api'){
+      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
+        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+      })
+    }
+
+    // 从后端获取数据提取方式映射
+    extractMappingList().then(response => {
+      this.$busEvents.data.extractMappingList = response.data
+    })
+
+    // 从后端获取断言数方式映射
+    getAssertMapping().then(response => {
+      this.$busEvents.data.apiAssertMappingList = response.data
+    })
+
+    // 从后端获取跳过方式映射
+    getSkipIfTypeMapping().then(response => {
+      this.$busEvents.data.skipIfTypeMappingList = response.data
+    })
+
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
       if (_type === 'selectRunEnv' && _runUnit === 'set') {
         this.runCaseSet(runDict)

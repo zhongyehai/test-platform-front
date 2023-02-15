@@ -173,8 +173,7 @@
 
 <script>
 
-import {getAssertMapping} from '@/apis/apiTest/api'
-import {getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping} from '@/apis/config/config'
+import {getSkipIfDataSourceMapping} from '@/apis/config/config'
 import Sortable from "sortablejs";
 
 export default {
@@ -195,21 +194,14 @@ export default {
   },
 
   mounted() {
-    if (this.skipIfTypeMapping.length === 0) {
-      this.getSkipIfTypeMappings()
-    }
 
     if (this.skipIfDataSourceMapping.length === 0) {
       this.getSkipIfDataSourceMappings()
     }
 
-    if (this.validateTypeList.length === 0) {
-      this.getAssertMappings()
-    }
-
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
+    this.skipIfTypeMapping = this.$busEvents.data.skipIfTypeMappingList
+    this.validateTypeList = this.$busEvents.data.apiAssertMappingList
+    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList
 
     this.initTempData(this.skipIfData)
     this.oldList = this.tempData.map(v => v.id)
@@ -226,27 +218,6 @@ export default {
     getSkipIfDataSourceMappings() {
       getSkipIfDataSourceMapping({type: this.use_type}).then(response => {
         this.skipIfDataSourceMapping = response.data
-      })
-    },
-
-    // 从后端获取跳过方式
-    getSkipIfTypeMappings() {
-      getSkipIfTypeMapping().then(response => {
-        this.skipIfTypeMapping = response.data
-      })
-    },
-
-    // 从后端获取断言方式
-    getAssertMappings() {
-      getAssertMapping().then(response => {
-        this.validateTypeList = response.data
-      })
-    },
-
-    // 从后端获取数据类型映射
-    getDataTypeMapping() {
-      getConfigByName({'name': 'data_type_mapping'}).then(response => {
-        this.dataTypeMapping = JSON.parse(response.data.value)
       })
     },
 

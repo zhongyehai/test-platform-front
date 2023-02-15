@@ -263,8 +263,6 @@
 
 <script>
 
-import {getAssertMapping} from '@/apis/apiTest/api'
-import {getConfigByName} from '@/apis/config/config'
 import Sortable from "sortablejs";
 
 export default {
@@ -286,17 +284,9 @@ export default {
 
   mounted() {
 
-    if (this.validateTypeList.length === 0) {
-      this.getAssertMappings()
-    }
-
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
-
-    if (this.responseDataSourceMapping.length === 0) {
-      this.getResponseDataSourceMapping()
-    }
+    this.validateTypeList = this.$busEvents.data.apiAssertMappingList  // 从缓存获取断言类型映射
+    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList  // 从缓存获取数据类型映射
+    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList  // 从缓存获取响应对象数据源映射
 
     this.initValidates(this.validates)
     this.oldList = this.tempData.map(v => v.id)
@@ -308,28 +298,6 @@ export default {
 
 
   methods: {
-
-    // 从后端获取断言方式
-    getAssertMappings() {
-      getAssertMapping().then(response => {
-        this.validateTypeList = response.data
-      })
-    },
-
-    // 从后端获取数据类型映射
-    getDataTypeMapping() {
-      getConfigByName({'name': 'data_type_mapping'}).then(response => {
-        this.dataTypeMapping = JSON.parse(response.data.value)
-      })
-    },
-
-    // 从后端获取响应数据源映射
-    getResponseDataSourceMapping() {
-      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
-        this.responseDataSourceMapping = JSON.parse(response.data.value)
-      })
-    },
-
     // 根据选择的数据源显示不同的提示
     getDataSourcePlaceholder(_type) {
       if (!_type) {

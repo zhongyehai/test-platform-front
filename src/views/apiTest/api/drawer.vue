@@ -196,7 +196,7 @@
         type="primary"
         style="float: left"
         :loading="isShowDebugLoading"
-        @click="clickDebugApi()"
+        @click="debugApi()"
       >调试
       </el-button>
 
@@ -341,14 +341,14 @@ export default {
     },
 
     // 调试api，先保存，走数据校验，再发送请求
-    debugApi(runDict) {
+    debugApi() {
       this.isShowDebugLoading = true
       if (this.tempApi.id) {
         putApi(this.getTempApi()).then(response => {
           this.isShowDebugLoading = false
           if (this.showMessage(this, response)) {
-            this.drawerIsCommit()
-            this.runApis(runDict)
+            this.drawerIsCommit(true)
+            this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'apiDrawer', false)
           }
         })
       } else {
@@ -356,16 +356,12 @@ export default {
           this.isShowDebugLoading = false
           if (this.showMessage(this, response)) {
             this.tempApi = response.data
-            this.drawerIsCommit()
-            this.runApis(runDict)
+            this.drawerIsCommit(true)
+            this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'apiDrawer', false)
           }
         })
       }
       this.drawerType = 'update'
-    },
-
-    clickDebugApi() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'apiDrawer', false)
     },
 
     runApis(runConf) {
@@ -408,8 +404,8 @@ export default {
       })
     },
 
-    drawerIsCommit() {
-      this.drawerIsShow = false
+    drawerIsCommit(drawerIsShow) {
+      this.drawerIsShow = drawerIsShow
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'apiInfo')
     },
 

@@ -8,7 +8,7 @@
           v-model="tempDataForm.project_id"
           placeholder="选择服务"
           size="mini"
-          style="width: 400px"
+          style="width: 250px"
           filterable
           default-first-option
           @change="getModuleList"
@@ -211,6 +211,14 @@
       </div>
     </el-drawer>
 
+    <selectRunEnv
+      :dataType="dataType"
+    ></selectRunEnv>
+
+    <runProcess
+      :dataType="dataType"
+    ></runProcess>
+
   </div>
 
 
@@ -220,9 +228,12 @@
 import waves from "@/directive/waves";
 import apiManage from '@/views/apiTest/api'  // 接口管理组件
 import pageManage from '@/components/business/page/index.vue'
+import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
+import runProcess from '@/components/runProcess'  // 测试执行进度组件
 
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
+import {getConfigByName} from "@/apis/config/config";
 import {apiMsgBelongTo, apiMsgBelongToStep, downloadApiMsgTemplate, uploadApi, uploadApiMsg} from "@/apis/apiTest/api";
 
 import {projectList as apiProjectList} from "@/apis/apiTest/project";
@@ -255,7 +266,9 @@ export default {
   props: ["dataType"],
   components: {
     apiManage,
-    pageManage
+    pageManage,
+    selectRunEnv,
+    runProcess
   },
   directives: {waves},
   data() {
@@ -532,6 +545,19 @@ export default {
       this.$bus.$emit(this.$busEvents.treeIsDone, 'module', JSON.parse(JSON.stringify(moduleTree)))
     },
   },
+
+  mounted() {
+    // 从后端获取数据类型映射
+    getConfigByName({'name': 'data_type_mapping'}).then(response => {
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取响应对象数据源映射
+    getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
+      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+    })
+  },
+
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);

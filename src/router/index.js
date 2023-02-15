@@ -327,6 +327,7 @@ export const constantRoutes = [
       {
         path: 'diffRecord',
         name: 'DiffRecord',
+        hidden: true,
         component: () => import('@/views/assist/yapi/diffDecord'),
         meta: {title: 'yapi监控记录', icon: 'el-icon-video-camera-solid'}
       },
@@ -363,12 +364,14 @@ export const constantRoutes = [
       {
         path: 'kym',
         name: 'KYM',
+        hidden: true,
         component: () => import('@/views/testWork/kym'),
         meta: {title: 'KYM分析', icon: 'el-icon-edit-outline'}
       },
       {
         path: 'makeTestCase',
         name: 'MakeTestCase',
+        hidden: true,
         component: () => import('@/views/testWork/makeTestCase'),
         meta: {title: '用例编写', icon: 'el-icon-s-opportunity'}
       },
@@ -397,16 +400,16 @@ export const constantRoutes = [
         meta: {title: '征信考试', icon: 'form'}
       },
       {
-        path: 'makeUserInfo',
-        name: 'MakeUserInfo',
-        component: () => import('@/views/tools/makeUserInfo'),
-        meta: {title: '生成用户信息', icon: 'el-icon-s-unfold'}
+        path: 'dataPool',
+        name: 'DataPool',
+        component: () => import('@/views/tools/dataPool'),
+        meta: {title: '数据池', icon: 'el-icon-coin'}
       },
       {
-        path: 'makeUserInfo1',
-        name: 'MakeUserInfo1',
-        component: () => import('@/views/tools/makeUserInfo'),
-        meta: {title: '生成用户信息1', icon: 'el-icon-s-unfold'}
+        path: 'makeUserInfo',
+        name: 'MakeUserInfo',
+        component: () => import('@/views/tools/makeUserInfo/index.vue'),
+        meta: {title: '生成用户信息', icon: 'el-icon-s-unfold'}
       }
     ]
   },

@@ -2,7 +2,7 @@
   <!-- 结构树/服务列表 -->
   <div class="tabs">
     <el-tabs v-model="projectTab">
-      <el-tab-pane label="服务列表" name="project">
+      <el-tab-pane :label=title name="project">
         <!-- 服务列表和操作 -->
         <el-scrollbar>
           <el-tree
@@ -54,6 +54,7 @@ import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
 import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
+import {dataTypeTitleMappingContent} from "@/utils/mapping";
 
 export default {
   name: 'projectTree',
@@ -69,11 +70,10 @@ export default {
 
   data() {
     return {
-      //  tab页的显示
-      projectTab: 'project',
 
-      // 树的显示规则详见element-ui
-      defaultProps: {children: 'children', label: 'name'},
+      title: `${dataTypeTitleMappingContent[this.dataType]}列表`,
+      projectTab: 'project',   //  tab页的显示
+      defaultProps: {children: 'children', label: 'name'},  // 树的显示规则详见element-ui
 
       // 初始化数据默认的数据
       pageNum: 1,
@@ -86,18 +86,10 @@ export default {
         currentPage: null,
         currentProject: null
       },
-
-      //  默认选中的标识，用于判断是否需要默认选中第一个
-      defaultSelectedProject: [],
-
-      // 定义点击次数, 默认0次，区分单击和双击
-      treeClickCount: 0,
-
-      // 当前选中的服务
-      currentProjectId: null,
-
-      // 当前鼠标滑入的节点名
-      currentLabel: '',
+      defaultSelectedProject: [],  //  默认选中的标识，用于判断是否需要默认选中第一个
+      treeClickCount: 0,  // 定义点击次数, 默认0次，区分单击和双击
+      currentProjectId: null,  // 当前选中的服务
+      currentLabel: '',  // 当前鼠标滑入的节点名
 
       projectListUrl: ''
     }

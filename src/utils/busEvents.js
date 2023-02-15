@@ -4,8 +4,14 @@ export default {
 
   // 缓存数据
   data: {
-    executeTypeList: [],  // ui自动化步骤的执行方式
-    executeTypeDict: {},  // ui自动化步骤的执行方式
+    dataTypeMappingList: [],  // 数据类型枚举
+    skipIfTypeMappingList: [],  // 跳过类型枚举
+
+    responseDataSourceMappingList: [],  // 接口响应数据源枚举
+
+    apiAssertMappingList: [],  // 接口自动化断言方法映射
+
+    executeTypeDict: {},  // ui自动化执行类型
 
     extractMappingList: [],  // ui自动化数据提取方法映射
     extractMappingDict: {},  // ui自动化数据提取方法映射

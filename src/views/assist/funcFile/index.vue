@@ -51,7 +51,7 @@
         type="primary"
         size="mini"
         style="margin-left: 10px"
-        @click.native="showAddFuncFileDrawer()"
+        @click.native="sendEditEmit('add')"
       >新增函数文件
       </el-button>
 
@@ -104,16 +104,8 @@
             type="text"
             size="mini"
             icon="el-icon-edit"
-            @click="sendEditEmit(scope.row, 'funcFileInfo')">
-          </el-button>
-
-          <!--修改函数内容-->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 5px"
-            icon="el-icon-edit-outline"
-            @click="sendEditEmit(scope.row, 'funcFileData')">
+            style="margin-right: 10px"
+            @click="sendEditEmit('update', scope.row)">
           </el-button>
 
           <!-- 删除文件 -->
@@ -151,14 +143,13 @@
     />
 
     <funcFileDrawer></funcFileDrawer>
-    <funcDataDrawer></funcDataDrawer>
+
   </div>
 </template>
 
 <script>
 import Sortable from 'sortablejs'
 import funcFileDrawer from "@/views/assist/funcFile/drawer";
-import funcDataDrawer from "@/views/assist/funcFile/funcDataDrawer";
 import Pagination from '@/components/Pagination'
 
 import {funcFileList, deleteFuncFile, funcSort} from '@/apis/assist/funcFile'
@@ -168,8 +159,7 @@ export default {
   name: "funcFile",
   components: {
     Pagination,
-    funcFileDrawer,
-    funcDataDrawer
+    funcFileDrawer
   },
   data() {
     return {
@@ -232,12 +222,12 @@ export default {
     },
 
     // 新增函数文件
-    showAddFuncFileDrawer() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', 'add')
-    },
+    // showAddFuncFileDrawer() {
+    //   this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', 'add')
+    // },
 
-    sendEditEmit(row, _type) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, _type, 'update', row)
+    sendEditEmit(_type, row) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', _type, row)
     },
 
     cancelDeletePopover(row){
@@ -291,7 +281,7 @@ export default {
 
     // 修改函数文件成功，重新请求列表
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
-      if (['funcFileInfo', 'funcFileData'].indexOf(_type) !== -1){
+      if (_type === 'funcFileInfo'){
         this.getFuncFileList()
       }
     })

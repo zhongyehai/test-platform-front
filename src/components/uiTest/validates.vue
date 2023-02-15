@@ -253,7 +253,6 @@
 <script>
 
 import {assertMappingList} from '@/apis/webUiTest/step'
-import {getConfigByName} from '@/apis/config/config'
 import Sortable from "sortablejs";
 
 export default {
@@ -282,9 +281,7 @@ export default {
       this.getAssertMappings()
     }
 
-    if (this.dataTypeMapping.length === 0) {
-      this.getDataTypeMapping()
-    }
+    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList  // 从缓存获取数据类型映射
 
     this.initValidates(this.validates)
 
@@ -302,13 +299,6 @@ export default {
     getAssertMappings() {
       assertMappingList().then(response => {
         this.validateTypeList = response.data
-      })
-    },
-
-    // 从后端获取数据类型映射
-    getDataTypeMapping() {
-      getConfigByName({'name': 'data_type_mapping'}).then(response => {
-        this.dataTypeMapping = JSON.parse(response.data.value)
       })
     },
 

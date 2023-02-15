@@ -112,7 +112,6 @@
 <script>
 import {fileCheck, fileUpload, uploadAddr} from "@/apis/assist/file";
 import Sortable from "sortablejs";
-import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: "dataForm",
@@ -127,14 +126,6 @@ export default {
   },
 
   methods: {
-
-    // 从后端获取数据类型映射
-    getDataTypeMapping() {
-      getConfigByName({'name': 'data_type_mapping'}).then(response => {
-        this.formDataTypes = JSON.parse(response.data.value)
-        this.formDataTypes.push({label: '文件', value: 'file'})
-      })
-    },
 
     initTempData(data) {
       if (data && data.length > 0) {
@@ -244,7 +235,9 @@ export default {
   },
 
   mounted() {
-    this.getDataTypeMapping()
+
+    this.formDataTypes = this.$busEvents.data.dataTypeMappingList  // 从缓存获取数据类型映射
+    this.formDataTypes.push({label: '文件', value: 'file'})
 
     this.initTempData(this.dataForm)
     this.oldList = this.tempData.map(v => v.id)

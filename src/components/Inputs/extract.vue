@@ -302,7 +302,6 @@
 </template>
 
 <script>
-import {getConfigByName} from "@/apis/config/config";
 import Sortable from "sortablejs";
 
 export default {
@@ -330,13 +329,6 @@ export default {
       } else {
         this.addRow()
       }
-    },
-
-    // 从后端获取响应数据源映射
-    getResponseDataSourceMapping() {
-      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
-        this.responseDataSourceMapping = JSON.parse(response.data.value)
-      })
     },
 
     // 根据选择的数据源显示不同的提示
@@ -412,7 +404,7 @@ export default {
   },
 
   mounted() {
-    this.getResponseDataSourceMapping()
+    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList  // 从缓存获取响应对象数据源映射
 
     this.initTempData(this.currentData)
     this.oldList = this.tempData.map(v => v.id)

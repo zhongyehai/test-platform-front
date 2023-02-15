@@ -17,7 +17,7 @@
           <!-- 服务选择 -->
           <el-row>
             <el-col :span="12">
-              <el-form-item label="选择服务" class="is-required">
+              <el-form-item :label="`选择${dataTypeTitleMappingContent[this.dataType]}`" class="is-required">
                 <el-select
                   v-model="projectSelectedId"
                   placeholder="请选择服务"
@@ -303,9 +303,15 @@ import {caseList as appUiCaseList} from '@/apis/appUiTest/case'
 
 import {arrayToTree} from "@/utils/parseData";
 import {getRunModel} from "@/apis/config/config";
+import {dataTypeTitleMappingContent} from "@/utils/mapping";
 
 export default {
   name: "drawer",
+  computed: {
+    dataTypeTitleMappingContent() {
+      return dataTypeTitleMappingContent
+    }
+  },
   props: ["dataType"],
   components: {
     environmentSelectorView,

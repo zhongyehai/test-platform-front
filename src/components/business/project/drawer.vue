@@ -49,7 +49,7 @@
             </el-form-item>
 
             <el-form-item
-              v-if="dataType==='app'"
+              v-if="dataType==='appUi'"
               label="app包名"
               prop="app_package"
               size="mini"
@@ -58,7 +58,7 @@
             </el-form-item>
 
             <el-form-item
-              v-if="dataType==='app'"
+              v-if="dataType==='appUi'"
               label="activity"
               prop="app_activity"
               size="mini"

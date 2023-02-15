@@ -14,7 +14,6 @@
     "test:ci": "npm run lint && npm run test:unit"
   },
   "dependencies": {
-    "af-table-column": "^1.0.3",
     "axios": "0.18.1",
     "core-js": "3.6.5",
     "default-passive-events": "^2.0.0",
