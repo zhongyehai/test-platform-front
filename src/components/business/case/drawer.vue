@@ -423,6 +423,8 @@ export default {
         env_code: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
         'trigger_type': 'page'
       }).then(response => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))

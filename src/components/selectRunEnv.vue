@@ -3,7 +3,7 @@
   <el-dialog title="选择运行环境" append-to-body :visible.sync="dialogIsShow" :close-on-click-modal="false" width="50%">
 
     <!-- 选择运行环境 -->
-    <div v-if="dataType !== 'appUi'">
+    <div>
       <div>
         <label>选择环境：</label>
       </div>
@@ -183,10 +183,10 @@ export default {
       runEnvData: [],
       runModeData: {},
       runBrowserNameData: {},
-      runEnv: null,
-      runBrowser: null,
-      runServer: null,
-      runPhone: null,
+      runEnv: undefined,
+      runBrowser: undefined,
+      runServer: undefined,
+      runPhone: undefined,
       runUnit: 'api',
       runType: '0',
       runServerList: [],
@@ -269,7 +269,6 @@ export default {
         this.runUnit = runUnit
         this.showSelectRunModel = showSelectRunModel
         if (this.dataType === 'api') {
-          this.initEnvList()
           this.initRunMode()
           if (runUnit === 'set') {
             this.showSelectBusiness = true
@@ -277,10 +276,10 @@ export default {
         } else if (this.dataType === 'appUi') {
           this.getRunAppEnv()
         } else {
-          this.initEnvList()
           this.initRunMode()
           this.initBrowserName()
         }
+        this.initEnvList()
         this.dialogIsShow = true
       }
     })

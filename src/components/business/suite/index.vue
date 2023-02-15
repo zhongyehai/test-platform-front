@@ -434,6 +434,8 @@ export default {
         is_async: runConf.runType,
         business_id: runConf.businessId,
         browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {

@@ -221,7 +221,7 @@ export default {
     // 初始化编辑框数据
     initTempData(row) {
       if (row) {
-        this.tempData = row
+        this.tempData = JSON.parse(JSON.stringify(row))
       } else {
         this.tempData.id = ''
         this.tempData.num = ''

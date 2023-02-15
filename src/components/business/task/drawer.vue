@@ -558,6 +558,8 @@ export default {
         env: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
         'trigger_type': 'page'
       }).then(response => {
         this.isShowDebugLoading = false
