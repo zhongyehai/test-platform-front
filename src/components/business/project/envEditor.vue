@@ -9,7 +9,7 @@
 
       <el-row>
         <el-col :span="dataType !== 'app' ? 3 : 0">
-          <el-tabs :tab-position="tabPosition" v-model="activeName" :before-leave="changeEnv">
+          <el-tabs :tab-position="tabPosition" v-model="activeName" :before-leave="changeTab">
             <el-tab-pane
               :name="runEnv.id.toString()"
               :label="runEnv.name"
@@ -170,7 +170,7 @@ export default {
   methods: {
 
     // 切换环境时，自动保存，保存失败则不切换
-    changeEnv(activeName, oldActiveName) {
+    changeTab(activeName, oldActiveName) {
       return new Promise((resolve, reject) => {
         if (oldActiveName && oldActiveName !== '0') {
           this.submitButtonIsLoading = true

@@ -21,6 +21,8 @@ export default {
 
     findElementOptionList: [],  // ui自动化的定位方式
     findElementOptionDict: {},  // ui自动化的定位方式
+
+    keyboardKeyCodeList: [],  // 模拟键盘输入code
   },
 
   // 抽屉

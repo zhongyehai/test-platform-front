@@ -132,7 +132,9 @@
                             :key="index1"
                             @click="handleNodeClick(index, index1)"
                         >
-                          <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
+                          <div :style="
+                        item1.status === 'success' ? 'color:#67c23a':
+                        item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'">
                             <span class="test-name">{{ item1.name }}</span>
                             <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
                             <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">

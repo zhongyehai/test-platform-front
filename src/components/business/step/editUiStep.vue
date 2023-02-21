@@ -75,12 +75,55 @@
 
             <!-- 输入文本 -->
             <el-form-item
-              v-show="currentStep.execute_type && currentStep.execute_type.indexOf('is_input') !== -1"
+              v-show="currentStep.execute_type &&
+              currentStep.execute_type.indexOf('keyboard') === -1 &&
+              currentStep.execute_type.indexOf('is_input') !== -1"
               label="输入内容"
               prop="send_keys"
               size="small"
               class="is-required">
-              <el-input type="textarea" autosize v-model="currentStep.send_keys" placeholder="输入对应内容"></el-input>
+              <el-input
+                type="textarea"
+                autosize
+                :style="{'width': currentStep.execute_type.indexOf('scroll_coordinate') !== -1 ? '98%' : '100%'}"
+                v-model="currentStep.send_keys"
+                :placeholder="
+                currentStep.execute_type.indexOf('coordinate_is_input1') !== -1 ? placeholder1 :
+                currentStep.execute_type.indexOf('coordinate_is_input2') !== -1 ? placeholder2 : '输入对应内容'"
+              ></el-input>
+              <el-popover
+                v-show="currentStep.execute_type.indexOf('scroll_coordinate') !== -1"
+                class="el_popover_class"
+                placement="top-start"
+                trigger="hover">
+                <div>从坐标x1,y1移动到x2,y2</div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
+            </el-form-item>
+
+            <!-- 模拟键盘输入 -->
+            <el-form-item
+              v-show="currentStep.execute_type.indexOf('keyboard') !== -1"
+              label="选择输入内容"
+              prop="send_keys"
+              size="mini"
+              class="is-required">
+              <el-select
+                ref="pageSelectorView"
+                v-model="currentStep.send_keys"
+                placeholder="选择输入内容"
+                size="mini"
+                style="min-width: 100%"
+                filterable
+                default-first-option
+              >
+                <el-option
+                  v-for="(value, key) in $busEvents.data.keyboardKeyCodeList"
+                  :key="key"
+                  :label="value"
+                  :value="key"
+                ></el-option>
+              </el-select>
             </el-form-item>
 
             <el-row>
@@ -316,14 +359,7 @@ export default {
         "wait_time_out": 10,
         "up_func": '',
         "down_func": '',
-        "skip_if": {
-          skip_type: null,
-          data_source: null,
-          expect: null,
-          comparator: null,
-          data_type: null,
-          check_value: null
-        },
+        "skip_if": {},
         "execute_type": '',
         "send_keys": '',
         "run_times": 0,
@@ -333,6 +369,10 @@ export default {
         "case_id": this.caseId,
         "project_id": ''
       },
+
+      placeholder1: '{"x1": 0.2, "y1": 0.7, "x2": 0.1, "y2": 0.4}，从当前中心坐标往4个方向移动的百分比',  // 滑动屏幕的描述
+      placeholder2: '{"x1": 500, "y1": 1000, "x2": 600, "y2": 1024}，坐标的具体值',  // 滑动屏幕的描述
+
       getProjectUrl: '',
       getPageUrl: '',
       changeElementByIdUrl: '',
@@ -343,38 +383,8 @@ export default {
       putStepUrl: ''
     }
   },
-  methods: {
 
-    initNewStep() {
-      return {
-        'id': '',
-        "status": '',
-        "name": '',
-        "wait_time_out": 10,
-        "up_func": '',
-        "down_func": '',
-        "skip_if": {
-          skip_type: null,
-          data_source: null,
-          expect: null,
-          comparator: null,
-          data_type: null,
-          check_value: null
-        },
-        "execute_type": '',
-        "run_times": 0,
-        "headers": [],
-        "params": [],
-        "extracts": [],
-        "validates": [],
-        "data_form": [],
-        "data_json": '',
-        "data_text": '',
-        "data_driver": [],
-        "case_id": this.caseId,
-        "project_id": ''
-      }
-    },
+  methods: {
 
     getStepForCommit() {
       return {
@@ -460,7 +470,7 @@ export default {
           this.currentStep.wait_time_out = step.wait_time_out
           this.currentStep.up_func = ''
           this.currentStep.down_func = ''
-          this.currentStep.execute_type = ''
+          this.currentStep.execute_type = this.$busEvents.data.executeTypeList[1].label
           this.currentStep.send_keys = ''
           this.currentStep.run_times = 1
           this.currentStep.extracts = []

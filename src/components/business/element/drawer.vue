@@ -34,8 +34,25 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item :label="'元素表达式'" prop="element" size="mini" class="is-required">
-              <el-input v-model="tempElement.element"/>
+            <el-form-item
+              label="元素表达式"
+              prop="element"
+              class="is-required">
+              <el-input
+                size="mini"
+                v-model="tempElement.element"
+                :placeholder="tempElement.by === 'coordinate' ? '请填写坐标：(x, y)，如(538, 1816)' : '元素表达式'"
+                :style="{'width': tempElement.by === 'coordinate' ? '98%' : '100%'}"
+              />
+              <el-popover
+                v-show="tempElement.by === 'coordinate'"
+                class="el_popover_class"
+                placement="top-start"
+                trigger="hover">
+                <div>请填写坐标：(x, y)</div>
+                <div>如坐标x为538, y为1816，则填写: (538, 1816)</div>
+                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              </el-popover>
             </el-form-item>
 
             <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
@@ -99,12 +116,14 @@ export default {
         by: null,
         element: null,
         desc: null,
-        wait_time_out: 10,
+        wait_time_out: 5,
       },
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
       pageId: '',
       isSendForPage: false,  // 标记是否发送给页面管理，更新页面地址
+
+      element_label: '',
 
       postElementUrl: '',
       putElementUrl: ''
@@ -121,7 +140,7 @@ export default {
         by: null,
         element: null,
         desc: null,
-        wait_time_out: 10,
+        wait_time_out: 5,
         page_id: this.pageId,
         module_id: this.currentModuleId,
         project_id: this.currentProjectId
@@ -207,6 +226,11 @@ export default {
           this.drawerType = 'add'
           this.updateTempElement(data)
         }
+
+        if (this.tempElement.by === null) {
+          this.tempElement.by = this.$busEvents.data.findElementOptionList[0].label
+        }
+
         this.drawerIsShow = true
       }
     })

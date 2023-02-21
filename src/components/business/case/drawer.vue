@@ -5,7 +5,8 @@
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
-    <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
+
+    <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px" :before-leave="changeTab">
 
       <!-- 用例信息组件 -->
       <el-tab-pane label="用例信息" name="caseInFo">
@@ -13,13 +14,25 @@
         <el-form size="mini" label-width="100px">
 
           <el-row>
-            <el-col :span="12">
+            <el-col :span="18">
               <el-form-item label="用例名称" class="is-required">
                 <el-input v-model="tempCase.name"></el-input>
               </el-form-item>
             </el-col>
 
-            <el-col :span="12">
+            <el-col :span="6">
+              <el-form-item label="执行次数" class="is-required">
+                <el-input-number v-model="tempCase.run_times" :min="1" :max="1000" controls-position="right"
+                ></el-input-number>
+              </el-form-item>
+
+            </el-col>
+          </el-row>
+
+          <el-row>
+
+            <!-- 用例集选择 -->
+            <el-col :span="18">
               <el-form-item label="函数文件">
                 <funcFilesView
                   :cite="'case'"
@@ -39,24 +52,10 @@
                 </el-popover>
               </el-form-item>
             </el-col>
-          </el-row>
 
-          <el-row>
-            <!-- 业务线选择 -->
-            <el-col :span="12">
-              <el-form-item label="业务线" class="is-required" style="margin-bottom: 5px">
-                <businessView
-                  ref="businessView"
-                  :currentBusiness="tempCase.business_id"
-                  :isMultiple="false"
-                  :selectWidth="'97%'"
-                ></businessView>
-              </el-form-item>
-            </el-col>
-
-            <!-- 用例集选择 -->
+            <!-- 执行次数 -->
             <el-col :span="6">
-              <el-form-item label="用例集" class="is-required" style="margin-bottom: 5px">
+              <el-form-item label="用例归属" class="is-required" style="margin-bottom: 5px">
                 <el-select v-model="caseSetLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
                     <el-tree
@@ -72,15 +71,6 @@
                   </el-option>
                 </el-select>
 
-              </el-form-item>
-
-            </el-col>
-
-            <!-- 执行次数 -->
-            <el-col :span="6">
-              <el-form-item label="执行次数" class="is-required">
-                <el-input-number v-model="tempCase.run_times" :min="1" :max="1000" controls-position="right"
-                ></el-input-number>
               </el-form-item>
             </el-col>
 
@@ -189,7 +179,7 @@
         size="mini"
         type="primary"
         :loading="submitLoadingIsShow"
-        @click=" drawerType === 'add' ? addCase() : changCase() ">
+        @click="drawerType === 'add' ? addCase() : changCase() ">
         {{ '保存' }}
       </el-button>
     </div>
@@ -205,7 +195,6 @@ import funcFilesView from '@/components/Selector/funcFile'
 import headersView from '@/components/Inputs/changeRow'
 import variablesView from '@/components/Inputs/variables'
 import stepView from '@/components/business/step/index.vue'
-import businessView from '@/components/Selector/business'
 
 import {
   postCase as apiPostCase,
@@ -248,8 +237,7 @@ export default {
     funcFilesView,
     headersView,
     variablesView,
-    stepView,
-    businessView
+    stepView
   },
   data() {
     return {
@@ -285,7 +273,6 @@ export default {
         },
         before_case: [],
         after_case: [],
-        business_id: '',
         project_id: '',
         set_id: ''
       },
@@ -323,7 +310,6 @@ export default {
         expect: null
       }
       this.tempCase.headers = [{key: null, value: null, remark: null}]
-      this.tempCase.business_id = ''
       this.tempCase.project_id = this.currentProjectId || ''
       this.tempCase.set_id = this.currentSetId || ''
       this.drawerType = 'add'
@@ -346,7 +332,6 @@ export default {
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.dataType === 'api' ? this.$refs.headersView.tempData : []
       caseData.skip_if = this.$refs.skipIfView.tempData
-      caseData.business_id = this.$refs.businessView.business
       return caseData
     },
 
@@ -356,6 +341,39 @@ export default {
         this.$refs.setTree.setCheckedKeys([data.id])  // 选中
         this.caseSetLabel = data.name
       }
+    },
+
+    // 保存用例
+    changeTab(activeName, oldActiveName) {
+      return new Promise((resolve, reject) => {
+        if (oldActiveName && oldActiveName === 'caseInFo') {
+          this.submitLoadingIsShow = true
+          if (this.tempCase.id) {  // 修改
+            this.putCaseUrl(this.getCaseDataToCommit()).then(response => {
+              this.submitLoadingIsShow = false
+              if (this.showMessage(this, response)) {
+                this.sendDrawerIsCommit()
+                return resolve()
+              } else {
+                this.activeName = 'caseInFo'
+              }
+            })
+          } else {  // 新增
+            this.postCaseUrl(this.getCaseDataToCommit()).then(response => {
+              this.submitLoadingIsShow = false
+              if (this.showMessage(this, response)) {
+                this.drawerType = 'update'
+                this.tempCase.id = response.data.id
+                this.sendDrawerIsCommit()
+                return resolve()
+              } else {
+                this.activeName = 'caseInFo'
+              }
+            })
+          }
+        }
+        return resolve()
+      })
     },
 
     // 新增用例
@@ -425,6 +443,7 @@ export default {
         browser: runConf.browser,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
         'trigger_type': 'page'
       }).then(response => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
@@ -492,16 +511,7 @@ export default {
 
     // 在操作步骤时触发的保存用例，这个时候保存后不关闭抽屉，只重新请求用例列表
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'stepTrigger'){
-        this.postCaseUrl(this.getCaseDataToCommit()).then(response => {
-          if (this.showMessage(this, response)) {
-            // 把接口返回的用例id赋值给this.tempCase.id
-            this.tempCase.id = response.data.id
-            this.drawerType = 'update'  // 新增完后把状态改为编辑
-            this.sendDrawerIsCommit()
-          }
-        })
-      }else if (_type === 'selectRunEnv' && _runUnit === 'caseDrawer') {
+      if (_type === 'selectRunEnv' && _runUnit === 'caseDrawer') {
         this.debugCase(runDict)
       }
     })

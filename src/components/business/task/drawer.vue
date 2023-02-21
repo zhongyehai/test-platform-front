@@ -560,6 +560,7 @@ export default {
         browser: runConf.browser,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
         'trigger_type': 'page'
       }).then(response => {
         this.isShowDebugLoading = false

@@ -45,27 +45,6 @@
       </div>
     </div>
 
-    <!-- 业务线，接口自动化，且运行的是用例集，才显示此选项 -->
-    <div v-if="showSelectBusiness">
-      <div style="margin-top: 40px">
-        <label>业务线： </label>
-      </div>
-      <div style="margin-top: 10px">
-        <label>
-          <span style="color: red">
-            仅运行当前用例集下，业务线为当前选中的业务线的测试用例
-          </span>
-        </label>
-      </div>
-      <div style="margin-top: 10px">
-        <businessView
-          ref="businessView"
-          :isMultiple="false"
-          :selectType="'radio'"
-        ></businessView>
-      </div>
-    </div>
-
     <!-- 执行模式 -->
     <div v-if="dataType !== 'appUi' && showSelectRunModel">
       <div style="margin-top: 40px">
@@ -91,9 +70,23 @@
     <!-- 运行app的配置 -->
     <div v-if="dataType === 'appUi'">
       <div style="margin-top: 40px">
-        <label>运行终端： </label>
+        <label>是否重置APP本地缓存： </label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>
+          <span style="color: red">
+            重置历史运行APP记录的信息，如登录信息、地址信息等 <br>
+          </span>
+        </label>
+      </div>
+      <div style="margin-top: 10px">
+        <el-radio v-model="noReset" :label="false">重置</el-radio>
+        <el-radio v-model="noReset" :label="true">不重置</el-radio>
       </div>
 
+      <div style="margin-top: 40px">
+        <label>运行终端： </label>
+      </div>
       <div style="margin-top: 10px">
         <label>
           <span style="color: red">
@@ -160,8 +153,6 @@
 </template>
 
 <script>
-import businessView from '@/components/Selector/business'
-
 import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
 
 import {getConfigByName, getRunModel} from "@/apis/config/config";
@@ -174,9 +165,6 @@ export default {
   props: [
     'dataType'
   ],
-  components: {
-    businessView
-  },
   data() {
     return {
       dialogIsShow: false,
@@ -187,12 +175,12 @@ export default {
       runBrowser: undefined,
       runServer: undefined,
       runPhone: undefined,
+      noReset: undefined,
       runUnit: 'api',
       runType: '0',
       runServerList: [],
       runPhoneList: [],
       showSelectRunModel: false,
-      showSelectBusiness: false,
 
       statusContentMapping: appiumServerRequestStatusMappingContent,
       statusTagTypeMapping: appiumServerRequestStatusMappingTagType
@@ -205,10 +193,10 @@ export default {
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'selectRunEnv', this.runUnit, {
         runEnv: this.runEnv,
         browser: this.runBrowser,
-        businessId: this.showSelectBusiness ? this.$refs.businessView.business : '',
         runServer: this.runServer,
         runPhone: this.runPhone,
-        runType: parseInt(this.runType)
+        runType: parseInt(this.runType),
+        noReset: this.noReset
       })
       this.dialogIsShow = false
     },
@@ -270,11 +258,9 @@ export default {
         this.showSelectRunModel = showSelectRunModel
         if (this.dataType === 'api') {
           this.initRunMode()
-          if (runUnit === 'set') {
-            this.showSelectBusiness = true
-          }
         } else if (this.dataType === 'appUi') {
           this.getRunAppEnv()
+          this.noReset = false
         } else {
           this.initRunMode()
           this.initBrowserName()

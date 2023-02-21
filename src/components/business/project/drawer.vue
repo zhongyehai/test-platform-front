@@ -104,10 +104,9 @@
             size="mini"
             @click="tempProject.id ? changProject() : addProject() "
             :loading="submitButtonIsLoading"
-          >{{ tempProject.id ? '保存项目信息' : '新增项目信息' }}
-          </el-button>
-
+          >保存</el-button>
         </div>
+
       </div>
 
       <el-dialog

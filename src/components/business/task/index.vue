@@ -282,6 +282,7 @@ export default {
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
         browser: runConf.browser,
+        no_reset: runConf.noReset,
         'trigger_type': 'page'
       }).then(response => {
         this.$set(this.currentTask, 'runButtonIsLoading', false)

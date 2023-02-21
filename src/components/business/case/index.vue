@@ -28,10 +28,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            align="center"
-            min-width="15%"
-          >
+          <el-table-column align="center" min-width="15%">
             <template slot="header">
               <el-tooltip
                 class="item"
@@ -220,7 +217,7 @@ export default {
     // 编辑用例
     editCase(row) {
       this.tempCase = row
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'edit', this.tempCase)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'edit', JSON.parse(JSON.stringify(this.tempCase)))
     },
 
     // 删除用例
@@ -239,7 +236,7 @@ export default {
     copyCase(caseData) {
       this.tempCase = caseData
       this.tempCase.num = ''
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', this.tempCase)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', JSON.parse(JSON.stringify(this.tempCase)))
       this.$set(caseData, 'copyPopoverIsShow', false)
     },
 
@@ -266,6 +263,7 @@ export default {
         browser: runConf.browser,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
@@ -276,7 +274,7 @@ export default {
 
     // 修改用例状态
     changeCaseIsRun(row) {
-      this.putCaseIsRunUrl({'id': row.id, 'status': row.status}).then(response => {
+      this.putCaseIsRunUrl({'id': row.id}).then(response => {
         this.showMessage(this, response)
       })
     },

@@ -139,7 +139,7 @@
             <el-col :span="12">
               <el-upload
                 class="upload-demo"
-                :action="remoteUploadElementDir"
+                :action="uploadElementDirUrl"
                 :show-file-list='false'
                 :on-success="uploadFile">
                 <el-button size="mini" type="primary">选择文件</el-button>
@@ -229,7 +229,7 @@ export default {
       pageList: [],
 
       // 文件上传框打开状态
-      remoteUploadElementDir: this.uploadElementDirUrl,
+      uploadElementDirUrl: '',
       uploadFileDrawerIsShow: false,
       fileDataList: [],
       currentPage: '',
@@ -243,7 +243,6 @@ export default {
       deletePageUrl: '',
       pageSortUrl: '',
       uploadElementUrl: '',
-      uploadElementDirUrl: '',
       downloadElementTemplateUrl: ''
 
     }

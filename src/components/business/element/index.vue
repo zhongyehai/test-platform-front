@@ -22,13 +22,18 @@
         </template>
       </el-table-column>
 
-      <el-table-column
-        :show-overflow-tooltip=true
-        prop="by"
-        label="定位方式"
-        align="center"
-        :render-header="renderBy"
-        min-width="23%">
+      <el-table-column :show-overflow-tooltip=true align="center" min-width="23%">
+        <template slot="header">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            placement="top-start">
+            <div slot="content">
+              <div>在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址</div>
+            </div>
+            <span> 定位方式 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+          </el-tooltip>
+        </template>
         <template slot-scope="scope">
           <span> {{ parseFindElementOption(scope.row.by) }} </span>
         </template>
@@ -40,23 +45,22 @@
         </template>
       </el-table-column>
 
-      <el-table-column
-        :show-overflow-tooltip=true
-        prop="wait_time_out"
-        align="center"
-        label="等待时间(秒)"
-        :render-header="renderWaitTimeOut"
-        min-width="15%">
+      <el-table-column :show-overflow-tooltip=true align="center" min-width="15%">
+        <template slot="header">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            placement="top-start">
+            <div slot="content">
+              <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待</div>
+            </div>
+            <span> 等待时间(秒) <i style="color: #409EFF" class="el-icon-warning"></i></span>
+          </el-tooltip>
+        </template>
         <template slot-scope="scope">
           <span> {{ scope.row.wait_time_out }} </span>
         </template>
       </el-table-column>
-
-      <!--      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="10%">-->
-      <!--        <template slot-scope="scope">-->
-      <!--          <span>{{ parseUser(scope.row.update_user) }}</span>-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
 
       <el-table-column align="center" label="操作" min-width="8%">
         <template slot-scope="scope">
@@ -305,45 +309,7 @@ export default {
           })
         }
       })
-    },
-    renderBy(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
-    renderWaitTimeOut(h, {column}) {
-      // 悬浮提示的文字内容
-      const info = '预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待'
-      return h(
-        'div',
-        [
-          h('span', column.label),
-          // placement指定悬浮显示方向
-          h('el-tooltip', {props: {placement: 'top', effect: 'light'}},
-            [
-              // style 调文字颜色样式
-              h('div', {slot: 'content', style: {whiteSpace: 'normal', color: 'blue'}}, info),
-              // el-icon-warning是element图标, style 调图标颜色 样式
-              h('i', {class: 'el-icon-warning', style: 'color: #409EFF; margin-left: 5px;'})
-            ]
-          )
-        ]
-      )
-    },
+    }
 
   },
 

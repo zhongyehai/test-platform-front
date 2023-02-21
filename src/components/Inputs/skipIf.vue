@@ -293,6 +293,8 @@ export default {
     },
 
     initTempData(skipIfs) {
+      console.log('skipIfs: ', JSON.stringify(skipIfs))
+      console.log('this.skipIfData: ', JSON.stringify(this.skipIfData))
       if (skipIfs && skipIfs.length > 0) {
         this.tempData = this.skipIfData
       } else {

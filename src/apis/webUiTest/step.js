@@ -42,6 +42,11 @@ export function extractMappingList() {
   return request({url: stepDir + '/extractMapping', method: 'get'});
 }
 
+// 键盘动作映射
+export function keyBoardCodeMappingList() {
+  return request({url: stepDir + '/keyBoardCode', method: 'get'});
+}
+
 // 断言动作映射
 export function assertMappingList() {
   return request({url: stepDir + '/assertMapping', method: 'get'});

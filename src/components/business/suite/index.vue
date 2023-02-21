@@ -219,7 +219,7 @@ import {
   putCaseSet as appUiPutCaseSet
 } from "@/apis/appUiTest/caseSet";
 import {getConfigByName, getSkipIfTypeMapping} from "@/apis/config/config";
-import {extractMappingList} from "@/apis/webUiTest/step";
+import {extractMappingList, keyBoardCodeMappingList} from "@/apis/webUiTest/step";
 
 
 export default {
@@ -432,10 +432,10 @@ export default {
         'id': this.runSetData ? this.runSetData.id : undefined,
         env_code: runConf.runEnv,
         is_async: runConf.runType,
-        business_id: runConf.businessId,
         browser: runConf.browser,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
@@ -505,6 +505,23 @@ export default {
     getConfigByName({'name': 'data_type_mapping'}).then(response => {
       this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
     })
+
+    // 从后端获取app键盘code类型映射
+    if (this.dataType === 'appUi'){
+      getConfigByName({'name': 'app_key_code'}).then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+      })
+    }
+
+    // 从后端获取PC键盘code类型映射
+    if (this.dataType === 'webUi'){
+      // getConfigByName({'name': 'app_key_code'}).then(response => {
+      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+      // })
+      keyBoardCodeMappingList().then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = response.data
+      })
+    }
 
     // 从后端获取响应对象数据源映射
     if (this.dataType === 'api'){

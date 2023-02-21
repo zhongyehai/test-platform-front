@@ -14,16 +14,13 @@
       style="width: 100%"
       :height="tableHeight"
     >
-      <el-table-column prop="num" label="序号" min-width="15%">
+      <el-table-column prop="num" label="序号" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        align="center"
-        min-width="20%"
-      >
+      <el-table-column align="center" min-width="15%">
         <template slot="header">
           <el-tooltip
             class="item"
@@ -40,23 +37,23 @@
             :inactive-value="0"
             :active-value="1"
             v-model="scope.row.status"
-            @change="changeStepIsRun(scope.$index)"></el-switch>
+            @change="changeStepIsRun(scope.row.id)"></el-switch>
         </template>
       </el-table-column>
 
-      <el-table-column v-if="dataType !== 'api'" align="center" label="执行事件" min-width="20%">
+      <el-table-column v-if="dataType !== 'api'" align="center" label="执行事件" min-width="25%">
         <template slot-scope="scope">
           <span>{{ parseExecuteType(scope.row.execute_type) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="步骤名称" min-width="35%">
+      <el-table-column align="center" label="步骤名称" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="30%">
+      <el-table-column align="center" label="操作" min-width="20%">
         <template slot-scope="scope">
 
           <!-- 编辑步骤 -->
@@ -230,6 +227,27 @@
             <el-table-column align="center" label="步骤名称" min-width="35%">
               <template slot-scope="scope">
                 <span>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="center" min-width="15%">
+              <template slot="header">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  placement="top-start">
+                  <div slot="content">
+                    <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
+                  </div>
+                  <span> 执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-switch
+                  :inactive-value="0"
+                  :active-value="1"
+                  v-model="scope.row.status"
+                  @change="changeStepIsRun(scope.row.id)"></el-switch>
               </template>
             </el-table-column>
 
@@ -450,9 +468,8 @@ export default {
     },
 
     // 修改步骤的执行状态
-    changeStepIsRun(index) {
-      let step = this.stepList[index]
-      this.putStepIsRunUrl({'id': step.id, 'status': step.status}).then(response => {
+    changeStepIsRun(step_id) {
+      this.putStepIsRunUrl({'id': step_id}).then(response => {
         this.showMessage(this, response)
       })
     },
@@ -489,7 +506,7 @@ export default {
     // 点击编辑步骤
     editStep(row) {
       this.currentStep = row
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'edit', this.currentStep)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'edit', JSON.parse(JSON.stringify(this.currentStep)))
     },
 
     // 点击查看步骤

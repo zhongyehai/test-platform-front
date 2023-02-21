@@ -149,7 +149,22 @@
         </el-form-item>
 
         <el-form-item label="服务器ip" class="is-required">
-          <el-input v-model="tempData.ip" size="mini" placeholder="服务器ip，如 196.128.123.123"></el-input>
+          <el-input
+            v-model="tempData.ip"
+            size="mini"
+            style="width: 98%"
+            placeholder="服务器ip，如 196.128.123.123"
+          ></el-input>
+          <el-popover
+            class="el_popover_class"
+            placement="top-start"
+            trigger="hover">
+            <div>
+              <div>请填写ip地址，勿填写http</div>
+              <div>如：地址为http://192.168.0.1，请填写：192.168.0.1</div>
+            </div>
+            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+          </el-popover>
         </el-form-item>
 
         <el-form-item label="服务器端口" class="is-required">

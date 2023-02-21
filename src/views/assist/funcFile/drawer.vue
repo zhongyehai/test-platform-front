@@ -197,6 +197,27 @@ export default {
 
     // 调试函数文件
     debugFunc() {
+
+      // 先保存
+      this.submitButtonIsLoading = true
+      if (this.tempFunc.id) {
+        putFuncFile(this.tempFunc).then(res => {
+          this.submitButtonIsLoading = false
+          if (this.showMessage(this, res)) {
+            this.runDeBug()
+          }
+        })
+      } else {
+        postFuncFile(this.tempFunc).then(res => {
+          this.submitButtonIsLoading = false
+          if (this.showMessage(this, res)) {
+            this.runDeBug()
+          }
+        })
+      }
+    },
+
+    runDeBug() {
       this.deBugButtonIsLoading = true
       debugFuncFile({'id': this.tempFunc.id, 'expression': this.expression}).then(res => {
         this.deBugButtonIsLoading = false

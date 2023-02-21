@@ -4,121 +4,84 @@
 
       <!-- 有测试报告数据 -->
       <div v-show="reportData.details.length > 0">
+
         <!-- 第一行，头部信息 -->
-        <el-row>
-          <el-col :span="24">
-            <div class="grid-content" style="background-color: #f5f5f5 !important;">
-              <el-button type="primary" round style="padding: 4px 10px ;" v-show="false">{{ null }}</el-button>
-              <el-button type="primary" size="mini" round style="margin-top: 5px;padding: 4px 10px ;"
-                         @click.native="isShowPic(false)"
-                         v-show="this.picStatus"
-              >隐藏统计图
-              </el-button>
-              <el-button type="primary" size="mini" round style="padding: 4px 10px ;"
-                         @click.native="isShowPic(true)"
-                         v-show="!this.picStatus"
-              >展示统计图
-              </el-button>
-              <el-dropdown @command="handleCommand" style="line-height:15px;margin-left:10px;color: #3a8ee6;">
-                          <span class="el-dropdown-link">
-                            根据状态筛选用例<i class="el-icon-arrow-down el-icon--right"></i>
-                          </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="None">全部用例</el-dropdown-item>
-                  <el-dropdown-item command="success">成功的用例</el-dropdown-item>
-                  <el-dropdown-item command="error">失败的用例</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-                <el-button
-                  v-if="!this.reportData.success"
-                  type="primary"
-                  size="mini"
-                  style="margin-left: 10px"
-                  @click.native="showHitDrawer('add')"
-                >记录问题</el-button>
-              </span>
-              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            总共耗时: {{ this.reportData.time.duration }} 秒
-          </span>
-              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            开始时间: {{ this.reportData.time.start_at }}
-          </span>
-              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            执行模式: {{ this.reportData.is_async === 1 ? "并行运行" : "串行运行" }}
-          </span>
-              <span style="font-family: Source Sans Pro;float: right;font-size: 13px;color: #3a8ee6;margin-right: 40px">
-            运行环境: {{ runEnvDict[reportData.run_env] }}
-          </span>
-            </div>
-          </el-col>
-        </el-row>
+        <div class="grid-content" style="background-color: #f5f5f5 !important;">
+          <el-button
+            type="primary"
+            size="mini"
+            round
+            style="margin-left: 10px; margin-top: 5px;padding: 4px 10px ;"
+            @click="isShowPic()"
+          >{{ this.picStatus ? '隐藏统计图' : '展示统计图' }}
+          </el-button>
+
+          <span style="float: right;font-size: 13px;color: #3a8ee6">
+              <span style="margin-right: 30px">运行环境: {{ runEnvDict[reportData.run_env] }}</span>
+              <span style="margin-right: 30px">执行模式: {{
+                  this.reportData.is_async === 1 ? "并行运行" : "串行运行"
+                }}</span>
+              <span style="margin-right: 30px">开始时间: {{ this.reportData.time.start_at }}</span>
+              <span style="margin-right: 30px"> 总共耗时: {{ this.reportData.time.duration }} 秒</span>
+              <el-button
+                v-if="!this.reportData.success"
+                type="primary"
+                size="mini"
+                style="margin-right: 20px"
+                @click.native="showHitDrawer('add')"
+              >记录问题</el-button>
+            </span>
+        </div>
 
         <!-- 第二行，饼图 -->
         <el-row v-show="this.picStatus">
           <!-- 步骤 -->
-          <el-col :span="10"
-                  style="border-style:solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;border-width: 1px;"
-          >
+          <el-col :span="12">
             <div style="height: 200px;float:left;">
               <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
             </div>
-            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-              <li style="font-weight:700;font-size:16px">步骤概况</li>
-              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.teststeps.total }}</li>
-              <li style="color: rgb(25,212,174);font-weight:600">成功:{{
-                  this.reportData.stat.teststeps.successes
-                }}
-              </li>
-              <li style="color: rgb(250,110,134);font-weight:600">失败:{{
-                  this.reportData.stat.teststeps.failures
-                }}
-              </li>
-              <li style="color: #E87C25;font-weight:600">错误:{{ this.reportData.stat.teststeps.errors }}</li>
-              <li style="color: #60C0DD;font-weight:600">跳过:{{ this.reportData.stat.teststeps.skipped }}</li>
-            </ol>
+            <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
+              <div style="color: #927B8B">总数: {{ this.reportData.stat.teststeps.total }}</div>
+              <div style="color: #19D4AE">成功: {{ this.reportData.stat.teststeps.successes }}</div>
+              <div style="color: #FA6E86">失败: {{ this.reportData.stat.teststeps.failures }}</div>
+              <div style="color: #E87C25">错误: {{ this.reportData.stat.teststeps.errors }}</div>
+              <div style="color: #60C0DD">跳过: {{ this.reportData.stat.teststeps.skipped }}</div>
+            </div>
           </el-col>
 
           <!-- 用例 -->
-          <el-col :span="14" style="border-width: 1px;">
+          <el-col :span="12">
             <div style="height: 200px;float:left;">
-              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px"
-                       width="350px"
-              ></ve-ring>
+              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px"></ve-ring>
             </div>
-            <ol style="margin-top:5px;font-size:14px;line-height:25px" class="remote-line">
-              <li style="font-weight:700;font-size:16px">用例概况</li>
-              <li style="font-weight:600;color: rgb(146, 123, 139)">总数:{{ this.reportData.stat.testcases.total }}
-              </li>
-              <li style="color: rgb(25,212,174);font-weight:600">成功:{{ this.reportData.stat.testcases.success }}
-              </li>
-              <li style="color: rgb(250,110,134);font-weight:600">失败:{{ this.reportData.stat.testcases.fail }}</li>
-            </ol>
+            <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
+              <div style="color: #927B8B">总数: {{ this.reportData.stat.testcases.total }}</div>
+              <div style="color: #19D4AE">成功: {{ this.reportData.stat.testcases.success }}</div>
+              <div style="color: #FA6E86">失败: {{ this.reportData.stat.testcases.fail }}</div>
+              <!-- <div style="color: #E87C25">错误: {{ this.reportData.stat.testcases.errors }}</div>-->
+              <!-- <div style="color: #60C0DD">跳过: {{ this.reportData.stat.testcases.skipped }}</div>-->
+            </div>
           </el-col>
         </el-row>
 
         <!-- 第三行，用例和详情 -->
         <el-row>
           <!-- 用例、步骤列表 -->
-          <el-col :span="6"
-                  style="border-style:solid;border-color: rgb(234, 234, 234) #ffffff #ffffff #ffffff;border-width: 1px;"
-          >
+          <el-col :span="6">
             <el-scrollbar>
-              <div :style={height:picHeight}>
+              <div :style={height:caseScrollbarHeight}>
                 <el-collapse accordion>
                   <!-- 遍历用例 -->
-                  <el-collapse-item
-                    v-for="(item, index) in reportData['details']"
-                    :key="index"
-                    v-show="item.success === true ? showScene[0]: showScene[1]"
-                  >
+                  <el-collapse-item v-for="(item, index) in reportData['details']" :key="index">
                     <template slot="title">
-                      <el-tooltip class="item"
-                                  effect="dark"
-                                  :content="item.records ? `${item.records.length}个步骤` : ''"
-                                  placement="top-start">
-                        <div style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                             :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="item.records ? `${item.records.length}个步骤` : ''"
+                        placement="top-start">
+                        <div
+                          style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
+                          :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
                           {{ item.name }}
                         </div>
                       </el-tooltip>
@@ -132,7 +95,9 @@
                             :key="index1"
                             @click="handleNodeClick(index, index1)"
                         >
-                          <div :style="item1.status === 'success' ? 'color:#67c23a': 'color:rgb(255, 74, 74)'">
+                          <div :style="
+                                item1.status === 'success' ? 'color:#67c23a':
+                                item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'">
                             <span class="test-name">{{ item1.name }}</span>
                             <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
                             <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">
@@ -161,19 +126,13 @@
               </div>
             </el-scrollbar>
           </el-col>
+
           <!-- 详情页 -->
-          <el-col :span="18"
-                  style="border-style:solid;border-color:rgb(234, 234, 234) #ffffff rgb(234, 234, 234) rgb(234, 234, 234);border-width: 1px;font-family:Serif"
-          >
-
-
-            <el-scrollbar :wrapStyle={height:picHeight}>
-              <div :style={height:picHeight}>
-
-                <div style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
-                     border="0" cellpadding="0" cellspacing="0">
-
-
+          <el-col :span="18">
+            <el-scrollbar>
+              <div :style={height:caseScrollbarHeight}>
+                <div
+                  style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;">
                   <el-collapse v-model="defaultShowResponseInFo">
 
                     <el-collapse-item name="1">
@@ -286,7 +245,7 @@
 
 
 import JsonViewer from "vue-json-viewer";
-import vkbeautify from "vkbeautify";
+import vkbeautify from "vkbeautify";  // xml格式化组件
 import hitDrawer from "@/views/assist/hits/drawer";
 
 import {reportDetail} from '@/apis/appUiTest/report'
@@ -302,54 +261,6 @@ export default {
     hitDrawer
   },
   data() {
-
-    this.caseChartSettings = {
-      radius: 80,
-      avoidLabelOverlap: false,
-      offsetY: 110,
-      itemStyle: {
-        normal: {
-          color: function (params) {
-            let colorList = [
-              'rgb(25,212,174)', 'rgb(250,110,134)', '#FE8463', '#60C0DD', '#E87C25', '#27727B',
-              '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
-              '#D7504B', '#C6E579', '#F4E001', '#F0805A', '#26C0C0'
-            ]
-            return colorList[params.dataIndex]
-          }
-        }
-      },
-      label: {
-        normal: {position: 'center', show: false}
-      },
-      labelLine: {
-        normal: {show: false}
-      }
-
-    }
-    this.suiteChartSettings = {
-      radius: [50, 80],
-      avoidLabelOverlap: false,
-      offsetY: 110,
-      itemStyle: {
-        normal: {
-          color: function (params) {
-            let colorList = [
-              'rgb(25,212,174)', 'rgb(250,110,134)', '#fb2828', '#E87C25', '#27727B',
-              '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
-              '#D7504B', '#C6E579', '#F4E001', '#F0805A', '#26C0C0'
-            ]
-            return colorList[params.dataIndex]
-          }
-        }
-      },
-      label: {
-        normal: {position: 'center', show: false}
-      },
-      labelLine: {
-        normal: {show: false}
-      }
-    }
     return {
       runTestTypeList: [],
       runEnvDict: {},
@@ -404,13 +315,8 @@ export default {
           normal: {show: false}
         }
       },
-
-      reportId: '',
-      picHeight: '635px',
-      picStatus: true,
-      active: true,
-      showScene: [true, true],
-      statusShow: [true, true, true, true, true, true, true, true, true],
+      caseScrollbarHeight: `${window.innerHeight * 0.85}px`,  // 用例和步骤内容的高度
+      picStatus: false,  // 是否展示饼图
       showColor: [],
       attachment: '',
       meta_datas: {
@@ -423,8 +329,10 @@ export default {
       caseChartData: {
         columns: ['caseName', 'num'],
         rows: [
-          {'caseName': '成功步骤', num: 0}, {'caseName': '失败步骤', num: 0},
-          {'caseName': '错误步骤', num: 0}, {'caseName': '跳过步骤', num: 0}
+          {'caseName': '成功步骤', num: 0},
+          {'caseName': '失败步骤', num: 0},
+          {'caseName': '错误步骤', num: 0},
+          {'caseName': '跳过步骤', num: 0}
         ]
       },
       suiteChartData: {
@@ -521,38 +429,6 @@ export default {
       this.attachment = this.reportData['details'][i1]['records'][i2]['attachment']
     },
 
-    handleCommand(command) {
-      // this.getReportDataById(command);
-      if (command === 'error') {
-        this.showScene = [false, true]
-      } else if (command === 'success') {
-        this.showScene = [true, false]
-      } else {
-        this.showScene = [true, true]
-      }
-    },
-    optimizeShow(dict) {
-      if (dict) {
-        let line = ''
-        for (let key in dict) {
-          line = line + key + ':' + dict[key] + '\n'
-        }
-        return line
-      }
-    },
-    showInfo() {
-      this.statusShow = [true, true, true, false, false, false, false, false, true]
-
-    },
-    showAll() {
-      this.statusShow = [true, true, true, true, true, true, true, true, true]
-
-    },
-    showError() {
-      this.statusShow = [false, false, false, false, false, false, false, false, false]
-
-    },
-
     // 获取测试报告具体内容
     getReportDataById() {
       const loading = this.$loading({
@@ -577,14 +453,9 @@ export default {
         }
       )
     },
-    isShowPic(isShow) {
-      if (isShow) {
-        this.picStatus = true
-        this.picHeight = '635px'
-      } else {
-        this.picStatus = false
-        this.picHeight = '835px'
-      }
+
+    isShowPic() {
+      this.picStatus = !this.picStatus
     }
   },
 
@@ -623,10 +494,6 @@ export default {
 .wire {
   border-top: 1px solid #eee;
 
-}
-
-.remote-line {
-  list-style-type: none;
 }
 
 .active {

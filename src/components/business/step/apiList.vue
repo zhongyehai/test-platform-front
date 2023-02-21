@@ -87,7 +87,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="center" label="操作"min-width="10%">
+        <el-table-column align="center" label="操作" min-width="10%">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click.native="addApiToStep(scope.row)">转步骤</el-button>
           </template>
@@ -154,7 +154,7 @@ export default {
 
     // 监听选中服务
     this.$bus.$on(this.$busEvents.selectorChoice, (project) => {
-      if (project){
+      if (project) {
         this.currentProjectId = project
         this.getModulesByProjectId(project.id)
       }
@@ -187,7 +187,7 @@ export default {
     },
 
     // 获取接口使用情况
-    getApiMsgBelongToStep(){
+    getApiMsgBelongToStep() {
       apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
         this.showMessage(this, response)
       })
@@ -252,26 +252,20 @@ export default {
 
     // 深拷贝接口，添加到步骤列表
     addApiToStep(api) {
-
-      // 如果有用例id，则添加步骤，否则先保存用例
-      if (this.caseId) {
-        // 把当前选中的接口，传给步骤编辑tab
-        // 初始化步骤的默认值
-        var new_api = JSON.parse(JSON.stringify(api))
-        new_api['api_id'] = new_api['id']
-        new_api['id'] = ''
-        new_api['status'] = 1
-        new_api['run_times'] = 1
-        new_api['replace_host'] = false
-        new_api['skip_if'] = {"expect": null, "comparator": "", "data_type": "", "check_value": null}
-        this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
-      } else {
-        this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
-      }
+      // 把当前选中的接口，传给步骤编辑tab
+      // 初始化步骤的默认值
+      var new_api = JSON.parse(JSON.stringify(api))
+      new_api['api_id'] = new_api['id']
+      new_api['id'] = ''
+      new_api['status'] = 1
+      new_api['run_times'] = 1
+      new_api['replace_host'] = false
+      new_api['skip_if'] = {"expect": null, "comparator": "", "data_type": "", "check_value": null}
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
     }
   },
-  watch: {
 
+  watch: {
     'currentCaseId': {
       handler(newVal, oldVal) {
         this.caseId = newVal

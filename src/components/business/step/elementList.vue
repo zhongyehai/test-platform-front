@@ -279,19 +279,13 @@ export default {
 
     // 深拷贝元素，添加到步骤列表
     addElementToStep(element) {
-
-      // 如果有用例id，则添加步骤，否则先保存用例
-      if (this.caseId) {
-        // 把当前选中的元素，传给步骤编辑tab
-        // 初始化步骤的默认值
-        var new_element = JSON.parse(JSON.stringify(element))
-        new_element['projectName'] = this.$refs.projectSelectorView.selected.label
-        new_element['pageName'] = this.$refs.pageSelectorView.selected.label
-        new_element['page_id'] = this.$refs.pageSelectorView.selected.value
-        this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_element)
-      } else {
-        this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
-      }
+      // 把当前选中的元素，传给步骤编辑tab
+      // 初始化步骤的默认值
+      var new_element = JSON.parse(JSON.stringify(element))
+      new_element['projectName'] = this.$refs.projectSelectorView.selected.label
+      new_element['pageName'] = this.$refs.pageSelectorView.selected.label
+      new_element['page_id'] = this.$refs.pageSelectorView.selected.value
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_element)
     }
   },
   watch: {
