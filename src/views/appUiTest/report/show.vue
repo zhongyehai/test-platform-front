@@ -190,6 +190,33 @@
 
                     <el-collapse-item name="8">
                       <template slot="title">
+                        <div class="el-collapse-item-title"> {{ "执行测试时内存中的公共变量：" }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="20">
+                          <div style="margin-left: 100px" v-if="this.meta_datas.variables_mapping">
+                            <JsonViewer
+                              :value="strToJson(this.meta_datas.variables_mapping)"
+                              :expand-depth="5"
+                              copyable
+                            ></JsonViewer>
+                          </div>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-button
+                            size="mini"
+                            v-if="this.meta_datas.variables_mapping"
+                            v-clipboard:copy="getCopyData(this.meta_datas.variables_mapping)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+                    </el-collapse-item>
+
+                    <el-collapse-item name="9">
+                      <template slot="title">
                         <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
                       </template>
                       <el-row>
@@ -215,7 +242,7 @@
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="9">
+                    <el-collapse-item name="10">
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
                       </template>
@@ -266,7 +293,7 @@ export default {
       runEnvDict: {},
       msg: {copyText: 'copy', copiedText: 'copied'},
       // 响应信息，默认展开全部
-      defaultShowResponseInFo: ['1', '3', '4', '7', '8', '9'],
+      defaultShowResponseInFo: ['1', '3', '4', '7', '9', '10'],
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,

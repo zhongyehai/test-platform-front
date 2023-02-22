@@ -410,7 +410,7 @@
 
                     <el-collapse-item name="16">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "发送请求时内存中的公共变量：" }}</div>
+                        <div class="el-collapse-item-title"> {{ "执行测试时内存中的公共变量：" }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
