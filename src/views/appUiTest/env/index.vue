@@ -2,10 +2,9 @@
   <div class="app-container">
     <el-tabs v-model="activeName">
 
-      <el-tab-pane label="appium执行服务器" name="appServer">
-        <serverView></serverView>
-        <span slot="label"> appium执行服务器 </span>
-        <span slot="label">
+      <el-tab-pane name="appServer">
+        <template slot="label">
+          <span> appium执行服务器 </span>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>添加appium执行服务器</div>
             <el-button
@@ -16,13 +15,13 @@
               @click="showAddDrawer(activeName)"
             ></el-button>
           </el-popover>
-         </span>
+        </template>
+        <serverView></serverView>
       </el-tab-pane>
 
       <el-tab-pane label="手机设备管理" name="appPhone">
-        <phoneView></phoneView>
-        <span slot="label"> 手机设备管理 </span>
-        <span slot="label">
+        <template slot="label">
+          <span> 手机设备管理 </span>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>添加手机设备</div>
             <el-button
@@ -33,7 +32,8 @@
               @click="showAddDrawer(activeName)"
             ></el-button>
           </el-popover>
-         </span>
+        </template>
+        <phoneView></phoneView>
       </el-tab-pane>
 
     </el-tabs>

@@ -86,7 +86,7 @@ export default {
             that.activeProcess = response.data.process
             that.activeStatus = response.data.status
 
-            if (response.data.process === 3 && response.data.status === 2) {
+            if (that.activeProcess === 3 && that.activeStatus === 2) {
               this.processIsShow = false  // 关闭进度框
               that.openReportById(reportId)
               clearInterval(timer)  // 关闭定时器

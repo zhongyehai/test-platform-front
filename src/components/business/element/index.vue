@@ -24,6 +24,7 @@
 
       <el-table-column :show-overflow-tooltip=true align="center" min-width="23%">
         <template slot="header">
+          <span>定位方式</span>
           <el-tooltip
             class="item"
             effect="dark"
@@ -31,7 +32,7 @@
             <div slot="content">
               <div>在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址</div>
             </div>
-            <span> 定位方式 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -47,6 +48,7 @@
 
       <el-table-column :show-overflow-tooltip=true align="center" min-width="15%">
         <template slot="header">
+          <span>等待时间(秒)</span>
           <el-tooltip
             class="item"
             effect="dark"
@@ -54,7 +56,7 @@
             <div slot="content">
               <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待</div>
             </div>
-            <span> 等待时间(秒) <i style="color: #409EFF" class="el-icon-warning"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">

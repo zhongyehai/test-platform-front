@@ -22,6 +22,7 @@
 
       <el-table-column align="center" min-width="15%">
         <template slot="header">
+          <span>执行</span>
           <el-tooltip
             class="item"
             effect="dark"
@@ -29,7 +30,7 @@
             <div slot="content">
               <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
             </div>
-            <span> 执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -232,6 +233,7 @@
 
             <el-table-column align="center" min-width="15%">
               <template slot="header">
+                <span>执行</span>
                 <el-tooltip
                   class="item"
                   effect="dark"
@@ -239,7 +241,7 @@
                   <div slot="content">
                     <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
                   </div>
-                  <span> 执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                  <span><i style="color: #409EFF" class="el-icon-question"></i></span>
                 </el-tooltip>
               </template>
               <template slot-scope="scope">

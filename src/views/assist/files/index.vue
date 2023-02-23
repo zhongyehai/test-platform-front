@@ -134,7 +134,8 @@ export default {
         {'key': 'case', 'value': '用例文件'},
         {'key': 'cfca', 'value': 'CFCA证书文件'},
         {'key': 'callBack', 'value': '回调文件'},
-        {'key': 'temp', 'value': '临时文件'}
+        {'key': 'temp', 'value': '临时文件'},
+        {'key': 'driver', 'value': '浏览器驱动文件'}
       ],
 
       // 文件列表

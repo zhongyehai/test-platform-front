@@ -228,7 +228,7 @@ export default {
         }
 
         if (this.tempElement.by === null) {
-          this.tempElement.by = this.$busEvents.data.findElementOptionList[0].label
+          this.tempElement.by = this.$busEvents.data.findElementOptionList[0].value
         }
 
         this.drawerIsShow = true

@@ -127,7 +127,7 @@
             </el-form-item>
 
             <el-row>
-              <el-col :span="12">
+              <el-col :span="6">
                 <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
                   <el-input-number size="mini" v-model="currentStep.wait_time_out" :min="2"></el-input-number>
                   <el-popover class="el_popover_class" placement="top-start" trigger="hover">
@@ -140,8 +140,7 @@
                   </el-popover>
                 </el-form-item>
               </el-col>
-
-              <el-col :span="12">
+              <el-col :span="6">
                 <el-form-item label="执行次数" class="is-required">
                   <el-input-number
                     v-model="currentStep.run_times"
@@ -151,6 +150,17 @@
                     :max="1000"
                   ></el-input-number>
                 </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form label-width="200px">
+                  <el-form-item label="当有步骤失败时跳过当前步骤">
+                    <el-switch v-model="currentStep.skip_on_fail" :active-value="1" :inactive-value="0"></el-switch>
+                    <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                      <div>当前用例执行时，当前步骤之前的步骤出现失败/错误的情况，是否跳过当前步骤</div>
+                      <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                    </el-popover>
+                  </el-form-item>
+                </el-form>
               </el-col>
             </el-row>
 
@@ -360,6 +370,7 @@ export default {
         "up_func": '',
         "down_func": '',
         "skip_if": {},
+        "skip_on_fail": 1,
         "execute_type": '',
         "send_keys": '',
         "run_times": 0,
@@ -395,6 +406,7 @@ export default {
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
         "skip_if": this.$refs.skipIfView.tempData,
+        "skip_on_fail": this.currentStep.skip_on_fail,
         "run_times": this.currentStep.run_times,
         "execute_type": this.currentStep.execute_type,
         "send_keys": this.currentStep.send_keys,
@@ -470,9 +482,10 @@ export default {
           this.currentStep.wait_time_out = step.wait_time_out
           this.currentStep.up_func = ''
           this.currentStep.down_func = ''
-          this.currentStep.execute_type = this.$busEvents.data.executeTypeList[1].label
+          this.currentStep.execute_type = this.$busEvents.data.executeTypeList[2].value
           this.currentStep.send_keys = ''
           this.currentStep.run_times = 1
+          this.currentStep.skip_on_fail = 1
           this.currentStep.extracts = []
           this.currentStep.validates = []
           this.currentStep.data_driver = []

@@ -48,6 +48,7 @@
             align="center"
             min-width="10%">
             <template slot="header">
+              <span> 使用次数 </span>
               <el-tooltip
                 class="item"
                 effect="dark"
@@ -56,7 +57,7 @@
                   <div>1: 统计有多少条用例里直接使用了此接口</div>
                   <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
                 </div>
-                <span> 使用次数 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">

@@ -37,16 +37,22 @@
             <el-tabs style="margin-left: 10px">
               <!-- 公用变量 -->
               <el-tab-pane label="自定义变量">
-                <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
-                  <div slot="content">
-                    1、可用此功能设置一些预设值，比如token、账号信息 <br/>
-                    2、在此处设置的值，对于此服务下的接口、用例均可直接引用 <br/>
-                    3、若此处设置的值key为a，value为1，则只需要在要使用时使用“$a”即可获取到“1” <br/>
-                    4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
-                  </div>
-                  <span>自定义变量</span>
-                </el-tooltip>
+                <template slot="label">
+                  <span> 自定义变量 </span>
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    placement="top-start">
+                    <div slot="content">
+                      1、可用此功能设置一些预设值，比如token、账号信息 <br/>
+                      2、在此处设置的值，对于此服务下的接口、用例均可直接引用 <br/>
+                      3、若此处设置的值key为a，value为1，则只需要在要使用时使用“$a”即可获取到“1” <br/>
+                      4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+                      5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
+                    </div>
+                    <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                  </el-tooltip>
+                </template>
                 <variablesView
                   ref="variablesView"
                   :currentData="tempEnv.variables"
@@ -59,15 +65,21 @@
 
               <!-- 头部信息 -->
               <el-tab-pane label="头部信息" v-if="dataType === 'api'">
-                <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
-                  <div slot="content">
-                    1、可用此功能设置当前服务的固定的头部参数，比如token、cookie <br/>
-                    2、在此处设置的值，在运行此服务下的接口、用例的时候，会自动加到对应的接口/步骤的头部参数上 <br/>
-                    3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
-                    4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
-                  </div>
-                  <span>头部信息</span>
-                </el-tooltip>
+                <template slot="label">
+                  <span> 头部信息 </span>
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    placement="top-start">
+                    <div slot="content">
+                      1、可用此功能设置当前服务的固定的头部参数，比如token、cookie <br/>
+                      2、在此处设置的值，在运行此服务下的接口、用例的时候，会自动加到对应的接口/步骤的头部参数上 <br/>
+                      3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+                      4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
+                    </div>
+                    <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                  </el-tooltip>
+                </template>
                 <headersView
                   ref="headersView"
                   :currentData="tempEnv.headers"
@@ -244,7 +256,7 @@ export default {
 
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, project) => {
-      if (_type === 'env'){
+      if (_type === 'env') {
         this.drawerIsShow = true
         this.getEnv(this.activeName, project.id)
       }
@@ -252,12 +264,12 @@ export default {
 
     // 监听 环境同步是否完成 的状态
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, envData) => {
-        if (_type === 'envSynchronizer'){
-          if (envData[this.tempEnv]) {
-            this.tempEnv.headers = envData[this.tempEnv].headers
-            this.tempEnv.variables = envData[this.tempEnv].variables
-          }
+      if (_type === 'envSynchronizer') {
+        if (envData[this.tempEnv]) {
+          this.tempEnv.headers = envData[this.tempEnv].headers
+          this.tempEnv.variables = envData[this.tempEnv].variables
         }
+      }
     })
 
   },

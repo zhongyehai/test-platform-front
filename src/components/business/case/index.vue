@@ -30,6 +30,7 @@
 
           <el-table-column align="center" min-width="15%">
             <template slot="header">
+              <span>是否执行</span>
               <el-tooltip
                 class="item"
                 effect="dark"
@@ -38,7 +39,7 @@
                   <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
                   <div>2: 请务必将用例调试通过后再设为要运行</div>
                 </div>
-                <span> 是否执行 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">

@@ -45,7 +45,7 @@
           </el-form-item>
 
           <el-row>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-form-item label="执行次数" class="is-required">
                 <el-input-number
                   v-model="currentStep.run_times"
@@ -56,8 +56,21 @@
                 ></el-input-number>
               </el-form-item>
             </el-col>
+            <el-col :span="12">
+              <el-form label-width="200px">
+                <el-form-item label="是否使用用例所在项目的域名">
+                  <el-switch v-model="currentStep.replace_host" :active-value="1" :inactive-value="0"></el-switch>
+                  <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                    <div>解析当前步骤时，若此项为激活状态，则使用用例所在服务的域名，否则使用步骤对应接口所在服务的域名</div>
+                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                  </el-popover>
+                </el-form-item>
+              </el-form>
+            </el-col>
+          </el-row>
 
-            <el-col :span="8">
+          <el-row>
+            <el-col :span="12">
               <el-form-item label="超时时间">
                 <el-input-number
                   v-model="currentStep.time_out"
@@ -70,23 +83,19 @@
                 </el-popover>
               </el-form-item>
             </el-col>
-
-            <el-col :span="8">
-              <el-form label-width="200px" v-show="currentStep.id">
-                <el-form-item label="是否使用用例所在项目的域名">
-                  <el-switch
-                    :disabled="putStepHostIsLoading"
-                    v-model="currentStep.replace_host"
-                    @change="changeStatus()"></el-switch>
+            <el-col :span="12">
+              <el-form label-width="200px">
+                <el-form-item label="当有步骤失败时跳过当前步骤">
+                  <el-switch v-model="currentStep.skip_on_fail" :active-value="1" :inactive-value="0"></el-switch>
                   <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                    <div>解析当前步骤时，若此项为激活状态，则使用用例所在服务的域名，否则使用步骤对应接口所在服务的域名
-                    </div>
+                    <div>当前用例执行时，当前步骤之前的步骤出现失败/错误的情况，是否跳过当前步骤</div>
                     <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
                   </el-popover>
                 </el-form-item>
               </el-form>
             </el-col>
           </el-row>
+
         </el-form>
       </el-tab-pane>
 
@@ -248,13 +257,12 @@ export default {
       drawerType: 'add',
       direction: 'rtl',  // 抽屉打开方式
       submitButtonIsLoading: false,
-      putStepHostIsLoading: false,
       activeName: 'editStepInfo',
       currentStepCopy: '',
       currentStep: {
         'id': '',
         "status": '',
-        "replace_host": '',
+        "replace_host": 0,
         "name": '',
         "time_out": 60,
         "up_func": '',
@@ -267,6 +275,7 @@ export default {
           data_type: null,
           check_value: null
         },
+        "skip_on_fail": 1,
         "run_times": 0,
         "headers": [],
         "params": [],
@@ -289,40 +298,6 @@ export default {
   },
   methods: {
 
-    initStep() {
-      return {
-        'id': '',
-        "status": '',
-        "replace_host": '',
-        "name": '',
-        "time_out": 60,
-        "up_func": '',
-        "down_func": '',
-        "skip_if": {
-          skip_type: null,
-          data_source: null,
-          check_value: null,
-          comparator: null,
-          data_type: null,
-          expect: null
-        },
-        "run_times": 0,
-        "headers": [],
-        "params": [],
-        "extracts": [],
-        "validates": [],
-        "data_type": "json",
-        "data_form": [],
-        "data_json": {},
-        "data_urlencoded": {},
-        "data_text": '',
-        "data_driver": [],
-        "case_id": this.caseId,
-        "api_id": '',
-        "project_id": ''
-      }
-    },
-
     getStepForCommit() {
       var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
       assertStrIsJson(json_data, 'json请求体格式错误')
@@ -340,6 +315,7 @@ export default {
         "up_func": this.currentStep.up_func,
         "down_func": this.currentStep.down_func,
         "skip_if": skip_if,
+        "skip_on_fail": this.currentStep.skip_on_fail,
         "run_times": this.currentStep.run_times,
         "headers": this.$refs.headersView.tempData,
         "params": this.$refs.paramsView.tempData,
@@ -384,15 +360,6 @@ export default {
       })
     },
 
-    // 修改步骤的引用host
-    changeStatus() {
-      this.putStepHostIsLoading = true
-      putStepHost({'id': this.currentStep.id, 'replace_host': this.currentStep.replace_host}).then(response => {
-        this.putStepHostIsLoading = false
-        this.showMessage(this, response)
-      })
-    },
-
     // 取消保存
     rowBackStep() {
       this.currentStep = this.currentStepCopy
@@ -429,6 +396,8 @@ export default {
         } else {  // 新增
           step.case_id = this.caseId
           this.currentStep = JSON.parse(JSON.stringify(step))  // 深拷贝
+          this.currentStep.replace_host = 0
+          this.currentStep.skip_on_fail = 1
 
           // 获取接口的所属信息
           apiMsgBelongTo({id: step.api_id}).then(response => {
