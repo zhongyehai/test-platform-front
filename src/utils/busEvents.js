@@ -1,5 +1,7 @@
 // bus监听事件常量方式
 
+import {phoneList} from "@/apis/appUiTest/env";
+
 export default {
 
   // 缓存数据
@@ -21,6 +23,10 @@ export default {
 
     findElementOptionList: [],  // ui自动化的定位方式
     findElementOptionDict: {},  // ui自动化的定位方式
+
+    runServerList: [],  // app自动化运行服务器
+    runPhoneList: [],  // app自动化运行手机
+    runBrowserNameDict: {},  // ui自动化运行浏览器
 
     keyboardKeyCodeList: [],  // 模拟键盘输入code
   },

@@ -14,7 +14,7 @@
       style="width: 100%"
       :height="tableHeight"
     >
-      <el-table-column prop="num" label="序号" min-width="10%">
+      <el-table-column prop="num" label="序号" min-width="8%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
@@ -63,9 +63,8 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            icon="el-icon-edit"
             @click.native="editStep(scope.row)"
-          ></el-button>
+          >修改</el-button>
 
           <!-- 复制引用用例的步骤 -->
           <el-popover
@@ -75,7 +74,7 @@
             style="margin-right: 10px"
             popper-class="down-popover"
             v-model="scope.row.pullStepPopoverIsShow">
-            <p>复制此引用用例的步骤并生成新的步骤?</p>
+            <p>复制此引用用例下的步骤并生成新的步骤?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelPullStepPopover(scope.row)">取消</el-button>
               <el-button type="primary" size="mini" @click="pullCaseStep(scope.row)">确定</el-button>
@@ -84,9 +83,8 @@
               slot="reference"
               type="text"
               size="mini"
-              icon="el-icon-bottom-left"
               :loading="scope.row.pullIsLoading"
-            ></el-button>
+            >复制步骤</el-button>
           </el-popover>
 
           <!-- 复制步骤 -->
@@ -105,9 +103,8 @@
               slot="reference"
               type="text"
               size="mini"
-              icon="el-icon-document-copy"
               :loading="scope.row.copyIsLoading"
-            ></el-button>
+            >复制</el-button>
           </el-popover>
 
           <!-- 查看用例详情 -->
@@ -117,9 +114,8 @@
             type="text"
             size="mini"
             style="margin-right: 5px"
-            icon="el-icon-view"
             @click="showCaseRemark(scope.row.quote_case)"
-          ></el-button>
+          >查看</el-button>
 
           <!-- 删除步骤 -->
           <el-popover
@@ -140,8 +136,7 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
-            ></el-button>
+            >删除</el-button>
           </el-popover>
 
           <!-- 解除引用 -->
@@ -164,8 +159,7 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
-            ></el-button>
+            >删除</el-button>
           </el-popover>
 
         </template>
@@ -175,156 +169,184 @@
     <!-- 引用用例详情 -->
     <el-drawer
       title="用例信息"
-      size="60%"
+      size="75%"
       :append-to-body="true"
-      :wrapperClosable="false"
       :visible.sync="caseRemarkIsShow"
       :before-close="beforeCloseDrawer"
       :direction="direction">
       <div class="demo-drawer__content" style="margin-left: 20px">
+        <el-button
+          v-show="caseIdList.length > 1"
+          type="primary"
+          size="mini"
+          style="float: right"
+          @click="backLast()"
+        >回到上一级
+        </el-button>
 
-        <!-- 用例来源 -->
-        <div>
-          <label>用例来源:</label>
-          <div style="margin-top: 20px">
-            {{ caseFromDetail }}
-            <el-button
-              v-show="caseIdList.length > 1"
-              type="primary"
-              size="mini"
-              @click="backLast()"
-            >回到上一级
-            </el-button>
-          </div>
-        </div>
+        <el-collapse v-model="activeNames">
+          <el-collapse-item name="1">
+            <template slot="title">
+              <div class="el-collapse-item-title">用例来源: {{showCaseDetail.fromDetail}}</div>
+            </template>
+          </el-collapse-item>
 
-        <hr style="margin-top: 20px; margin-bottom: 20px">
+          <el-collapse-item name="2">
+            <template slot="title">
+              <div class="el-collapse-item-title">用例描述:</div>
+            </template>
+            <pre class="el-collapse-item-content" style="overflow: auto">{{ showCaseDetail.remarkDetail }}</pre>
+          </el-collapse-item>
 
-        <!-- 用例描述 -->
-        <div>
-          <label>用例描述:</label>
-          <pre class="el-collapse-item-content" style="overflow: auto">{{ caseRemarkDetail }}</pre>
-        </div>
+          <el-collapse-item name="3">
+            <template slot="title">
+              <div class="el-collapse-item-title">跳过条件:</div>
+            </template>
+            <skipIfView ref="skipIfView" :skipIfData="showCaseDetail.skip_if" :use_type="'case'"
+            ></skipIfView>
+          </el-collapse-item>
 
-        <hr style="margin-bottom: 20px">
+          <el-collapse-item name="4">
+            <template slot="title">
+              <div class="el-collapse-item-title">公共变量:</div>
+            </template>
+            <variablesView
+              ref="variablesView"
+              :currentData="showCaseDetail.variables"
+              :placeholder-key="'key'"
+              :placeholder-value="'value'"
+              :placeholder-desc="'备注'"
+            ></variablesView>
+          </el-collapse-item>
 
-        <!-- 步骤列表 -->
-        <div>
-          <label>步骤列表:</label>
-          <el-table
-            ref="caseStepListTable"
-            :data="caseStepList"
-            fit
-            row-key="id"
-            highlight-current-row
-            style="width: 100%"
-          >
-            <el-table-column prop="num" label="序号" min-width="15%">
-              <template slot-scope="scope">
-                <span>{{ scope.$index + 1 }}</span>
-              </template>
-            </el-table-column>
+          <el-collapse-item name="5">
+            <template slot="title">
+              <div class="el-collapse-item-title">头部信息:</div>
+            </template>
+            <headersView
+              ref="headersView"
+              :currentData="showCaseDetail.headers"
+              :placeholder-key="'key'"
+              :placeholder-value="'value'"
+              :placeholder-desc="'备注'"
+            ></headersView>
+          </el-collapse-item>
 
-            <el-table-column align="center" label="步骤名称" min-width="35%">
-              <template slot-scope="scope">
-                <span>{{ scope.row.name }}</span>
-              </template>
-            </el-table-column>
+          <el-collapse-item name="6">
+            <template slot="title">
+              <div class="el-collapse-item-title">步骤列表:</div>
+            </template>
+            <el-table
+              ref="caseStepListTable"
+              :data="showCaseDetail.stepList"
+              fit
+              row-key="id"
+              highlight-current-row
+              style="width: 100%"
+            >
+              <el-table-column prop="num" label="序号" min-width="15%">
+                <template slot-scope="scope">
+                  <span>{{ scope.$index + 1 }}</span>
+                </template>
+              </el-table-column>
 
-            <el-table-column align="center" min-width="15%">
-              <template slot="header">
-                <span>执行</span>
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  placement="top-start">
-                  <div slot="content">
-                    <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
-                  </div>
-                  <span><i style="color: #409EFF" class="el-icon-question"></i></span>
-                </el-tooltip>
-              </template>
-              <template slot-scope="scope">
-                <el-switch
-                  :inactive-value="0"
-                  :active-value="1"
-                  v-model="scope.row.status"
-                  @change="changeStepIsRun(scope.row.id)"></el-switch>
-              </template>
-            </el-table-column>
+              <el-table-column align="center" label="步骤名称" min-width="35%">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.name }}</span>
+                </template>
+              </el-table-column>
 
-            <el-table-column align="center" label="操作" min-width="30%">
-              <template slot-scope="scope">
+              <el-table-column align="center" min-width="15%">
+                <template slot="header">
+                  <span>执行</span>
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    placement="top-start">
+                    <div slot="content">
+                      <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
+                    </div>
+                    <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                  </el-tooltip>
+                </template>
+                <template slot-scope="scope">
+                  <el-switch
+                    :inactive-value="0"
+                    :active-value="1"
+                    v-model="scope.row.status"
+                    @change="changeStepIsRun(scope.row.id)"></el-switch>
+                </template>
+              </el-table-column>
 
-                <!-- 复制引用用例的步骤 -->
-                <el-popover
-                  :ref="`popover-${scope.row.id}`"
-                  v-if="scope.row.quote_case"
-                  placement="top"
-                  style="margin-right: 10px"
-                  popper-class="down-popover"
-                  v-model="scope.row.pullStepPopoverIsShow">
-                  <p>复制此引用用例的步骤并生成新的步骤?</p>
-                  <div style="text-align: right; margin: 0">
-                    <el-button size="mini" type="text" @click="cancelPullStepPopover(scope.row)">取消</el-button>
-                    <el-button type="primary" size="mini" @click="pullCaseStep(scope.row)">确定</el-button>
-                  </div>
+              <el-table-column align="center" label="操作" min-width="30%">
+                <template slot-scope="scope">
+
+                  <!-- 复制引用用例的步骤 -->
+                  <el-popover
+                    :ref="`popover-${scope.row.id}`"
+                    v-if="scope.row.quote_case"
+                    placement="top"
+                    style="margin-right: 10px"
+                    popper-class="down-popover"
+                    v-model="scope.row.pullStepPopoverIsShow">
+                    <p>复制此引用用例下的步骤并生成新的步骤?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="cancelPullStepPopover(scope.row)">取消</el-button>
+                      <el-button type="primary" size="mini" @click="pullCaseStep(scope.row)">确定</el-button>
+                    </div>
+                    <el-button
+                      slot="reference"
+                      type="text"
+                      size="mini"
+                      :loading="scope.row.pullIsLoading"
+                    >复制步骤</el-button>
+                  </el-popover>
+
+                  <!-- 复制步骤 -->
+                  <el-popover
+                    :ref="scope.row.id"
+                    placement="top"
+                    style="margin-right: 10px"
+                    popper-class="down-popover"
+                    v-model="scope.row.copyStepPopoverIsShow">
+                    <p>复制此步骤并生成新的步骤?</p>
+                    <div style="text-align: right; margin: 0">
+                      <el-button size="mini" type="text" @click="cancelCopyStepPopover(scope.row)">取消</el-button>
+                      <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
+                    </div>
+                    <el-button
+                      slot="reference"
+                      type="text"
+                      size="mini"
+                      :loading="scope.row.copyIsLoading"
+                    >复制</el-button>
+                  </el-popover>
+
+                  <!-- 查看用例详情 -->
                   <el-button
+                    v-if="scope.row.quote_case"
                     slot="reference"
                     type="text"
                     size="mini"
-                    icon="el-icon-bottom-left"
-                    :loading="scope.row.pullIsLoading"
-                  ></el-button>
-                </el-popover>
+                    style="margin-right: 5px"
+                    @click="showCaseRemark(scope.row.quote_case)"
+                  >查看</el-button>
 
-                <!-- 复制步骤 -->
-                <el-popover
-                  :ref="scope.row.id"
-                  placement="top"
-                  style="margin-right: 10px"
-                  popper-class="down-popover"
-                  v-model="scope.row.copyStepPopoverIsShow">
-                  <p>复制此步骤并生成新的步骤?</p>
-                  <div style="text-align: right; margin: 0">
-                    <el-button size="mini" type="text" @click="cancelCopyStepPopover(scope.row)">取消</el-button>
-                    <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
-                  </div>
+                  <!-- 点击编辑步骤 -->
                   <el-button
+                    v-if="!scope.row.quote_case"
                     slot="reference"
                     type="text"
                     size="mini"
-                    icon="el-icon-document-copy"
-                    :loading="scope.row.copyIsLoading"
-                  ></el-button>
-                </el-popover>
+                    style="margin-right: 5px"
+                    @click="editStep(scope.row)"
+                  >修改</el-button>
 
-                <!-- 查看用例详情 -->
-                <el-button
-                  v-if="scope.row.quote_case"
-                  slot="reference"
-                  type="text"
-                  size="mini"
-                  style="margin-right: 5px"
-                  icon="el-icon-view"
-                  @click="showCaseRemark(scope.row.quote_case)"
-                ></el-button>
-
-                <!-- 点击编辑步骤 -->
-                <el-button
-                  v-if="!scope.row.quote_case"
-                  slot="reference"
-                  type="text"
-                  size="mini"
-                  style="margin-right: 5px"
-                  icon="el-icon-edit"
-                  @click="editStep(scope.row)"
-                ></el-button>
-
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-collapse-item>
+        </el-collapse>
 
       </div>
     </el-drawer>
@@ -333,6 +355,9 @@
 
 <script>
 import Sortable from 'sortablejs'
+import variablesView from '@/components/Inputs/variables'
+import headersView from '@/components/Inputs/changeRow'
+import skipIfView from "@/components/Inputs/skipIf"
 
 import {
   deleteStep as apiDeleteStep,
@@ -361,9 +386,14 @@ import {
 } from "@/apis/appUiTest/step"
 import {caseFrom as appUiCaseFrom, getCase as appUiGetCase, pullStep as appUiPullStep} from "@/apis/appUiTest/case";
 
+
 export default {
   name: 'stepList',
-  components: {},
+  components: {
+    skipIfView,
+    headersView,
+    variablesView
+  },
   props: [
     'dataType',
     'caseId'
@@ -381,11 +411,16 @@ export default {
       newList: [],
 
       tableHeight: 500,  // 表格高度
-
+      activeNames: ['6'],
       direction: 'rtl',  // 抽屉打开方式
-      caseRemarkDetail: '',  // 被引用用例的描述
-      caseFromDetail: '',
-      caseStepList: [],
+      showCaseDetail: {
+        remarkDetail: '',
+        fromDetail: '',
+        skip_if: '',
+        variables: '',
+        headers: '',
+        stepList: []
+      },
       caseIdList: [],  // 用于记录查看的用例的来源
       caseRemarkIsShow: false,  // 是否展示被引用用例的描述
 
@@ -402,9 +437,11 @@ export default {
 
   mounted() {
     // 步骤提交事件，获取步骤列表
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, caseId) => {
       if (_type === 'stepInfo'){
         this.getStepList()
+      }else if (_type === 'showStepList'){
+        this.showCaseRemark(caseId)
       }
     })
   },
@@ -515,17 +552,20 @@ export default {
     showCaseRemark(caseId) {
       // 用例信息
       this.getCaseUrl({id: caseId}).then(response => {
-        this.caseRemarkDetail = response.data.desc
+        this.showCaseDetail.variables = response.data.variables
+        this.showCaseDetail.skip_if = response.data.skip_if
+        this.showCaseDetail.headers = response.data.headers
+        this.showCaseDetail.remarkDetail = response.data.desc
       })
 
       // 用例归属
       this.caseFromUrl({id: caseId}).then(response => {
-        this.caseFromDetail = response.data
+        this.showCaseDetail.fromDetail = response.data
       })
 
       // 步骤列表
       this.stepListUrl({caseId: caseId}).then(response => {
-        this.caseStepList = response.data
+        this.showCaseDetail.stepList = response.data
       })
 
       this.caseIdList.push(caseId)
@@ -606,6 +646,13 @@ export default {
 </script>
 
 <style>
+.el-collapse-item-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-left: 10px;
+  color: #409eff
+}
+
 .sortable-ghost {
   opacity: .8;
   color: #fff !important;

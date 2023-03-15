@@ -1,10 +1,10 @@
 <template>
   <el-drawer
     :title=" drawerType === 'update' ? '修改用例' : '新增用例'"
-    size="80%"
-    :wrapperClosable="false"
+    size="95%"
     :visible.sync="drawerIsShow"
     :direction="direction">
+<!--    :wrapperClosable="false"-->
 
     <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px" :before-leave="changeTab">
 
@@ -121,7 +121,6 @@
               <variablesView
                 ref="variablesView"
                 :currentData="tempCase.variables"
-                :dataTypeMapping="dataTypeMapping"
                 :placeholder-key="'key'"
                 :placeholder-value="'value'"
                 :placeholder-desc="'备注'"
@@ -244,8 +243,7 @@ export default {
   props: [
     'dataType',
     'currentProjectId',
-    'currentSetId',
-    'dataTypeMapping'
+    'currentSetId'
   ],
   components: {
     skipIfView,
@@ -497,25 +495,28 @@ export default {
     })
 
     // 引用用例为步骤后，后端会合并两条用例的公共变量，所以获取当前用例的最新公共变量
-    this.$bus.$on(this.$busEvents.quoteCaseToStep, () => {
-      this.getCaseUrl({id: this.tempCase.id}).then(response => {
-        let tempCase_variables = {}, response_variables = {}
-
-        response.data.variables.forEach(variable => {
-          response_variables[variable["key"]] = variable
+    this.$bus.$on(this.$busEvents.quoteCaseToStep, (testCase, status) => {
+      if (status){
+        this.getCaseUrl({id: this.tempCase.id}).then(response => {
+          this.tempCase.variables = response.data.variables
+          // let tempCase_variables = {}, response_variables = {}
+          //
+          // response.data.variables.forEach(variable => {
+          //   response_variables[variable["key"]] = variable
+          // })
+          //
+          // this.tempCase.variables.forEach(variable => {
+          //   tempCase_variables[variable["key"]] = variable
+          // })
+          //
+          // for (let key in response_variables) {
+          //   if (!(key in tempCase_variables)) {
+          //     this.tempCase.variables.push(response_variables[key])
+          //     // tempCase_variables[key] = response_variables[key]
+          //   }
+          // }
         })
-
-        this.tempCase.variables.forEach(variable => {
-          tempCase_variables[variable["key"]] = variable
-        })
-
-        for (let key in response_variables) {
-          if (!(key in tempCase_variables)) {
-            this.tempCase.variables.push(response_variables[key])
-            // tempCase_variables[key] = response_variables[key]
-          }
-        }
-      })
+      }
     })
 
     // 监听、接收用例集树

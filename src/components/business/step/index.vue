@@ -128,12 +128,15 @@ export default {
   mounted() {
 
     // 引用用例
-    this.$bus.$on(this.$busEvents.quoteCaseToStep, (elementOrCase) => {
-        this.postStepUrl(elementOrCase).then(response => {
+    this.$bus.$on(this.$busEvents.quoteCaseToStep, (testCase, status) => {
+      if (testCase){
+        this.postStepUrl(testCase).then(response => {
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')  // 重新请求步骤列表
+            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess')  // 重新请求步骤列表
           }
         })
+      }
     })
   },
 

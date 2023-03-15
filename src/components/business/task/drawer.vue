@@ -16,7 +16,7 @@
 
           <!-- 服务选择 -->
           <el-row>
-            <el-col :span="12">
+            <el-col :span="dataType !== 'appUi' ? 12 : 24">
               <el-form-item :label="`选择${dataTypeTitleMappingContent[this.dataType]}`" class="is-required">
                 <el-select
                   v-model="projectSelectedId"
@@ -24,7 +24,7 @@
                   size="mini"
                   filterable
                   default-first-option
-                  style="width: 90%"
+                  :style="{'width': dataType !== 'appUi' ? '90%' : '97%'}"
                   :disabled="true"
                 >
                   <el-option
@@ -42,7 +42,7 @@
             </el-col>
 
             <!-- 选择环境 -->
-            <el-col :span="12">
+            <el-col v-if="dataType !== 'appUi'" :span="12">
               <el-form-item label="默认运行环境" class="is-required">
                 <environmentSelectorView
                   :env="tempTask.env"
@@ -57,6 +57,57 @@
               </el-form-item>
             </el-col>
           </el-row>
+
+          <el-form-item label="运行浏览器" class="is-required" v-if="dataType==='webUi'">
+            <el-radio
+              v-model="tempTask.conf.browser"
+              :label="key"
+              v-for="(value, key) in $busEvents.data.runBrowserNameDict " :key="key">{{ value }}
+            </el-radio>
+          </el-form-item>
+
+          <el-form-item label="运行服务器" class="is-required" v-if="dataType==='appUi'">
+            <el-select
+              v-model="tempTask.conf.server_id"
+              filterable
+              default-first-option
+              placeholder="请选择运行服务器"
+              style="width: 100%"
+              size="mini"
+            >
+              <el-option
+                v-for="server in $busEvents.data.runServerList"
+                :key="server.id"
+                :label="`${server.name}   (最近一次访问：${statusContentMapping[server.status]})`"
+                :value="server.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="运行手机" class="is-required" v-if="dataType==='appUi'">
+            <el-select
+              v-model="tempTask.conf.phone_id"
+              filterable
+              default-first-option
+              placeholder="请选择运行手机"
+              style="width: 100%"
+              size="mini"
+            >
+              <el-option
+                v-for="phone in $busEvents.data.runPhoneList"
+                :key="phone.id"
+                :label="phone.name"
+                :value="phone.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="APP缓存" class="is-required" v-if="dataType==='appUi'">
+            <el-radio v-model="tempTask.conf.no_reset" :label="false">重置</el-radio>
+            <el-radio v-model="tempTask.conf.no_reset" :label="true">不重置</el-radio>
+          </el-form-item>
 
           <el-form-item label="发送报告" class="is-required">
             <el-radio v-model="tempTask.is_send" label="1">不发送</el-radio>
@@ -303,7 +354,11 @@ import {caseList as appUiCaseList} from '@/apis/appUiTest/case'
 
 import {arrayToTree} from "@/utils/parseData";
 import {getRunModel} from "@/apis/config/config";
-import {dataTypeTitleMappingContent} from "@/utils/mapping";
+import {
+  appiumServerRequestStatusMappingContent,
+  appiumServerRequestStatusMappingTagType,
+  dataTypeTitleMappingContent
+} from "@/utils/mapping";
 
 export default {
   name: "drawer",
@@ -340,7 +395,13 @@ export default {
             "headers": {},
             "json": {}
           }
-        ]
+        ],
+        conf: {
+          "browser": undefined,
+          "server_id": undefined,
+          "phone_id": undefined,
+          "no_reset": undefined
+        }
       },
 
       projectLists: '',  // 服务列表
@@ -359,6 +420,8 @@ export default {
           "json": {}
         }
       ],
+      statusContentMapping: appiumServerRequestStatusMappingContent,
+      statusTagTypeMapping: appiumServerRequestStatusMappingTagType,
 
       postTaskUrl: '',
       putTaskUrl: '',
@@ -466,6 +529,12 @@ export default {
         set_ids: [],
         case_ids: [],
         call_back: this.callBackPlaceholder,
+        conf: {
+          "browser": undefined,
+          "server_id": undefined,
+          "phone_id": undefined,
+          "no_reset": undefined
+        },
         project_id: ''
       }
     },
@@ -476,7 +545,7 @@ export default {
         id: this.tempTask.id,
         num: this.tempTask.num,
         name: this.tempTask.name,
-        env: this.$refs.environmentSelectorView.current_env,
+        env: this.dataType !== 'appUi' ? this.$refs.environmentSelectorView.current_env : undefined,
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
         is_send: this.tempTask.is_send,
@@ -484,6 +553,7 @@ export default {
         send_type: this.tempTask.send_type,
         we_chat: this.tempTask.we_chat,
         ding_ding: this.tempTask.ding_ding,
+        conf: this.tempTask.conf,
         email_server: this.$refs.emailServerSelector.tempEmailServer,
         email_to: this.tempTask.email_to,
         email_from: this.tempTask.email_from,
@@ -598,6 +668,15 @@ export default {
         } else {  // 新增
           this.initNewTask()
           this.tempTask.project_id = taskOrProject.id
+          if (this.dataType === 'webUi'){
+            if (Object.keys(this.$busEvents.data.runBrowserNameDict).length > 0) {
+              this.tempTask.conf.browser = Object.keys(this.$busEvents.data.runBrowserNameDict)[0]
+            }
+          }else if (this.dataType === 'appUi'){
+            this.tempTask.conf.no_reset = false
+            this.tempTask.conf.server_id = this.$busEvents.data.runServerList[0].id
+            this.tempTask.conf.phone_id = this.$busEvents.data.runPhoneList[0].id
+          }
         }
         this.drawerIsShow = true
 

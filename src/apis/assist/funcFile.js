@@ -38,6 +38,11 @@ export function debugFuncFile(data) {
   return request({url: currentBaseDir + '/debug', method: 'POST', data: data});
 }
 
+// 复制
+export function copyFunc(data) {
+  return request({url: currentBaseDir + '/copy', method: 'post', data: data});
+}
+
 // 修改排序
 export function funcSort(data) {
   return request({url: currentBaseDir + '/sort', method: 'put', data: data});

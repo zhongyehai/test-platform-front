@@ -2,7 +2,7 @@
 
   <div class="app-container">
 
-    <el-form label-width="150px" inline>
+    <el-form label-width="100px" inline>
       <el-form-item :label="'报告名：'" size="mini">
         <el-input
           v-model="projectName"
@@ -60,13 +60,13 @@
               :data="reportDataList"
               stripe
             >
-              <el-table-column prop="id" label="序号" align="center" min-width="10%">
+              <el-table-column prop="id" label="序号" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
+              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="20%">
               </el-table-column>
 
               <el-table-column label="生成时间" align="center" min-width="15%">
@@ -81,7 +81,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行环境" align="center" min-width="8%">
+              <el-table-column v-if="dataType !== 'appUi'" label="运行环境" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ eventDict[scope.row.env] }} </span>
                 </template>
@@ -93,7 +93,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否通过" align="center" min-width="8%">
+              <el-table-column label="是否通过" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="reportStatusTagType[scope.row.is_passed]">
                     {{ reportStatusContent[scope.row.is_passed] }}
@@ -117,10 +117,9 @@
                   <el-button
                     type="text"
                     size="mini"
-                    icon="el-icon-view"
                     style="margin-right: 10px"
                     v-show="scope.row.process === 3 && scope.row.status === 2"
-                    @click.native="openReportById(scope.row.id)"></el-button>
+                    @click.native="openReportById(scope.row.id)">查看</el-button>
 
                   <!-- 删除报告 -->
                   <el-popover
@@ -138,9 +137,8 @@
                       slot="reference"
                       type="text"
                       size="mini"
-                      icon="el-icon-delete"
                       style="color: red"
-                    ></el-button>
+                    >删除</el-button>
                   </el-popover>
 
                 </template>

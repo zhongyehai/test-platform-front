@@ -2,7 +2,7 @@
 
   <div class="app-container">
 
-    <el-form label-width="150px" inline>
+    <el-form label-width="100px" inline>
       <el-form-item :label="'选择服务：'" size="mini">
         <el-select
           v-model="currentProjectId"
@@ -177,6 +177,18 @@
       :dataType="dataType"
     ></runProcess>
 
+    <showApiFromDrawer
+      v-if="dataType === 'api'"
+      :api-list="showApiList"
+      :case-id="undefined"
+      :marker="marker"
+    ></showApiFromDrawer>
+
+    <showApiUseDrawer
+      v-if="dataType === 'api'"
+      :case-list="showCaseList"
+      :marker="marker"
+    ></showApiUseDrawer>
   </div>
 
 
@@ -187,6 +199,8 @@ import waves from "@/directive/waves";
 import caseManage from '@/components/business/case'  // 用例管理组件
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 import runProcess from '@/components/runProcess'  // 测试执行进度组件
+import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
+import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import {getFindElementOption} from "@/utils/getConfig";
 import {ellipsis, arrayToTree} from "@/utils/parseData"
@@ -220,6 +234,7 @@ import {
 } from "@/apis/appUiTest/caseSet";
 import {getConfigByName, getSkipIfTypeMapping} from "@/apis/config/config";
 import {extractMappingList, keyBoardCodeMappingList} from "@/apis/webUiTest/step";
+import {phoneList, serverList} from "@/apis/appUiTest/env";
 
 
 export default {
@@ -227,7 +242,9 @@ export default {
   components: {
     caseManage,
     selectRunEnv,
-    runProcess
+    runProcess,
+    showApiFromDrawer,
+    showApiUseDrawer
   },
   props: ['dataType'],
   directives: {waves},
@@ -252,6 +269,9 @@ export default {
         project_id: '',
       },
       queryAddr: '',
+      marker: 'suite',
+      showApiList: [],
+      showCaseList: [],
       moduleDrawerIsShow: false,
       defaultCaseSet: {},
       moduleDrawerStatus: '',
@@ -457,14 +477,20 @@ export default {
     // 获取接口归属
     getApiMsgBelongTo() {
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showApiList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+        }
       })
     },
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showCaseList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+        }
       })
     }
 
@@ -486,6 +512,9 @@ export default {
       this.postCaseSetUrl = webUiPostCaseSet
       this.putCaseSetUrl = webUiPutCaseSet
       getFindElementOption(this)  // 获取定位方式
+      getConfigByName({'name': 'browser_name'}).then(response => {
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+      })
     } else {
       this.projectListUrl = appUiProjectList
       this.caseSetTreeUrl = appUiCaseSetTree
@@ -494,6 +523,12 @@ export default {
       this.postCaseSetUrl = appUiPostCaseSet
       this.putCaseSetUrl = appUiPutCaseSet
       getFindElementOption(this)  // 获取定位方式
+      serverList().then(response => {
+        this.$busEvents.data.runServerList = response.data.data
+      })
+      phoneList().then(response => {
+        this.$busEvents.data.runPhoneList = response.data.data
+      })
     }
 
     this.getProjectList()

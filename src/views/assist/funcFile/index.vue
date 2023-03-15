@@ -10,7 +10,7 @@
           placeholder="函数名，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 400px">
+          style="width: 250px">
         </el-input>
       </el-form-item>
 
@@ -96,17 +96,35 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" min-width="10%">
+      <el-table-column label="操作" align="center" min-width="15%">
         <template slot-scope="scope">
 
           <!--修改文件信息-->
           <el-button
             type="text"
             size="mini"
-            icon="el-icon-edit"
             style="margin-right: 10px"
-            @click="sendEditEmit('update', scope.row)">
+            @click="sendEditEmit('update', scope.row)">修改
           </el-button>
+
+          <!-- 复制 -->
+          <el-popover
+            :ref="scope.row.name"
+            placement="top"
+            popper-class="down-popover"
+            v-model="scope.row.copyPopoverIsShow">
+            <p>确定复制【{{ scope.row.name }}】并生成一条新的数据?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
+              <el-button type="primary" size="mini" @click="copyFile(scope.row)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="text"
+              size="mini"
+              style="margin-right: 10px"
+            >复制</el-button>
+          </el-popover>
 
           <!-- 删除文件 -->
           <el-popover
@@ -124,9 +142,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            ></el-button>
+            >删除</el-button>
           </el-popover>
 
         </template>
@@ -152,7 +169,7 @@ import Sortable from 'sortablejs'
 import funcFileDrawer from "@/views/assist/funcFile/drawer";
 import Pagination from '@/components/Pagination'
 
-import {funcFileList, deleteFuncFile, funcSort} from '@/apis/assist/funcFile'
+import {funcFileList, deleteFuncFile, funcSort, copyFunc} from '@/apis/assist/funcFile'
 import {userList} from '@/apis/system/user'
 
 export default {
@@ -226,8 +243,22 @@ export default {
     //   this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', 'add')
     // },
 
+    // 复制函数文件
+    copyFile(row){
+      this.$set(row, 'copyPopoverIsShow', false)
+      copyFunc({id: row.id}).then(response => {
+        if (this.showMessage(this, response)) {
+          this.getFuncFileList()
+        }
+      })
+    },
+
     sendEditEmit(_type, row) {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', _type, row)
+    },
+
+    cancelCopyPopover(row){
+      this.$set(row, 'copyPopoverIsShow', false)
     },
 
     cancelDeletePopover(row){
@@ -264,8 +295,8 @@ export default {
           this.tableIsLoading = true
           funcSort({
             List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageNum: this.listQuery.pageNum,
+            pageSize: this.listQuery.pageSize,
           }).then(response => {
             this.showMessage(this, response)
             this.tableIsLoading = false

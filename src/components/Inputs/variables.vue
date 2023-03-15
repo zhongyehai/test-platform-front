@@ -37,7 +37,7 @@
           clearable
           size="mini">
           <el-option
-            v-for="(item) in dataTypeMapping"
+            v-for="(item) in $busEvents.data.dataTypeMappingList"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -100,7 +100,6 @@ export default {
   name: 'changeRow',
   props: [
     'currentData',
-    'dataTypeMapping',
     'placeholderKey',
     'placeholderValue',
     'placeholderDesc'

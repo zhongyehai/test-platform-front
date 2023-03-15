@@ -10,19 +10,19 @@
       row-key="id"
       stripe
     >
-      <el-table-column prop="num" label="序号" min-width="7%">
+      <el-table-column prop="num" label="序号" min-width="10%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="元素名称" min-width="20%">
+      <el-table-column :show-overflow-tooltip=true prop="name" label="元素名称" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" min-width="23%">
+      <el-table-column :show-overflow-tooltip=true align="center" min-width="20%">
         <template slot="header">
           <span>定位方式</span>
           <el-tooltip
@@ -40,7 +40,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="element" align="center" label="元素表达式" min-width="23%">
+      <el-table-column :show-overflow-tooltip=true prop="element" align="center" label="元素表达式" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.element }} </span>
         </template>
@@ -64,7 +64,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="8%">
+      <el-table-column align="center" label="操作" min-width="20%">
         <template slot-scope="scope">
 
           <!--修改元素-->
@@ -72,8 +72,7 @@
             type="text"
             size="mini"
             style="margin-right: 8px"
-            icon="el-icon-edit"
-            @click="showEditForm(scope.row)">
+            @click="showEditForm(scope.row)">修改
           </el-button>
 
           <!-- 复制元素 -->
@@ -92,8 +91,7 @@
               slot="reference"
               type="text"
               size="mini"
-              icon="el-icon-document-copy"
-            ></el-button>
+            >复制</el-button>
           </el-popover>
 
           <!-- 删除元素 -->
@@ -112,9 +110,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.isShowDeleteLoading"
-            ></el-button>
+            >删除</el-button>
           </el-popover>
         </template>
       </el-table-column>

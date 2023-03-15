@@ -11,14 +11,16 @@
         <el-table
           ref="apiListTable"
           v-loading="tableLoadingIsShow"
+          show-overflow-tooltip
           element-loading-text="正在排序中"
           element-loading-spinner="el-icon-loading"
           :header-cell-style="{'text-align':'center'}"
           :data="api_list"
           row-key="id"
           stripe
+          @cell-dblclick="cellDblclick"
         >
-          <el-table-column prop="num" label="序号" align="center" min-width="8%">
+          <el-table-column prop="num" label="序号" align="center" min-width="5%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
@@ -26,12 +28,14 @@
 
           <el-table-column
             :show-overflow-tooltip=true
-            prop="name"
+            prop="addr"
             label="接口信息"
             align="center"
-            min-width="67%">
+            min-width="50%">
             <template slot-scope="scope">
-              <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
+              <div class="block"
+                   :class="`block_${scope.row.method.toLowerCase()}`"
+                   :style="{'backgroundColor': scope.row.deprecated === true ? '#909399' : ''}">
                   <span class="block-method block_method_color"
                         :class="`block_method_${scope.row.method.toLowerCase()}`">
                     {{ scope.row.method }}
@@ -44,7 +48,73 @@
 
           <el-table-column
             :show-overflow-tooltip=true
-            prop="create_user"
+            prop="level"
+            align="center"
+            min-width="10%">
+            <template slot="header">
+              <span> 重要级别 </span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                placement="top-start">
+                <div slot="content">
+                  <div>标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口</div>
+                </div>
+                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+              </el-tooltip>
+            </template>
+            <template slot-scope="scope">
+              <div :style="{
+                'backgroundColor': scope.row.level === 'P0' ?
+              '#F56C6C' : scope.row.level === 'P1' ?
+              '#E6A23C' : '#67C23A'}">
+                <div style="width: 80%; margin-left:auto; margin-right:auto">
+                  <el-select
+                    v-model="scope.row.level"
+                    size="mini"
+                    slot="prepend"
+                    placeholder="选择请求方式"
+                    filterable
+                    class="select"
+                    default-first-option
+                    @change="selectApiLevel(scope.row)">
+                    <el-option
+                      v-for="item in [{label: '高', value: 'P0'}, {label: '中', value: 'P1'}, {label: '低', value: 'P2'}]"
+                      :key="item.value"
+                      :value="item.value"
+                      :label="item.label"
+                    ></el-option>
+                  </el-select>
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+
+          <el-table-column align="center" min-width="10%">
+            <template slot="header">
+              <span>是否可用</span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                placement="top-start">
+                <div slot="content">
+                  <div>标识接口是否被废弃</div>
+                </div>
+                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+              </el-tooltip>
+            </template>
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.deprecated"
+                :inactive-value="true"
+                :active-value="false"
+                @change="changeStatus(scope.row)"></el-switch>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :show-overflow-tooltip=true
+            prop="quote_count"
             align="center"
             min-width="10%">
             <template slot="header">
@@ -56,13 +126,19 @@
                 <div slot="content">
                   <div>1: 统计有多少条用例里直接使用了此接口</div>
                   <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
+                  <div>3: 被使用过的接口，点击使用次数数值可查看使用明细</div>
                 </div>
                 <span><i style="color: #409EFF" class="el-icon-question"></i></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <el-tag type="success" v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
-              <el-tag type="warning" v-else>0</el-tag>
+              <el-tag
+                v-if="scope.row.quote_count"
+                @click="getApiMsgBelongToStep(scope.row)"
+              >
+                {{ scope.row.quote_count }}
+              </el-tag>
+              <el-tag type="info" v-else>0</el-tag>
             </template>
           </el-table-column>
 
@@ -73,26 +149,24 @@
               <el-button
                 type="text"
                 size="mini"
-                slot="reference"
-                icon="el-icon-video-play"
+                style="margin-left: 5px"
                 :loading="scope.row.runButtonIsLoading"
                 @click="clickRunApi(scope.row)"
-              ></el-button>
+              >运行
+              </el-button>
 
               <!--修改接口-->
               <el-button
                 type="text"
                 size="mini"
-                style="margin-right: 8px"
-                icon="el-icon-edit"
-                @click="showEditForm(scope.row)">
+                style="margin-left: 5px"
+                @click="showEditForm(scope.row)">修改
               </el-button>
 
               <!-- 复制接口 -->
               <el-popover
                 :ref="scope.row.id"
                 placement="top"
-                style="margin-right: 10px"
                 popper-class="down-popover"
                 v-model="scope.row.copyPopoverIsShow">
                 <p>复制此接口并生成新的接口?</p>
@@ -104,8 +178,9 @@
                   slot="reference"
                   type="text"
                   size="mini"
-                  icon="el-icon-document-copy"
-                ></el-button>
+                  style="margin-left: 5px"
+                >复制
+                </el-button>
               </el-popover>
 
               <!-- 删除接口 -->
@@ -121,12 +196,12 @@
                 </div>
                 <el-button
                   slot="reference"
-                  style="color: red"
+                  style="color: red; margin-left: 5px"
                   type="text"
                   size="mini"
-                  icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
-                ></el-button>
+                >删除
+                </el-button>
               </el-popover>
 
             </template>
@@ -150,23 +225,37 @@
       :currentModuleId="currentModuleId"
     ></apiDrawer>
 
+    <showApiUseDrawer
+      :case-list="showCaseList"
+      :marker="marker"
+    ></showApiUseDrawer>
+
   </div>
 </template>
 
 <script>
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
-
 import apiDrawer from '@/views/apiTest/api/drawer'
+import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import {userList} from '@/apis/system/user'
-import {apiList, deleteApi, runApi, apiMsgSort} from '@/apis/apiTest/api'
+import {
+  apiList,
+  deleteApi,
+  runApi,
+  apiMsgSort,
+  changeApiLevel,
+  changeApiStatus,
+  apiMsgBelongToStep
+} from '@/apis/apiTest/api'
 
 export default {
   name: 'index',
   components: {
     Pagination,
-    apiDrawer
+    apiDrawer,
+    showApiUseDrawer
   },
 
   data() {
@@ -185,6 +274,9 @@ export default {
       pageSize: 20,
       api_total: 0,
       api_list: [],
+
+      marker: 'apiList',
+      showCaseList: [],
 
       // 拖拽排序参数
       sortable: null,
@@ -209,7 +301,7 @@ export default {
 
     // 点击树时，请求对应的接口列表
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId) => {
-      if (_type === 'module'){
+      if (_type === 'module') {
         this.currentModuleId = moduleId
         this.currentProjectId = projectId
         this.getApiList()
@@ -220,9 +312,9 @@ export default {
 
     // 接口提交成功，则重新请求接口列表
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'apiInfo'){
+      if (_type === 'apiInfo') {
         this.getApiList()
-      }else if (_type === 'selectRunEnv' && _runUnit === 'apiIndex'){
+      } else if (_type === 'selectRunEnv' && _runUnit === 'apiIndex') {
         this.runApis(runDict)
       }
     })
@@ -235,6 +327,45 @@ export default {
   },
 
   methods: {
+
+    // 获取接口使用情况
+    getApiMsgBelongToStep(row) {
+      apiMsgBelongToStep({id: row.id}).then(response => {
+        if (this.showMessage(this, response)) {
+          this.showCaseList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+        }
+      })
+    },
+
+    changeStatus(row) {
+      changeApiStatus({
+        id: row.id,
+        deprecated: row.deprecated
+      }).then(response => {
+        this.showMessage(this, response)
+      })
+    },
+
+    // 修改接口的重要等级
+    selectApiLevel(row) {
+      changeApiLevel({
+        id: row.id,
+        level: row.level
+      }).then(response => {
+        this.showMessage(this, response)
+      })
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      let that = this, data = `${row.name}: ${row.addr}`
+      this.$copyText(data).then(
+        function (e) {
+          that.$message.success("复制成功")
+        }
+      )
+    },
 
     // 获取用户信息，同步请求
     async getUserList() {
@@ -422,7 +553,7 @@ export default {
 .block {
   position: relative;
   border-radius: 4px;
-  height: 48px;
+  /*height: 48px;*/
   overflow: hidden;
   padding: 5px;
   display: flex;

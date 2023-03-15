@@ -79,19 +79,17 @@
                     type="text"
                     size="mini"
                     slot="reference"
-                    icon="el-icon-video-play"
                     :loading="scope.row.runButtonIsLoading"
                     @click="clickRunTask(scope.row)"
-                  ></el-button>
+                  >运行</el-button>
 
                   <!-- 修改任务 -->
                   <el-button
                     type="text"
                     size="mini"
-                    icon="el-icon-edit"
                     style="margin-right: 10px"
                     :disabled="scope.row.status === 1"
-                    @click.native="editTask(scope.row)"></el-button>
+                    @click.native="editTask(scope.row)">修改</el-button>
 
                   <!-- 复制任务 -->
                   <el-popover
@@ -109,9 +107,8 @@
                       slot="reference"
                       type="text"
                       size="mini"
-                      icon="el-icon-document-copy"
                       :loading="scope.row.copyButtonIsLoading"
-                    ></el-button>
+                    >复制</el-button>
                   </el-popover>
 
                   <!-- 删除任务 -->
@@ -130,10 +127,9 @@
                       style="color: red"
                       type="text"
                       size="mini"
-                      icon="el-icon-delete"
                       :disabled="scope.row.status === 1"
                       :loading="scope.row.deleteLoadingIsShow"
-                    ></el-button>
+                    >删除</el-button>
                   </el-popover>
                 </template>
               </el-table-column>

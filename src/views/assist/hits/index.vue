@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form inline style="margin-left: 20px">
-      <el-form-item :label="'测试类型'" prop="hit_type" size="mini" style="margin-right: 40px">
+      <el-form-item :label="'测试类型'" prop="hit_type" size="mini" style="margin-right: 10px">
         <el-select
           style="width: 100%"
           v-model="queryData.test_type"
@@ -21,7 +21,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="'问题类型'" prop="hit_type" size="mini">
+      <el-form-item :label="'问题类型'" prop="hit_type" size="mini" style="margin-right: 10px">
         <el-select
           v-model="queryData.hit_type"
           filterable
@@ -39,6 +39,10 @@
           >
           </el-option>
         </el-select>
+      </el-form-item>
+
+      <el-form-item :label="'报告id'" prop="report_id" size="mini" style="margin-right: 10px">
+        <el-input size="mini" v-model="queryData.report_id"/>
       </el-form-item>
 
       <el-button
@@ -189,8 +193,9 @@ export default {
       runTestTypeList: [],
       tableIsLoading: false,
       queryData: {
-        test_type: '',
-        hit_type: '',
+        test_type: undefined,
+        hit_type: undefined,
+        report_id: undefined,
         pageSize: 20,
         pageNum: 1
       }

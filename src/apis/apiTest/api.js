@@ -72,3 +72,15 @@ export function apiMsgBelongTo(params) {
 export function apiMsgBelongToStep(params) {
   return request({url: currentBaseDir + '/toStep', method: 'get', params: params});
 }
+
+
+// 修改接口重要程度
+export function changeApiLevel(data) {
+  return request({url: currentBaseDir + '/level', method: 'post', data: data});
+}
+
+// 修改接口废弃状态
+export function changeApiStatus(data) {
+  return request({url: currentBaseDir + '/status', method: 'post', data: data});
+}
+

@@ -104,6 +104,16 @@
 
     </div>
 
+    <showApiFromDrawer
+      :api-list="showApiList"
+      :case-id="currentCaseId"
+      :marker="marker"
+    ></showApiFromDrawer>
+
+    <showApiUseDrawer
+      :case-list="showCaseList"
+      :marker="marker"
+    ></showApiUseDrawer>
   </div>
 
 </template>
@@ -113,6 +123,8 @@ import projectSelectorView from "@/components/Selector/project";
 import moduleSelectorView from "@/components/Selector/module";
 import editStepView from "./editApiStep.vue";
 import Pagination from '@/components/Pagination'
+import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
+import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import {apiList, apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";
 import {moduleList} from "@/apis/apiTest/module";
@@ -129,6 +141,8 @@ export default {
     projectSelectorView,
     moduleSelectorView,
     editStepView,
+    showApiFromDrawer,
+    showApiUseDrawer
   },
   data() {
     return {
@@ -145,8 +159,10 @@ export default {
       },
       pageNum: 0,
       pageSize: 10,
-      queryAddr: ''
-
+      queryAddr: '',
+      marker: 'caseApiList',
+      showApiList: [],
+      showCaseList: [],
     }
   },
 
@@ -159,12 +175,6 @@ export default {
         this.getModulesByProjectId(project.id)
       }
     })
-
-    // 获取模块对应的接口列表
-    this.$bus.$on(this.$busEvents.selectorChoice2, (moduleId) => {
-      this.moduleId = moduleId
-      this.getApiListByModuleId()
-    })
   },
 
   created() {
@@ -174,7 +184,6 @@ export default {
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.selectorChoice)
-    this.$bus.$off(this.$busEvents.selectorChoice2)
   },
 
   methods: {
@@ -182,14 +191,20 @@ export default {
     // 获取接口归属
     getApiMsgBelongTo() {
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showApiList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+        }
       })
     },
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showCaseList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+        }
       })
     },
 
@@ -343,7 +358,7 @@ export default {
 .block {
   position: relative;
   border-radius: 4px;
-  height: 48px;
+  /*height: 48px;*/
   overflow: hidden;
   padding: 5px;
   display: flex;

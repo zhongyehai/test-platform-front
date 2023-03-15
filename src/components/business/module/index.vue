@@ -2,7 +2,7 @@
 
   <div class="app-container">
 
-    <el-form label-width="150px" inline>
+    <el-form label-width="100px" inline>
       <el-form-item :label="`选择${titleType}:`" size="mini">
         <el-select
           v-model="tempDataForm.project_id"
@@ -59,7 +59,7 @@
     <el-row>
 
       <!-- 第一列服务树 -->
-      <el-col style="width: 20%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+      <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="projectTab" class="table_padding table_project">
           <el-tab-pane :label="projectTab" :name="projectTab">
             <div class="custom-tree-container">
@@ -135,7 +135,7 @@
       </el-col>
 
       <!-- 第二列，接口列表 -->
-      <el-col style="width: 79%; margin-left: 5px">
+      <el-col style="width: 84%; margin-left: 5px">
         <!-- 接口管理组件 -->
         <apiManage
           v-if="dataType === 'api'"
@@ -219,6 +219,18 @@
       :dataType="dataType"
     ></runProcess>
 
+    <showApiFromDrawer
+      v-if="dataType === 'api'"
+      :api-list="showApiList"
+      :case-id="undefined"
+      :marker="marker"
+    ></showApiFromDrawer>
+
+    <showApiUseDrawer
+      v-if="dataType === 'api'"
+      :case-list="showCaseList"
+      :marker="marker"
+    ></showApiUseDrawer>
   </div>
 
 
@@ -230,6 +242,8 @@ import apiManage from '@/views/apiTest/api'  // 接口管理组件
 import pageManage from '@/components/business/page/index.vue'
 import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
 import runProcess from '@/components/runProcess'  // 测试执行进度组件
+import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
+import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import {ellipsis, arrayToTree} from "@/utils/parseData"
 
@@ -260,6 +274,7 @@ import {
   postModule as appUiPostModule,
   putModule as appUiPutModule
 } from "@/apis/appUiTest/module";
+import {phoneList, serverList} from "@/apis/appUiTest/env";
 
 export default {
   name: 'index',
@@ -268,7 +283,9 @@ export default {
     apiManage,
     pageManage,
     selectRunEnv,
-    runProcess
+    runProcess,
+    showApiFromDrawer,
+    showApiUseDrawer
   },
   directives: {waves},
   data() {
@@ -304,6 +321,9 @@ export default {
       currentLabel: '',
 
       queryAddr: '',
+      marker: 'module',
+      showApiList: [],
+      showCaseList: [],
 
       projectListUrl: '',
       moduleTreeUrl: '',
@@ -327,12 +347,21 @@ export default {
       this.deleteModuleUrl = webUiDeleteModule
       this.postModuleUrl = webUiPostModule
       this.putModuleUrl = webUiPutModule
+      getConfigByName({'name': 'browser_name'}).then(response => {
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+      })
     }else{
       this.projectListUrl = appUiProjectList
       this.moduleTreeUrl = appUiModuleTree
       this.deleteModuleUrl = appUiDeleteModule
       this.postModuleUrl = appUiPostModule
       this.putModuleUrl = appUiPutModule
+      serverList().then(response => {
+        this.$busEvents.data.runServerList = response.data.data
+      })
+      phoneList().then(response => {
+        this.$busEvents.data.runPhoneList = response.data.data
+      })
     }
 
     this.getProjectList()
@@ -343,14 +372,20 @@ export default {
     // 获取接口归属
     getApiMsgBelongTo() {
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showApiList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+        }
       })
     },
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        this.showMessage(this, response)
+        if (this.showMessage(this, response)){
+          this.showCaseList = response.data
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+        }
       })
     },
 

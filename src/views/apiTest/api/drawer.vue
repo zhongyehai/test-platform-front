@@ -2,10 +2,9 @@
   <!-- 新增/修改接口表单 -->
   <el-drawer
     :title=" drawerType === 'update' ? '修改接口' : '新增接口'"
-    :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction"
-    size="80%">
+    size="85%">
     <!-- 接口所属信息 -->
     <el-form style="margin-left: 20px;margin-right: 20px" label-width="100px">
 

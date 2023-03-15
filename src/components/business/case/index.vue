@@ -22,7 +22,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="用例名称" min-width="46%">
+          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="用例名称" min-width="55%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
@@ -51,7 +51,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" align="center" min-width="14%">
+          <el-table-column label="操作" align="center" min-width="20%">
             <template slot-scope="scope">
 
               <!-- 运行用例 -->
@@ -59,17 +59,15 @@
                 type="text"
                 size="mini"
                 slot="reference"
-                icon="el-icon-video-play"
                 @click="clickRunCase(scope.row)"
-              ></el-button>
+              >运行</el-button>
 
               <!--修改用例-->
               <el-button
                 type="text"
                 size="mini"
                 style="margin-right: 8px"
-                icon="el-icon-edit"
-                @click="editCase(scope.row)">
+                @click="editCase(scope.row)">修改
               </el-button>
 
               <!-- 复制用例 -->
@@ -88,8 +86,7 @@
                   slot="reference"
                   type="text"
                   size="mini"
-                  icon="el-icon-document-copy"
-                ></el-button>
+                >复制</el-button>
               </el-popover>
 
               <!-- 删除用例 -->
@@ -108,9 +105,8 @@
                   style="color: red"
                   type="text"
                   size="mini"
-                  icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
-                ></el-button>
+                >删除</el-button>
               </el-popover>
             </template>
           </el-table-column>
@@ -131,7 +127,6 @@
       :dataType="dataType"
       :currentProjectId="currentProjectId"
       :currentSetId="currentSetId"
-      :dataTypeMapping="$busEvents.data.dataTypeMappingList"
     ></caseDrawer>
 
   </div>

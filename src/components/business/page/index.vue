@@ -17,7 +17,7 @@
           row-key="id"
           stripe
         >
-          <el-table-column prop="num" label="序号" align="center" min-width="7%">
+          <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
@@ -34,7 +34,7 @@
             :show-overflow-tooltip=true
             prop="addr"
             align="center"
-            min-width="47%">
+            min-width="50%">
             <template slot="header">
               <el-tooltip
                 class="item"
@@ -63,7 +63,7 @@
           <!--            </template>-->
           <!--          </el-table-column>-->
 
-          <el-table-column label="操作" align="center" min-width="14%">
+          <el-table-column label="操作" align="center" min-width="20%">
             <template slot-scope="scope">
 
               <!--修改页面-->
@@ -71,8 +71,7 @@
                 type="text"
                 size="mini"
                 style="margin-right: 8px"
-                icon="el-icon-edit"
-                @click="showEditForm(scope.row)">
+                @click="showEditForm(scope.row)">修改
               </el-button>
 
               <!-- 复制页面 -->
@@ -91,8 +90,7 @@
                   slot="reference"
                   type="text"
                   size="mini"
-                  icon="el-icon-document-copy"
-                ></el-button>
+                >复制页面</el-button>
               </el-popover>
 
               <!--上传元素-->
@@ -100,8 +98,7 @@
                 type="text"
                 size="mini"
                 style="margin-right: 8px"
-                icon="el-icon-upload"
-                @click="showUploadFileDialog(scope.row)">
+                @click="showUploadFileDialog(scope.row)">导入元素
               </el-button>
 
               <!-- 删除页面 -->
@@ -120,9 +117,8 @@
                   style="color: red"
                   type="text"
                   size="mini"
-                  icon="el-icon-delete"
                   :loading="scope.row.isShowDeleteLoading"
-                ></el-button>
+                >删除</el-button>
               </el-popover>
             </template>
           </el-table-column>

@@ -2,11 +2,11 @@
   <div>
     <el-drawer
       :title=" currentStep.id ? '修改步骤' : '新增步骤'"
-      size="70%"
+      size="85%"
       :append-to-body="true"
-      :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">
+<!--      :wrapperClosable="false"-->
       <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
         <!-- 步骤信息 -->
         <el-tab-pane label="步骤信息" name="editStepInfo">
@@ -180,16 +180,8 @@
         <el-tab-pane label="元素信息" name="element">
           <el-form label-width="120px">
 
-            <el-form-item label="所属项目" prop="projectName" size="small">
-              <el-input disabled v-model="currentElement.projectName"></el-input>
-            </el-form-item>
-
-            <el-form-item label="所属页面" prop="pageName" size="small">
-              <el-input disabled v-model="currentElement.pageName"></el-input>
-            </el-form-item>
-
-            <el-form-item label="元素名" prop="elementName" size="small">
-              <el-input disabled v-model="currentElement.name"></el-input>
+            <el-form-item label="元素归属" prop="elementFrom" size="small">
+              <el-input disabled v-model="currentElement.elementFrom"></el-input>
             </el-form-item>
 
             <el-form-item :label="'定位方式'" prop="by" size="mini" class="is-required">
@@ -322,7 +314,8 @@ import {
   changeElementById as appUiChangeElementById,
   elementList as appUiElementList,
   getElement as appUiGetElement,
-  putElement as appUiPutElement
+  putElement as appUiPutElement,
+  elementFrom as appUiElementFrom,
 } from "@/apis/appUiTest/element";
 import {postStep as appUiPostStep, putStep as appUiPutStep} from "@/apis/appUiTest/step"
 
@@ -332,7 +325,8 @@ import {
   changeElementById as webUiChangeElementById,
   elementList as webUiElementList,
   getElement as webUiGetElement,
-  putElement as webUiPutElement
+  putElement as webUiPutElement,
+  elementFrom as webUiElementFrom,
 } from "@/apis/webUiTest/element";
 import {postStep as webUiPostStep, putStep as webUiPutStep} from "@/apis/webUiTest/step"
 
@@ -391,7 +385,8 @@ export default {
       getElementUrl: '',
       putElementUrl: '',
       postStepUrl: '',
-      putStepUrl: ''
+      putStepUrl: '',
+      elementFromUrl: ''
     }
   },
 
@@ -495,6 +490,10 @@ export default {
           this.currentStep.element_id = this.currentElement.id
           this.drawerIsShow = true
 
+          this.elementFromUrl({id: step.id}).then(response => {
+            this.$set(this.currentElement, 'elementFrom', response.message)
+          })
+
         } else if (drawerType === 'edit') {  // 修改步骤
 
           // 获取元素信息
@@ -502,14 +501,8 @@ export default {
             this.currentElement = response.data
           })
 
-          // 获取元素的页面信息
-          this.getPageUrl({id: this.currentElement.page_id}).then(response => {
-            this.$set(this.currentElement, 'pageName', response.data.name)
-          })
-
-          // 获取元素的项目信息
-          this.getProjectUrl({id: this.currentElement.project_id}).then(response => {
-            this.$set(this.currentElement, 'projectName', response.data.name)
+          this.elementFromUrl({id: step.id}).then(response => {
+            this.$set(this.currentElement, 'elementFrom', response.message)
           })
 
           this.currentStep = step
@@ -543,6 +536,7 @@ export default {
       this.putElementUrl = webUiPutElement
       this.postStepUrl = webUiPostStep
       this.putStepUrl = webUiPutStep
+      this.elementFromUrl = webUiElementFrom
     } else {
       this.getProjectUrl = appUiGetProject
       this.getPageUrl = appUiGetPage
@@ -552,6 +546,7 @@ export default {
       this.putElementUrl = appUiPutElement
       this.postStepUrl = appUiPostStep
       this.putStepUrl = appUiPutStep
+      this.elementFromUrl = appUiElementFrom
     }
   },
 

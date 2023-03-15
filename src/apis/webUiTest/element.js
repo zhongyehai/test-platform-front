@@ -43,6 +43,11 @@ export function elementSort(data) {
   return request({url: currentBaseDir + '/sort', method: 'put', data: data});
 }
 
+// 查询元素归属
+export function elementFrom(params) {
+  return request({url: currentBaseDir + '/from', method: 'get', params: params});
+}
+
 // 导入元素
 export function uploadElement(data) {
   return request({url: currentBaseDir + '/upload', method: 'post', data: data});

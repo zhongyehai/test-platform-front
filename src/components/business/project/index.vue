@@ -136,7 +136,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'操作'" align="center" min-width="15%" class-name="small-padding fixed-width">
+      <el-table-column :label="'操作'" align="center" min-width="20%" class-name="small-padding fixed-width">
         <template slot-scope="{row, $index}">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
@@ -145,25 +145,22 @@
             slot="reference"
             type="text"
             size="mini"
-            icon="el-icon-bottom-left"
             @click="clickPullButton(row)"
-          ></el-button>
+          >拉取</el-button>
 
           <!-- 编辑服务 -->
           <el-button
             type="text"
             size="mini"
-            icon="el-icon-edit"
-            @click="showEditForm(row)">
+            @click="showEditForm(row)">修改
           </el-button>
 
           <!-- 编辑服务环境 -->
           <el-button
             type="text"
             size="mini"
-            style="margin-right: 5px"
-            icon="el-icon-edit-outline"
-            @click="showEditEnvForm(row)">
+            style="margin-right: 10px"
+            @click="showEditEnvForm(row)">环境
           </el-button>
 
           <!--删除服务-->
@@ -182,9 +179,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="row.deleteButtonIsLoading"
-            ></el-button>
+            >删除</el-button>
           </el-popover>
 
         </template>
@@ -270,7 +266,7 @@ export default {
         {fieldName: 'name', label: this.dataType === 'appUi' ? 'APP名' : '项目名', minWidth: '20%'},
         {fieldName: 'created_time', label: '创建时间', minWidth: '10%'},
         {fieldName: 'manager', label: '负责人', minWidth: '10%'},
-        {fieldName: 'update_user', label: '最后修改人', minWidth: '15%'}
+        {fieldName: 'update_user', label: '最后修改人', minWidth: '10%'}
       ],
       currentProject: {},  // 当前选中的服务
       project_list: [],  // 服务列表

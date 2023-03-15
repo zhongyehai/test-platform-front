@@ -28,11 +28,11 @@
           placeholder="输入格式：${func(abc,123)}"
           type="textarea"
           :rows="1"
-          style="width: 90%"
+          style="width: 89%"
         ></el-input>
         <el-button
           type="primary"
-          style="margin-left: 10px"
+          style="margin-left: 5px"
           size="mini"
           :loading="deBugButtonIsLoading"
           @click="debugFunc">调试
@@ -97,8 +97,7 @@
       :visible.sync="debugResultDrawerIsShow"
       :direction="direction">
       <div class="demo-drawer__content" style="margin-left: 20px">
-        <pre class="el-collapse-item-content" style="overflow: auto">{{ debugResultDetail }}</pre>
-        <span style="color: red">注：触发调试函数不会自动保存函数文件，请自行点击保存按钮手动保存修改</span>
+        <pre class="el-collapse-item-content" style="overflow: auto">{{ debugResultDetail || '没有返回值或返回值为null' }}</pre>
       </div>
     </el-drawer>
 
@@ -159,17 +158,23 @@ export default {
   },
 
   methods: {
+
+    showDetail(res){
+      this.debugResultDetail = res.message.result
+      this.debugResultMessage = res.message.msg
+      this.debugResultDrawerIsShow = true
+    },
+
     // 新增函数文件
     creteFuncFile() {
       this.submitButtonIsLoading = true
       postFuncFile(this.tempFunc).then(res => {
         this.submitButtonIsLoading = false
         if (res.message.msg) {
-          this.debugResultDetail = res.message.result
-          this.debugResultMessage = res.message.msg
-          this.debugResultDrawerIsShow = true
+          this.showDetail(res)
         } else {
           if (this.showMessage(this, res)) {
+            this.tempFunc.id = res.data.id
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
             this.funcFileDrawerIsShow = false
           }
@@ -183,9 +188,7 @@ export default {
       putFuncFile(this.tempFunc).then(res => {
         this.submitButtonIsLoading = false
         if (res.message.msg) {
-          this.debugResultDetail = res.message.result
-          this.debugResultMessage = res.message.msg
-          this.debugResultDrawerIsShow = true
+          this.showDetail(res)
         } else {
           if (this.showMessage(this, res)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
@@ -203,15 +206,24 @@ export default {
       if (this.tempFunc.id) {
         putFuncFile(this.tempFunc).then(res => {
           this.submitButtonIsLoading = false
-          if (this.showMessage(this, res)) {
-            this.runDeBug()
+          if (res.message.msg) {
+            this.showDetail(res)
+          } else {
+            if (this.showMessage(this, res)) {
+              this.runDeBug()
+            }
           }
         })
       } else {
         postFuncFile(this.tempFunc).then(res => {
           this.submitButtonIsLoading = false
-          if (this.showMessage(this, res)) {
-            this.runDeBug()
+          if (res.message.msg) {
+            this.showDetail(res)
+          } else {
+            if (this.showMessage(this, res)) {
+              this.tempFunc.id = res.data.id
+              this.runDeBug()
+            }
           }
         })
       }
@@ -221,14 +233,9 @@ export default {
       this.deBugButtonIsLoading = true
       debugFuncFile({'id': this.tempFunc.id, 'expression': this.expression}).then(res => {
         this.deBugButtonIsLoading = false
-
-        if (res.result) {
-          this.debugResultDetail = res.result
-          this.debugResultMessage = res.message
-          this.debugResultDrawerIsShow = true
-        } else {
-          this.showMessage(this, res)
-        }
+        this.debugResultDetail = res.result
+        this.debugResultMessage = res.message
+        this.debugResultDrawerIsShow = true
       })
     },
 

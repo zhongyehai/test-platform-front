@@ -55,6 +55,8 @@ import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import {dataTypeTitleMappingContent} from "@/utils/mapping";
+import {phoneList, serverList} from "@/apis/appUiTest/env";
+import {getConfigByName} from "@/apis/config/config";
 
 export default {
   name: 'projectTree',
@@ -100,8 +102,17 @@ export default {
       this.projectListUrl = apiProjectList
     } else if (this.dataType === "webUi") {
       this.projectListUrl = webUiProjectList
+      getConfigByName({'name': 'browser_name'}).then(response => {
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+      })
     } else {
       this.projectListUrl = appUiProjectList
+      serverList().then(response => {
+        this.$busEvents.data.runServerList = response.data.data
+      })
+      phoneList().then(response => {
+        this.$busEvents.data.runPhoneList = response.data.data
+      })
     }
 
     // 初始化服务列表, 取20条数据

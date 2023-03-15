@@ -1,14 +1,13 @@
 <template>
   <el-drawer
     :title="tempEnv.id ? '修改环境' : '新增环境'"
-    size="70%"
-    :wrapperClosable="false"
+    size="90%"
     :visible.sync="drawerIsShow"
     :direction="direction">
     <div class="demo-drawer__content">
 
       <el-row>
-        <el-col :span="dataType !== 'app' ? 3 : 0">
+        <el-col :span="dataType !== 'appUi' ? 3 : 0">
           <el-tabs :tab-position="tabPosition" v-model="activeName" :before-leave="changeTab">
             <el-tab-pane
               :name="runEnv.id.toString()"
@@ -19,9 +18,9 @@
           </el-tabs>
         </el-col>
 
-        <el-col :span="dataType !== 'app' ? 21 : 24">
+        <el-col :span="dataType !== 'appUi' ? 21 : 24">
           <div>
-            <el-form label-width="120px" v-show="dataType !== 'app'">
+            <el-form label-width="120px" v-show="dataType !== 'appUi'">
               <el-form-item :label="'环境域名'" class="is-required" size="mini">
                 <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%"/>
                 <el-popover
@@ -97,7 +96,7 @@
       <div class="demo-drawer__footer">
         <!-- 同步环境信息 -->
         <el-button
-          v-if="dataType !== 'app'"
+          v-if="dataType !== 'appUi'"
           style="float: left"
           type="primary"
           size="mini"

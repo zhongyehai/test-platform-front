@@ -61,12 +61,12 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="'问题内容'" prop="name" class="is-required" size="mini">
+      <el-form-item :label="'问题内容'" prop="name" class="is-required">
         <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'备注'"/>
       </el-form-item>
 
-      <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
-        <el-input v-model="tempHit.report_id"/>
+      <el-form-item :label="'报告id'" prop="report_id" class="is-required">
+        <el-input size="mini" v-model="tempHit.report_id"/>
       </el-form-item>
 
       <el-form-item :label="'备注'" prop="desc">

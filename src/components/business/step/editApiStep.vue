@@ -2,11 +2,11 @@
 
   <el-drawer
     :title=" drawerType === 'update' ? '修改步骤' : '新增步骤'"
-    size="70%"
+    size="85%"
     :append-to-body="true"
-    :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
+<!--    :wrapperClosable="false"-->
     <el-tabs v-model="activeName" v-show="currentStep.api_id" style="margin-left: 20px;margin-right: 20px">
       <!-- 步骤信息 -->
       <el-tab-pane label="步骤信息" name="editStepInfo">
@@ -386,7 +386,7 @@ export default {
 
           // 获取接口的所属信息
           apiMsgBelongTo({id: step.api_id}).then(response => {
-            this.$set(this.currentStep, 'apiFrom', response.message)
+            this.$set(this.currentStep, 'apiFrom', response.data[0].from)
           })
 
           this.currentStep = step

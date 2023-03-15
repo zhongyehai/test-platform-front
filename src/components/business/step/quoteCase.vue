@@ -52,13 +52,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" align="center" min-width="80%">
+        <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" align="center" min-width="65%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="10%">
+        <el-table-column label="操作" align="center" min-width="25%">
           <template slot-scope="scope">
 
             <!-- 复制用例 -->
@@ -70,8 +70,7 @@
               <el-button
                 type="text"
                 size="mini"
-                icon="el-icon-document-copy"
-                @click.native="copyCaseStepAsStep(scope.row)">
+                @click.native="copyCaseStepAsStep(scope.row)">复制步骤
               </el-button>
             </el-tooltip>
 
@@ -84,10 +83,18 @@
               <el-button
                 type="text"
                 size="mini"
-                icon="el-icon-d-arrow-left"
-                @click.native="addQuote(scope.row)">
+                @click.native="addQuote(scope.row)">引用用例
               </el-button>
             </el-tooltip>
+
+            <!-- 查看用例详情 -->
+            <el-button
+              slot="reference"
+              type="text"
+              size="mini"
+              style="margin-right: 5px"
+              @click="showCaseRemark(scope.row.id)"
+            >查看详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -246,7 +253,7 @@ export default {
         new_api['extracts'] = [{"key": "", "remark": null, "value": ""}]
         new_api['validates'] = [{"key": "", "remark": null, "validate_type": "", "value": ""}]
         new_api['data_driver'] = []
-        this.$bus.$emit(this.$busEvents.quoteCaseToStep, new_api)
+        this.$bus.$emit(this.$busEvents.quoteCaseToStep, new_api, null)
       } else {
         this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
       }
@@ -263,6 +270,10 @@ export default {
       } else {
         this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
       }
+    },
+
+    showCaseRemark(caseId) {
+      this.$bus.$emit(this.$busEvents.drawerIsCommit, 'showStepList', caseId)
     }
   },
   watch: {}

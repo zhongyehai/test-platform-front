@@ -3,7 +3,7 @@
   <el-dialog title="选择运行环境" append-to-body :visible.sync="dialogIsShow" :close-on-click-modal="false" width="50%">
 
     <!-- 选择运行环境 -->
-    <div>
+    <div v-if="dataType !== 'appUi'">
       <div>
         <label>选择环境：</label>
       </div>
@@ -40,7 +40,8 @@
       <div style="margin-top: 10px">
         <el-radio
           v-model="runBrowser"
-          :label="key" v-for="(value, key) in runBrowserNameData " :key="key">{{ value }}
+          :label="key"
+          v-for="(value, key) in $busEvents.data.runBrowserNameDict " :key="key">{{ value }}
         </el-radio>
       </div>
     </div>
@@ -109,7 +110,7 @@
               size="mini"
             >
               <el-option
-                v-for="server in runServerList"
+                v-for="server in $busEvents.data.runServerList"
                 :key="server.id"
                 :label="`${server.name}   (最近一次访问：${statusContentMapping[server.status]})`"
                 :value="server.id"
@@ -131,7 +132,7 @@
               size="mini"
             >
               <el-option
-                v-for="phone in runPhoneList"
+                v-for="phone in $busEvents.data.runPhoneList"
                 :key="phone.id"
                 :label="phone.name"
                 :value="phone.id"
@@ -170,7 +171,6 @@ export default {
       dialogIsShow: false,
       runEnvData: [],
       runModeData: {},
-      runBrowserNameData: {},
       runEnv: undefined,
       runBrowser: undefined,
       runServer: undefined,
@@ -178,8 +178,6 @@ export default {
       noReset: undefined,
       runUnit: 'api',
       runType: '0',
-      runServerList: [],
-      runPhoneList: [],
       showSelectRunModel: false,
 
       statusContentMapping: appiumServerRequestStatusMappingContent,
@@ -214,13 +212,9 @@ export default {
 
     // 获取浏览器配置
     initBrowserName() {
-      getConfigByName({'name': 'browser_name'}).then(response => {
-        this.runBrowserNameData = JSON.parse(response.data.value)
-        let keys = Object.keys(this.runBrowserNameData)
-        if (keys.length > 0) {
-          this.runBrowser = keys[0]
-        }
-      })
+      if (Object.keys(this.$busEvents.data.runBrowserNameDict).length > 0) {
+        this.runBrowser = Object.keys(this.$busEvents.data.runBrowserNameDict)[0]
+      }
     },
 
     // 获取执行模式配置
@@ -232,19 +226,12 @@ export default {
 
     // 获取app测试的运行环境
     getRunAppEnv() {
-      serverList().then(response => {
-        this.runServerList = response.data.data
-        if (this.runServerList.length > 0) {
-          this.runServer = this.runServerList[0].id
-        }
-      })
-
-      phoneList().then(response => {
-        this.runPhoneList = response.data.data
-        if (this.runPhoneList.length > 0) {
-          this.runPhone = this.runPhoneList[0].id
-        }
-      })
+      if (this.$busEvents.data.runServerList.length > 0) {
+        this.runServer = this.$busEvents.data.runServerList[0].id
+      }
+      if (this.$busEvents.data.runPhoneList.length > 0) {
+        this.runPhone = this.$busEvents.data.runPhoneList[0].id
+      }
     }
   },
 
