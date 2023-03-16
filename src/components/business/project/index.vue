@@ -209,7 +209,6 @@
     <!-- 服务环境抽屉 -->
     <projectEnvDrawer
       :dataType="dataType"
-      :dataTypeMapping="dataTypeMapping"
     ></projectEnvDrawer>
   </div>
 </template>
@@ -275,7 +274,6 @@ export default {
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
-      dataTypeMapping: [],
       sortable: null,
       oldList: [],
       newList: [],
@@ -464,7 +462,7 @@ export default {
 
     // 从后端获取数据类型映射
     getConfigByName({'name': 'data_type_mapping'}).then(response => {
-      this.dataTypeMapping = JSON.parse(response.data.value)
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
     })
 
   },

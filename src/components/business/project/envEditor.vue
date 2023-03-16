@@ -55,7 +55,6 @@
                 <variablesView
                   ref="variablesView"
                   :currentData="tempEnv.variables"
-                  :dataTypeMapping="dataTypeMapping"
                   :placeholderKey="'key'"
                   :placeholderValue="'value'"
                   :placeholderDesc="'备注'"

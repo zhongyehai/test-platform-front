@@ -2,43 +2,6 @@
 
   <div class="app-container">
 
-    <el-form label-width="100px" inline>
-      <el-form-item :label="'报告名：'" size="mini">
-        <el-input
-          v-model="projectName"
-          class="input-with-select"
-          placeholder="报告名，模糊查询"
-          size="mini"
-          style="width: 400px"
-          clearable
-        >
-        </el-input>
-      </el-form-item>
-
-      <el-form-item :label="'创建人：'" size="mini">
-        <el-select
-          v-model="createUser"
-          placeholder="创建人"
-          size="mini"
-          style="width: 400px"
-          filterable
-          clearable
-          default-first-option
-        >
-          <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-        </el-select>
-
-      </el-form-item>
-
-      <el-button
-        type="primary"
-        size="mini"
-        @click="getReportList">
-        {{ '查询' }}
-      </el-button>
-
-    </el-form>
-
     <el-row>
       <!-- 服务树 -->
       <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
@@ -52,21 +15,90 @@
 
       <!-- 测试报告 -->
       <el-col style="width: 85%">
+
         <!-- 测试报告列表 -->
         <el-tabs v-model="reportTab" class="table_padding" style="margin-left: 5px">
           <el-tab-pane label="测试报告列表" :name="reportTab">
+
+            <el-form label-width="100px" inline>
+              <el-form-item :label="'报告名：'" size="mini">
+                <el-input
+                  v-model="projectName"
+                  class="input-with-select"
+                  placeholder="报告名，模糊查询"
+                  size="mini"
+                  style="width: 400px"
+                  clearable
+                >
+                </el-input>
+              </el-form-item>
+
+              <el-form-item :label="'创建人：'" size="mini">
+                <el-select
+                  v-model="createUser"
+                  placeholder="创建人"
+                  size="mini"
+                  style="width: 200px"
+                  filterable
+                  clearable
+                  default-first-option
+                >
+                  <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                </el-select>
+
+              </el-form-item>
+
+              <el-button
+                type="primary"
+                size="mini"
+                @click="getReportList"
+              >
+                {{ '查询' }}
+              </el-button>
+
+              <el-popover
+                v-show="selectReport.length > 0"
+                placement="top"
+                popper-class="down-popover"
+                v-model="showBatchDelete"
+              >
+                <p>确定删除所选中的测试报告?</p>
+                <p style="color: red">关联了失败记录的测试报告不会被删除</p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="cancelBatchDeletePopover()">取消</el-button>
+                  <el-button type="primary" size="mini" @click="delReport">确定</el-button>
+                </div>
+                <el-button
+                  slot="reference"
+                  type="primary"
+                  size="mini"
+                  style="margin-left: 5px"
+                >批量删除
+                </el-button>
+              </el-popover>
+
+            </el-form>
+
             <el-table
               ref="reportTable"
               :data="reportDataList"
               stripe
+              @selection-change="clickSelectAll"
             >
-              <el-table-column prop="id" label="序号" align="center" min-width="8%">
+
+              <el-table-column
+                type="selection"
+                min-width="2%"
+              >
+              </el-table-column>
+
+              <el-table-column prop="id" label="序号" align="center" min-width="5%">
                 <template slot-scope="scope">
                   <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="20%">
+              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="18%">
               </el-table-column>
 
               <el-table-column label="生成时间" align="center" min-width="15%">
@@ -104,7 +136,8 @@
               <el-table-column label="是否生成" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <el-tag size="small"
-                          :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'">
+                          :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'"
+                  >
                     {{ scope.row.process === 3 && scope.row.status === 2 ? '已生成' : '未生成' }}
                   </el-tag>
                 </template>
@@ -119,7 +152,9 @@
                     size="mini"
                     style="margin-right: 10px"
                     v-show="scope.row.process === 3 && scope.row.status === 2"
-                    @click.native="openReportById(scope.row.id)">查看</el-button>
+                    @click.native="openReportById(scope.row.id)"
+                  >查看
+                  </el-button>
 
                   <!-- 删除报告 -->
                   <el-popover
@@ -127,7 +162,8 @@
                     v-show="scope.row.process === 3 && scope.row.status === 2"
                     placement="top"
                     popper-class="down-popover"
-                    v-model="scope.row.deletePopoverIsShow">
+                    v-model="scope.row.deletePopoverIsShow"
+                  >
                     <p>确定删除【{{ scope.row.name }}】?</p>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -138,7 +174,8 @@
                       type="text"
                       size="mini"
                       style="color: red"
-                    >删除</el-button>
+                    >删除
+                    </el-button>
                   </el-popover>
 
                 </template>
@@ -182,17 +219,20 @@ import {
   downloadReport as appUiDownloadReport
 } from '@/apis/appUiTest/report'
 
-import {getConfigByName} from "@/apis/config/config";
-import {userList} from "@/apis/system/user";
-import {runEnvList} from "@/apis/config/runEnv";
+import { getConfigByName } from '@/apis/config/config'
+import { userList } from '@/apis/system/user'
+import { runEnvList } from '@/apis/config/runEnv'
 
-import {reportStatusMappingContent, reportStatusMappingTagType, reportTriggerTypeMappingContent} from "@/utils/mapping";
-
+import {
+  reportStatusMappingContent,
+  reportStatusMappingTagType,
+  reportTriggerTypeMappingContent
+} from '@/utils/mapping'
 
 export default {
   name: 'index',
-  props: ["dataType"],
-  components: {Pagination, projectTreeView},
+  props: ['dataType'],
+  components: { Pagination, projectTreeView },
   data() {
     return {
       reportTab: 'reportTab',
@@ -209,6 +249,8 @@ export default {
       reportStatusContent: reportStatusMappingContent,
       reportStatusTagType: reportStatusMappingTagType,
       reportTriggerType: reportTriggerTypeMappingContent,
+      selectReport: [],
+      showBatchDelete: false,
 
       reportListUrl: '',
       deleteReportUrl: '',
@@ -216,6 +258,11 @@ export default {
     }
   },
   methods: {
+
+    // 全选
+    clickSelectAll(val) {
+      this.selectReport = val
+    },
 
     // 获取用户信息，同步请求
     async getUserList() {
@@ -240,7 +287,7 @@ export default {
     // 打开测试报告
     openReportById(reportId) {
       // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
+      let { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId } })
       window.open(href, '_blank')
     },
 
@@ -256,89 +303,102 @@ export default {
     renderHtml(data, strFileName, strMimeType) {
 
       let self = window, // this script is only for browsers anyway...
-        defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
+        defaultMime = 'application/octet-stream', // this default mime also triggers iframe downloads
         mimeType = strMimeType || defaultMime,
         payload = data,
-        anchor = document.createElement("a"),
-        toString = function (a) {
-          return String(a);
+        anchor = document.createElement('a'),
+        toString = function(a) {
+          return String(a)
         },
         myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
-        fileName = strFileName || "download",
+        fileName = strFileName || 'download',
         blob,
-        reader;
-      myBlob = myBlob.call ? myBlob.bind(self) : Blob;
+        reader
+      myBlob = myBlob.call ? myBlob.bind(self) : Blob
 
       //go ahead and download dataURLs right away
       blob = payload instanceof myBlob ?
         payload :
-        new myBlob([payload], {type: mimeType});
-
+        new myBlob([payload], { type: mimeType })
 
       function saver(url, winMode) {
         if ('download' in anchor) { //html5 A[download]
-          anchor.href = url;
-          anchor.setAttribute("download", fileName);
-          anchor.className = "download-js-link";
-          anchor.innerHTML = "downloading...";
-          anchor.style.display = "none";
-          document.body.appendChild(anchor);
-          setTimeout(function () {
-            anchor.click();
-            document.body.removeChild(anchor);
+          anchor.href = url
+          anchor.setAttribute('download', fileName)
+          anchor.className = 'download-js-link'
+          anchor.innerHTML = 'downloading...'
+          anchor.style.display = 'none'
+          document.body.appendChild(anchor)
+          setTimeout(function() {
+            anchor.click()
+            document.body.removeChild(anchor)
             if (winMode === true) {
-              setTimeout(function () {
-                self.URL.revokeObjectURL(anchor.href);
-              }, 250);
+              setTimeout(function() {
+                self.URL.revokeObjectURL(anchor.href)
+              }, 250)
             }
-          }, 66);
-          return true;
+          }, 66)
+          return true
         }
 
       }//end saver
 
       if (self.URL) { // simple fast and modern way using Blob and URL:
-        saver(self.URL.createObjectURL(blob), true);
+        saver(self.URL.createObjectURL(blob), true)
       } else {
         // handle non-Blob()+non-URL browsers:
-        if (typeof blob === "string" || blob.constructor === toString) {
+        if (typeof blob === 'string' || blob.constructor === toString) {
           try {
-            return saver("data:" + mimeType + ";base64," + self.btoa(blob));
+            return saver('data:' + mimeType + ';base64,' + self.btoa(blob))
           } catch (y) {
-            return saver("data:" + mimeType + "," + encodeURIComponent(blob));
+            return saver('data:' + mimeType + ',' + encodeURIComponent(blob))
           }
         }
 
         // Blob but not URL support:
-        reader = new FileReader();
-        reader.onload = function () {
-          saver(this.result);
-        };
-        reader.readAsDataURL(blob);
+        reader = new FileReader()
+        reader.onload = function() {
+          saver(this.result)
+        }
+        reader.readAsDataURL(blob)
       }
-      return true;
+      return true
     },
 
     cancelDeletePopover(report) {
       this.$set(report, 'deletePopoverIsShow', false)
     },
 
+    cancelBatchDeletePopover() {
+      this.showBatchDelete = false
+    },
+
     // 删除报告
     delReport(report) {
-      this.$set(report, 'deletePopoverIsShow', false)
-      this.deleteReportUrl({id: report.id}).then(response => {
+      // 删除单个
+      let reportIdList = []
+      if (report.id) {
+        this.$set(report, 'deletePopoverIsShow', false)
+        reportIdList = [report.id]
+      } else { // 批量删除
+        this.showBatchDelete = false
+        this.selectReport.forEach(report =>{
+          reportIdList.push(report.id)
+        })
+      }
+      this.deleteReportUrl({ id: reportIdList }).then(response => {
         if (this.showMessage(this, response)) {
           this.getReportList()
         }
       })
-    },
+    }
   },
 
   mounted() {
     this.getUserList()
 
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
-      if (_type === 'project'){
+      if (_type === 'project') {
         this.projectId = project.id
         this.getReportList()
       }
@@ -351,21 +411,21 @@ export default {
       })
     })
 
-    getConfigByName({'name': 'run_type'}).then(response => {
+    getConfigByName({ 'name': 'run_type' }).then(response => {
       this.runTypeDict = JSON.parse(response.data.value)
     })
   },
 
   created() {
-    if (this.dataType === "api"){
+    if (this.dataType === 'api') {
       this.reportListUrl = apiReportList
       this.deleteReportUrl = apiDeleteReport
       this.downloadReportUrl = apiDownloadReport
-    }else if (this.dataType === "webUi"){
+    } else if (this.dataType === 'webUi') {
       this.reportListUrl = webUiReportList
       this.deleteReportUrl = webUiDeleteReport
       this.downloadReportUrl = webUiDownloadReport
-    }else {
+    } else {
       this.reportListUrl = appUiReportList
       this.deleteReportUrl = appUiDeleteReport
       this.downloadReportUrl = appUiDownloadReport
