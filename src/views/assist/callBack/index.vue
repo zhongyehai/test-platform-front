@@ -52,7 +52,7 @@
 
     <el-drawer
       :title="'回调详情'"
-      size="60%"
+      size="70%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">

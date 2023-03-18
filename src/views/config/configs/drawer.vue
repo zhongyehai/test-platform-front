@@ -3,7 +3,7 @@
   <!-- 新增/修改配置表单 -->
   <el-drawer
     :title=" drawerType === 'add' ? '新增配置' : '修改配置'"
-    size="40%"
+    size="60%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">

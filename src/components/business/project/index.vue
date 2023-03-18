@@ -4,20 +4,20 @@
     <div class="filter-container">
 
       <!-- inline="true"，el-form-item不自动换行 -->
-      <el-form label-width="100px" :inline="true">
+      <el-form label-width="60px" :inline="true">
 
-        <el-form-item :label="'服务名：'" size="mini">
+        <el-form-item :label="`${titleType}`" size="mini">
           <el-input
             v-model="listQuery.name"
             class="input-with-select"
-            placeholder="服务名，支持关键字查询"
+            :placeholder="`${titleType}名，支持关键字查询`"
             size="mini"
             clearable
             style="width: 200px">
           </el-input>
         </el-form-item>
 
-        <el-form-item :label="'创建人：'" size="mini">
+        <el-form-item label="创建人" size="mini">
           <el-select
             v-model="listQuery.create_user"
             :placeholder="'选择创建人'"
@@ -30,7 +30,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="'负责人：'" size="mini">
+        <el-form-item label="负责人" size="mini">
           <el-select
             v-model="listQuery.manager"
             :placeholder="'选择负责人'"
@@ -252,6 +252,7 @@ export default {
   directives: {waves},
   data() {
     return {
+      titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       // 查询对象
       listQuery: {
         pageNum: 1,

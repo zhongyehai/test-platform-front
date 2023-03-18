@@ -2,11 +2,11 @@
 
   <div class="app-container">
 
-    <el-form label-width="100px" inline>
-      <el-form-item :label="`选择${titleType}:`" size="mini">
+    <el-form label-width="60px" inline>
+      <el-form-item :label="`${titleType}`" size="mini">
         <el-select
           v-model="tempDataForm.project_id"
-          placeholder="选择服务"
+          :placeholder="`选择${titleType}`"
           size="mini"
           style="width: 250px"
           filterable
@@ -27,7 +27,7 @@
 
       </el-form-item>
 
-      <el-form-item v-if="dataType === 'api'" :label="'查询接口：'" size="mini">
+      <el-form-item v-if="dataType === 'api'" label="查接口" size="mini">
         <el-input
           v-model="queryAddr"
           class="input-with-select"

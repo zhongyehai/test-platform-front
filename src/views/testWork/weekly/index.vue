@@ -109,14 +109,14 @@
       :title="productDrawerStatus === 'add'
       ? `新增${productDrawerType === 'product' ? '产品' : '项目'}`
       : `修改${productDrawerType === 'product' ? '产品' : '项目'}`"
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="productDrawerIsShow"
       :direction="direction">
       <el-form
         ref="dataForm"
         :model="tempDataForm"
-        label-position="left"
+        label-position="center"
         label-width="90px"
         style="min-width: 400px;margin-left: 20px;margin-right: 20px">
 

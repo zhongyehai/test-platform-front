@@ -2,9 +2,9 @@
   <div class="app-container">
 
     <div class="filter-container">
-      <el-form label-width="90px" :inline="true">
+      <el-form label-width="70px" :inline="true">
 
-        <el-form-item :label="'选择环境：'" size="mini">
+        <el-form-item :label="'选择环境'" size="mini">
           <el-select
             v-model="listQuery.env"
             :placeholder="'选择环境'"
@@ -12,23 +12,23 @@
             filterable
             size="mini"
             class="filter-item"
-          >
+            style="width: 100%">
             <el-option v-for="env in runEnvList" :key="env.code" :label="env.name" :value="env.code"/>
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="'手机号：'" size="mini">
+        <el-form-item :label="'手机号'" size="mini">
           <el-input
             v-model="listQuery.mobile"
             class="input-with-select"
             placeholder="支持模糊搜索"
             size="mini"
             clearable
-            style="width: 150px">
+            style="width: 100%">
           </el-input>
         </el-form-item>
 
-        <el-form-item :label="'流水号：'" size="mini">
+        <el-form-item :label="'流水号'" size="mini">
           <el-input
             v-model="listQuery.business_order_no"
             placeholder="支持模糊搜索"
@@ -38,7 +38,7 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item :label="'业务状态：'" size="mini">
+        <el-form-item :label="'业务状态'" size="mini">
           <el-select
             v-model="listQuery.business_status"
             :placeholder="'选择业务状态'"
@@ -51,7 +51,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="'使用状态：'" size="mini">
+        <el-form-item :label="'使用状态'" size="mini">
           <el-select
             v-model="listQuery.use_status"
             :placeholder="'选择使用状态'"

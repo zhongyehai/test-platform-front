@@ -2,8 +2,8 @@
 
   <div class="app-container">
 
-    <el-form label-width="100px" inline>
-      <el-form-item :label="'选择服务：'" size="mini">
+    <el-form label-width="60px" inline>
+      <el-form-item label="服务" size="mini">
         <el-select
           v-model="currentProjectId"
           placeholder="选择服务"
@@ -26,7 +26,7 @@
         </el-button>
       </el-form-item>
 
-      <el-form-item v-if="dataType === 'api'" :label="'查询接口：'" size="mini">
+      <el-form-item v-if="dataType === 'api'" label="查接口" size="mini">
         <el-input
           v-model="queryAddr"
           class="input-with-select"

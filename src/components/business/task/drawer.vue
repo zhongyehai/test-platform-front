@@ -1,11 +1,11 @@
 <template>
   <el-drawer
     :title=" tempTask.id ? '修改定时任务' : '新增定时任务'"
-    size="60%"
+    size="75%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
-    <el-form label-width="110px" style="margin-left: 20px;margin-right: 20px">
+    <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
       <el-tabs v-model="activeName">
         <el-tab-pane label="任务信息" name="taskInfo">
@@ -43,7 +43,7 @@
 
             <!-- 选择环境 -->
             <el-col v-if="dataType !== 'appUi'" :span="12">
-              <el-form-item label="默认运行环境" class="is-required">
+              <el-form-item label="运行环境" class="is-required">
                 <environmentSelectorView
                   :env="tempTask.env"
                   ref="environmentSelectorView"

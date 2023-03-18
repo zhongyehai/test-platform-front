@@ -20,48 +20,65 @@
         <el-tabs v-model="reportTab" class="table_padding" style="margin-left: 5px">
           <el-tab-pane label="测试报告列表" :name="reportTab">
 
-            <el-form label-width="100px" inline>
-              <el-form-item :label="'报告名：'" size="mini">
+            <el-form label-width="60px" inline>
+              <el-form-item label="报告名" size="mini">
                 <el-input
-                  v-model="projectName"
+                  v-model="query.projectName"
                   class="input-with-select"
                   placeholder="报告名，模糊查询"
                   size="mini"
-                  style="width: 400px"
                   clearable
                 >
                 </el-input>
               </el-form-item>
 
-              <el-form-item :label="'创建人：'" size="mini">
+              <el-form-item label="创建人" size="mini" label-width="60px">
                 <el-select
-                  v-model="createUser"
+                  v-model="query.createUser"
                   placeholder="创建人"
                   size="mini"
-                  style="width: 200px"
                   filterable
                   clearable
                   default-first-option
                 >
-                  <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                  <el-option
+                    v-for="item in userList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
                 </el-select>
+              </el-form-item>
 
+              <el-form-item label="单元" size="mini" label-width="50px">
+                <el-select
+                  v-model="query.run_type"
+                  placeholder="运行单元"
+                  size="mini"
+                  filterable
+                  clearable
+                  default-first-option
+                >
+                  <el-option
+                    v-for="(value, key) in runTypeDict"
+                    :key="key"
+                    :label="value"
+                    :value="key"
+                  ></el-option>
+                </el-select>
               </el-form-item>
 
               <el-button
                 type="primary"
                 size="mini"
-                @click="getReportList"
-              >
-                {{ '查询' }}
+                @click="getReportList">查询
               </el-button>
 
               <el-popover
-                v-show="selectReport.length > 0"
+                v-show="selectedList.length > 0"
                 placement="top"
                 popper-class="down-popover"
-                v-model="showBatchDelete"
-              >
+                v-model="showBatchDelete">
                 <p>确定删除所选中的测试报告?</p>
                 <p style="color: red">关联了失败记录的测试报告不会被删除</p>
                 <div style="text-align: right; margin: 0">
@@ -85,16 +102,11 @@
               stripe
               @selection-change="clickSelectAll"
             >
-
-              <el-table-column
-                type="selection"
-                min-width="2%"
-              >
-              </el-table-column>
+              <el-table-column type="selection" min-width="2%"></el-table-column>
 
               <el-table-column prop="id" label="序号" align="center" min-width="5%">
                 <template slot-scope="scope">
-                  <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+                  <span> {{ (query.pageNum - 1) * query.pageSize + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
@@ -165,6 +177,7 @@
                     v-model="scope.row.deletePopoverIsShow"
                   >
                     <p>确定删除【{{ scope.row.name }}】?</p>
+                    <p style="color: red">关联了失败记录的测试报告不会被删除</p>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
                       <el-button type="primary" size="mini" @click="delReport(scope.row)">确定</el-button>
@@ -183,10 +196,10 @@
             </el-table>
 
             <pagination
-              v-show="reportTotal>0"
-              :total="reportTotal"
-              :page.sync="pageNum"
-              :limit.sync="pageSize"
+              v-show="query.total>0"
+              :total="query.total"
+              :page.sync="query.pageNum"
+              :limit.sync="query.pageSize"
               @pagination="getReportList"
             />
           </el-tab-pane>
@@ -239,17 +252,21 @@ export default {
       projectId: '',
       reportDataList: [],
       reportTotal: 0,
-      pageNum: 0,
-      pageSize: 20,
-      projectName: '',
-      createUser: '',
+      query: {
+        pageNum: 0,
+        pageSize: 20,
+        total: 0,
+        projectName: undefined,
+        createUser: undefined,
+        run_type: undefined
+      },
       userList: [],
       eventDict: {},
       runTypeDict: {},
       reportStatusContent: reportStatusMappingContent,
       reportStatusTagType: reportStatusMappingTagType,
       reportTriggerType: reportTriggerTypeMappingContent,
-      selectReport: [],
+      selectedList: [],
       showBatchDelete: false,
 
       reportListUrl: '',
@@ -261,7 +278,7 @@ export default {
 
     // 全选
     clickSelectAll(val) {
-      this.selectReport = val
+      this.selectedList = val
     },
 
     // 获取用户信息，同步请求
@@ -272,15 +289,10 @@ export default {
 
     // 获取服务对应的报告列表
     getReportList() {
-      this.reportListUrl({
-        projectId: this.projectId,
-        pageNum: this.pageNum,
-        pageSize: this.pageSize,
-        projectName: this.projectName,
-        createUser: this.createUser
-      }).then(response => {
+      this.query.projectId = this.projectId
+      this.reportListUrl(this.query).then(response => {
         this.reportDataList = response.data.data
-        this.reportTotal = response.data.total
+        this.query.total = response.data.total
       })
     },
 
@@ -374,19 +386,19 @@ export default {
     },
 
     // 删除报告
-    delReport(report) {
+    delReport(row) {
       // 删除单个
-      let reportIdList = []
-      if (report.id) {
-        this.$set(report, 'deletePopoverIsShow', false)
-        reportIdList = [report.id]
+      let selectedIdList = []
+      if (row.id) {
+        this.$set(row, 'deletePopoverIsShow', false)
+        selectedIdList = [row.id]
       } else { // 批量删除
         this.showBatchDelete = false
-        this.selectReport.forEach(report =>{
-          reportIdList.push(report.id)
+        this.selectedList.forEach(report => {
+          selectedIdList.push(report.id)
         })
       }
-      this.deleteReportUrl({ id: reportIdList }).then(response => {
+      this.deleteReportUrl({ id: selectedIdList }).then(response => {
         if (this.showMessage(this, response)) {
           this.getReportList()
         }
@@ -400,6 +412,9 @@ export default {
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
       if (_type === 'project') {
         this.projectId = project.id
+        this.query.pageNum = 1
+        this.query.pageSize = 20
+        this.query.total = 0
         this.getReportList()
       }
     })

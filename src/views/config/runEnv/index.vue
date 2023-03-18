@@ -98,7 +98,7 @@
     <!-- 新增/修改环境 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增环境' : '修改环境'"
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">

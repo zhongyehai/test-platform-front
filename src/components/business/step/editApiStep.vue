@@ -119,6 +119,24 @@
           </div>
           <span>头部信息</span>
         </el-tooltip>
+
+        <el-form label-width="80px">
+          <el-form-item label="忽略字段" prop="pop_header_filed" size="small">
+            <el-input
+              v-model="currentStep.pop_header_filed"
+              placeholder="多个时，个用英文的,隔开(',')"
+              type="textarea"
+              autosize
+              style="width: 98%"
+            ></el-input>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、若此处设置了字段，则此步骤执行时将从头部信息中去除此处设置的字段</div>
+              <div>2、多个时，个用英文的逗号隔开(',')</div>
+              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            </el-popover>
+          </el-form-item>
+        </el-form>
+
         <headersView
           ref="headersView"
           :currentData="currentStep.headers"
@@ -276,6 +294,7 @@ export default {
           check_value: null
         },
         "skip_on_fail": 1,
+        'pop_header_filed': '',
         "run_times": 0,
         "headers": [],
         "params": [],
@@ -316,6 +335,7 @@ export default {
         "down_func": this.currentStep.down_func,
         "skip_if": skip_if,
         "skip_on_fail": this.currentStep.skip_on_fail,
+        "pop_header_filed": this.currentStep.pop_header_filed,
         "run_times": this.currentStep.run_times,
         "headers": this.$refs.headersView.tempData,
         "params": this.$refs.paramsView.tempData,
@@ -398,6 +418,7 @@ export default {
           this.currentStep = JSON.parse(JSON.stringify(step))  // 深拷贝
           this.currentStep.replace_host = 0
           this.currentStep.skip_on_fail = 1
+          this.currentStep.pop_header_filed = ''
 
           // 获取接口的所属信息
           apiMsgBelongTo({id: step.api_id}).then(response => {

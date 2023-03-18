@@ -240,7 +240,7 @@
     <!-- 新增/修改周报表单 -->
     <el-drawer
       :title="weeklyDrawerStatus === 'add' ? '新增周报' : weeklyDrawerStatus === 'copy' ? '复制周报' : '修改周报'"
-      size="60%"
+      size="80%"
       :wrapperClosable="false"
       :visible.sync="weeklyDrawerIsShow"
       :direction="direction">

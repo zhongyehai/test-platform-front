@@ -98,18 +98,18 @@
     <!-- 新增/修改配置类型 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增配置类型' : '修改配置类型'"
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">
 
       <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
 
-        <el-form-item :label="'配置类型'" class="is-required">
+        <el-form-item :label="'配置类型'" class="is-required" size="mini">
           <el-input v-model="tempConfigType.name" :disabled="drawerType === 'edit'" size="mini"/>
         </el-form-item>
 
-        <el-form-item :label="'备注'">
+        <el-form-item :label="'备注'" size="mini">
           <el-input v-model="tempConfigType.desc" type="textarea" autosize size="mini"/>
         </el-form-item>
 

@@ -168,22 +168,24 @@
 
     <!-- 引用用例详情 -->
     <el-drawer
-      title="用例信息"
       size="75%"
       :append-to-body="true"
       :visible.sync="caseRemarkIsShow"
       :before-close="beforeCloseDrawer"
       :direction="direction">
-      <div class="demo-drawer__content" style="margin-left: 20px">
+      <template slot="title">
+        <div>用例详情</div>
         <el-button
           v-show="caseIdList.length > 1"
           type="primary"
           size="mini"
-          style="float: right"
+          style="margin-left: 50px"
           @click="backLast()"
         >回到上一级
         </el-button>
+      </template>
 
+      <div class="demo-drawer__content" style="margin-left: 20px">
         <el-collapse v-model="activeNames">
           <el-collapse-item name="1">
             <template slot="title">

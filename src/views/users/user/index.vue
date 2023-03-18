@@ -145,7 +145,7 @@
     <!-- 新增/修改表单 -->
     <el-drawer
       :title=" drawerType === 'create' ? '新增用户' : '修改用户'"
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">

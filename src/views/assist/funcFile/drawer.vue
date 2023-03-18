@@ -2,7 +2,7 @@
   <!-- 新增/修改函数文件表单 -->
   <el-drawer
     :title="tempFunc.id ? '修改函数文件' : '新增函数文件'"
-    size="60%"
+    size="85%"
     :wrapperClosable="false"
     :visible.sync="funcFileDrawerIsShow"
     :direction="direction">

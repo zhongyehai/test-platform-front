@@ -2,9 +2,9 @@
   <div class="app-container">
 
     <div class="filter-container">
-      <el-form label-width="120px" :inline="true">
+      <el-form label-width="65px" :inline="true">
 
-        <el-form-item :label="'选择配置类型：'" size="mini">
+        <el-form-item :label="'类型'" size="mini">
           <el-select
             v-model="listQuery.queryType"
             :placeholder="'选择配置类型'"
@@ -19,7 +19,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="'配置名：'" size="mini">
+        <el-form-item :label="'配置名'" size="mini">
           <el-input
             v-model="listQuery.name"
             class="input-with-select"
@@ -30,7 +30,7 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item :label="'配置值：'" size="mini">
+        <el-form-item :label="'配置值'" size="mini">
           <el-input
             v-model="listQuery.value"
             class="input-with-select"
@@ -41,7 +41,7 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item :label="'创建人：'" size="mini">
+        <el-form-item :label="'创建人'" size="mini">
           <el-select
             v-model="listQuery.create_user"
             :placeholder="'选择创建人'"
@@ -62,7 +62,7 @@
         </el-button>
 
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" size="mini" @click="addConfig">
-          {{ '添加配置' }}
+          {{ '添加' }}
         </el-button>
 
       </el-form>

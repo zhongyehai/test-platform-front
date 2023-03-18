@@ -115,21 +115,22 @@
     <!-- 新增/修改配置类型 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增业务线' : '修改业务线'"
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">
 
       <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
 
-        <el-form-item :label="'业务线名'" class="is-required">
+        <el-form-item :label="'业务线名'" class="is-required" size="mini">
           <el-input v-model="tempBusiness.name" size="mini"/>
         </el-form-item>
-        <el-form-item :label="'code'" class="is-required">
+
+        <el-form-item :label="'code'" class="is-required" size="mini">
           <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini"/>
         </el-form-item>
 
-        <el-form-item :label="'备注'">
+        <el-form-item :label="'备注'" size="mini">
           <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini"/>
         </el-form-item>
 

@@ -2,17 +2,17 @@
   <!-- 新增/修改命中问题表单 -->
   <el-drawer
     :title="tempHit.id ? '修改命中问题' : '新增命中问题'"
-    size="40%"
+    size="60%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
     <el-form
-      ref="dataForm"
+      ref="hitForm"
       label-position="center"
       label-width="100px"
       style="min-width: 400px;margin-left: 20px;margin-right: 20px">
 
-      <el-form-item :label="'触发时间'" prop="hit_type" class="is-required" size="mini">
+      <el-form-item :label="'触发时间'" prop="date" class="is-required" size="mini">
         <el-date-picker
           v-model="tempHit.date"
           align="right"
@@ -23,7 +23,7 @@
         </el-date-picker>
       </el-form-item>
 
-      <el-form-item :label="'测试类型'" prop="hit_type" class="is-required" size="mini">
+      <el-form-item :label="'测试类型'" prop="test_type" class="is-required" size="mini">
         <el-select
           style="width: 100%"
           v-model="tempHit.test_type"
@@ -61,15 +61,15 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="'问题内容'" prop="name" class="is-required">
-        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'备注'"/>
+      <el-form-item :label="'问题内容'" prop="hit_detail" class="is-required" size="mini">
+        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'"/>
       </el-form-item>
 
-      <el-form-item :label="'报告id'" prop="report_id" class="is-required">
+      <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
         <el-input size="mini" v-model="tempHit.report_id"/>
       </el-form-item>
 
-      <el-form-item :label="'备注'" prop="desc">
+      <el-form-item :label="'备注'" prop="desc" size="mini">
         <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'"/>
       </el-form-item>
 

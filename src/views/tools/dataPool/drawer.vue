@@ -2,7 +2,7 @@
 
   <el-drawer
     :title=" drawerType === 'add' ? '新增数据' : '修改数据'"
-    size="40%"
+    size="60%"
     :wrapperClosable="false"
     :visible.sync="drawerIsShow"
     :direction="direction">
@@ -13,7 +13,7 @@
       label-width="100px"
       style="min-width: 400px;margin-left: 20px;margin-right: 20px">
 
-      <el-form-item label="环境：" size="mini" class="is-required">
+      <el-form-item label="环境" size="mini" class="is-required">
         <el-select
           v-model="tempData.env"
           placeholder="选择环境"

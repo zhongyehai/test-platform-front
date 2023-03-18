@@ -121,7 +121,7 @@
     <!-- 新增/修改账号表单 -->
     <el-drawer
       :title=" currentAccount.id ? '修改账号' : '新增账号' "
-      size="40%"
+      size="60%"
       :wrapperClosable="false"
       :visible.sync="drawerIsShow"
       :direction="direction">
@@ -194,7 +194,7 @@
           <el-input v-model="currentAccount.password" placeholder="登录密码"/>
         </el-form-item>
 
-        <el-form-item :label="'备注'" class="filter-item" prop="desc">
+        <el-form-item :label="'备注'" class="filter-item" prop="desc"size="mini">
           <el-input type="textarea" v-model="currentAccount.desc" autosize size="mini" placeholder="备注"></el-input>
         </el-form-item>
       </el-form>
