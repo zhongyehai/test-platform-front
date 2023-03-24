@@ -16,24 +16,23 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="手机名称" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="手机名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="os" align="center" label="手机系统类型" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" prop="os" align="center" label="手机系统类型" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="ip" align="center" label="手机系统版本" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" prop="ip" align="center" label="手机系统版本" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.os_version }} </span>
         </template>
       </el-table-column>
-
 
       <el-table-column align="center" label="操作" min-width="16%">
         <template slot-scope="scope">
@@ -44,15 +43,17 @@
             size="mini"
             icon="el-icon-edit"
             style="margin-right: 10px"
-            @click.native="showDrawer(scope.row)"></el-button>
+            @click.native="showDrawer(scope.row)"
+          />
 
           <!-- 复制手机 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.copyPopoverIsShow"
             placement="top"
             style="margin-right: 10px"
             popper-class="down-popover"
-            v-model="scope.row.copyPopoverIsShow">
+          >
             <p>复制此手机并生成新的手机?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyServerPopover(scope.row)">取消</el-button>
@@ -64,15 +65,16 @@
               size="mini"
               icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
-            ></el-button>
+            />
           </el-popover>
 
           <!-- 删除手机 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.deletePopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.deletePopoverIsShow">
+          >
             <p>确定删除【{{ scope.row.name }}】?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelDeleteServerPopover(scope.row)">取消</el-button>
@@ -85,7 +87,7 @@
               size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            ></el-button>
+            />
           </el-popover>
 
         </template>
@@ -95,14 +97,15 @@
     <el-drawer
       :title="tempData.id ? '修改手机' : '新增手机'"
       size="65%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item label="别名" class="is-required">
-          <el-input v-model="tempData.name" size="mini" placeholder="手机名字"></el-input>
+          <el-input v-model="tempData.name" size="mini" placeholder="手机名字" />
         </el-form-item>
 
         <el-form-item label="系统类型" class="is-required">
@@ -114,25 +117,25 @@
             size="mini"
             style="width:100%"
             placeholder="请选择执行app自动化的手机的系统类型"
-            class="filter-item">
+            class="filter-item"
+          >
             <el-option
               v-for="osType in phoneOsMapping"
               :key="osType"
               :label="osType"
               :value="osType"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
 
         <el-form-item label="系统版本" class="is-required">
-          <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本"></el-input>
+          <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本" />
         </el-form-item>
 
       </el-form>
 
-
       <div class="demo-drawer__footer">
-        <el-button @click="drawerIsShow = false" size="mini">取 消</el-button>
+        <el-button size="mini" @click="drawerIsShow = false">取 消</el-button>
         <el-button
           type="primary"
           size="mini"
@@ -159,13 +162,12 @@ import Sortable from 'sortablejs'
 import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 
-import {phoneList, postPhone, putPhone, getServer, deletePhone, sortPhone, copyPhone} from '@/apis/appUiTest/env'
-import {getConfigByName} from "@/apis/config/config";
-
+import { phoneList, postPhone, putPhone, getServer, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/env'
+import { getConfigByName } from '@/apis/config/config'
 
 export default {
-  name: "index",
-  components: {Pagination, projectTreeView},
+  name: 'Index',
+  components: { Pagination, projectTreeView },
   data() {
     return {
       tableLoadingIsShow: false,
@@ -187,7 +189,7 @@ export default {
         os_version: ''
       },
 
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       drawerIsShow: false,
 
@@ -195,6 +197,32 @@ export default {
     }
   },
 
+  mounted() {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
+      if (_type === 'appPhone') {
+        this.showDrawer()
+      }
+    })
+
+    getConfigByName({ 'name': 'phone_os_mapping' }).then(response => {
+      this.phoneOsMapping = JSON.parse(response.data.value)
+    })
+
+    this.gePhoneList()
+  },
+
+  created() {
+    this.oldList = this.dataList.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+  },
 
   methods: {
 
@@ -256,7 +284,7 @@ export default {
       deletePhone().then(response => {
         this.$set(row, 'deletePopoverIsShow', false)
         this.$set(row, 'deleteLoadingIsShow', true)
-        deletePhone({id: row.id}).then(response => {
+        deletePhone({ id: row.id }).then(response => {
           this.$set(row, 'deleteLoadingIsShow', false)
           if (this.showMessage(this, response)) {
             this.gePhoneList()
@@ -269,7 +297,7 @@ export default {
     serverCopy(row) {
       this.$set(row, 'copyPopoverIsShow', false)
       this.$set(row, 'copyButtonIsLoading', true)
-      copyPhone({'id': row.id}).then(response => {
+      copyPhone({ 'id': row.id }).then(response => {
         this.$set(row, 'copyButtonIsLoading', false)
         if (this.showMessage(this, response)) {
           this.dataList.push(response.data)
@@ -291,7 +319,7 @@ export default {
       const el = this.$refs.taskTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -306,7 +334,7 @@ export default {
           sortPhone({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -314,34 +342,7 @@ export default {
         }
       })
     }
-  },
-
-  mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
-      if (_type === 'appPhone'){
-        this.showDrawer()
-      }
-    })
-
-    getConfigByName({"name": "phone_os_mapping"}).then(response => {
-      this.phoneOsMapping = JSON.parse(response.data.value)
-    })
-
-    this.gePhoneList()
-  },
-
-  created() {
-    this.oldList = this.dataList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
+  }
 }
 </script>
 

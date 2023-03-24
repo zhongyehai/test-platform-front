@@ -1,10 +1,10 @@
-import request from '@/utils/request';
-import {baseDirAppUiTest} from "@/apis/base";
+import request from '@/utils/request'
+import { baseDirAppUiTest } from '@/apis/base'
 
-let currentBaseDir = baseDirAppUiTest + '/task'
+const currentBaseDir = baseDirAppUiTest + '/task'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 获取任务信息
@@ -29,30 +29,30 @@ export function deleteTask(data) {
 
 // 任务列表
 export function taskList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 启用任务
 export function enableTask(data) {
-  return request({url: currentBaseDir + '/status', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/status', method: 'post', data: data })
 }
 
 // 禁用任务
 export function disableTask(data) {
-  return request({url: currentBaseDir + '/status', method: 'delete', data: data});
+  return request({ url: currentBaseDir + '/status', method: 'delete', data: data })
 }
 
 // 单次运行定时任务
 export function runTask(data) {
-  return request({url: currentBaseDir + '/run', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/run', method: 'post', data: data })
 }
 
 // 复制定时任务
 export function copyTask(data) {
-  return request({url: currentBaseDir + '/copy', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/copy', method: 'post', data: data })
 }
 
 // 修改定时任务排序
 export function taskSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }

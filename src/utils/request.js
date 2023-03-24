@@ -1,21 +1,20 @@
 // 优化axios封装见：https://juejin.im/post/6844903652881072141
 
-import axios from 'axios';
-import router from "@/router/index";
+import axios from 'axios'
+import router from '@/router/index'
 
 // 创建对象，自定义实例默认值
 const service = axios.create({
   // process.env.NODE_ENV === 'development' 来判断是否开发环境
   baseURL: '',
-  timeout: 600000,  // 请求超时
+  timeout: 600000, // 请求超时
   async: false
-});
-
+})
 
 // 请求拦截，请求前置处理
 service.interceptors.request.use(
   config => {
-    let token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
     if (token) {
       config.headers['X-Token'] = token
     }

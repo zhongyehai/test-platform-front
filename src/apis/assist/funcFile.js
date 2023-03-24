@@ -1,11 +1,10 @@
-import request from '@/utils/request';  //加载请求配置文件
-import {baseDirAssist} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirAssist } from '@/apis/base'
 
-
-let currentBaseDir = baseDirAssist + '/func'
+const currentBaseDir = baseDirAssist + '/func'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 新增自定函数文件
@@ -30,20 +29,20 @@ export function deleteFuncFile(data) {
 
 // 获取所有自定函数文件名
 export function funcFileList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 校验自定函数文件
 export function debugFuncFile(data) {
-  return request({url: currentBaseDir + '/debug', method: 'POST', data: data});
+  return request({ url: currentBaseDir + '/debug', method: 'POST', data: data })
 }
 
 // 复制
 export function copyFunc(data) {
-  return request({url: currentBaseDir + '/copy', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/copy', method: 'post', data: data })
 }
 
 // 修改排序
 export function funcSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }

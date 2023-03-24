@@ -1,7 +1,6 @@
 <template>
 
-  <caseSuiteView :dataType="'api'"></caseSuiteView>
-
+  <caseSuiteView :data-type="'api'" />
 
 </template>
 
@@ -9,11 +8,11 @@
 import caseSuiteView from '@/components/business/suite/index.vue'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     caseSuiteView
   }
-};
+}
 </script>
 
 <style scoped>

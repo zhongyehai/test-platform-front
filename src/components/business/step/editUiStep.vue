@@ -5,31 +5,34 @@
       size="85%"
       :append-to-body="true"
       :visible.sync="drawerIsShow"
-      :direction="direction">
-<!--      :wrapperClosable="false"-->
+      :direction="direction"
+    >
+      <!--      :wrapperClosable="false"-->
       <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
         <!-- 步骤信息 -->
         <el-tab-pane label="步骤信息" name="editStepInfo">
-          <el-form label-width="120px" v-model="currentStep">
+          <el-form v-model="currentStep" label-width="120px">
 
             <el-form-item label="步骤名称" prop="name" size="small" class="is-required">
-              <el-input v-model="currentStep.name" placeholder="步骤名称"></el-input>
+              <el-input v-model="currentStep.name" placeholder="步骤名称" />
             </el-form-item>
 
             <el-form-item label="前置处理" size="small">
               <el-input
+                v-model="currentStep.up_func"
                 type="textarea"
                 autosize
-                v-model="currentStep.up_func"
-                placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
+                placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
+              />
             </el-form-item>
 
             <el-form-item label="后置处理" size="small">
               <el-input
+                v-model="currentStep.down_func"
                 type="textarea"
                 autosize
-                v-model="currentStep.down_func"
-                placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"></el-input>
+                placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
+              />
             </el-form-item>
 
             <el-form-item label="执行方式" prop="execute_type" size="small" class="is-required">
@@ -47,7 +50,7 @@
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
 
@@ -57,18 +60,20 @@
               :label="'选择文件'"
               prop="send_keys"
               size="small"
-              class="is-required">
+              class="is-required"
+            >
               <el-row>
                 <el-col :span="20">
                   <el-input
-                    disabled
                     v-model="currentStep.send_keys"
+                    disabled
                     placeholder="选择文件"
-                    style="width: 90%"></el-input>
+                    style="width: 90%"
+                  />
                 </el-col>
 
                 <el-col :span="4">
-                  <el-button type="primary" @click.native="openFileUploadDialog" size="mini">上传文件</el-button>
+                  <el-button type="primary" size="mini" @click.native="openFileUploadDialog">上传文件</el-button>
                 </el-col>
               </el-row>
             </el-form-item>
@@ -76,28 +81,30 @@
             <!-- 输入文本 -->
             <el-form-item
               v-show="currentStep.execute_type &&
-              currentStep.execute_type.indexOf('keyboard') === -1 &&
-              currentStep.execute_type.indexOf('is_input') !== -1"
+                currentStep.execute_type.indexOf('keyboard') === -1 &&
+                currentStep.execute_type.indexOf('is_input') !== -1"
               label="输入内容"
               prop="send_keys"
               size="small"
-              class="is-required">
+              class="is-required"
+            >
               <el-input
+                v-model="currentStep.send_keys"
                 type="textarea"
                 autosize
                 :style="{'width': currentStep.execute_type.indexOf('scroll_coordinate') !== -1 ? '98%' : '100%'}"
-                v-model="currentStep.send_keys"
                 :placeholder="
-                currentStep.execute_type.indexOf('coordinate_is_input1') !== -1 ? placeholder1 :
-                currentStep.execute_type.indexOf('coordinate_is_input2') !== -1 ? placeholder2 : '输入对应内容'"
-              ></el-input>
+                  currentStep.execute_type.indexOf('coordinate_is_input1') !== -1 ? placeholder1 :
+                  currentStep.execute_type.indexOf('coordinate_is_input2') !== -1 ? placeholder2 : '输入对应内容'"
+              />
               <el-popover
                 v-show="currentStep.execute_type.indexOf('scroll_coordinate') !== -1"
                 class="el_popover_class"
                 placement="top-start"
-                trigger="hover">
+                trigger="hover"
+              >
                 <div>从坐标x1,y1移动到x2,y2</div>
-                <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
               </el-popover>
             </el-form-item>
 
@@ -107,7 +114,8 @@
               label="选择输入内容"
               prop="send_keys"
               size="mini"
-              class="is-required">
+              class="is-required"
+            >
               <el-select
                 ref="pageSelectorView"
                 v-model="currentStep.send_keys"
@@ -122,21 +130,21 @@
                   :key="key"
                   :label="value"
                   :value="key"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
 
             <el-row>
               <el-col :span="6">
                 <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
-                  <el-input-number size="mini" v-model="currentStep.wait_time_out" :min="2"></el-input-number>
+                  <el-input-number v-model="currentStep.wait_time_out" size="mini" :min="2" />
                   <el-popover class="el_popover_class" placement="top-start" trigger="hover">
                     <div>
                       1、等待元素出现的超时时间，最少设置为2秒 <br>
                       2、若在此时间内，元素出现，则立即执行步骤，若超过此时间，元素仍未出现，则报错 <br>
                       3、若元素管理处已设置超时时间，以步骤处设置的为准
                     </div>
-                    <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                    <el-button slot="reference" type="text" icon="el-icon-question" />
                   </el-popover>
                 </el-form-item>
               </el-col>
@@ -148,16 +156,16 @@
                     :precision="0"
                     :min="1"
                     :max="1000"
-                  ></el-input-number>
+                  />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form label-width="200px">
                   <el-form-item label="当有步骤失败时跳过当前步骤">
-                    <el-switch v-model="currentStep.skip_on_fail" :active-value="1" :inactive-value="0"></el-switch>
+                    <el-switch v-model="currentStep.skip_on_fail" :active-value="1" :inactive-value="0" />
                     <el-popover class="el_popover_class" placement="top-start" trigger="hover">
                       <div>当前用例执行时，当前步骤之前的步骤出现失败/错误的情况，是否跳过当前步骤</div>
-                      <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+                      <el-button slot="reference" type="text" icon="el-icon-question" />
                     </el-popover>
                   </el-form-item>
                 </el-form>
@@ -171,9 +179,9 @@
         <el-tab-pane label="跳过条件" name="editSkipIf">
           <skipIfView
             ref="skipIfView"
-            :skipIfData="currentStep.skip_if"
+            :skip-if-data="currentStep.skip_if"
             :use_type="'step'"
-          ></skipIfView>
+          />
         </el-tab-pane>
 
         <!-- 元素信息，允许修改元素 -->
@@ -181,7 +189,7 @@
           <el-form label-width="120px">
 
             <el-form-item label="元素归属" prop="elementFrom" size="small">
-              <el-input disabled v-model="currentElement.elementFrom"></el-input>
+              <el-input v-model="currentElement.elementFrom" disabled />
             </el-form-item>
 
             <el-form-item :label="'定位方式'" prop="by" size="mini" class="is-required">
@@ -192,18 +200,19 @@
                 clearable
                 size="mini"
                 style="width:100%"
-                placeholder="请选择定位方式">
+                placeholder="请选择定位方式"
+              >
                 <el-option
                   v-for="option in $busEvents.data.findElementOptionList"
                   :key="option.label"
                   :label="option.label"
                   :value="option.value"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
 
             <el-form-item label="定位元素" prop="element" size="small">
-              <el-input v-model="currentElement.element"></el-input>
+              <el-input v-model="currentElement.element" />
             </el-form-item>
 
           </el-form>
@@ -213,22 +222,22 @@
         <el-tab-pane label="数据提取" name="editExtracts">
           <extractsView
             ref="extractsView"
-            :currentData="currentStep.extracts"
-            :tempElementList="tempElementList"
-            :placeholderKey="'起个变量名'"
-            :placeholderValue="'提取数据的表达式'"
-            :placeholderDesc="'备注'"
-          ></extractsView>
+            :current-data="currentStep.extracts"
+            :temp-element-list="tempElementList"
+            :placeholder-key="'起个变量名'"
+            :placeholder-value="'提取数据的表达式'"
+            :placeholder-desc="'备注'"
+          />
         </el-tab-pane>
 
         <!-- 断言信息 -->
         <el-tab-pane label="断言" name="editAssert">
           <validatesView
             ref="validatesView"
-            :tempElementList="tempElementList"
-            :stepDrawerStatus="drawerIsShow"
+            :temp-element-list="tempElementList"
+            :step-drawer-status="drawerIsShow"
             :validates="currentStep.validates"
-          ></validatesView>
+          />
         </el-tab-pane>
 
         <!-- 数据驱动 -->
@@ -271,7 +280,8 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click="changElement()">{{ '保存元素修改' }}
+          @click="changElement()"
+        >{{ '保存元素修改' }}
         </el-button>
 
         <el-button
@@ -280,18 +290,20 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click="currentStep.id ? editStep() : addStep()">{{ '保存步骤' }}
+          @click="currentStep.id ? editStep() : addStep()"
+        >{{ '保存步骤' }}
         </el-button>
 
         <el-button
           v-show="activeName !== 'element' && currentStep.id"
           style="float: left"
           size="mini"
-          @click="rowBackStep()"> {{ '还原步骤' }}
+          @click="rowBackStep()"
+        > {{ '还原步骤' }}
         </el-button>
       </div>
 
-      <uploadFileView></uploadFileView>
+      <uploadFileView />
 
     </el-drawer>
 
@@ -299,58 +311,52 @@
 </template>
 
 <script>
-import skipIfView from "@/components/Inputs/skipIf"
-import headersView from "@/components/Inputs/changeRow"
-import paramsView from "@/components/Inputs/changeRow"
-import bodyView from '@/components/apiBody'
-import jsonEditorView from "@/components/jsonView";
-import extractsView from "@/components/uiTest/extract"
-import validatesView from "@/components/uiTest/validates";
-import uploadFileView from "@/components/file/uploadFile";
+import skipIfView from '@/components/Inputs/skipIf'
+import jsonEditorView from '@/components/jsonView'
+import extractsView from '@/components/uiTest/extract'
+import validatesView from '@/components/uiTest/validates'
+import uploadFileView from '@/components/file/uploadFile'
 
-import {getProject as appUiGetProject} from "@/apis/appUiTest/project";
-import {getPage as appUiGetPage} from "@/apis/appUiTest/page";
+import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
+import { getPage as appUiGetPage } from '@/apis/appUiTest/page'
 import {
   changeElementById as appUiChangeElementById,
   elementList as appUiElementList,
   getElement as appUiGetElement,
   putElement as appUiPutElement,
-  elementFrom as appUiElementFrom,
-} from "@/apis/appUiTest/element";
-import {postStep as appUiPostStep, putStep as appUiPutStep} from "@/apis/appUiTest/step"
+  elementFrom as appUiElementFrom
+} from '@/apis/appUiTest/element'
+import { postStep as appUiPostStep, putStep as appUiPutStep } from '@/apis/appUiTest/step'
 
-import {getProject as webUiGetProject} from "@/apis/webUiTest/project";
-import {getPage as webUiGetPage} from "@/apis/webUiTest/page";
+import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
+import { getPage as webUiGetPage } from '@/apis/webUiTest/page'
 import {
   changeElementById as webUiChangeElementById,
   elementList as webUiElementList,
   getElement as webUiGetElement,
   putElement as webUiPutElement,
-  elementFrom as webUiElementFrom,
-} from "@/apis/webUiTest/element";
-import {postStep as webUiPostStep, putStep as webUiPutStep} from "@/apis/webUiTest/step"
+  elementFrom as webUiElementFrom
+} from '@/apis/webUiTest/element'
+import { postStep as webUiPostStep, putStep as webUiPutStep } from '@/apis/webUiTest/step'
 
 export default {
-  name: "editStep",
-  props: [
-    'dataType',
-    'projectId',
-    'caseId'
-  ],
+  name: 'EditStep',
   components: {
-    headersView,
-    paramsView,
-    bodyView,
     jsonEditorView,
     extractsView,
     validatesView,
     uploadFileView,
     skipIfView
   },
+  props: [
+    'dataType',
+    'projectId',
+    'caseId'
+  ],
   data() {
     return {
       drawerIsShow: false,
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       activeName: 'editStepInfo',
       currentStepCopy: {},
@@ -358,25 +364,25 @@ export default {
       tempElementList: [],
       currentStep: {
         'id': '',
-        "status": '',
-        "name": '',
-        "wait_time_out": 10,
-        "up_func": '',
-        "down_func": '',
-        "skip_if": {},
-        "skip_on_fail": 1,
-        "execute_type": '',
-        "send_keys": '',
-        "run_times": 0,
-        "extracts": [],
-        "validates": [],
-        "data_driver": [],
-        "case_id": this.caseId,
-        "project_id": ''
+        'status': '',
+        'name': '',
+        'wait_time_out': 10,
+        'up_func': '',
+        'down_func': '',
+        'skip_if': {},
+        'skip_on_fail': 1,
+        'execute_type': '',
+        'send_keys': '',
+        'run_times': 0,
+        'extracts': [],
+        'validates': [],
+        'data_driver': [],
+        'case_id': this.caseId,
+        'project_id': ''
       },
 
-      placeholder1: '{"x1": 0.2, "y1": 0.7, "x2": 0.1, "y2": 0.4}，从当前中心坐标往4个方向移动的百分比',  // 滑动屏幕的描述
-      placeholder2: '{"x1": 500, "y1": 1000, "x2": 600, "y2": 1024}，坐标的具体值',  // 滑动屏幕的描述
+      placeholder1: '{"x1": 0.2, "y1": 0.7, "x2": 0.1, "y2": 0.4}，从当前中心坐标往4个方向移动的百分比', // 滑动屏幕的描述
+      placeholder2: '{"x1": 500, "y1": 1000, "x2": 600, "y2": 1024}，坐标的具体值', // 滑动屏幕的描述
 
       getProjectUrl: '',
       getPageUrl: '',
@@ -390,87 +396,13 @@ export default {
     }
   },
 
-  methods: {
-
-    getStepForCommit() {
-      return {
-        'id': this.currentStep.id,
-        "status": this.currentStep.status,
-        "name": this.currentStep.name,
-        "wait_time_out": this.currentStep.wait_time_out,
-        "up_func": this.currentStep.up_func,
-        "down_func": this.currentStep.down_func,
-        "skip_if": this.$refs.skipIfView.tempData,
-        "skip_on_fail": this.currentStep.skip_on_fail,
-        "run_times": this.currentStep.run_times,
-        "execute_type": this.currentStep.execute_type,
-        "send_keys": this.currentStep.send_keys,
-        "extracts": this.$refs.extractsView.tempData,
-        "validates": this.$refs.validatesView.tempData,
-        "quote_case": null,
-        "case_id": this.currentStep.case_id,
-        "element_id": this.currentElement.id,
-        "page_id": this.currentElement.page_id,
-        "project_id": this.currentStep.project_id
-      }
-    },
-
-    // 新增步骤信息
-    addStep() {
-      this.submitButtonIsLoading = true
-      this.postStepUrl(this.getStepForCommit()).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')  // 重新请求步骤列表
-          this.drawerIsShow = false
-        }
-      })
-    },
-
-    // 修改步骤信息
-    editStep() {
-      this.submitButtonIsLoading = true
-      this.putStepUrl(this.getStepForCommit()).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')  // 重新请求步骤列表
-          this.drawerIsShow = false
-        }
-      })
-    },
-
-    // 修改元素
-    changElement() {
-      this.submitButtonIsLoading = true
-      this.changeElementByIdUrl({
-        id: this.currentStep.element_id,
-        by: this.currentElement.by,
-        element: this.currentElement.element
-      }).then(response => {
-        this.submitButtonIsLoading = false
-        this.showMessage(this, response)
-      })
-    },
-
-    // 打开文件上传窗口
-    openFileUploadDialog() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, "uploadFile")
-    },
-
-    // 取消保存
-    rowBackStep() {
-      this.currentStep = this.currentStepCopy
-    }
-  },
-
   mounted() {
-
     // 新增步骤（把元素转为步骤）
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType, step) => {
       if (_type === 'stepInfo') {
         this.currentElement = step
 
-        if (drawerType === 'add') {  // 新增步骤
+        if (drawerType === 'add') { // 新增步骤
           this.currentStep.id = ''
           this.currentStep.status = 1
           this.currentStep.name = step.name
@@ -489,29 +421,23 @@ export default {
           this.currentStep.page_id = this.currentElement.page_id
           this.currentStep.element_id = this.currentElement.id
           this.drawerIsShow = true
-
-          this.elementFromUrl({id: step.id}).then(response => {
-            this.$set(this.currentElement, 'elementFrom', response.message)
-          })
-
-        } else if (drawerType === 'edit') {  // 修改步骤
-
+        } else if (drawerType === 'edit') { // 修改步骤
           // 获取元素信息
-          this.getElementUrl({id: step.element_id}).then(response => {
+          this.getElementUrl({ id: step.element_id }).then(response => {
             this.currentElement = response.data
           })
-
-          this.elementFromUrl({id: step.id}).then(response => {
-            this.$set(this.currentElement, 'elementFrom', response.message)
-          })
-
           this.currentStep = step
-          this.currentStepCopy = JSON.parse(JSON.stringify(step))  // 深拷贝
+          this.currentStepCopy = JSON.parse(JSON.stringify(step)) // 深拷贝
           this.drawerIsShow = true
         }
 
+        // 获取元素归属
+        this.elementFromUrl({ id: this.currentStep.element_id }).then(response => {
+          this.$set(this.currentElement, 'elementFrom', response.message)
+        })
+
         // 获取当前步骤对应元素所在页面的所有元素
-        this.elementListUrl({pageId: step.page_id}).then(response => {
+        this.elementListUrl({ pageId: step.page_id }).then(response => {
           this.tempElementList = response.data.data
         })
       }
@@ -523,7 +449,6 @@ export default {
         this.currentStep.send_keys = file_name_list[0]
       }
     })
-
   },
 
   created() {
@@ -554,6 +479,79 @@ export default {
     // 页面销毁的时候，关闭bus监听选中事件
     this.$bus.$off(this.$busEvents.drawerIsShow)
     this.$bus.$off(this.$busEvents.drawerIsCommit)
+  },
+
+  methods: {
+
+    getStepForCommit() {
+      return {
+        'id': this.currentStep.id,
+        'status': this.currentStep.status,
+        'name': this.currentStep.name,
+        'wait_time_out': this.currentStep.wait_time_out,
+        'up_func': this.currentStep.up_func,
+        'down_func': this.currentStep.down_func,
+        'skip_if': this.$refs.skipIfView.tempData,
+        'skip_on_fail': this.currentStep.skip_on_fail,
+        'run_times': this.currentStep.run_times,
+        'execute_type': this.currentStep.execute_type,
+        'send_keys': this.currentStep.send_keys,
+        'extracts': this.$refs.extractsView.tempData,
+        'validates': this.$refs.validatesView.tempData,
+        'quote_case': null,
+        'case_id': this.currentStep.case_id,
+        'element_id': this.currentElement.id,
+        'page_id': this.currentElement.page_id,
+        'project_id': this.currentStep.project_id
+      }
+    },
+
+    // 新增步骤信息
+    addStep() {
+      this.submitButtonIsLoading = true
+      this.postStepUrl(this.getStepForCommit()).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 重新请求步骤列表
+          this.drawerIsShow = false
+        }
+      })
+    },
+
+    // 修改步骤信息
+    editStep() {
+      this.submitButtonIsLoading = true
+      this.putStepUrl(this.getStepForCommit()).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 重新请求步骤列表
+          this.drawerIsShow = false
+        }
+      })
+    },
+
+    // 修改元素
+    changElement() {
+      this.submitButtonIsLoading = true
+      this.changeElementByIdUrl({
+        id: this.currentStep.element_id,
+        by: this.currentElement.by,
+        element: this.currentElement.element
+      }).then(response => {
+        this.submitButtonIsLoading = false
+        this.showMessage(this, response)
+      })
+    },
+
+    // 打开文件上传窗口
+    openFileUploadDialog() {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'uploadFile')
+    },
+
+    // 取消保存
+    rowBackStep() {
+      this.currentStep = this.currentStepCopy
+    }
   }
 }
 </script>

@@ -2,7 +2,7 @@
   <div class="dashboard-editor-container">
 
     <!-- title统计 -->
-    <panel-group @handleSetLineChartData="handleSetLineChartData"/>
+    <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
     <!-- 曲线图 -->
     <!--    <el-row style="background:#fff;padding:16px 16px 0;">-->
@@ -10,12 +10,11 @@
     <!--      <line-chart :chart-data="detailData" :key="detailData.title"/>-->
     <!--    </el-row>-->
 
-
     <!-- 柱状图 -->
     <el-row :gutter="32">
       <el-col :xs="24" :sm="24" :lg="24">
         <div class="chart-wrapper">
-          <bar-chart :chart-data="detailData" :key="detailData.title"/>
+          <bar-chart :key="detailData.title" :chart-data="detailData" />
         </div>
       </el-col>
     </el-row>
@@ -36,7 +35,7 @@ import TransactionTable from './components/TransactionTable'
 import TodoList from './components/TodoList'
 // import BoxCard from './components/BoxCard'
 
-import {getDetailCount} from '@/apis/home/apiTest'
+import { getDetailCount } from '@/apis/home/apiTest'
 
 const lineChartData = {
   newVisitis: {
@@ -76,15 +75,6 @@ export default {
     }
   },
 
-  methods: {
-    handleSetLineChartData(type) {
-      // this.lineChartData = lineChartData[type]
-      getDetailCount(type).then(response => {
-        this.detailData = response.data
-      })
-    }
-  },
-
   // mounted() {
   //   // 初始时获取定时任务的详情
   //   this.handleSetLineChartData('task')
@@ -93,6 +83,15 @@ export default {
   created() {
     // 初始时获取定时任务的详情
     this.handleSetLineChartData('hit')
+  },
+
+  methods: {
+    handleSetLineChartData(type) {
+      // this.lineChartData = lineChartData[type]
+      getDetailCount(type).then(response => {
+        this.detailData = response.data
+      })
+    }
   }
 }
 </script>
@@ -124,13 +123,11 @@ export default {
 }
 </style>
 
-
 <!--&lt;!&ndash;<template>&ndash;&gt;-->
 <!--&lt;!&ndash;&lt;!&ndash;  <div class="dashboard-container">&ndash;&gt;&ndash;&gt;-->
 <!--&lt;!&ndash;&lt;!&ndash;    <div class="dashboard-text">userName: {{ userName }}</div>&ndash;&gt;&ndash;&gt;-->
 <!--&lt;!&ndash;&lt;!&ndash;  </div>&ndash;&gt;&ndash;&gt;-->
 <!--&lt;!&ndash;</template>&ndash;&gt;-->
-
 
 <!--<script>-->
 <!--import { mapGetters } from 'vuex'-->

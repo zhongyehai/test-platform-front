@@ -5,21 +5,23 @@
     :append-to-body="true"
     :visible.sync="fileUploadDialogIsShow"
     :close-on-click-modal="false"
-    width="30%">
-<!--    :modal-append-to-body="false"-->
+    width="30%"
+  >
+    <!--    :modal-append-to-body="false"-->
     <el-upload
+      ref="upload"
       multiple
       class="upload-demo"
-      ref="upload"
       :action="uploadUrl"
       :auto-upload="false"
       :on-change="onChange"
       :on-remove="handleRemove"
-      :file-list="tempFileList">
+      :file-list="tempFileList"
+    >
       <el-button size="small" type="primary">选择文件</el-button>
     </el-upload>
 
-    <div style="height: 20px"></div>
+    <div style="height: 20px" />
 
     <el-button v-show="tempFileList.length > 0" size="small" type="primary" @click="submitUpload">上传到服务器</el-button>
 
@@ -31,12 +33,11 @@
 
 </template>
 
-
 <script>
-import {uploadApi, fileCheck, filePost} from "@/apis/assist/file";
+import { uploadApi, fileCheck, filePost } from '@/apis/assist/file'
 
 export default {
-  name: 'uploadFile',
+  name: 'UploadFile',
   data() {
     return {
 
@@ -54,12 +55,27 @@ export default {
     }
   },
 
+  mounted() {
+    // 监听 Dialog 打开事件
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, fileType) => {
+      if (_type === 'uploadFile') {
+        this.fileType = fileType
+        this.fileUploadDialogIsShow = true
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+  },
+
   methods: {
 
     // 选中文件事件, 检验文件是否已存在
     onChange(file, fileList) {
       // 检验文件是否已存在
-      fileCheck({fileType: this.fileType, 'name': file.name}).then(response => {
+      fileCheck({ fileType: this.fileType, 'name': file.name }).then(response => {
         if (response.message.indexOf('已存在') !== -1) {
           // 确认是否继续上传，不上传则从缓存中删除
           this.$confirm(`${response.message}，是否覆盖?`, '提示', {
@@ -70,7 +86,7 @@ export default {
           }).catch(() => {
             // 选择不覆盖，则把文件从缓存中删除
             this.handleRemove(file, fileList, true)
-          });
+          })
         }
       })
       this.tempFileList = fileList
@@ -88,19 +104,18 @@ export default {
 
     // 提交上传的文件到服务器
     submitUpload() {
-
       // 把文件添加到form
-      let form = new FormData()
+      const form = new FormData()
       form.append('fileType', this.fileType)
       this.tempFileList.forEach(file => {
         form.append('files', file.raw)
-      });
+      })
 
       // 上传form到服务器
       filePost(form).then((response) => {
-          this.closeDialog(response)
-        }
-      );
+        this.closeDialog(response)
+      }
+      )
     },
 
     // 关闭Dialog
@@ -112,22 +127,7 @@ export default {
         this.$bus.$emit(this.$busEvents.drawerIsCommit, 'uploadFile', true, response.data)
       }
     }
-  },
-
-  mounted() {
-    // 监听 Dialog 打开事件
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, fileType) => {
-      if (_type === 'uploadFile'){
-        this.fileType = fileType
-        this.fileUploadDialogIsShow = true
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
+  }
 }
 </script>
 

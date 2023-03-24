@@ -19,17 +19,17 @@
                 <div>断言整数</div>
               </el-col>
               <el-col :span="5">
-                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%" />
               </el-col>
 
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%" />
               </el-col>
 
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'整数'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'200'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'整数'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'200'" style="width: 90%" />
               </el-col>
             </el-row>
 
@@ -39,17 +39,17 @@
                 <div>断言普通字符串</div>
               </el-col>
               <el-col :span="5">
-                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'message'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'message'" style="width: 90%" />
               </el-col>
 
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%" />
               </el-col>
 
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'普通字符串'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'获取成功'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'普通字符串'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'获取成功'" style="width: 90%" />
               </el-col>
             </el-row>
 
@@ -59,15 +59,15 @@
                 <div>断言自定义变量</div>
               </el-col>
               <el-col :span="5">
-                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'自定义变量'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'$extract_name_2'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'自定义变量'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'$extract_name_2'" style="width: 90%" />
               </el-col>
             </el-row>
 
@@ -77,15 +77,15 @@
                 <div>断言自定义函数</div>
               </el-col>
               <el-col :span="5">
-                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'自定义函数'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'${do_something(status)}'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'自定义函数'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'${do_something(status)}'" style="width: 90%" />
               </el-col>
             </el-row>
 
@@ -95,16 +95,20 @@
                 <div>断言自定义函数+自定义变量</div>
               </el-col>
               <el-col :span="5">
-                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'status'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'相等'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'自定义函数'" style="width: 90%"></el-input>
-                <el-input size="mini" disabled :placeholder="'${do_something($extract_name_2)}'"
-                          style="width: 90%"></el-input>
+                <el-input size="mini" disabled :placeholder="'自定义函数'" style="width: 90%" />
+                <el-input
+                  size="mini"
+                  disabled
+                  :placeholder="'${do_something($extract_name_2)}'"
+                  style="width: 90%"
+                />
               </el-col>
             </el-row>
           </div>
@@ -119,7 +123,8 @@
       stripe
       :show-header="false"
       size="mini"
-      row-key="id">
+      row-key="id"
+    >
       <el-table-column label="id" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
@@ -137,13 +142,14 @@
                 filterable
                 clearable
                 default-first-option
-                size="mini">
+                size="mini"
+              >
                 <el-option
                   v-for="(item) in responseDataSourceMapping"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                />
               </el-select>
             </el-row>
             <el-row>
@@ -152,7 +158,8 @@
                 type="textarea"
                 size="mini"
                 :rows="1"
-                :placeholder="getDataSourcePlaceholder(scope.row.data_source)"></el-input>
+                :placeholder="getDataSourcePlaceholder(scope.row.data_source)"
+              />
             </el-row>
           </el-row>
         </template>
@@ -174,8 +181,8 @@
               v-for="(item) in validateTypeList"
               :key="item.value"
               :label="item.value"
-              :value="item.value">
-            </el-option>
+              :value="item.value"
+            />
           </el-select>
         </template>
       </el-table-column>
@@ -192,13 +199,14 @@
                 filterable
                 clearable
                 default-first-option
-                size="mini">
+                size="mini"
+              >
                 <el-option
                   v-for="(item) in dataTypeMapping"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                />
               </el-select>
             </el-row>
             <el-row>
@@ -210,10 +218,10 @@
                 :rows="1"
                 :placeholder="
                   scope.row.validate_type === '契约校验' ?
-                  '详见：https://pypi.org/project/pactverify/，注：契约校验标识符改用@':
-                  '预期结果'
-                ">
-              </el-input>
+                    '详见：https://pypi.org/project/pactverify/，注：契约校验标识符改用@':
+                    '预期结果'
+                "
+              />
             </el-row>
           </el-row>
         </template>
@@ -227,8 +235,8 @@
               type="text"
               size="mini"
               icon="el-icon-plus"
-              @click.native="addRow(true)">
-            </el-button>
+              @click.native="addRow(true)"
+            />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
@@ -237,8 +245,8 @@
               size="mini"
               icon="el-icon-minus"
               style="color: red"
-              @click.native="delRow(scope.$index)">
-            </el-button>
+              @click.native="delRow(scope.$index)"
+            />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
             <el-button
@@ -248,8 +256,7 @@
               icon="el-icon-circle-close"
               style="color: red"
               @click.native="clearData()"
-            >
-            </el-button>
+            />
           </el-tooltip>
         </template>
       </el-table-column>
@@ -258,15 +265,14 @@
 
   </div>
 
-
 </template>
 
 <script>
 
-import Sortable from "sortablejs";
+import Sortable from 'sortablejs'
 
 export default {
-  name: "validates",
+  name: 'Validates',
   props: ['validates'],
 
   data() {
@@ -278,15 +284,22 @@ export default {
       responseDataSourceMapping: [],
       sortable: null,
       oldList: [],
-      newList: [],
+      newList: []
+    }
+  },
+
+  watch: {
+    'validates': {
+      handler(newVal, oldVal) {
+        this.initValidates(newVal)
+      }
     }
   },
 
   mounted() {
-
-    this.validateTypeList = this.$busEvents.data.apiAssertMappingList  // 从缓存获取断言类型映射
-    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList  // 从缓存获取数据类型映射
-    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList  // 从缓存获取响应对象数据源映射
+    this.validateTypeList = this.$busEvents.data.apiTestAssertMappingList // 从缓存获取断言类型映射
+    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList // 从缓存获取数据类型映射
+    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList // 从缓存获取响应对象数据源映射
 
     this.initValidates(this.validates)
     this.oldList = this.tempData.map(v => v.id)
@@ -295,7 +308,6 @@ export default {
       this.setSort()
     })
   },
-
 
   methods: {
     // 根据选择的数据源显示不同的提示
@@ -329,7 +341,7 @@ export default {
 
     // 添加一行
     addRow(isRow) {
-      if (isRow){
+      if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
           data_source: this.responseDataSourceMapping[0].value,
@@ -338,7 +350,7 @@ export default {
           data_type: this.dataTypeMapping[0].value,
           value: null
         })
-      }else {
+      } else {
         this.tempData = [{
           id: `${Date.now()}`,
           data_source: null,
@@ -348,12 +360,11 @@ export default {
           value: null
         }]
       }
-
     },
 
     // 删除一行
     delRow(index) {
-      this.tempData.splice(index, 1);
+      this.tempData.splice(index, 1)
     },
 
     // 清除数据
@@ -378,7 +389,7 @@ export default {
       const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -389,16 +400,8 @@ export default {
           this.newList.splice(evt.newIndex, 0, tempIndex)
         }
       })
-    },
-
-  },
-
-  watch: {
-    'validates': {
-      handler(newVal, oldVal) {
-        this.initValidates(newVal)
-      }
     }
+
   }
 }
 </script>

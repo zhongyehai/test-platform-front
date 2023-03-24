@@ -32,9 +32,9 @@
 
           <el-popover
             v-show="selectedList.length > 0"
+            v-model="showBatchChangeStatusToRun"
             placement="top"
             popper-class="down-popover"
-            v-model="showBatchChangeStatusToRun"
           >
             <p>确定把所选用例状态改为要执行?</p>
             <div style="text-align: right; margin: 0">
@@ -52,9 +52,9 @@
 
           <el-popover
             v-show="selectedList.length > 0"
+            v-model="showBatchChangeStatusToNotRun"
             placement="top"
             popper-class="down-popover"
-            v-model="showBatchChangeStatusToNotRun"
           >
             <p>确定把所选用例状态改为不执行?</p>
             <div style="text-align: right; margin: 0">
@@ -70,6 +70,15 @@
             </el-button>
           </el-popover>
 
+          <el-button
+            v-show="selectedList.length > 0"
+            type="primary"
+            size="mini"
+            style="margin-left: 5px"
+            @click="clickRunCase"
+          >批量运行
+          </el-button>
+
         </el-form>
 
         <el-table
@@ -82,7 +91,7 @@
           stripe
           @selection-change="clickSelectAll"
         >
-          <el-table-column type="selection" min-width="2%"></el-table-column>
+          <el-table-column type="selection" min-width="2%" />
 
           <el-table-column prop="num" label="序号" align="center" min-width="8%">
             <template slot-scope="scope">
@@ -90,7 +99,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="用例名称" min-width="55%">
+          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="55%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
@@ -108,7 +117,7 @@
                   <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
                   <div>2: 请务必将用例调试通过后再设为要运行</div>
                 </div>
-                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
@@ -117,7 +126,7 @@
                 :inactive-value="0"
                 :active-value="1"
                 @change="changeCaseIsRun(scope.row, null)"
-              ></el-switch>
+              />
             </template>
           </el-table-column>
 
@@ -126,9 +135,9 @@
 
               <!-- 运行用例 -->
               <el-button
+                slot="reference"
                 type="text"
                 size="mini"
-                slot="reference"
                 @click="clickRunCase(scope.row)"
               >运行
               </el-button>
@@ -145,10 +154,10 @@
               <!-- 复制用例 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.copyPopoverIsShow"
                 placement="top"
                 style="margin-right: 10px"
                 popper-class="down-popover"
-                v-model="scope.row.copyPopoverIsShow"
               >
                 <p>复制用例及其步骤？</p>
                 <div style="text-align: right; margin: 0">
@@ -166,9 +175,9 @@
               <!-- 删除用例 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.deletePopoverIsShow"
                 placement="top"
                 popper-class="down-popover"
-                v-model="scope.row.deletePopoverIsShow"
               >
                 <p>确定删除【{{ scope.row.name }}】?</p>
                 <div style="text-align: right; margin: 0">
@@ -200,10 +209,10 @@
     </el-tabs>
 
     <caseDrawer
-      :dataType="dataType"
-      :currentProjectId="currentProjectId"
-      :currentSetId="currentSetId"
-    ></caseDrawer>
+      :data-type="dataType"
+      :current-project-id="currentProjectId"
+      :current-set-id="currentSetId"
+    />
 
   </div>
 </template>
@@ -240,7 +249,7 @@ import {
 import { executeList as appUiExecuteList } from '@/apis/appUiTest/step'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     Pagination,
     caseDrawer
@@ -263,11 +272,11 @@ export default {
       showBatchChangeStatusToRun: false,
       showBatchChangeStatusToNotRun: false,
 
-      tableLoadingIsShow: false,  // 请求列表等待响应的状态
-      caseTab: 'case',  // tab页的显示
+      tableLoadingIsShow: false, // 请求列表等待响应的状态
+      caseTab: 'case', // tab页的显示
 
-      tempCase: {},  // 用例新增/编辑临时数据
-      currentCase: '',  // 当前点击的用例
+      tempCase: {}, // 用例新增/编辑临时数据
+      runCaseId: [], // 当前点击的用例
 
       // 用例数据列表
       case_total: 0,
@@ -287,173 +296,33 @@ export default {
     }
   },
 
-  methods: {
+  watch: {
 
-    // 全选
-    clickSelectAll(val) {
-      this.selectedList = val
-    },
-
-    cancelShowBatchChangeStatusToRun() {
-      this.showBatchChangeStatusToRun = false
-    },
-
-    cancelShowBatchChangeStatusToNotRun() {
-      this.showBatchChangeStatusToNotRun = false
-    },
-
-    cancelBatchDeletePopover() {
-      this.showBatchDelete = false
-    },
-
-    // 编辑用例
-    editCase(row) {
-      this.tempCase = row
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'edit', JSON.parse(JSON.stringify(this.tempCase)))
-    },
-
-    // 删除用例
-    delCase(row) {
-      let selectedIdList = []
-      if (row.id) {
-        this.$set(row, 'deletePopoverIsShow', false)
-        this.$set(row, 'isShowDeleteLoading', true)
-        selectedIdList = [row.id]
-      } else {  // 批量删除
-        this.showBatchDelete = false
-        this.selectedList.forEach(report => {
-          selectedIdList.push(report.id)
-        })
-      }
-      this.deleteCaseUrl({ 'id': selectedIdList }).then(response => {
-        if (row.id) {
-          this.$set(row, 'isShowDeleteLoading', false)
-        }
-        if (this.showMessage(this, response)) {
-          this.getCaseList()
-        }
-      })
-    },
-
-    // 复制用例
-    copyCase(caseData) {
-      this.tempCase = caseData
-      this.tempCase.num = ''
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', JSON.parse(JSON.stringify(this.tempCase)))
-      this.$set(caseData, 'copyPopoverIsShow', false)
-    },
-
-    cancelDeletePopover(caseData) {
-      this.$set(caseData, 'deletePopoverIsShow', false)
-    },
-
-    cancelCopyPopover(caseData) {
-      this.$set(caseData, 'copyPopoverIsShow', false)
-    },
-
-    // 点击运行用例
-    clickRunCase(row) {
-      this.currentCase = row
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'caseIndex', false)
-    },
-
-    // 运行用例
-    runCase(runConf) {
-      this.caseRunUrl({
-        caseId: [this.currentCase.id],
-        env_code: runConf.runEnv,
-        is_async: runConf.runType,
-        browser: runConf.browser,
-        server_id: runConf.runServer,
-        phone_id: runConf.runPhone,
-        no_reset: runConf.noReset,
-        'trigger_type': 'page'
-      }).then(response => {
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
-        }
-      })
-    },
-
-    // 修改用例状态
-    changeCaseIsRun(row, status) {
-      let selectedIdList = []
-      let changeStatus = 0
-      if (row === null) {  // 批量修改
-        this.showBatchChangeStatusToRun = false
-        this.showBatchChangeStatusToNotRun = false
-        this.selectedList.forEach(data => {
-          selectedIdList.push(data.id)
-        })
-        changeStatus = status
-      } else {
-        selectedIdList = [row.id]
-        changeStatus = row.status
-      }
-      this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus }).then(response => {
-        this.showMessage(this, response)
-        this.getCaseList()
-      })
-    },
-
-    // 根据模块内容获取用例列表
-    getCaseList(params) {
-      this.tableLoadingIsShow = true
-      this.caseListUrl({
-        'setId': this.currentSetId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
-        this.tableLoadingIsShow = false
-
-        this.case_list = response.data.data
-        this.case_total = response.data.total
-
-        this.oldList = this.case_list.map(v => v.id)
-        this.newList = this.oldList.slice()
-      })
-
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.caseTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.case_list.splice(evt.oldIndex, 1)[0]
-          this.case_list.splice(evt.newIndex, 0, targetRow)
-
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableLoadingIsShow = true
-          this.caseSortUrl({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
-            this.showMessage(this, response)
-            this.tableLoadingIsShow = false
+    // 监听父组件传过来的当前选中的用例集，实时获取父组件传过来的用例集对应下的用例列表
+    'currentSetId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.getCaseList({
+            'caseSetId': newVal,
+            'pageNum': this.pageNum,
+            'pageSize': this.pageSize
           })
+        } else {
+          this.case_list = []
         }
-      })
+      }
     }
   },
 
   mounted() {
-
     // 如果是ui测试用例，则获取步骤执行方式
     if (this.dataType !== 'api') {
       this.executeListUrl().then(response => {
         this.executeTypeList = response.data
         this.$busEvents.data.executeTypeList = response.data
         this.$busEvents.data.executeTypeList.forEach(executeType => {
-          this.$busEvents.data.executeTypeDict[executeType.value] = executeType.label
+          this.$busEvents.data.uiTestExecuteTypeDict[executeType.value] = executeType.label
         })
       })
     }
@@ -507,22 +376,167 @@ export default {
     this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
-  watch: {
+  methods: {
 
-    // 监听父组件传过来的当前选中的用例集，实时获取父组件传过来的用例集对应下的用例列表
-    'currentSetId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.getCaseList({
-            'caseSetId': newVal,
-            'pageNum': this.pageNum,
-            'pageSize': this.pageSize
-          })
-        } else {
-          this.case_list = []
-        }
+    // 全选
+    clickSelectAll(val) {
+      this.selectedList = val
+    },
+
+    cancelShowBatchChangeStatusToRun() {
+      this.showBatchChangeStatusToRun = false
+    },
+
+    cancelShowBatchChangeStatusToNotRun() {
+      this.showBatchChangeStatusToNotRun = false
+    },
+
+    cancelBatchDeletePopover() {
+      this.showBatchDelete = false
+    },
+
+    // 编辑用例
+    editCase(row) {
+      this.tempCase = row
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'edit', JSON.parse(JSON.stringify(this.tempCase)))
+    },
+
+    // 删除用例
+    delCase(row) {
+      let selectedIdList = []
+      if (row.id) {
+        this.$set(row, 'deletePopoverIsShow', false)
+        this.$set(row, 'isShowDeleteLoading', true)
+        selectedIdList = [row.id]
+      } else { // 批量删除
+        this.showBatchDelete = false
+        this.selectedList.forEach(report => {
+          selectedIdList.push(report.id)
+        })
       }
+      this.deleteCaseUrl({ 'id': selectedIdList }).then(response => {
+        if (row.id) {
+          this.$set(row, 'isShowDeleteLoading', false)
+        }
+        if (this.showMessage(this, response)) {
+          this.getCaseList()
+        }
+      })
+    },
+
+    // 复制用例
+    copyCase(caseData) {
+      this.tempCase = caseData
+      this.tempCase.num = ''
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', JSON.parse(JSON.stringify(this.tempCase)))
+      this.$set(caseData, 'copyPopoverIsShow', false)
+    },
+
+    cancelDeletePopover(caseData) {
+      this.$set(caseData, 'deletePopoverIsShow', false)
+    },
+
+    cancelCopyPopover(caseData) {
+      this.$set(caseData, 'copyPopoverIsShow', false)
+    },
+
+    // 点击运行用例
+    clickRunCase(row) {
+      if (row.id) {
+        this.runCaseId = [row.id]
+      } else {
+        this.runCaseId = []
+        this.selectedList.forEach(data => {
+          this.runCaseId.push(data.id)
+        })
+      }
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'caseIndex', false)
+    },
+
+    // 运行用例
+    runCase(runConf) {
+      this.caseRunUrl({
+        caseId: this.runCaseId,
+        env_code: runConf.runEnv,
+        is_async: runConf.runType,
+        browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
+        'trigger_type': 'page'
+      }).then(response => {
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+        }
+      })
+    },
+
+    // 修改用例状态
+    changeCaseIsRun(row, status) {
+      let selectedIdList = []
+      let changeStatus = 0
+      if (row === null) { // 批量修改
+        this.showBatchChangeStatusToRun = false
+        this.showBatchChangeStatusToNotRun = false
+        this.selectedList.forEach(data => {
+          selectedIdList.push(data.id)
+        })
+        changeStatus = status
+      } else {
+        selectedIdList = [row.id]
+        changeStatus = row.status
+      }
+      this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus }).then(response => {
+        this.showMessage(this, response)
+        this.getCaseList()
+      })
+    },
+
+    // 根据模块内容获取用例列表
+    getCaseList(params) {
+      this.tableLoadingIsShow = true
+      this.caseListUrl({
+        'setId': this.currentSetId,
+        'pageNum': this.pageNum,
+        'pageSize': this.pageSize
+      }).then(response => {
+        this.tableLoadingIsShow = false
+
+        this.case_list = response.data.data
+        this.case_total = response.data.total
+
+        this.oldList = this.case_list.map(v => v.id)
+        this.newList = this.oldList.slice()
+      })
+    },
+
+    // 拖拽排序
+    setSort() {
+      const el = this.$refs.caseTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+      this.sortable = Sortable.create(el, {
+        ghostClass: 'sortable-ghost',
+        setData: function(dataTransfer) {
+          dataTransfer.setData('Text', '')
+        },
+        onEnd: evt => {
+          const targetRow = this.case_list.splice(evt.oldIndex, 1)[0]
+          this.case_list.splice(evt.newIndex, 0, targetRow)
+
+          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
+          this.newList.splice(evt.newIndex, 0, tempIndex)
+
+          // 发送请求，改变排序
+          this.tableLoadingIsShow = true
+          this.caseSortUrl({
+            List: this.newList,
+            pageNum: this.pageNum,
+            pageSize: this.pageSize
+          }).then(response => {
+            this.showMessage(this, response)
+            this.tableLoadingIsShow = false
+          })
+        }
+      })
     }
   }
 }

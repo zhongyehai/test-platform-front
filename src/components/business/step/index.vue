@@ -7,9 +7,9 @@
     <el-col :span="10">
       <stepListView
         ref="stepListView"
-        :dataType="dataType"
-        :caseId="caseId">
-      </stepListView>
+        :data-type="dataType"
+        :case-id="caseId"
+      />
     </el-col>
 
     <!-- 添加步骤/引用用例 -->
@@ -21,10 +21,10 @@
         <el-tab-pane v-if="dataType === 'api'" label="接口列表" name="apiList">
           <apiListView
             ref="apiListView"
-            :projectId="this.projectId"
-            :dialogIsShow="dialogIsShow"
-            :currentCaseId="caseId"
-          ></apiListView>
+            :project-id="this.projectId"
+            :dialog-is-show="dialogIsShow"
+            :current-case-id="caseId"
+          />
         </el-tab-pane>
 
         <!-- 接口列表 -->
@@ -32,10 +32,10 @@
           <elementListView
             ref="elementList"
             :data-type="dataType"
-            :projectId="this.projectId"
-            :dialogIsShow="dialogIsShow"
-            :currentCaseId="caseId"
-          ></elementListView>
+            :project-id="this.projectId"
+            :dialog-is-show="dialogIsShow"
+            :current-case-id="caseId"
+          />
         </el-tab-pane>
 
         <!-- 引用用例 -->
@@ -43,9 +43,9 @@
           <quoteCaseView
             ref="quoteCase"
             :data-type="dataType"
-            :tempCase="tempCase"
-            :caseId="caseId"
-          ></quoteCaseView>
+            :temp-case="tempCase"
+            :case-id="caseId"
+          />
         </el-tab-pane>
 
       </el-tabs>
@@ -56,44 +56,36 @@
     <editApiStepView
       v-if="dataType === 'api'"
       ref="editStepView"
-      :caseId="caseId"
-    ></editApiStepView>
+      :case-id="caseId"
+    />
 
     <!-- ui步骤编辑 -->
     <editUiStepView
       v-else
       ref="editStepView"
       :data-type="dataType"
-      :projectId="projectId"
-      :caseId="caseId"
-    ></editUiStepView>
+      :project-id="projectId"
+      :case-id="caseId"
+    />
   </el-row>
-
 
 </template>
 
 <script>
 
-
 import stepListView from './stepList'
 import apiListView from './apiList'
 import elementListView from './elementList.vue'
-import editApiStepView from "./editApiStep.vue";
-import editUiStepView from "./editUiStep.vue";
-import quoteCaseView from "./quoteCase";
+import editApiStepView from './editApiStep.vue'
+import editUiStepView from './editUiStep.vue'
+import quoteCaseView from './quoteCase'
 
-import {postStep as apiPostStep} from "@/apis/apiTest/step";
-import {postStep as webUiPostStep} from "@/apis/webUiTest/step";
-import {postStep as appUiPostStep} from "@/apis/appUiTest/step";
+import { postStep as apiPostStep } from '@/apis/apiTest/step'
+import { postStep as webUiPostStep } from '@/apis/webUiTest/step'
+import { postStep as appUiPostStep } from '@/apis/appUiTest/step'
 
 export default {
-  name: 'index',
-  props: [
-    'dataType',
-    'projectId',
-    'caseId',
-    'tempCase'
-  ],
+  name: 'Index',
   components: {
     stepListView,
     apiListView,
@@ -102,9 +94,15 @@ export default {
     editUiStepView,
     quoteCaseView
   },
+  props: [
+    'dataType',
+    'projectId',
+    'caseId',
+    'tempCase'
+  ],
   data() {
     return {
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       dialogStatus: '',
       dialogIsShow: false,
       activeName: 'apiList',
@@ -112,28 +110,24 @@ export default {
     }
   },
 
-  methods: {},
-
   created() {
-
-    if (this.dataType === 'api'){
+    if (this.dataType === 'api') {
       this.postStepUrl = apiPostStep
-    }else if (this.dataType === 'webUi'){
+    } else if (this.dataType === 'webUi') {
       this.postStepUrl = webUiPostStep
-    }else {
+    } else {
       this.postStepUrl = appUiPostStep
     }
   },
 
   mounted() {
-
     // 引用用例
     this.$bus.$on(this.$busEvents.quoteCaseToStep, (testCase, status) => {
-      if (testCase){
+      if (testCase) {
         this.postStepUrl(testCase).then(response => {
           if (this.showMessage(this, response)) {
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')  // 重新请求步骤列表
-            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess')  // 重新请求步骤列表
+            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 重新请求步骤列表
+            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess') // 重新请求步骤列表
           }
         })
       }
@@ -143,7 +137,9 @@ export default {
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.quoteCaseToStep)
-  }
+  },
+
+  methods: {}
 }
 </script>
 

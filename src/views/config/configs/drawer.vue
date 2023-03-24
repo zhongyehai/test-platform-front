@@ -4,36 +4,38 @@
   <el-drawer
     :title=" drawerType === 'add' ? '新增配置' : '修改配置'"
     size="60%"
-    :wrapperClosable="false"
+    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
 
     <el-form
       ref="dataForm"
       :model="tempConfig"
       :rules="rules"
       label-width="80px"
-      style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+      style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+    >
 
       <el-form-item :label="'配置类型'" prop="type" class="is-required" size="mini">
         <configTypeSelector
           ref="configTypeSelector"
-          :configTypeList="configTypeList"
-          :configType="tempConfig.type"
-          :dialogType="drawerType"
-        ></configTypeSelector>
+          :config-type-list="configTypeList"
+          :config-type="tempConfig.type"
+          :dialog-type="drawerType"
+        />
       </el-form-item>
 
       <el-form-item :label="'配置名'" prop="name" class="is-required" size="mini">
-        <el-input v-model="tempConfig.name" :disabled="drawerType === 'edit'"/>
+        <el-input v-model="tempConfig.name" :disabled="drawerType === 'edit'" />
       </el-form-item>
 
       <el-form-item :label="'配置值'" prop="value" class="is-required" size="mini">
-        <el-input type="textarea" autosize v-model="tempConfig.value"/>
+        <el-input v-model="tempConfig.value" type="textarea" autosize />
       </el-form-item>
 
       <el-form-item :label="'描述'" prop="desc" size="mini">
-        <el-input v-model="tempConfig.desc"/>
+        <el-input v-model="tempConfig.desc" />
       </el-form-item>
 
     </el-form>
@@ -43,7 +45,8 @@
         type="primary"
         size="mini"
         :loading="submitButtonIsLoading"
-        @click=" drawerType === 'add' ? addConfig() : changConfig() ">
+        @click=" drawerType === 'add' ? addConfig() : changConfig() "
+      >
         {{ '保存' }}
       </el-button>
     </div>
@@ -52,14 +55,14 @@
 </template>
 
 <script>
-import configTypeSelector from "@/components/Selector/configType";
-import {postConfig, putConfig} from "@/apis/config/config";
+import configTypeSelector from '@/components/Selector/configType'
+import { postConfig, putConfig } from '@/apis/config/config'
 import waves from '@/directive/waves'
 
 export default {
-  name: "drawer",
-  components: {configTypeSelector},
-  directives: {waves},
+  name: 'Drawer',
+  components: { configTypeSelector },
+  directives: { waves },
   props: ['configTypeList', 'configTypeDict'],
   data() {
     return {
@@ -72,26 +75,29 @@ export default {
         name: '',
         value: '',
         type: '',
-        desc: '',
+        desc: ''
       },
-      drawerIsShow: false,  // 抽屉的显示状态
-      drawerType: 'add',  // 抽屉状态，edit为编辑数据, create为新增数据
-      direction: 'rtl',  // 抽屉打开方式
+      drawerIsShow: false, // 抽屉的显示状态
+      drawerType: 'add', // 抽屉状态，edit为编辑数据, create为新增数据
+      direction: 'rtl', // 抽屉打开方式
       // 检验规则
       rules: {
-        name: [{required: true, message: '请输入配置名称', trigger: 'blur'}]
+        name: [{ required: true, message: '请输入配置名称', trigger: 'blur' }]
       }
     }
   },
+
+  computed: {},
+
+  watch: {},
 
   created() {
   },
 
   mounted() {
-
     // 监听 bus 配置操作指令
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, config) => {
-      if (_type === 'configInfo'){
+      if (_type === 'configInfo') {
         if (status === 'add') {
           this.initTempConfig()
         } else if (status === 'edit') {
@@ -111,21 +117,21 @@ export default {
     // 点击新增配置时，初始化 dialog 数据
     initTempConfig() {
       this.drawerType = 'add'
-      this.tempConfig.id = '';
-      this.tempConfig.name = '';
-      this.tempConfig.value = '';
-      this.tempConfig.desc = '';
-      this.tempConfig.type = '';
+      this.tempConfig.id = ''
+      this.tempConfig.name = ''
+      this.tempConfig.value = ''
+      this.tempConfig.desc = ''
+      this.tempConfig.type = ''
     },
 
     // 点击修改配置时，初始化 dialog 内容
     editTempConfig(config) {
       this.drawerType = 'edit'
-      this.tempConfig.id = config.id;
-      this.tempConfig.name = config.name;
-      this.tempConfig.value = config.value;
-      this.tempConfig.desc = config.desc;
-      this.tempConfig.type = config.type;
+      this.tempConfig.id = config.id
+      this.tempConfig.name = config.name
+      this.tempConfig.value = config.value
+      this.tempConfig.desc = config.desc
+      this.tempConfig.type = config.type
     },
 
     getConfigToCommit() {
@@ -134,7 +140,7 @@ export default {
         name: this.tempConfig.name,
         value: this.tempConfig.value,
         desc: this.tempConfig.desc,
-        type: this.$refs.configTypeSelector.tempConfigType,
+        type: this.$refs.configTypeSelector.tempConfigType
       }
     },
 
@@ -148,7 +154,7 @@ export default {
             this.sendIsCommitStatus()
           }
         })
-      });
+      })
     },
 
     // 修改配置
@@ -166,15 +172,10 @@ export default {
     sendIsCommitStatus() {
       this.drawerIsShow = false
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'configInfo')
-    },
-  },
-
-  computed: {},
-
-  watch: {}
+    }
+  }
 }
 </script>
-
 
 <style scoped>
 

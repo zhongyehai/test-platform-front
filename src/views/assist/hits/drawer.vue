@@ -3,14 +3,41 @@
   <el-drawer
     :title="tempHit.id ? '修改命中问题' : '新增命中问题'"
     size="60%"
-    :wrapperClosable="false"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
     <el-form
       ref="hitForm"
       label-position="center"
       label-width="100px"
-      style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+      style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+    >
+
+      <!--      <el-form-item :label="'服务id'" prop="project_id" class="is-required" size="mini">-->
+      <!--        <el-input v-model="tempHit.project_id" size="mini"/>-->
+      <!--      </el-form-item>-->
+
+      <el-form-item :label="'运行环境'" prop="env" class="is-required" size="mini">
+        <el-select
+          v-model="tempHit.env"
+          filterable
+          default-first-option
+          placeholder="运行环境"
+          size="mini"
+          style="width:100%"
+        >
+          <el-option
+            v-for="item in runEnvList"
+            :key="item.code"
+            :label="item.name"
+            :value="item.code"
+          />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
+        <el-input v-model="tempHit.report_id" size="mini" />
+      </el-form-item>
 
       <el-form-item :label="'触发时间'" prop="date" class="is-required" size="mini">
         <el-date-picker
@@ -19,14 +46,14 @@
           type="date"
           placeholder="选择日期"
           style="width: 100%"
-          :picker-options="pickerOptions">
-        </el-date-picker>
+          :picker-options="pickerOptions"
+        />
       </el-form-item>
 
       <el-form-item :label="'测试类型'" prop="test_type" class="is-required" size="mini">
         <el-select
-          style="width: 100%"
           v-model="tempHit.test_type"
+          style="width: 100%"
           placeholder="测试类型"
           size="mini"
           filterable
@@ -37,8 +64,7 @@
             :key="item.key"
             :label="item.label"
             :value="item.key"
-          >
-          </el-option>
+          />
         </el-select>
       </el-form-item>
 
@@ -50,27 +76,23 @@
           default-first-option
           placeholder="问题类型，可手动输入"
           size="mini"
-          style="width:100%">
+          style="width:100%"
+        >
           <el-option
             v-for="item in hitTypeList"
             :key="item.key"
             :label="item.value"
             :value="item.key"
-          >
-          </el-option>
+          />
         </el-select>
       </el-form-item>
 
       <el-form-item :label="'问题内容'" prop="hit_detail" class="is-required" size="mini">
-        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'"/>
-      </el-form-item>
-
-      <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
-        <el-input size="mini" v-model="tempHit.report_id"/>
+        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'" />
       </el-form-item>
 
       <el-form-item :label="'备注'" prop="desc" size="mini">
-        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'"/>
+        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'" />
       </el-form-item>
 
     </el-form>
@@ -81,7 +103,8 @@
         type="primary"
         size="mini"
         :loading="submitButtonIsLoading"
-        @click="tempHit.id ? editHit(): creteHit()">
+        @click="tempHit.id ? editHit(): creteHit()"
+      >
         {{ '保存' }}
       </el-button>
     </div>
@@ -90,18 +113,22 @@
 </template>
 
 <script>
-import {getConfigByName} from '@/apis/config/config'
-import {postHit, putHit, getHitTypeList} from '@/apis/assist/hit'
+import { getConfigByName } from '@/apis/config/config'
+import { postHit, putHit, getHitTypeList } from '@/apis/assist/hit'
 
 export default {
-  name: "drawer",
+  name: 'Drawer',
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'runTestTypeList',
-    'currentHitTypeList'
+    // eslint-disable-next-line vue/require-prop-types
+    'currentHitTypeList',
+    // eslint-disable-next-line vue/require-prop-types
+    'runEnvList'
   ],
   data() {
     return {
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       drawerIsShow: false,
       hitTypeList: this.currentHitTypeList,
@@ -112,37 +139,57 @@ export default {
         hit_type: '',
         hit_detail: '',
         test_type: '',
+        project_id: '',
+        env: '',
         report_id: '',
         desc: ''
       },
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [{
           text: '今天',
           onClick(picker) {
-            picker.$emit('pick', new Date());
+            picker.$emit('pick', new Date())
           }
         }, {
           text: '昨天',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() - 3600 * 1000 * 24);
-            picker.$emit('pick', date);
+            const date = new Date()
+            date.setTime(date.getTime() - 3600 * 1000 * 24)
+            picker.$emit('pick', date)
           }
         }]
-      },
+      }
+    }
+  },
+
+  watch: {
+    'runTestTypeList': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.runTestType = newVal
+        }
+      }
+    },
+
+    'currentHitTypeList': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.hitTypeList = newVal
+        }
+      }
     }
   },
 
   mounted() {
-
     this.$bus.$on(this.$busEvents.drawerIsShow, (status, data) => {
+      this.initHitTypeList() // 获取问题类型列表
 
-      this.initHitTypeList()  // 获取问题类型列表
-
-      this.getRunType()  // 获取测试类型列表
+      this.getRunType() // 获取测试类型列表
 
       if (status === 'add') {
         this.tempHit.id = ''
@@ -150,6 +197,8 @@ export default {
         this.tempHit.hit_type = ''
         this.tempHit.hit_detail = ''
         this.tempHit.test_type = data ? data.test_type : ''
+        this.tempHit.project_id = data ? data.project_id : ''
+        this.tempHit.env = data ? data.run_env : ''
         this.tempHit.report_id = data ? data.report_id : ''
         this.tempHit.desc = ''
       } else if (status === 'update') {
@@ -158,6 +207,8 @@ export default {
         this.tempHit.hit_type = data.hit_type
         this.tempHit.hit_detail = data.hit_detail
         this.tempHit.test_type = data.test_type
+        this.tempHit.project_id = data.project_id
+        this.tempHit.env = data.env
         this.tempHit.report_id = data.report_id
         this.tempHit.desc = data.desc
       }
@@ -197,7 +248,7 @@ export default {
     },
 
     initHitTypeList() {
-      if (!this.hitTypeList || this.hitTypeList.length < 1){
+      if (!this.hitTypeList || this.hitTypeList.length < 1) {
         getHitTypeList().then(response => {
           this.hitTypeList = response.data
         })
@@ -206,29 +257,9 @@ export default {
 
     getRunType() {
       if (!this.runTestType || this.runTestType.length < 1) {
-        getConfigByName({name: 'test_type'}).then(response => {
+        getConfigByName({ name: 'test_type' }).then(response => {
           this.runTestType = JSON.parse(response.data.value)
         })
-      }
-    }
-  },
-
-  watch: {
-    "runTestTypeList": {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.runTestType = newVal
-        }
-      }
-    },
-
-    "currentHitTypeList": {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.hitTypeList = newVal
-        }
       }
     }
   }

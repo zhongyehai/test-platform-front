@@ -1,5 +1,5 @@
 <template>
-  <projectView :data-type="'appUi'"></projectView>
+  <projectView :data-type="'appUi'" />
 </template>
 
 <script>

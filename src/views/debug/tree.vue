@@ -4,21 +4,22 @@
       :data="data"
       node-key="id"
       default-expand-all
+      draggable
+      :allow-drop="allowDrop"
+      :allow-drag="allowDrag"
       @node-drag-start="handleDragStart"
       @node-drag-enter="handleDragEnter"
       @node-drag-leave="handleDragLeave"
       @node-drag-over="handleDragOver"
       @node-drag-end="handleDragEnd"
       @node-drop="handleDrop"
-      draggable
-      :allow-drop="allowDrop"
-      :allow-drag="allowDrag">
-    </el-tree>
+    />
 
     <el-popover
+      v-model="visible"
       placement="top"
       width="160"
-      v-model="visible">
+    >
       <p>这是一段内容这是一段内容确定删除吗？</p>
       <div style="text-align: right; margin: 0">
         <el-button size="mini" type="text" @click="visible = false">取消</el-button>
@@ -84,36 +85,36 @@ export default {
         children: 'children',
         label: 'label'
       }
-    };
+    }
   },
   methods: {
     // 节点开始拖拽时触发的事件
     handleDragStart(node, ev) {
-      console.log('drag start', node);
+      console.log('drag start', node)
     },
     // 拖拽进入其他节点时触发的事件
     handleDragEnter(draggingNode, dropNode, ev) {
-      console.log('tree drag enter: ', dropNode.label);
+      console.log('tree drag enter: ', dropNode.label)
     },
     // 拖拽离开某个节点时触发的事件
     handleDragLeave(draggingNode, dropNode, ev) {
-      console.log('tree drag leave: ', dropNode.label);
+      console.log('tree drag leave: ', dropNode.label)
     },
     // 在拖拽节点时触发的事件（类似浏览器的 mouseover 事件）
     handleDragOver(draggingNode, dropNode, ev) {
-      console.log('tree drag over: ', dropNode.label);
+      console.log('tree drag over: ', dropNode.label)
     },
     // 拖拽结束时（可能未成功）触发的事件
     handleDragEnd(draggingNode, dropNode, dropType, ev) {
-      console.log('tree drag end: ', dropNode && dropNode.label, dropType);
+      console.log('tree drag end: ', dropNode && dropNode.label, dropType)
     },
     // 拖拽成功完成时触发的事件
     handleDrop(draggingNode, dropNode, dropType, ev) {
-      console.log('拖拽成功完成.dropType: ', dropType);
+      console.log('拖拽成功完成.dropType: ', dropType)
 
-      console.log('拖拽成功完成.draggingNode: ', draggingNode);
+      console.log('拖拽成功完成.draggingNode: ', draggingNode)
 
-      console.log('拖拽成功完成.ev: ', ev);
+      console.log('拖拽成功完成.ev: ', ev)
     },
     // 判断节点能否被拖拽
     allowDrop(draggingNode, dropNode, type) {
@@ -126,8 +127,8 @@ export default {
     },
     // 拖拽时判定目标节点能否被放置。type 参数有三种情况：'prev'、'inner' 和 'next'，分别表示放置在目标节点前、插入至目标节点和放置在目标节点后
     allowDrag(draggingNode) {
-      return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+      return draggingNode.data.label.indexOf('三级 3-2-2') === -1
     }
   }
-};
+}
 </script>

@@ -3,15 +3,17 @@
   <el-drawer
     :title=" drawerType === 'add' ? '新增数据' : '修改数据'"
     size="60%"
-    :wrapperClosable="false"
+    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
 
     <el-form
       ref="dataForm"
       :model="tempData"
       label-width="100px"
-      style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+      style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+    >
 
       <el-form-item label="环境" size="mini" class="is-required">
         <el-select
@@ -23,20 +25,20 @@
           size="mini"
           class="filter-item"
         >
-          <el-option v-for="env in runEnvList" :key="env.code" :label="env.name" :value="env.code"/>
+          <el-option v-for="env in runEnvList" :key="env.code" :label="env.name" :value="env.code" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="手机号" size="mini">
-        <el-input v-model="tempData.mobile"/>
+        <el-input v-model="tempData.mobile" />
       </el-form-item>
 
       <el-form-item label="密码" size="mini">
-        <el-input v-model="tempData.password"/>
+        <el-input v-model="tempData.password" />
       </el-form-item>
 
       <el-form-item label="流水号" size="mini" class="is-required">
-        <el-input v-model="tempData.business_order_no"/>
+        <el-input v-model="tempData.business_order_no" />
       </el-form-item>
 
       <el-form-item label="业务状态" size="mini">
@@ -49,7 +51,7 @@
           size="mini"
           class="filter-item"
         >
-          <el-option v-for="status in businessStatusList" :key="status" :label="status" :value="status"/>
+          <el-option v-for="status in businessStatusList" :key="status" :label="status" :value="status" />
         </el-select>
       </el-form-item>
 
@@ -64,12 +66,12 @@
           size="mini"
           class="filter-item"
         >
-          <el-option v-for="(value, key) in useStatusList" :key="key" :label="value" :value="key"/>
+          <el-option v-for="(value, key) in useStatusList" :key="key" :label="value" :value="key" />
         </el-select>
       </el-form-item>
 
       <el-form-item :label="'描述'" prop="desc" size="mini">
-        <el-input type="textarea" autosize v-model="tempData.desc"/>
+        <el-input v-model="tempData.desc" type="textarea" autosize />
       </el-form-item>
 
     </el-form>
@@ -79,7 +81,8 @@
         type="primary"
         size="mini"
         :loading="submitButtonIsLoading"
-        @click=" drawerType === 'add' ? addData() : changData() ">
+        @click=" drawerType === 'add' ? addData() : changData() "
+      >
         {{ '保存' }}
       </el-button>
     </div>
@@ -88,13 +91,13 @@
 </template>
 
 <script>
-import {dataPool, postDataPool, putDataPool} from '@/apis/assist/dataPool'
+import { dataPool, postDataPool, putDataPool } from '@/apis/assist/dataPool'
 
 import waves from '@/directive/waves'
 
 export default {
-  name: "drawer",
-  directives: {waves},
+  name: 'Drawer',
+  directives: { waves },
   props: [
     'businessStatusList', 'useStatusList', 'runEnvList'
   ],
@@ -115,39 +118,38 @@ export default {
         business_status: undefined,
         business_order_no: undefined
       },
-      drawerIsShow: false,  // 抽屉的显示状态
-      drawerType: 'add',  // 抽屉状态，edit为编辑数据, create为新增数据
-      direction: 'rtl',  // 抽屉打开方式
+      drawerIsShow: false, // 抽屉的显示状态
+      drawerType: 'add', // 抽屉状态，edit为编辑数据, create为新增数据
+      direction: 'rtl' // 抽屉打开方式
     }
   },
 
   mounted() {
-
     // 监听 bus 配置操作指令
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
-      if (_type === 'dataPool'){
+      if (_type === 'dataPool') {
         if (status === 'add') {
           this.drawerType = 'add'
-          this.tempData.id = '';
-          this.tempData.env = '';
-          this.tempData.mobile = '';
-          this.tempData.password = '';
-          this.tempData.amount = '';
-          this.tempData.desc = '';
-          this.tempData.use_status = '';
-          this.tempData.business_status = '';
-          this.tempData.business_order_no = '';
+          this.tempData.id = ''
+          this.tempData.env = ''
+          this.tempData.mobile = ''
+          this.tempData.password = ''
+          this.tempData.amount = ''
+          this.tempData.desc = ''
+          this.tempData.use_status = ''
+          this.tempData.business_status = ''
+          this.tempData.business_order_no = ''
         } else if (status === 'edit') {
           this.drawerType = 'edit'
-          this.tempData.id = data.id;
-          this.tempData.env = data.env;
-          this.tempData.mobile = data.mobile;
-          this.tempData.password = data.password;
-          this.tempData.amount = data.amount;
-          this.tempData.desc = data.desc;
-          this.tempData.use_status = data.use_status;
-          this.tempData.business_status = data.business_status;
-          this.tempData.business_order_no = data.business_order_no;
+          this.tempData.id = data.id
+          this.tempData.env = data.env
+          this.tempData.mobile = data.mobile
+          this.tempData.password = data.password
+          this.tempData.amount = data.amount
+          this.tempData.desc = data.desc
+          this.tempData.use_status = data.use_status
+          this.tempData.business_status = data.business_status
+          this.tempData.business_order_no = data.business_order_no
         }
         this.drawerIsShow = true
       }
@@ -185,11 +187,10 @@ export default {
     sendIsCommitStatus() {
       this.drawerIsShow = false
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'dataPool')
-    },
+    }
   }
 }
 </script>
-
 
 <style scoped>
 

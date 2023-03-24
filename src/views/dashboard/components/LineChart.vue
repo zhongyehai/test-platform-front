@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}"/>
+  <div :class="className" :style="{height:height,width:width}" />
 </template>
 
 <script>
@@ -77,7 +77,7 @@ export default {
     setOptions() {
       this.chart.setOption({
         xAxis: {
-          axisLabel:{
+          axisLabel: {
             interval: 0,
             rotate: 0
           },
@@ -103,7 +103,7 @@ export default {
           padding: [5, 10]
         },
         yAxis: {
-          //y轴刻度线
+          // y轴刻度线
           axisTick: {
             show: false
           }
@@ -111,7 +111,7 @@ export default {
         // 图像title，用list
         legend: {
           // data: ['expected', 'actual']
-          data: [this.chartData.title],
+          data: [this.chartData.title]
         },
         series: [
           {
@@ -128,10 +128,10 @@ export default {
             smooth: true,
             type: 'line',
             // data: expectedData,  // [100, 120, 161, 134, 105, 160, 165]
-            data: this.chartData.data,  // 数据
+            data: this.chartData.data, // 数据
             animationDuration: 2800,
             animationEasing: 'cubicInOut'
-          },
+          }
           // {
           //   name: 'actual',
           //   smooth: true,

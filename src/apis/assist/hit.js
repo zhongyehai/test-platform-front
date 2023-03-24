@@ -1,11 +1,10 @@
-import request from '@/utils/request';  //加载请求配置文件
-import {baseDirAssist} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirAssist } from '@/apis/base'
 
-
-let currentBaseDir = baseDirAssist + '/hit'
+const currentBaseDir = baseDirAssist + '/hit'
 
 function Hit(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 新增问题
@@ -30,11 +29,11 @@ export function deleteHit(data) {
 
 // 获取所有问题列表
 export function hitList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 获取所有问题类型
 export function getHitTypeList() {
-  return request({url: currentBaseDir + '/type/list', method: 'get'});
+  return request({ url: currentBaseDir + '/type/list', method: 'get' })
 }
 

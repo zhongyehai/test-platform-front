@@ -8,24 +8,19 @@
     style="min-width: 100%"
     size="mini"
   >
-    <el-option v-for="item in configTypeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+    <el-option v-for="item in configTypeList" :key="item.id" :label="item.name" :value="item.id" />
   </el-select>
 </template>
 
 <script>
 
 export default {
-  name: "configType",
+  name: 'ConfigType',
   props: ['configTypeList', 'configType', 'dialogType'],
   data() {
     return {
-      tempConfigType: '',
+      tempConfigType: ''
     }
-  },
-  methods: {},
-
-  created() {
-    this.tempConfigType = this.configType
   },
 
   watch: {
@@ -34,7 +29,12 @@ export default {
         this.tempConfigType = newVal
       }
     }
-  }
+  },
+
+  created() {
+    this.tempConfigType = this.configType
+  },
+  methods: {}
 }
 </script>
 

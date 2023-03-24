@@ -1,10 +1,10 @@
-import request from '@/utils/request';  // 加载请求配置文件
-import {baseDirAppUiTest} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirAppUiTest } from '@/apis/base'
 
-let currentBaseDir = baseDirAppUiTest + '/case'
+const currentBaseDir = baseDirAppUiTest + '/case'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 添加用例
@@ -29,50 +29,50 @@ export function deleteCase(data) {
 
 // 运行测试用例，并生成报告
 export function caseRun(data) {
-  return request({url: currentBaseDir + '/run', method: 'post', data: data})
+  return request({ url: currentBaseDir + '/run', method: 'post', data: data })
 }
 
 // 修改用例状态
 export function putCaseIsRun(data) {
-  return request({url: currentBaseDir + '/changeIsRun', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/changeIsRun', method: 'put', data: data })
 }
 
 // 获取用例list
 export function caseList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 根据用例id获取用例名
 export function caseName(params) {
-  return request({url: currentBaseDir + '/name', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/name', method: 'get', params: params })
 }
 
 // 修改用例的引用关系
 export function changeCaseQuote(data) {
-  return request({url: currentBaseDir + '/quote', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/quote', method: 'put', data: data })
 }
 
 // 复制用例
 export function copyCase(data) {
-  return request({url: currentBaseDir + '/copy', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/copy', method: 'post', data: data })
 }
 
 // 复制用例的步骤
 export function copyCaseStep(data) {
-  return request({url: currentBaseDir + '/copy/step', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/copy/step', method: 'post', data: data })
 }
 
 // 拉取用例的步骤
 export function pullStep(data) {
-  return request({url: currentBaseDir + '/pull/step', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/pull/step', method: 'post', data: data })
 }
 
 // 修改用例排序
 export function caseSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }
 
 // 获取用例的来源
 export function caseFrom(params) {
-  return request({url: currentBaseDir + '/from', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/from', method: 'get', params: params })
 }

@@ -1,10 +1,10 @@
-import request from '@/utils/request';  //加载请求配置文件
-import {baseDirAppUiTest} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirAppUiTest } from '@/apis/base'
 
-let currentBaseDir = baseDirAppUiTest + '/page'
+const currentBaseDir = baseDirAppUiTest + '/page'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 添加页面信息
@@ -29,15 +29,15 @@ export function deletePage(data) {
 
 // 复制页面
 export function copyPage(data) {
-  return request({url: currentBaseDir + '/copy', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/copy', method: 'post', data: data })
 }
 
 // 指定模块下页面list
 export function pageList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 修改页面排序
 export function pageSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }

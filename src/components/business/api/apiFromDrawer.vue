@@ -2,10 +2,11 @@
 
   <el-drawer
     title="接口归属信息"
-    size="85%"
+    size="95%"
     :append-to-body="true"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
 
     <el-table
       ref="apiTable"
@@ -18,19 +19,21 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="接口归属" align="center" min-width="40%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口归属" align="center" min-width="40%">
         <template slot-scope="scope">
           <span>{{ scope.row.from }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="接口信息" align="center" min-width="40%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="40%">
         <template slot-scope="scope">
           <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
-              <span class="block-method block_method_color"
-                    :class="`block_method_${scope.row.method.toLowerCase()}`">
-                {{ scope.row.method }}
-              </span>
+            <span
+              class="block-method block_method_color"
+              :class="`block_method_${scope.row.method.toLowerCase()}`"
+            >
+              {{ scope.row.method }}
+            </span>
             <span class="block-method block_url">{{ scope.row.addr }}</span>
             <span class="block-summary-description">{{ scope.row.name }}</span>
           </div>
@@ -38,43 +41,48 @@
       </el-table-column>
 
       <el-table-column
-        :show-overflow-tooltip=true
+        :show-overflow-tooltip="true"
         prop="create_user"
         align="center"
-        min-width="12%">
+        min-width="12%"
+      >
         <template slot="header">
           <span> 重要级别 </span>
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <div :style="{
-                'backgroundColor': scope.row.level === 'P0' ?
-              '#F56C6C' : scope.row.level === 'P1' ?
-              '#E6A23C' : '#67C23A'}">
+          <div
+            :style="{
+              'backgroundColor': scope.row.level === 'P0' ?
+                '#F56C6C' : scope.row.level === 'P1' ?
+                  '#E6A23C' : '#67C23A'}"
+          >
             <div style="width: 80%; margin-left:auto; margin-right:auto">
               <el-select
+                slot="prepend"
                 v-model="scope.row.level"
                 size="mini"
-                slot="prepend"
                 placeholder="选择请求方式"
                 filterable
                 class="select"
                 default-first-option
-                @change="selectApiLevel(scope.row)">
+                @change="selectApiLevel(scope.row)"
+              >
                 <el-option
                   v-for="item in [{label: '高', value: 'P0'}, {label: '中', value: 'P1'}, {label: '低', value: 'P2'}]"
                   :key="item.value"
                   :value="item.value"
                   :label="item.label"
-                ></el-option>
+                />
               </el-select>
             </div>
           </div>
@@ -87,11 +95,12 @@
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>标识接口是否被废弃</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -99,37 +108,52 @@
             v-model="scope.row.deprecated"
             :inactive-value="true"
             :active-value="false"
-            @change="changeStatus(scope.row)"></el-switch>
+            @change="changeStatus(scope.row)"
+          />
         </template>
       </el-table-column>
 
       <el-table-column
-        :show-overflow-tooltip=true
+        :show-overflow-tooltip="true"
         prop="create_user"
         align="center"
-        min-width="12%">
+        min-width="12%"
+      >
         <template slot="header">
           <span> 使用次数 </span>
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>1: 统计有多少条用例里直接使用了此接口</div>
               <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
           <el-tag v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
-          <el-tag type="info" v-else>0</el-tag>
+          <el-tag v-else type="info">0</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column v-if="caseId" align="center" label="操作" min-width="10%">
+      <el-table-column align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click.native="addApiToStep(scope.row)">转步骤</el-button>
+          <el-button
+            type="text"
+            size="mini"
+            style="margin-left: 5px"
+            @click="showEditForm(scope.row)"
+          >查看</el-button>
+
+          <el-button
+            v-if="caseId"
+            type="primary"
+            size="mini"
+            @click.native="addApiToStep(scope.row)"
+          >转步骤</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -139,58 +163,21 @@
 
 <script>
 
-import {changeApiLevel, changeApiStatus} from "@/apis/apiTest/api";
+import { changeApiLevel, changeApiStatus } from '@/apis/apiTest/api'
 
 export default {
-  name: "showApiFromDrawer",
+  name: 'ShowApiFromDrawer',
+  components: {},
   props: [
     'caseId',
     'apiList',
     'marker'
   ],
-  components: {},
   data() {
     return {
       drawerIsShow: false,
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl' // 抽屉打开方式
     }
-  },
-  methods: {
-
-    // 深拷贝接口，添加到步骤列表
-    addApiToStep(api) {
-      // 把当前选中的接口，传给步骤编辑tab
-      // 初始化步骤的默认值
-      var new_api = JSON.parse(JSON.stringify(api))
-      new_api['api_id'] = new_api['id']
-      new_api['id'] = ''
-      new_api['status'] = 1
-      new_api['run_times'] = 1
-      new_api['replace_host'] = false
-      new_api['skip_if'] = {"expect": null, "comparator": "", "data_type": "", "check_value": null}
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
-    },
-
-    changeStatus(row){
-      changeApiStatus({
-        id: row.id,
-        deprecated: row.deprecated
-      }).then(response => {
-        this.showMessage(this, response)
-      })
-    },
-
-    // 修改接口的重要等级
-    selectApiLevel(row){
-      changeApiLevel({
-        id: row.id,
-        level: row.level
-      }).then(response => {
-        this.showMessage(this, response)
-      })
-    },
-
-
   },
 
   mounted() {
@@ -205,6 +192,47 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+  methods: {
+
+    // 打开编辑框
+    showEditForm(row) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', JSON.parse(JSON.stringify(row)), 'showFrom')
+    },
+
+    // 深拷贝接口，添加到步骤列表
+    addApiToStep(api) {
+      // 把当前选中的接口，传给步骤编辑tab
+      // 初始化步骤的默认值
+      var new_api = JSON.parse(JSON.stringify(api))
+      new_api['api_id'] = new_api['id']
+      new_api['id'] = ''
+      new_api['status'] = 1
+      new_api['run_times'] = 1
+      new_api['replace_host'] = false
+      new_api['skip_if'] = { 'expect': null, 'comparator': '', 'data_type': '', 'check_value': null }
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
+    },
+
+    changeStatus(row) {
+      changeApiStatus({
+        id: row.id,
+        deprecated: row.deprecated
+      }).then(response => {
+        this.showMessage(this, response)
+      })
+    },
+
+    // 修改接口的重要等级
+    selectApiLevel(row) {
+      changeApiLevel({
+        id: row.id,
+        level: row.level
+      }).then(response => {
+        this.showMessage(this, response)
+      })
+    }
+
+  }
 
 }
 </script>

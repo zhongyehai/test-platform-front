@@ -1,10 +1,10 @@
-import request from '@/utils/request';
-import {baseDirConfig} from "@/apis/base";  // 加载请求配置类型文件
+import request from '@/utils/request'
+import { baseDirConfig } from '@/apis/base' // 加载请求配置类型文件
 
-let currentBaseDir = baseDirConfig + '/runEnv'
+const currentBaseDir = baseDirConfig + '/runEnv'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 添加配置类型
@@ -29,10 +29,10 @@ export function deleteRunEnv(data) {
 
 // 获取配置类型list
 export function runEnvList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 获取配置类型list
 export function runEnvSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }

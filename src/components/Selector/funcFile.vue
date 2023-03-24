@@ -9,28 +9,46 @@
     size="mini"
     :style="selectStyle"
     placeholder="请选择函数文件"
-    class="filter-item">
+    class="filter-item"
+  >
     <el-option
       v-for="funcFile in funcFilesList"
       :key="funcFile.id"
       :label="funcFile.name"
       :value="funcFile.id"
-    ></el-option>
+    />
   </el-select>
 
 </template>
 
 <script>
 
-import {funcFileList} from '@/apis/assist/funcFile'
+import { funcFileList } from '@/apis/assist/funcFile'
 
 export default {
-  name: 'funcFile',
+  name: 'FuncFile',
   props: [
     'currentFuncFileList',
     'funcFiles',
     'cite'
   ],
+
+  data() {
+    return {
+      funcFilesList: [], // 自定义函数列表
+      tempFuncFiles: [], // 选中的自定义函数列表
+      selectStyle: {
+        width: '98%'
+      }
+    }
+  },
+  watch: {
+    'funcFiles': {
+      handler(newVal, oldVal) {
+        this.tempFuncFiles = newVal
+      }
+    }
+  },
 
   mounted() {
     this.funcFilesList = this.currentFuncFileList
@@ -47,16 +65,6 @@ export default {
     }
     this.tempFuncFiles = this.funcFiles
   },
-
-  data() {
-    return {
-      funcFilesList: [],  // 自定义函数列表
-      tempFuncFiles: [],  // 选中的自定义函数列表
-      selectStyle: {
-        width: '98%'
-      }
-    }
-  },
   methods: {
 
     // 获取自定义函数列表
@@ -64,13 +72,6 @@ export default {
       funcFileList().then(response => {
         this.funcFilesList = response.data.data
       })
-    }
-  },
-  watch: {
-    'funcFiles': {
-      handler(newVal, oldVal) {
-        this.tempFuncFiles = newVal
-      }
     }
   }
 }

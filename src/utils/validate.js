@@ -1,10 +1,8 @@
-import { Notification } from 'element-ui';
+import { Notification } from 'element-ui'
 
 /**
  * Created by PanJiaChen on 16/11/18.
  */
-
-import {cache} from "@vue/cli-service/lib/config/terserOptions";
 
 /**
  * @param {string} path
@@ -29,8 +27,7 @@ export function assertStrIsJson(strData, message) {
   try {
     JSON.parse(strData)
   } catch (e) {
-    Notification.error(message);
+    Notification.error(message)
     throw e
   }
-
 }

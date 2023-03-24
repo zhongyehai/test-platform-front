@@ -3,13 +3,13 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('project')">
         <div class="card-panel-icon-wrapper icon-people">
-          <i class="el-icon-folder-opened card-panel-icon"></i>
+          <i class="el-icon-folder-opened card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.project.title}}
+            {{ title.project.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.project.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.project.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -18,14 +18,14 @@
       <div class="card-panel" @click="handleSetLineChartData('module')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
-          <i class="el-icon-folder card-panel-icon" ></i>
+          <i class="el-icon-folder card-panel-icon" />
         </div>
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.module.title}}
+            {{ title.module.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.module.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.module.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -33,13 +33,13 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('api')">
         <div class="card-panel-icon-wrapper icon-message">
-          <i class="el-icon-s-order card-panel-icon"></i>
+          <i class="el-icon-s-order card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.api.title}}
+            {{ title.api.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.api.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.api.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -48,14 +48,14 @@
       <div class="card-panel" @click="handleSetLineChartData('hit')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
-          <i class="el-icon-files card-panel-icon" ></i>
+          <i class="el-icon-files card-panel-icon" />
         </div>
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.hit.title}}
+            {{ title.hit.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.hit.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.hit.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -63,13 +63,13 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('case')">
         <div class="card-panel-icon-wrapper icon-money">
-          <i class="el-icon-tickets card-panel-icon"></i>
+          <i class="el-icon-tickets card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.case.title}}
+            {{ title.case.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.case.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.case.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -78,14 +78,14 @@
       <div class="card-panel" @click="handleSetLineChartData('step')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
-          <i class="el-icon-document-copy card-panel-icon" ></i>
+          <i class="el-icon-document-copy card-panel-icon" />
         </div>
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.step.title}}
+            {{ title.step.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.step.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.step.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -94,14 +94,14 @@
       <div class="card-panel" @click="handleSetLineChartData('task')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
-          <i class="el-icon-date card-panel-icon" ></i>
+          <i class="el-icon-date card-panel-icon" />
         </div>
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.task.title}}
+            {{ title.task.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.task.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.task.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -110,14 +110,14 @@
       <div class="card-panel" @click="handleSetLineChartData('report')">
         <!--  图标 -->
         <div class="card-panel-icon-wrapper icon-shopping">
-          <i class="el-icon-s-data card-panel-icon" ></i>
+          <i class="el-icon-s-data card-panel-icon" />
         </div>
         <!-- 文案 -->
         <div class="card-panel-description">
           <div class="card-panel-text">
-            {{title.report.title}}
+            {{ title.report.title }}
           </div>
-          <count-to :start-val="0" :end-val="title.report.total" :duration="1" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="title.report.total" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -127,7 +127,7 @@
 
 <script>
 
-import {getTitleCount} from '@/apis/home/apiTest'
+import { getTitleCount } from '@/apis/home/apiTest'
 import CountTo from 'vue-count-to'
 
 export default {
@@ -145,9 +145,13 @@ export default {
         'case': 0,
         'step': 0,
         'task': 0,
-        'report': 0,
+        'report': 0
       }
     }
+  },
+
+  mounted() {
+    this.getTitle()
   },
 
   methods: {
@@ -161,11 +165,7 @@ export default {
       getTitleCount().then(response => {
         this.title = response.data
       })
-    },
-  },
-
-  mounted() {
-    this.getTitle()
+    }
   }
 }
 </script>

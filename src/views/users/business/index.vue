@@ -10,8 +10,8 @@
           placeholder="业务线，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 200px">
-        </el-input>
+          style="width: 200px"
+        />
       </el-form-item>
 
       <el-form-item :label="'code：'" size="mini">
@@ -21,8 +21,8 @@
           placeholder="业务线code，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 200px">
-        </el-input>
+          style="width: 200px"
+        />
       </el-form-item>
 
       <el-form-item :label="'创建人：'" size="mini">
@@ -33,15 +33,17 @@
           default-first-option
           clearable
           size="mini"
-          class="filter-item">
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
         </el-select>
       </el-form-item>
 
       <el-button
         type="primary"
         size="mini"
-        @click="getBusinessList()">
+        @click="getBusinessList()"
+      >
         搜索
       </el-button>
 
@@ -50,7 +52,8 @@
         style="margin-left: 10px"
         type="primary"
         size="mini"
-        @click="showAddBusinessDialog()">
+        @click="showAddBusinessDialog()"
+      >
         添加业务线
       </el-button>
 
@@ -68,70 +71,72 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="业务线" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="业务线" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="code" align="center" label="code" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" prop="code" align="center" label="code" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.code }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="操作" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
           <el-tooltip
             class="item"
             effect="dark"
             content="修改"
-            placement="top-start">
-          <el-button
-            type="text"
-            size="mini"
-            icon="el-icon-edit"
-            :disabled="roles !== '2'"
-            @click.native="showAddBusinessDialog(scope.row)"></el-button>
+            placement="top-start"
+          >
+            <el-button
+              type="text"
+              size="mini"
+              icon="el-icon-edit"
+              :disabled="roles !== '2'"
+              @click.native="showAddBusinessDialog(scope.row)"
+            />
           </el-tooltip>
         </template>
       </el-table-column>
 
     </el-table>
 
-
     <!-- 新增/修改配置类型 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增业务线' : '修改业务线'"
       size="60%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item :label="'业务线名'" class="is-required" size="mini">
-          <el-input v-model="tempBusiness.name" size="mini"/>
+          <el-input v-model="tempBusiness.name" size="mini" />
         </el-form-item>
 
         <el-form-item :label="'code'" class="is-required" size="mini">
-          <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini"/>
+          <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini" />
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
-          <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini"/>
+          <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini" />
         </el-form-item>
 
       </el-form>
@@ -141,7 +146,8 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click=" drawerType === 'add' ? addBusiness() : changBusiness()">
+          @click=" drawerType === 'add' ? addBusiness() : changBusiness()"
+        >
           {{ '保存' }}
         </el-button>
       </div>
@@ -159,11 +165,11 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import {businessList, postBusiness, putBusiness, deleteBusiness, getBusiness} from "@/apis/system/business";
-import {userList} from "@/apis/system/user";
+import { businessList, postBusiness, putBusiness, deleteBusiness, getBusiness } from '@/apis/system/business'
+import { userList } from '@/apis/system/user'
 
 export default {
-  name: "index",
+  name: 'Index',
   components: {
     Pagination
   },
@@ -183,7 +189,7 @@ export default {
       list: [],
       drawerIsShow: false,
       drawerType: '',
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       tempBusiness: {
         id: '',
@@ -194,19 +200,24 @@ export default {
       // 用户权限
       roles: localStorage.getItem('roles'),
       currentUserList: [],
-      userDict: {},
+      userDict: {}
     }
+  },
+
+  mounted() {
+    this.getUserList(this.getBusinessList)
+    // this.getBusinessList()
   },
 
   methods: {
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
       })
-      if (func){
+      if (func) {
         func()
       }
     },
@@ -221,7 +232,7 @@ export default {
         this.tempBusiness = row
         this.drawerType = 'edit'
       } else {
-        this.tempBusiness = {name: '', desc: ''}
+        this.tempBusiness = { name: '', desc: '' }
         this.drawerType = 'add'
       }
       this.drawerIsShow = true
@@ -260,11 +271,6 @@ export default {
         this.total = response.data.total
       })
     }
-  },
-
-  mounted() {
-    this.getUserList(this.getBusinessList)
-    // this.getBusinessList()
   }
 }
 </script>

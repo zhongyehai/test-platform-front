@@ -5,13 +5,15 @@
     title="测试执行进度"
     :visible.sync="processIsShow"
     :close-on-click-modal="false"
-    append-to-body>
+    append-to-body
+  >
     <div style="margin: 20px">
       <el-steps
         :active="activeProcess"
         align-center
         finish-status="success"
-        :process-status="statusMapping[activeStatus]">
+        :process-status="statusMapping[activeStatus]"
+      >
         <el-step title="触发执行">
           <template slot="description">
             <span>触发执行测试</span><br>
@@ -43,14 +45,13 @@
 
 </template>
 <script>
-import {getReport as apiTestGetReport} from "@/apis/apiTest/report";
-import {getReport as appUiTestGetReport} from "@/apis/appUiTest/report";
-import {getReport as webUiTestGetReport} from "@/apis/webUiTest/report";
-import {runTestTimeOutMessage} from "@/utils/message";
-
+import { getReport as apiTestGetReport } from '@/apis/apiTest/report'
+import { getReport as appUiTestGetReport } from '@/apis/appUiTest/report'
+import { getReport as webUiTestGetReport } from '@/apis/webUiTest/report'
+import { runTestTimeOutMessage } from '@/utils/message'
 
 export default {
-  name: 'runStep',
+  name: 'RunStep',
   props: [
     'dataType'
   ],
@@ -59,15 +60,41 @@ export default {
     return {
       processIsShow: false,
       statusMapping: {
-        1: "wait",
-        2: "success",
-        3: "error",
-        4: "finish"
+        1: 'wait',
+        2: 'success',
+        3: 'error',
+        4: 'finish'
       },
       activeProcess: 0,
       activeStatus: 1,
       getReportUrl: ''
-    };
+    }
+  },
+
+  created() {
+    if (this.dataType === 'api') {
+      this.getReportUrl = apiTestGetReport
+    } else if (this.dataType === 'webUi') {
+      this.getReportUrl = webUiTestGetReport
+    } else {
+      this.getReportUrl = appUiTestGetReport
+    }
+  },
+
+  mounted() {
+    // 监听运行申请的提交状态，提交成功，则获取对应的测试报告
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, reportId) => {
+      if (_type === 'process') {
+        this.activeProcess = 0
+        this.activeStatus = 1
+        this.processIsShow = true
+        this.getReport(reportId)
+      }
+    })
+  },
+
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   methods: {
@@ -80,58 +107,32 @@ export default {
       var that = this
       var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
       var queryCount = 1
-      var timer = setInterval(function () {
+      var timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
-          that.getReportUrl({'id': reportId}).then(response => {
+          that.getReportUrl({ 'id': reportId }).then(response => {
             that.activeProcess = response.data.process
             that.activeStatus = response.data.status
 
             if (that.activeProcess === 3 && that.activeStatus === 2) {
-              this.processIsShow = false  // 关闭进度框
+              this.processIsShow = false // 关闭进度框
               that.openReportById(reportId)
-              clearInterval(timer)  // 关闭定时器
+              clearInterval(timer) // 关闭定时器
             }
           })
           queryCount += 1
         } else {
-          that.$notify(runTestTimeOutMessage(that));
-          this.processIsShow = false  // 关闭进度框
-          clearInterval(timer)  // 关闭定时器
+          that.$notify(runTestTimeOutMessage(that))
+          this.processIsShow = false // 关闭进度框
+          clearInterval(timer) // 关闭定时器
         }
       }, 3000)
     },
 
     openReportById(reportId) {
       // console.log(`task.index.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let {href} = this.$router.resolve({path: 'reportShow', query: {id: reportId}})
+      const { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId }})
       window.open(href, '_blank')
-    },
-  },
-
-  created() {
-    if (this.dataType === 'api'){
-      this.getReportUrl = apiTestGetReport
-    }else if (this.dataType === "webUi"){
-      this.getReportUrl = webUiTestGetReport
-    }else {
-      this.getReportUrl = appUiTestGetReport
     }
-  },
-
-  mounted() {
-    // 监听运行申请的提交状态，提交成功，则获取对应的测试报告
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, reportId) => {
-      if (_type === 'process'){
-        this.activeProcess = 0
-        this.activeStatus = 1
-        this.processIsShow = true
-        this.getReport(reportId)
-      }
-    })
-  },
-
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
-};
+  }
+}
 </script>

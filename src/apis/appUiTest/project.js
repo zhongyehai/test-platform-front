@@ -1,11 +1,11 @@
-import request from '@/utils/request';  //加载请求配置文件
-import {baseDirAppUiTest} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirAppUiTest } from '@/apis/base'
 
-let currentBaseDir = baseDirAppUiTest + '/project'
-let currentEnvBaseDir = baseDirAppUiTest + '/project/env'
+const currentBaseDir = baseDirAppUiTest + '/project'
+const currentEnvBaseDir = baseDirAppUiTest + '/project/env'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 添加服务
@@ -30,30 +30,30 @@ export function deleteProject(data) {
 
 // 获取服务列表
 export function projectList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 修改服务排序
 export function projectSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }
 
 // 获取服务的环境信息
 export function getProjectEnv(params) {
-  return request({url: currentEnvBaseDir, method: 'get', params: params});
+  return request({ url: currentEnvBaseDir, method: 'get', params: params })
 }
 
 // 修改改服务的环境信息
 export function putProjectEnv(data) {
-  return request({url: currentEnvBaseDir, method: 'put', data: data});
+  return request({ url: currentEnvBaseDir, method: 'put', data: data })
 }
 
 // 新增服务的环境信息
 export function postProjectEnv(data) {
-  return request({url: currentEnvBaseDir, method: 'post', data: data});
+  return request({ url: currentEnvBaseDir, method: 'post', data: data })
 }
 
 // 同步服务的环境信息
 export function projectEnvSynchronization(data) {
-  return request({url: currentEnvBaseDir + '/synchronization', method: 'post', data: data});
+  return request({ url: currentEnvBaseDir + '/synchronization', method: 'post', data: data })
 }

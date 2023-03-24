@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-import {baseDirSystem} from "@/apis/base";
+import { baseDirSystem } from '@/apis/base'
 
-let currentBaseDir = baseDirSystem + '/role'
+const currentBaseDir = baseDirSystem + '/role'
 
 // 角色列表
 export function roleList() {
-  return request({url: currentBaseDir + '/list', method: 'get'});
+  return request({ url: currentBaseDir + '/list', method: 'get' })
 }

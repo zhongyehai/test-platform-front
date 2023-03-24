@@ -23,7 +23,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="页面名称" min-width="20%">
+          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="页面名称" min-width="20%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
@@ -31,19 +31,21 @@
 
           <el-table-column
             v-if="dataType==='webUi'"
-            :show-overflow-tooltip=true
+            :show-overflow-tooltip="true"
             prop="addr"
             align="center"
-            min-width="50%">
+            min-width="50%"
+          >
             <template slot="header">
               <el-tooltip
                 class="item"
                 effect="dark"
-                placement="top-start">
+                placement="top-start"
+              >
                 <div slot="content">
                   <div>在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处</div>
                 </div>
-                <span> 页面地址 <i style="color: #409EFF" class="el-icon-warning"></i></span>
+                <span> 页面地址 <i style="color: #409EFF" class="el-icon-warning" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
@@ -71,16 +73,18 @@
                 type="text"
                 size="mini"
                 style="margin-right: 8px"
-                @click="showEditForm(scope.row)">修改
+                @click="showEditForm(scope.row)"
+              >修改
               </el-button>
 
               <!-- 复制页面 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.copyPopoverIsShow"
                 placement="top"
                 style="margin-right: 10px"
                 popper-class="down-popover"
-                v-model="scope.row.copyPopoverIsShow">
+              >
                 <p>复制此页面并生成新的页面?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -98,15 +102,17 @@
                 type="text"
                 size="mini"
                 style="margin-right: 8px"
-                @click="showUploadFileDialog(scope.row)">导入元素
+                @click="showUploadFileDialog(scope.row)"
+              >导入元素
               </el-button>
 
               <!-- 删除页面 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.deletePopoverIsShow"
                 placement="top"
                 popper-class="down-popover"
-                v-model="scope.row.deletePopoverIsShow">
+              >
                 <p>确定删除【{{ scope.row.name }}】?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -128,16 +134,18 @@
         <el-drawer
           :title="'上传元素'"
           size="40%"
-          :wrapperClosable="false"
+          :wrapper-closable="false"
           :visible.sync="uploadFileDrawerIsShow"
-          :direction="direction">
+          :direction="direction"
+        >
           <el-row style="margin-left: 20px;margin-right: 20px">
             <el-col :span="12">
               <el-upload
                 class="upload-demo"
                 :action="uploadElementDirUrl"
-                :show-file-list='false'
-                :on-success="uploadFile">
+                :show-file-list="false"
+                :on-success="uploadFile"
+              >
                 <el-button size="mini" type="primary">选择文件</el-button>
               </el-upload>
             </el-col>
@@ -163,10 +171,10 @@
     </el-tabs>
 
     <pageDrawer
-      :dataType="dataType"
-      :currentProjectId="currentProjectId"
-      :currentModuleId="currentModuleId"
-    ></pageDrawer>
+      :data-type="dataType"
+      :current-project-id="currentProjectId"
+      :current-module-id="currentModuleId"
+    />
 
   </div>
 </template>
@@ -177,14 +185,14 @@ import Pagination from '@/components/Pagination'
 
 import pageDrawer from '@/components/business/page/drawer'
 
-import {getFindElementOption} from "@/utils/getConfig";
+import { getFindElementOption } from '@/utils/getConfig'
 
-import {pageList as appPageList, deletePage as appDeletePage, pageSort as appPageSort} from '@/apis/appUiTest/page'
+import { pageList as appPageList, deletePage as appDeletePage, pageSort as appPageSort } from '@/apis/appUiTest/page'
 import {
   uploadElement as appUploadElement,
   uploadElementDir as appUploadElementDir,
   downloadElementTemplate as appDownloadElementTemplate
-} from "@/apis/appUiTest/element";
+} from '@/apis/appUiTest/element'
 
 import {
   pageList as webUiPageList,
@@ -195,11 +203,10 @@ import {
   uploadElement as webUiUploadElement,
   uploadElementDir as webUiUploadElementDir,
   downloadElementTemplate as webUiDownloadElementTemplate
-} from "@/apis/webUiTest/element";
-
+} from '@/apis/webUiTest/element'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     Pagination,
     pageDrawer
@@ -207,13 +214,13 @@ export default {
 
   // 接收父组件传参的key
   props: [
-    "dataType"
+    'dataType'
   ],
   data() {
     return {
-      direction: 'rtl',  // 抽屉打开方式
-      tableLoadingIsShow: false,  // 请求列表等待响应的状态
-      pageTab: 'pageList',  //  tab页的显示
+      direction: 'rtl', // 抽屉打开方式
+      tableLoadingIsShow: false, // 请求列表等待响应的状态
+      pageTab: 'pageList', //  tab页的显示
 
       currentModuleId: '',
       currentProjectId: '',
@@ -245,7 +252,7 @@ export default {
   },
 
   beforeCreate() {
-    getFindElementOption(this)  // 获取定位方式
+    getFindElementOption(this) // 获取定位方式
   },
 
   created() {
@@ -273,7 +280,6 @@ export default {
   },
 
   mounted() {
-
     // 点击树时，请求对应的页面列表
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId) => {
       if (_type === 'module') {
@@ -289,7 +295,12 @@ export default {
         this.getPageList()
       }
     })
+  },
 
+  // 页面销毁的时候，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
+    this.$bus.$off(this.$busEvents.treeIsChoice)
   },
 
   methods: {
@@ -317,7 +328,7 @@ export default {
     delPage(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
-      this.deletePageUrl({'id': row.id}).then(response => {
+      this.deletePageUrl({ 'id': row.id }).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
         if (this.showMessage(this, response)) {
           this.getPageList()
@@ -351,12 +362,12 @@ export default {
     // 下载接口模板
     downloadTemplate() {
       this.downloadElementTemplateUrl().then(response => {
-        let blob = new Blob([response], {
-          type: 'application/vnd.ms-excel'   //将会被放入到blob中的数组内容的MIME类型
-        });
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = '元素导入模板'
         a.click()
       })
@@ -364,15 +375,15 @@ export default {
 
     // 从excel导入元素
     uploadFile(response, file) {
-      let form = new FormData();
-      form.append("file", file.raw);
-      form.append("id", this.currentPage.id);
+      const form = new FormData()
+      form.append('file', file.raw)
+      form.append('id', this.currentPage.id)
       this.uploadElementUrl(form).then((response) => {
-          if (this.showMessage(this, response)) {
-            this.fileDataList = []
-            this.uploadFileDrawerIsShow = false
-          }
+        if (this.showMessage(this, response)) {
+          this.fileDataList = []
+          this.uploadFileDrawerIsShow = false
         }
+      }
       )
     },
 
@@ -381,7 +392,7 @@ export default {
       const el = this.$refs.pageListTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -395,7 +406,7 @@ export default {
           this.pageSortUrl({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -403,13 +414,7 @@ export default {
         }
       })
     }
-  },
-
-  // 页面销毁的时候，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-    this.$bus.$off(this.$busEvents.treeIsChoice)
-  },
+  }
 }
 </script>
 

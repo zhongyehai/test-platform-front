@@ -1,16 +1,15 @@
 <template>
-  <taskView :dataType="'webUi'"></taskView>
+  <taskView :data-type="'webUi'" />
 </template>
 
 <script>
-import taskView from "@/components/business/task/index.vue";
-
+import taskView from '@/components/business/task/index.vue'
 
 export default {
-  name: "index",
+  name: 'Index',
   components: {
     taskView
-  },
+  }
 }
 </script>
 

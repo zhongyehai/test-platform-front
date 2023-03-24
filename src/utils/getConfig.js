@@ -1,10 +1,10 @@
-import {getConfigByName} from '@/apis/config/config'
-import {assertMappingList, extractMappingList} from '@/apis/webUiTest/step'
+import { getConfigByName } from '@/apis/config/config'
+import { assertMappingList, extractMappingList } from '@/apis/webUiTest/step'
 
 // 获取配置的运行等待超时时间
 export function getRunTimeout(_this) {
   let runTimeout = 0
-  getConfigByName({'name': 'run_time_out'}).then(response => {
+  getConfigByName({ 'name': 'run_time_out' }).then(response => {
     _this.$busEvents.runTimeout = response.data.value
     runTimeout = response.data.value
   })
@@ -14,11 +14,11 @@ export function getRunTimeout(_this) {
 // 获取ui自动化元素定位方式
 export function getFindElementOption(_this) {
   let findElementOption = []
-  getConfigByName({'name': 'find_element_option'}).then(response => {
+  getConfigByName({ 'name': 'find_element_option' }).then(response => {
     findElementOption = JSON.parse(response.data.value)
     _this.$busEvents.data.findElementOptionList = findElementOption
     // 列表解析为字典
-    let optionDict = []
+    const optionDict = []
     findElementOption.forEach(option => {
       optionDict[option.value] = option.label
     })
@@ -48,13 +48,13 @@ export function getExtractMappingList(_this) {
   let tempList = []
   extractMappingList().then(response => {
     tempList = response.data
-    _this.$busEvents.data.extractMappingList = tempList
+    _this.$busEvents.data.uiTestExtractMappingList = tempList
     // 列表解析为字典
-    let tempDict = []
+    const tempDict = []
     tempList.forEach(option => {
       tempDict[option.value] = option.label
     })
-    _this.$busEvents.data.extractMappingDict = tempDict
+    _this.$busEvents.data.uiTestExtractMappingDict = tempDict
   })
   return tempList
 }
@@ -66,7 +66,7 @@ export function getAssertMappingList(_this) {
     tempList = response.data
     _this.$busEvents.data.assertMappingList = tempList
     // 列表解析为字典
-    let tempDict = []
+    const tempDict = []
     tempList.forEach(option => {
       tempDict[option.value] = option.label
     })

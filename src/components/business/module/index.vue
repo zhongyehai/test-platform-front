@@ -13,7 +13,7 @@
           default-first-option
           @change="getModuleList"
         >
-          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
 
         <el-button
@@ -34,8 +34,8 @@
           placeholder="请输入接口地址"
           size="mini"
           clearable
-          style="width: 400px">
-        </el-input>
+          style="width: 400px"
+        />
         <el-button
           v-show="queryAddr"
           type="primary"
@@ -64,11 +64,11 @@
           <el-tab-pane :label="projectTab" :name="projectTab">
             <div class="custom-tree-container">
               <div class="block">
-                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini"></el-input>
+                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini" />
                 <el-scrollbar style="height:800px">
                   <el-tree
-                    class="project-tree"
                     ref="tree"
+                    class="project-tree"
                     :check-on-click-node="false"
                     :data="moduleListData"
                     :default-expanded-keys="[defaultModule]"
@@ -79,11 +79,14 @@
                     lazy
                     node-key="id"
                     @node-click="clickTree"
-                    @node-drag-end="nodeDragEnd">
-                    <div slot-scope="{ node, data }"
-                         class="custom-tree-node"
-                         @mouseenter="mouseenter(data)"
-                         @mouseleave="mouseleave(data)">
+                    @node-drag-end="nodeDragEnd"
+                  >
+                    <div
+                      slot-scope="{ node, data }"
+                      class="custom-tree-node"
+                      @mouseenter="mouseenter(data)"
+                      @mouseleave="mouseleave(data)"
+                    >
                       <span> {{ data.name }} </span>
                       <span v-show="data.showMenu">
                         <el-dropdown
@@ -92,38 +95,42 @@
                           placement="top-start"
                           @visible-change="changeDropdownStatus"
                         >
-                        <i
-                          class="el-icon-more"
-                          style="padding-left: 5px;color: #409EFF;transform: rotate(90deg)"
-                        ></i>
-                        <el-dropdown-menu slot="dropdown">
+                          <i
+                            class="el-icon-more"
+                            style="padding-left: 5px;color: #409EFF;transform: rotate(90deg)"
+                          />
+                          <el-dropdown-menu slot="dropdown">
 
-                          <el-dropdown-item @click.native.stop="addApiOrPage(node, data)"
-                          >{{ dataType === 'api' ? "添加接口" : "添加页面"}}
-                          </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.native.stop="addApiOrPage(node, data)"
+                            >{{ dataType === 'api' ? '添加接口' : '添加页面' }}
+                            </el-dropdown-item>
 
-<!--                          <el-dropdown-item-->
-<!--                            v-if="dataType === 'api'"-->
-<!--                            @click.native.stop="showUploadFileDialog(node, data)"-->
-<!--                          >{{ "导入接口" }}-->
-<!--                          </el-dropdown-item>-->
+                            <!--                          <el-dropdown-item-->
+                            <!--                            v-if="dataType === 'api'"-->
+                            <!--                            @click.native.stop="showUploadFileDialog(node, data)"-->
+                            <!--                          >{{ "导入接口" }}-->
+                            <!--                          </el-dropdown-item>-->
 
-                          <el-dropdown-item @click.native.stop="showModuleDialog('add', node, data)"
-                          >{{ '添加子模块' }}
-                          </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.native.stop="showModuleDialog('add', node, data)"
+                            >{{ '添加子模块' }}
+                            </el-dropdown-item>
 
-                          <el-dropdown-item @click.native.stop="showModuleDialog('edit', node, data)"
-                          >{{ '修改当前模块' }}
-                          </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.native.stop="showModuleDialog('edit', node, data)"
+                            >{{ '修改当前模块' }}
+                            </el-dropdown-item>
 
-                          <el-dropdown-item @click.native.stop="clickDeleteChild(node, data)"
-                          >{{ "删除当前模块" }}
-                          </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.native.stop="clickDeleteChild(node, data)"
+                            >{{ '删除当前模块' }}
+                            </el-dropdown-item>
 
-                        </el-dropdown-menu>
-                      </el-dropdown>
+                          </el-dropdown-menu>
+                        </el-dropdown>
 
-                    </span>
+                      </span>
                     </div>
                   </el-tree>
                 </el-scrollbar>
@@ -139,12 +146,12 @@
         <!-- 接口管理组件 -->
         <apiManage
           v-if="dataType === 'api'"
-        ></apiManage>
+        />
 
         <pageManage
           v-else
-          :dataType="dataType"
-        ></pageManage>
+          :data-type="dataType"
+        />
       </el-col>
 
     </el-row>
@@ -152,16 +159,18 @@
     <el-drawer
       :title="'上传接口文件'"
       size="40%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="uploadFileDrawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <el-row style="margin-left: 20px;margin-right: 20px">
         <el-col :span="12">
           <el-upload
             class="upload-demo"
             :action="uploadApiMsg"
-            :show-file-list='false'
-            :on-success="uploadFile">
+            :show-file-list="false"
+            :on-success="uploadFile"
+          >
             <el-button size="mini" type="primary">选择文件</el-button>
           </el-upload>
         </el-col>
@@ -179,23 +188,24 @@
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增模块' : '修改模块'"
       size="40%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="moduleDrawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <el-form
         ref="dataForm"
         :model="tempDataForm"
         label-position="left"
         label-width="90px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      >
 
         <el-form-item :label="'模块名称'" class="filter-item is-required" prop="name" size="mini">
-          <el-input v-model="tempDataForm.name" placeholder="同一节点下，模块名称不可重复"/>
+          <el-input v-model="tempDataForm.name" placeholder="同一节点下，模块名称不可重复" />
         </el-form-item>
 
-
         <el-form-item v-if="dataType === 'api'" :label="'controller'" class="filter-item" prop="name" size="mini">
-          <el-input v-model="tempDataForm.controller" disabled/>
+          <el-input v-model="tempDataForm.controller" disabled />
         </el-form-item>
 
       </el-form>
@@ -205,80 +215,85 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" moduleDrawerStatus === 'add' ? addModule() : changModule() ">
+          @click=" moduleDrawerStatus === 'add' ? addModule() : changModule() "
+        >
           {{ '保存' }}
         </el-button>
       </div>
     </el-drawer>
 
     <selectRunEnv
-      :dataType="dataType"
-    ></selectRunEnv>
+      :data-type="dataType"
+    />
 
     <runProcess
-      :dataType="dataType"
-    ></runProcess>
+      :data-type="dataType"
+    />
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
       :api-list="showApiList"
       :case-id="undefined"
       :marker="marker"
-    ></showApiFromDrawer>
+    />
 
     <showApiUseDrawer
       v-if="dataType === 'api'"
       :case-list="showCaseList"
       :marker="marker"
-    ></showApiUseDrawer>
+    />
   </div>
-
 
 </template>
 
 <script>
-import waves from "@/directive/waves";
-import apiManage from '@/views/apiTest/api'  // 接口管理组件
+import waves from '@/directive/waves'
+import apiManage from '@/views/apiTest/api' // 接口管理组件
 import pageManage from '@/components/business/page/index.vue'
-import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
-import runProcess from '@/components/runProcess'  // 测试执行进度组件
+import selectRunEnv from '@/components/selectRunEnv' // 环境选择组件
+import runProcess from '@/components/runProcess' // 测试执行进度组件
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import {ellipsis, arrayToTree} from "@/utils/parseData"
+import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import {getConfigByName} from "@/apis/config/config";
-import {apiMsgBelongTo, apiMsgBelongToStep, downloadApiMsgTemplate, uploadApi, uploadApiMsg} from "@/apis/apiTest/api";
+import { getConfigByName } from '@/apis/config/config'
+import {
+  apiMsgBelongTo,
+  apiMsgBelongToStep,
+  getAssertMapping,
+  downloadApiMsgTemplate,
+  uploadApi,
+  uploadApiMsg
+} from '@/apis/apiTest/api'
 
-import {projectList as apiProjectList} from "@/apis/apiTest/project";
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import {
   moduleTree as apiModuleTree,
   deleteModule as apiDeleteModule,
   postModule as apiPostModule,
   putModule as apiPutModule
-} from "@/apis/apiTest/module";
+} from '@/apis/apiTest/module'
 
-
-import {projectList as webUiProjectList} from "@/apis/webUiTest/project";
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 import {
   moduleTree as webUiModuleTree,
   deleteModule as webUiDeleteModule,
   postModule as webUiPostModule,
   putModule as webUiPutModule
-} from "@/apis/webUiTest/module";
+} from '@/apis/webUiTest/module'
 
-import {projectList as appUiProjectList} from "@/apis/appUiTest/project";
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import {
   moduleTree as appUiModuleTree,
   deleteModule as appUiDeleteModule,
   postModule as appUiPostModule,
   putModule as appUiPutModule
-} from "@/apis/appUiTest/module";
-import {phoneList, serverList} from "@/apis/appUiTest/env";
+} from '@/apis/appUiTest/module'
+import { phoneList, serverList } from '@/apis/appUiTest/env'
 
 export default {
-  name: 'index',
-  props: ["dataType"],
+  name: 'Index',
   components: {
     apiManage,
     pageManage,
@@ -287,18 +302,20 @@ export default {
     showApiFromDrawer,
     showApiUseDrawer
   },
-  directives: {waves},
+  directives: { waves },
+  // eslint-disable-next-line vue/require-prop-types
+  props: ['dataType'],
   data() {
     return {
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
-      direction: 'rtl',  // 抽屉打开方式
-      projectTab: '模块列表',  // 服务tab的title
-      filterText: '',  // 查询关键字
+      direction: 'rtl', // 抽屉打开方式
+      projectTab: '模块列表', // 服务tab的title
+      filterText: '', // 查询关键字
       isShowLoading: false, // 模块编辑框提交Loading
-      projectListData: [],  // 项目列表
-      moduleListData: [],  // 模块列表
-      currentModuleIdForCommit: '',  // 当前选中的模块id，用于提交新增、修改
-      currentLevelForCommit: 1,  // 当前选中的模块id，用于提交新增、修改
+      projectListData: [], // 项目列表
+      moduleListData: [], // 模块列表
+      currentModuleIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
+      currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
       tempDataForm: {
         name: '',
@@ -334,6 +351,12 @@ export default {
     }
   },
 
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
+
   created() {
     if (this.dataType === 'api') {
       this.projectListUrl = apiProjectList
@@ -341,16 +364,16 @@ export default {
       this.deleteModuleUrl = apiDeleteModule
       this.postModuleUrl = apiPostModule
       this.putModuleUrl = apiPutModule
-    }else if (this.dataType === 'webUi') {
+    } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
       this.moduleTreeUrl = webUiModuleTree
       this.deleteModuleUrl = webUiDeleteModule
       this.postModuleUrl = webUiPostModule
       this.putModuleUrl = webUiPutModule
-      getConfigByName({'name': 'browser_name'}).then(response => {
+      getConfigByName({ 'name': 'browser_name' }).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
       })
-    }else{
+    } else {
       this.projectListUrl = appUiProjectList
       this.moduleTreeUrl = appUiModuleTree
       this.deleteModuleUrl = appUiDeleteModule
@@ -367,12 +390,29 @@ export default {
     this.getProjectList()
   },
 
+  mounted() {
+    // 从后端获取数据类型映射
+    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取响应对象数据源映射
+    getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
+      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取断言数方式映射
+    getAssertMapping().then(response => {
+      this.$busEvents.data.apiTestAssertMappingList = response.data
+    })
+  },
+
   methods: {
 
     // 获取接口归属
     getApiMsgBelongTo() {
-      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showApiList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
         }
@@ -381,8 +421,8 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
-      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showCaseList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
         }
@@ -406,7 +446,7 @@ export default {
       this.currentModuleIdForCommit = '' // 切换项目的时候，把选中模块置为''
       this.currentParent = {}
       this.currentLevelForCommit = 1 // 切换项目的时候，把选中模块置为''
-      this.moduleTreeUrl({'project_id': projectId}).then(response => {
+      this.moduleTreeUrl({ 'project_id': projectId }).then(response => {
         var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
         this.moduleListData = arrayToTree(response_data, null)
 
@@ -441,13 +481,13 @@ export default {
       this.currentParent = data
       this.currentLabel = JSON.parse(JSON.stringify(data.name))
       data.name = ellipsis(data.name, 10)
-      this.$set(data, 'showMenu', true);
+      this.$set(data, 'showMenu', true)
     },
 
     // 鼠标滑出的时候，把可展示菜单的标识去掉
     mouseleave(data) {
       data.name = this.currentLabel
-      this.$set(data, 'showMenu', false);
+      this.$set(data, 'showMenu', false)
     },
 
     // 模块编辑框
@@ -478,7 +518,7 @@ export default {
               this.$set(this.currentParent, 'children', [])
             }
             this.currentParent.children.push(response.data)
-            this.$refs.tree.store.nodesMap[this.currentParent.id].expanded = true  // 展开节点
+            this.$refs.tree.store.nodesMap[this.currentParent.id].expanded = true // 展开节点
           } else {
             this.moduleListData.push(response.data)
           }
@@ -495,7 +535,7 @@ export default {
         id: this.currentParent.id,
         level: this.currentParent.level,
         parent: this.currentParent.parent,
-        project_id: this.currentParent.project_id,
+        project_id: this.currentParent.project_id
       }).then(response => {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
@@ -508,8 +548,8 @@ export default {
 
     // 关键字查询模块
     filterNode(value, data) {
-      if (!value) return true;
-      return data.name.indexOf(value) !== -1;
+      if (!value) return true
+      return data.name.indexOf(value) !== -1
     },
 
     // 点击删除节点
@@ -519,7 +559,7 @@ export default {
 
     // 删除节点
     deleteChild(data) {
-      this.deleteModuleUrl({'id': data.id}).then(response => {
+      this.deleteModuleUrl({ 'id': data.id }).then(response => {
         if (this.showMessage(this, response)) {
           this.$refs.tree.remove(data)
           this.sendModuleTreeIsDone(this.tempDataForm)
@@ -545,12 +585,12 @@ export default {
     // 下载接口模板
     downloadTemplate() {
       downloadApiMsgTemplate().then(response => {
-        let blob = new Blob([response], {
-          type: 'application/vnd.ms-excel'   //将会被放入到blob中的数组内容的MIME类型
-        });
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = '接口导入模板'
         a.click()
       })
@@ -563,42 +603,24 @@ export default {
 
     // 从excel导入接口
     uploadFile(response, file) {
-      let form = new FormData();
-      form.append("file", file.raw);
-      form.append("id", this.currentParent.id);
+      const form = new FormData()
+      form.append('file', file.raw)
+      form.append('id', this.currentParent.id)
       uploadApi(form).then((response) => {
-          if (this.showMessage(this, response)) {
-            this.fileDataList = []
-            this.uploadFileDrawerIsShow = false
-          }
+        if (this.showMessage(this, response)) {
+          this.fileDataList = []
+          this.uploadFileDrawerIsShow = false
         }
+      }
       )
     },
 
     // 发送模块树数据
     sendModuleTreeIsDone(moduleTree) {
       this.$bus.$emit(this.$busEvents.treeIsDone, 'module', JSON.parse(JSON.stringify(moduleTree)))
-    },
-  },
-
-  mounted() {
-    // 从后端获取数据类型映射
-    getConfigByName({'name': 'data_type_mapping'}).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
-    })
-
-    // 从后端获取响应对象数据源映射
-    getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
-      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
-    })
-  },
-
-  watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
     }
-  },
-};
+  }
+}
 </script>
 
 <style scoped>

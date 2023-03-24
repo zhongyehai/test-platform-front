@@ -4,7 +4,8 @@
     :title=" drawerType === 'update' ? '修改接口' : '新增接口'"
     :visible.sync="drawerIsShow"
     :direction="direction"
-    size="85%">
+    size="85%"
+  >
     <!-- 接口所属信息 -->
     <el-form style="margin-left: 20px;margin-right: 20px" label-width="100px">
 
@@ -13,8 +14,7 @@
         <!-- 接口名称 -->
         <el-col :span="9">
           <el-form-item label="接口名称" class="is-required" style="margin-bottom: 5px">
-            <el-input v-model="tempApi.name" placeholder="接口名称" size="mini">
-            </el-input>
+            <el-input v-model="tempApi.name" placeholder="接口名称" size="mini" />
           </el-form-item>
         </el-col>
 
@@ -32,7 +32,7 @@
                   highlight-current
                   :props="defaultProps"
                   @check-change="handleNodeClick"
-                ></el-tree>
+                />
               </el-option>
             </el-select>
           </el-form-item>
@@ -41,10 +41,10 @@
         <!-- 接口超时时间 -->
         <el-col :span="6">
           <el-form-item label="超时时间" class="is-required" style="margin-bottom: 5px">
-            <el-input-number size="mini" v-model="tempApi.time_out" :min="5"></el-input-number>
+            <el-input-number v-model="tempApi.time_out" size="mini" :min="5" />
             <el-popover class="el_popover_class" placement="top-start" trigger="hover">
               <div>发送request请求时，等待回调的超时时间，最少设置为5秒</div>
-              <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
             </el-popover>
           </el-form-item>
         </el-col>
@@ -55,15 +55,16 @@
       <el-row>
         <el-form-item label="前置条件" prop="up_func" style="margin-bottom: 5px">
           <el-input
+            v-model="tempApi.up_func"
             type="textarea"
             autosize
             style="width: 98%"
-            v-model="tempApi.up_func"
             placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-            size="mini"></el-input>
+            size="mini"
+          />
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>在运行接口之前要做的一些前置操作，使用自定义函数的形式实现</div>
-            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
           </el-popover>
         </el-form-item>
       </el-row>
@@ -72,15 +73,16 @@
       <el-row>
         <el-form-item label="后置条件" prop="down_func" style="margin-bottom: 5px">
           <el-input
+            v-model="tempApi.down_func"
             type="textarea"
             autosize
             style="width: 98%"
-            v-model="tempApi.down_func"
             placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-            size="mini"></el-input>
+            size="mini"
+          />
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>在运行接口之后要做的一些后置操作，使用自定义函数的形式实现</div>
-            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
           </el-popover>
         </el-form-item>
       </el-row>
@@ -95,7 +97,7 @@
         <methodsSelectorView
           ref="methodsSelectorView"
           :method="tempApi.method"
-        ></methodsSelectorView>
+        />
 
         <!-- 接口地址 -->
         <el-input
@@ -103,46 +105,46 @@
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
+          style="width: 78%;margin-right: 5px"
           @change="changeUrl"
-          style="width: 78%;margin-right: 5px">
-        </el-input>
+        />
 
       </el-form-item>
     </el-form>
 
     <!-- 参数信息 -->
-    <el-tabs style="margin: 0 20px 0 20px;" v-model="bodyShow">
+    <el-tabs v-model="bodyShow" style="margin: 0 20px 0 20px;">
 
       <!-- 头部信息 -->
       <el-tab-pane label="头部信息" name="headers">
-        <el-tooltip class="item-tabs" effect="light" placement="top" slot="label">
+        <el-tooltip slot="label" class="item-tabs" effect="light" placement="top">
           <div slot="content">
-            1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br/>
-            2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br/>
-            3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br/>
+            1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br>
+            2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br>
+            3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
             4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
           </div>
           <span>头部信息</span>
         </el-tooltip>
         <headersView
           ref="headersView"
-          :currentData="tempApi.headers"
+          :current-data="tempApi.headers"
           :placeholder-key="'key'"
           :placeholder-value="'value'"
           :placeholder-desc="'备注'"
-        ></headersView>
+        />
       </el-tab-pane>
 
       <!-- 接口查询字符串信息 -->
       <el-tab-pane label="url参数" name="params">
         <queryStringView
           ref="queryStringView"
-          :currentData="tempApi.params"
+          :current-data="tempApi.params"
           :placeholder-key="'key'"
           :placeholder-value="'value'"
           :placeholder-desc="'备注'"
-          :busEventName="busEventName"
-        ></queryStringView>
+          :bus-event-name="busEventName"
+        />
       </el-tab-pane>
 
       <!-- 请求体 -->
@@ -154,18 +156,18 @@
           :data-form="tempApi.data_form"
           :data-urlencoded="tempApi.data_urlencoded"
           :data-text="tempApi.data_text"
-        ></bodyView>
+        />
       </el-tab-pane>
 
       <!-- 数据提取信息 -->
       <el-tab-pane label="数据提取" name="extracts">
         <extractsView
           ref="extractsView"
-          :currentData="tempApi.extracts"
+          :current-data="tempApi.extracts"
           :placeholder-key="'起个变量名'"
           :placeholder-value="'提取表达式'"
           :placeholder-desc="'备注'"
-        ></extractsView>
+        />
       </el-tab-pane>
 
       <!-- 断言信息 -->
@@ -173,7 +175,7 @@
         <validatesView
           ref="validatesView"
           :validates="tempApi.validates"
-        ></validatesView>
+        />
       </el-tab-pane>
 
       <!-- 响应信息 -->
@@ -182,7 +184,7 @@
           :value="strToJson(tempApi.response)"
           :expand-depth="5"
           copyable
-        ></JsonViewer>
+        />
       </el-tab-pane>
 
     </el-tabs>
@@ -204,7 +206,8 @@
         type="primary"
         size="mini"
         :loading="isShowSubmitLoading"
-        @click=" drawerType === 'update' ? changApi() : addApi() ">
+        @click=" drawerType === 'update' ? changApi() : addApi() "
+      >
         {{ '保存' }}
       </el-button>
 
@@ -215,28 +218,24 @@
 </template>
 
 <script>
-import JsonViewer from "vue-json-viewer";
+import JsonViewer from 'vue-json-viewer'
 
-import projectSelectorView from "@/components/Selector/project";
-import moduleSelectorView from "@/components/Selector/module";
-import methodsSelectorView from "@/components/Selector/methods";
+import projectSelectorView from '@/components/Selector/project'
+import moduleSelectorView from '@/components/Selector/module'
+import methodsSelectorView from '@/components/Selector/methods'
 import headersView from '@/components/Inputs/changeRow'
 import queryStringView from '@/components/Inputs/changeRow'
 import bodyView from '@/components/apiBody'
 import extractsView from '@/components/Inputs/extract'
 import validatesView from '@/components/Inputs/validates'
 
-import {postApi, putApi, runApi} from '@/apis/apiTest/api'
-import {getModule} from "@/apis/apiTest/module";
-import {paramsListToStr} from "@/utils/parseData";
-import {assertStrIsJson} from "@/utils/validate";
+import { postApi, putApi, runApi } from '@/apis/apiTest/api'
+import { getModule } from '@/apis/apiTest/module'
+import { paramsListToStr } from '@/utils/parseData'
+import { assertStrIsJson } from '@/utils/validate'
 
 export default {
-  name: 'drawer',
-  props: [
-    'currentProjectId',
-    'currentModuleId',
-  ],
+  name: 'Drawer',
   components: {
     JsonViewer,
     projectSelectorView,
@@ -248,23 +247,27 @@ export default {
     extractsView,
     validatesView
   },
+  props: [
+    'currentProjectId',
+    'currentModuleId'
+  ],
   data() {
     return {
 
       drawerIsShow: false, // 抽屉是否打开
-      direction: 'rtl',  // 抽屉打开方式
-      drawerType: '',  // title展示创建还是编辑
-      methodSelectorChoiceMethod: '',  // 请求方法选择组件选择的请求方法
+      direction: 'rtl', // 抽屉打开方式
+      drawerType: '', // title展示创建还是编辑
+      methodSelectorChoiceMethod: '', // 请求方法选择组件选择的请求方法
 
       moduleTree: [],
       defaultProps: {
-        children: "children",
-        label: "name"
+        children: 'children',
+        label: 'name'
       },
       moduleLabel: '',
-      isShowDebugLoading: false,  // 是否展示请求接口时的等待状态
+      isShowDebugLoading: false, // 是否展示请求接口时的等待状态
       isShowSubmitLoading: false,
-      bodyShow: 'headers',  // 默认展示的tab页
+      bodyShow: 'headers', // 默认展示的tab页
 
       // 接口新增/编辑临时数据
       tempApi: {
@@ -276,15 +279,15 @@ export default {
         method: '',
         addr: '',
         time_out: 60,
-        headers: [{key: null, value: null, remark: null}],
-        params: [{key: null, value: null}],
+        headers: [{ key: null, value: null, remark: null }],
+        params: [{ key: null, value: null }],
         data_type: '',
         data_form: [],
         data_json: JSON.stringify({}),
         data_urlencoded: JSON.stringify({}),
         data_text: '',
-        extracts: [{key: null, value: null, remark: null}],
-        validates: [{key: null, value: null, validate_type: null, remark: null}],
+        extracts: [{ key: null, value: null, remark: null }],
+        validates: [{ key: null, value: null, validate_type: null, remark: null }],
         response: {},
         module_id: '',
         project_id: ''
@@ -293,22 +296,108 @@ export default {
     }
   },
 
+  watch: {
+
+    // 监控父组件选中的服务, 实时获取对应的模块列表
+    'currentProjectId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.tempApi.project_id = newVal
+      }
+    },
+
+    // 监控父组件选中的模块
+    'currentModuleId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.tempApi.module_id = newVal
+      }
+    },
+
+    'drawerIsShow': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          getModule({ 'id': this.tempApi.module_id }).then(response => {
+            this.moduleLabel = response.data.name
+            this.$refs.moduleTree.setCheckedKeys([this.tempApi.module_id])
+          })
+        }
+      }
+    }
+  },
+
+  mounted() {
+    // 监听、接收模块树
+    this.$bus.$on(this.$busEvents.treeIsDone, (_type, moduleTree) => {
+      if (_type === 'module') {
+        this.moduleTree = moduleTree
+      }
+    })
+
+    // 监听请求方法选择器的选中事件
+    this.$bus.$on(this.$busEvents.selectorChoice, (_type, method) => {
+      if (_type === 'method') {
+        this.methodSelectorChoiceMethod = method
+      }
+    })
+
+    // 监听 接口编辑框命令事件
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, api, isShowFrom) => {
+      if (_type === 'apiInfo') {
+        if (command === 'add') {
+          this.initNewTempApi() // 新增
+        } else if (command === 'edit') {
+          this.initUpdateTempApi(api) // 修改
+          this.drawerType = 'update'
+        } else if (command === 'copy') {
+          this.initUpdateTempApi(api) // 复制
+          this.drawerType = 'add'
+        }
+
+        if (isShowFrom) { // 查看接口详情打开的编辑框
+          this.moduleTree = [{ id: api.module_id, name: this.moduleLabel }]
+        }
+      }
+    })
+
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'selectRunEnv' && _runUnit === 'apiDrawer') {
+        this.runApis(runDict)
+      }
+    })
+
+    this.$bus.$on(this.$busEvents.changeData, (_type, param) => {
+      if (_type === this.busEventName) {
+        this.paramsToStr(param)
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.changeData)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+    this.$bus.$off(this.$busEvents.treeIsDone)
+    this.$bus.$off(this.$busEvents.selectorChoice)
+  },
+
   methods: {
 
     // 修改url,如果是包含了查询字符串，则自动解析
     changeUrl(value) {
-      let queryStr = value.split("?")[1]
+      const queryStr = value.split('?')[1]
 
       if (queryStr) {
-        let queryStrParam = queryStr.split("&")
+        const queryStrParam = queryStr.split('&')
 
-        let newParam = []
+        const newParam = []
         for (let i = 0; i < queryStrParam.length; i++) {
-          let param = queryStrParam[i]
-          let [key, value] = param.split("=")
+          const param = queryStrParam[i]
+          const [key, value] = param.split('=')
 
           if (key) {
-            newParam.push({'id': i, 'key': key, 'value': value, 'remark': null, 'data_type': 'str'})
+            newParam.push({ 'id': i, 'key': key, 'value': value, 'remark': null, 'data_type': 'str' })
           }
         }
         if (newParam.length > 0) {
@@ -334,7 +423,7 @@ export default {
     // 勾选树事件
     handleNodeClick(data, checked, node) {
       if (checked && [data.id] !== this.$refs.moduleTree.getCheckedKeys()) {
-        this.$refs.moduleTree.setCheckedKeys([data.id])  // 选中
+        this.$refs.moduleTree.setCheckedKeys([data.id]) // 选中
         this.moduleLabel = data.name
       }
     },
@@ -418,16 +507,16 @@ export default {
       this.tempApi.method = ''
       this.tempApi.addr = ''
       this.tempApi.time_out = 60
-      this.tempApi.headers = [{key: null, value: null, remark: null}]
-      this.tempApi.params = [{key: null, value: null}]
+      this.tempApi.headers = [{ key: null, value: null, remark: null }]
+      this.tempApi.params = [{ key: null, value: null }]
       this.tempApi.data_type = ''
       this.tempApi.data_form = []
       this.tempApi.data_json = {}
       this.tempApi.data_urlencoded = {}
       this.tempApi.data_text = ''
       this.tempApi.response = {}
-      this.tempApi.extracts = [{key: null, value: null, remark: null}]
-      this.tempApi.validates = [{key: null, value: null, validate_type: null, remark: null}]
+      this.tempApi.extracts = [{ key: null, value: null, remark: null }]
+      this.tempApi.validates = [{ key: null, value: null, validate_type: null, remark: null }]
       this.tempApi.module_id = this.currentModuleId ? this.currentModuleId : ''
       this.tempApi.project_id = this.currentProjectId || ''
       this.drawerType = 'create'
@@ -471,89 +560,6 @@ export default {
       }
     }
 
-  },
-
-  mounted() {
-
-    // 监听、接收模块树
-    this.$bus.$on(this.$busEvents.treeIsDone, (_type, moduleTree) => {
-      if (_type === 'module') {
-        this.moduleTree = moduleTree
-      }
-    })
-
-    // 监听请求方法选择器的选中事件
-    this.$bus.$on(this.$busEvents.selectorChoice, (_type, method) => {
-      if (_type === 'method') {
-        this.methodSelectorChoiceMethod = method
-      }
-    })
-
-    // 监听 接口编辑框命令事件
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, api) => {
-      if (_type === 'apiInfo') {
-        if (command === 'add') {
-          this.initNewTempApi()  // 新增
-        } else if (command === 'edit') {
-          this.initUpdateTempApi(api)  // 修改
-          this.drawerType = 'update'
-        } else if (command === 'copy') {
-          this.initUpdateTempApi(api)  // 复制
-          this.drawerType = 'add'
-        }
-      }
-    })
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'selectRunEnv' && _runUnit === 'apiDrawer'){
-        this.runApis(runDict)
-      }
-    })
-
-    this.$bus.$on(this.$busEvents.changeData, (_type, param) => {
-      if (_type === this.busEventName) {
-        this.paramsToStr(param)
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.changeData)
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-    this.$bus.$off(this.$busEvents.treeIsDone)
-    this.$bus.$off(this.$busEvents.selectorChoice)
-  },
-
-  watch: {
-
-    // 监控父组件选中的服务, 实时获取对应的模块列表
-    'currentProjectId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        this.tempApi.project_id = newVal
-      }
-    },
-
-    // 监控父组件选中的模块
-    'currentModuleId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        this.tempApi.module_id = newVal
-      }
-    },
-
-    'drawerIsShow': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          getModule({'id': this.tempApi.module_id}).then(response => {
-            this.moduleLabel = response.data.name
-            this.$refs.moduleTree.setCheckedKeys([this.tempApi.module_id])
-          })
-        }
-      }
-    }
   }
 }
 </script>

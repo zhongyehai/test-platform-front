@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import VCharts from 'v-charts';
-import VueClipboard from 'vue-clipboard2'  // 复制内容到粘贴板
+import VCharts from 'v-charts'
+import VueClipboard from 'vue-clipboard2' // 复制内容到粘贴板
 
 import 'default-passive-events'
 import 'normalize.css/normalize.css' // CSS重置的现代替代方案
@@ -14,11 +14,11 @@ import '@/permission' // 权限控制
 import App from './App'
 import store from './store'
 import router from './router'
-import showMessage from '@/utils/showMessage';
-import busEvents from "@/utils/busEvents";
+import showMessage from '@/utils/showMessage'
+import busEvents from '@/utils/busEvents'
 
-Vue.use(VCharts);
-Vue.use(showMessage);
+Vue.use(VCharts)
+Vue.use(showMessage)
 Vue.use(ElementUI)
 Vue.use(VueClipboard)
 

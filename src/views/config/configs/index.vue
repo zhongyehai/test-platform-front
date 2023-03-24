@@ -15,7 +15,7 @@
             size="mini"
             class="filter-item"
           >
-            <el-option v-for="type in currentConfigTypeList" :key="type.id" :label="type.name" :value="type.id"/>
+            <el-option v-for="type in currentConfigTypeList" :key="type.id" :label="type.name" :value="type.id" />
           </el-select>
         </el-form-item>
 
@@ -26,8 +26,8 @@
             placeholder="配置名，支持模糊搜索"
             size="mini"
             clearable
-            style="width: 200px">
-          </el-input>
+            style="width: 200px"
+          />
         </el-form-item>
 
         <el-form-item :label="'配置值'" size="mini">
@@ -37,8 +37,8 @@
             placeholder="配置值，支持模糊搜索"
             size="mini"
             clearable
-            style="width: 200px">
-          </el-input>
+            style="width: 200px"
+          />
         </el-form-item>
 
         <el-form-item :label="'创建人'" size="mini">
@@ -49,15 +49,17 @@
             default-first-option
             clearable
             size="mini"
-            class="filter-item">
-            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+            class="filter-item"
+          >
+            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
           </el-select>
         </el-form-item>
 
         <el-button
           type="primary"
           size="mini"
-          @click="getConfigList()">
+          @click="getConfigList()"
+        >
           搜索
         </el-button>
 
@@ -80,37 +82,37 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="配置名称" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="配置名称" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="value" align="center" label="配置值" min-width="28%">
+      <el-table-column :show-overflow-tooltip="true" prop="value" align="center" label="配置值" min-width="28%">
         <template slot-scope="scope">
           <span> {{ scope.row.value }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="type" align="center" label="配置类型" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="type" align="center" label="配置类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ parseConfigType(scope.row.type) }} </span>
         </template>
       </el-table-column>
 
-<!--      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="8%">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseUser(scope.row.create_user) }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="8%">-->
+      <!--        <template slot-scope="scope">-->
+      <!--          <span>{{ parseUser(scope.row.create_user) }}</span>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="最后修改人" min-width="12%">
+      <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="最后修改人" min-width="12%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
@@ -122,13 +124,15 @@
             class="item"
             effect="dark"
             content="若不清楚配置的规则，请勿修改"
-            placement="right-end">
+            placement="right-end"
+          >
             <el-button
               type="text"
               size="mini"
               icon="el-icon-edit"
               :disabled="roles !== '2'"
-              @click.native="editConfig(scope.row)"></el-button>
+              @click.native="editConfig(scope.row)"
+            />
           </el-tooltip>
         </template>
       </el-table-column>
@@ -146,21 +150,21 @@
     <configDialog
       :config-type-list="currentConfigTypeList"
       :config-type-dict="currentConfigTypeDict"
-    ></configDialog>
+    />
   </div>
 </template>
 
 <script>
 
 import Pagination from '@/components/Pagination'
-import configDialog from "@/views/config/configs/drawer";
+import configDialog from '@/views/config/configs/drawer'
 
-import {configList, deleteConfig} from '@/apis/config/config'
-import {userList} from "@/apis/system/user";
-import {configTypeList} from "@/apis/config/configType";
+import { configList, deleteConfig } from '@/apis/config/config'
+import { userList } from '@/apis/system/user'
+import { configTypeList } from '@/apis/config/configType'
 
 export default {
-  name: "config",
+  name: 'Config',
   components: {
     Pagination,
     configDialog
@@ -194,22 +198,36 @@ export default {
       // 用户权限
       roles: localStorage.getItem('roles'),
       currentUserList: [],
-      userDict: {},
+      userDict: {}
     }
+  },
+
+  mounted() {
+    this.getUserList(this.getConfigTypeList)
+
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+      if (_type === 'configInfo') {
+        this.getConfigList()
+      }
+    })
+  },
+
+  // 页面销毁前，关闭bus监听服务选中事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
   methods: {
     // 获取用户信息，同步请求
     getUserList(func) {
-      userList().then(response =>{
+      userList().then(response => {
         this.currentUserList = response.data.data
         response.data.data.forEach(user => {
           this.userDict[user.id] = user
         })
-        if (func){
+        if (func) {
           func()
         }
       })
-
     },
 
     // 解析用户
@@ -254,28 +272,13 @@ export default {
 
     // 删除配置
     delConfig(congfigId) {
-      deleteConfig({'id': congfigId}).then(response => {
+      deleteConfig({ 'id': congfigId }).then(response => {
         if (this.showMessage(this, response)) {
           this.getConfigList()
         }
       })
     }
-  },
-
-  mounted() {
-    this.getUserList(this.getConfigTypeList)
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (_type === 'configInfo'){
-        this.getConfigList()
-      }
-    })
-  },
-
-  // 页面销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
+  }
 }
 </script>
 

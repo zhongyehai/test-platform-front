@@ -7,10 +7,10 @@
         <!-- 服务列表树组件 -->
         <projectTreeView
           ref="projectTree"
-          :dataType="dataType"
-          :menuName="'添加任务'"
-          :labelWidth="5"
-        ></projectTreeView>
+          :data-type="dataType"
+          :menu-name="'添加任务'"
+          :label-width="5"
+        />
       </el-col>
 
       <!-- 定时任务 -->
@@ -33,7 +33,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="25%">
+              <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="任务名称" min-width="25%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.name }} </span>
                 </template>
@@ -47,27 +47,30 @@
 
               <el-table-column
                 align="center"
-                min-width="15%">
+                min-width="15%"
+              >
                 <template slot="header">
                   <span>是否启用</span>
                   <el-tooltip
                     class="item"
                     effect="dark"
-                    placement="top-start">
+                    placement="top-start"
+                  >
                     <div slot="content">
                       <div>1: 启用中的任务才会定时执行</div>
                       <div>2: 禁用中的任务才支持修改</div>
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
                   </el-tooltip>
                 </template>
                 <template slot-scope="scope">
                   <el-switch
+                    v-model="scope.row.status"
                     :inactive-value="0"
                     :active-value="1"
                     :disabled="scope.row.taskIsDisabled"
-                    v-model="scope.row.status"
-                    @change="changeStatus(scope.row)"></el-switch>
+                    @change="changeStatus(scope.row)"
+                  />
                 </template>
               </el-table-column>
 
@@ -76,9 +79,9 @@
 
                   <!-- 运行任务 -->
                   <el-button
+                    slot="reference"
                     type="text"
                     size="mini"
-                    slot="reference"
                     :loading="scope.row.runButtonIsLoading"
                     @click="clickRunTask(scope.row)"
                   >运行</el-button>
@@ -89,15 +92,17 @@
                     size="mini"
                     style="margin-right: 10px"
                     :disabled="scope.row.status === 1"
-                    @click.native="editTask(scope.row)">修改</el-button>
+                    @click.native="editTask(scope.row)"
+                  >修改</el-button>
 
                   <!-- 复制任务 -->
                   <el-popover
                     :ref="scope.row.id"
+                    v-model="scope.row.copyPopoverIsShow"
                     placement="top"
                     style="margin-right: 10px"
                     popper-class="down-popover"
-                    v-model="scope.row.copyPopoverIsShow">
+                  >
                     <p>复制此任务并生成新的任务?</p>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -114,9 +119,10 @@
                   <!-- 删除任务 -->
                   <el-popover
                     :ref="scope.row.id"
+                    v-model="scope.row.deletePopoverIsShow"
                     placement="top"
                     popper-class="down-popover"
-                    v-model="scope.row.deletePopoverIsShow">
+                  >
                     <p>确定删除【{{ scope.row.name }}】?</p>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -148,16 +154,16 @@
     </el-row>
 
     <selectRunEnv
-      :dataType="dataType"
-    ></selectRunEnv>
+      :data-type="dataType"
+    />
 
     <runProcess
-      :dataType="dataType"
-    ></runProcess>
+      :data-type="dataType"
+    />
 
     <taskDrawer
-      :dataType="dataType"
-    ></taskDrawer>
+      :data-type="dataType"
+    />
   </div>
 </template>
 
@@ -165,9 +171,9 @@
 import Sortable from 'sortablejs'
 import projectTreeView from '@/components/Trees/projectTree.vue'
 import Pagination from '@/components/Pagination/index.vue'
-import taskDrawer from "@/components/business/task/drawer.vue";
-import selectRunEnv from '@/components/selectRunEnv.vue'  // 环境选择组件
-import runProcess from '@/components/runProcess.vue'  // 测试执行进度组件
+import taskDrawer from '@/components/business/task/drawer.vue'
+import selectRunEnv from '@/components/selectRunEnv.vue' // 环境选择组件
+import runProcess from '@/components/runProcess.vue' // 测试执行进度组件
 
 import {
   taskList as apiTaskList,
@@ -200,9 +206,9 @@ import {
 } from '@/apis/appUiTest/task'
 
 export default {
-  name: "index",
-  props: ["dataType"],
-  components: {Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess},
+  name: 'Index',
+  components: { Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess },
+  props: ['dataType'],
   data() {
     return {
       tableLoadingIsShow: false,
@@ -232,6 +238,63 @@ export default {
     }
   },
 
+  created() {
+    if (this.dataType === 'api') {
+      this.taskListUrl = apiTaskList
+      this.disableTaskUrl = apiDisableTask
+      this.enableTaskUrl = apiEnableTask
+      this.runTaskUrl = apiRunTask
+      this.deleteTaskUrl = apiDeleteTask
+      this.copyTaskUrl = apiCopyTask
+      this.taskSortUrl = apiTaskSort
+    } else if (this.dataType === 'webUi') {
+      this.taskListUrl = webUiTaskList
+      this.disableTaskUrl = webUiDisableTask
+      this.enableTaskUrl = webUiEnableTask
+      this.runTaskUrl = webUiRunTask
+      this.deleteTaskUrl = webUiDeleteTask
+      this.copyTaskUrl = webUiCopyTask
+      this.taskSortUrl = webUiTaskSort
+    } else {
+      this.taskListUrl = appUiTaskList
+      this.disableTaskUrl = appUiDisableTask
+      this.enableTaskUrl = appUiEnableTask
+      this.runTaskUrl = appUiRunTask
+      this.deleteTaskUrl = appUiDeleteTask
+      this.copyTaskUrl = appUiCopyTask
+      this.taskSortUrl = appUiTaskSort
+    }
+
+    this.oldList = this.taskList.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  mounted() {
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'taskInfo') {
+        this.getTaskList()
+      } else if (_type === 'selectRunEnv' && _runUnit === 'taskIndex') {
+        this.run(runDict)
+      }
+    })
+
+    // 服务树选中项事件
+    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
+      if (_type === 'project') {
+        this.projectId = project.id
+        this.getTaskList()
+      }
+    })
+  },
+
+  // 页面销毁前，关闭bus监听服务选中事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
+    this.$bus.$off(this.$busEvents.treeIsChoice)
+  },
 
   methods: {
 
@@ -254,7 +317,7 @@ export default {
     copy(task) {
       this.$set(task, 'copyPopoverIsShow', false)
       this.$set(task, 'copyButtonIsLoading', true)
-      this.copyTaskUrl({'id': task.id}).then(response => {
+      this.copyTaskUrl({ 'id': task.id }).then(response => {
         this.$set(task, 'copyButtonIsLoading', false)
         if (this.showMessage(this, response)) {
           this.taskList.push(response.data)
@@ -293,7 +356,7 @@ export default {
     delTask(task) {
       this.$set(task, 'deletePopoverIsShow', false)
       this.$set(task, 'deleteLoadingIsShow', true)
-      this.deleteTaskUrl({id: task.id}).then(response => {
+      this.deleteTaskUrl({ id: task.id }).then(response => {
         this.$set(task, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getTaskList()
@@ -305,14 +368,14 @@ export default {
     changeStatus(task) {
       this.$set(task, 'taskIsDisabled', true)
       if (task.status === 1) {
-        this.enableTaskUrl({id: task.id}).then(response => {
+        this.enableTaskUrl({ id: task.id }).then(response => {
           this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
         })
       } else {
-        this.disableTaskUrl({id: task.id}).then(response => {
+        this.disableTaskUrl({ id: task.id }).then(response => {
           this.$set(task, 'taskIsDisabled', false)
           if (this.showMessage(this, response)) {
             this.getTaskList()
@@ -341,7 +404,7 @@ export default {
       const el = this.$refs.taskTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -356,7 +419,7 @@ export default {
           this.taskSortUrl({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -364,66 +427,6 @@ export default {
         }
       })
     }
-  },
-
-  created() {
-    if (this.dataType === "api") {
-      this.taskListUrl = apiTaskList
-      this.disableTaskUrl = apiDisableTask
-      this.enableTaskUrl = apiEnableTask
-      this.runTaskUrl = apiRunTask
-      this.deleteTaskUrl = apiDeleteTask
-      this.copyTaskUrl = apiCopyTask
-      this.taskSortUrl = apiTaskSort
-    } else if (this.dataType === "webUi") {
-      this.taskListUrl = webUiTaskList
-      this.disableTaskUrl = webUiDisableTask
-      this.enableTaskUrl = webUiEnableTask
-      this.runTaskUrl = webUiRunTask
-      this.deleteTaskUrl = webUiDeleteTask
-      this.copyTaskUrl = webUiCopyTask
-      this.taskSortUrl = webUiTaskSort
-    } else {
-      this.taskListUrl = appUiTaskList
-      this.disableTaskUrl = appUiDisableTask
-      this.enableTaskUrl = appUiEnableTask
-      this.runTaskUrl = appUiRunTask
-      this.deleteTaskUrl = appUiDeleteTask
-      this.copyTaskUrl = appUiCopyTask
-      this.taskSortUrl = appUiTaskSort
-    }
-
-    this.oldList = this.taskList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-  mounted() {
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'taskInfo') {
-        this.getTaskList()
-      } else if (_type === 'selectRunEnv' && _runUnit === 'taskIndex') {
-        this.run(runDict)
-      }
-    })
-
-    // 服务树选中项事件
-    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
-      if (_type === 'project') {
-        this.projectId = project.id
-        this.getTaskList()
-      }
-    })
-
-  },
-
-  // 页面销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-    this.$bus.$off(this.$busEvents.treeIsChoice)
   }
 }
 </script>

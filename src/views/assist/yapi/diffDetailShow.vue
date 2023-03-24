@@ -4,33 +4,37 @@
     <div style="margin-bottom: 10px">
       <!-- 下载按钮 -->
       <el-tooltip class="item" effect="dark" content="下载后需用xmind8打开" placement="top-start">
-        <el-button type="primary"
-                   size="mini"
-                   @click.native="exportDiffRecordAsXmind()">导出为xmind
+        <el-button
+          type="primary"
+          size="mini"
+          @click.native="exportDiffRecordAsXmind()"
+        >导出为xmind
         </el-button>
       </el-tooltip>
 
-      <el-button type="primary"
-                 size="mini"
-                 style="margin-left: 20px"
-                 @click.native="downloadXmidSetup()">下载xmind8安装包
+      <el-button
+        type="primary"
+        size="mini"
+        style="margin-left: 20px"
+        @click.native="downloadXmidSetup()"
+      >下载xmind8安装包
       </el-button>
     </div>
 
     <!-- 脑图 -->
-    <div v-show="mindIsShow" id="map" style="width: 100%; height: 1000px"></div>
+    <div v-show="mindIsShow" id="map" style="width: 100%; height: 1000px" />
 
   </div>
 </template>
 
 <script>
 // 使用方法详见：https://inspiring-golick-3c01b9.netlify.app/
-import MindElixir, {E} from "mind-elixir";
+import MindElixir, { E } from 'mind-elixir'
 
-import {getDiffRecord, getDiffRecordAsXmind} from "@/apis/assist/yapi";
+import { getDiffRecord, getDiffRecordAsXmind } from '@/apis/assist/yapi'
 
 export default {
-  name: 'showDiffDetail',
+  name: 'ShowDiffDetail',
   data() {
     return {
 
@@ -38,20 +42,24 @@ export default {
 
       ME: null,
       diffData: {
-        "nodeData": {
-          "topic": "新建服务",
-          "root": true,
-          "children": []
+        'nodeData': {
+          'topic': '新建服务',
+          'root': true,
+          'children': []
         }
-      },
+      }
     }
+  },
+
+  mounted() {
+    this.getDiffRecordData()
   },
 
   methods: {
 
     initMindElixir() {
       this.ME = new MindElixir({
-        el: "#map",
+        el: '#map',
         direction: MindElixir.LEFT,
         data: this.diffData,
         draggable: true, // 启用拖动 default true
@@ -61,16 +69,16 @@ export default {
         keypress: true, // 启用快捷键 default true
         locale: 'zh_CN', // 设置语言，支持[zh_CN,zh_TW,en,ja,pt]
         overflowHidden: false, // default false
-        primaryLinkStyle: 2, // 线条形状，1为弧线，2为直线 default 1
+        primaryLinkStyle: 2 // 线条形状，1为弧线，2为直线 default 1
         // primaryNodeVerticalGap: 15, //节点之间的垂直距离 default 25
         // primaryNodeHorizontalGap: 15, //节点之间的水平距离 default 65
-      });
-      this.ME.init();
+      })
+      this.ME.init()
       E('node-id')
     },
 
     getDiffRecordData() {
-      getDiffRecord({id: this.$route.query.id}).then((response) => {
+      getDiffRecord({ id: this.$route.query.id }).then((response) => {
         if (this.showMessage(this, response)) {
           this.diffData = response.data
 
@@ -82,13 +90,13 @@ export default {
 
     // 导出为xmind
     exportDiffRecordAsXmind() {
-      getDiffRecordAsXmind({id: this.$route.query.id}).then(response => {
-        let blob = new Blob([response], {
-          type: 'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
-        });
+      getDiffRecordAsXmind({ id: this.$route.query.id }).then(response => {
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = this.$route.query.name + '.xmind'
         a.click()
       })
@@ -98,11 +106,7 @@ export default {
     downloadXmidSetup() {
       window.open('https://dl2.xmind.cn/xmind-8-update9-windows.exe')
     }
-  },
-
-  mounted() {
-    this.getDiffRecordData()
-  },
+  }
 }
 </script>
 

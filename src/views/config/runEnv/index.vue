@@ -10,8 +10,8 @@
           placeholder="环境名字，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 300px">
-        </el-input>
+          style="width: 300px"
+        />
       </el-form-item>
 
       <el-form-item :label="'环境code：'" size="mini">
@@ -21,14 +21,15 @@
           placeholder="环境code，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 300px">
-        </el-input>
+          style="width: 300px"
+        />
       </el-form-item>
 
       <el-button
         type="primary"
         size="mini"
-        @click="getRunEnvList()">
+        @click="getRunEnvList()"
+      >
         搜索
       </el-button>
 
@@ -37,7 +38,8 @@
         style="margin-left: 10px"
         type="primary"
         size="mini"
-        @click="showAddRunEnvDialog()">
+        @click="showAddRunEnvDialog()"
+      >
         添加环境
       </el-button>
 
@@ -58,72 +60,77 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="环境名字" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="环境名字" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="code" align="center" label="环境code" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="code" align="center" label="环境code" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.code }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="操作" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
           <el-tooltip
             class="item"
             effect="dark"
             content="修改"
-            placement="top-start">
+            placement="top-start"
+          >
             <el-button
               type="text"
               size="mini"
               icon="el-icon-edit"
-              @click.native="showAddRunEnvDialog(scope.row)"></el-button>
+              @click.native="showAddRunEnvDialog(scope.row)"
+            />
           </el-tooltip>
         </template>
       </el-table-column>
 
     </el-table>
 
-
     <!-- 新增/修改环境 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增环境' : '修改环境'"
       size="60%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <el-form
         ref="envForm"
         label-width="80px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      >
         <el-form-item :label="'环境名字'" class="is-required" size="mini">
           <el-input
             v-model="tempRunEnv.name"
             placeholder="环境名字"
-            size="mini"/>
+            size="mini"
+          />
         </el-form-item>
 
         <el-form-item :label="'code'" class="is-required" size="mini">
           <el-input
-            :disabled="drawerType === 'edit'"
             v-model="tempRunEnv.code"
+            :disabled="drawerType === 'edit'"
             placeholder="环境code"
-            size="mini"/>
+            size="mini"
+          />
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
-          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini"/>
+          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini" />
         </el-form-item>
 
       </el-form>
@@ -134,7 +141,8 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click=" drawerType === 'add' ? addRunEnv() : changRunEnv()">
+          @click=" drawerType === 'add' ? addRunEnv() : changRunEnv()"
+        >
           {{ '保存' }}
         </el-button>
       </div>
@@ -151,13 +159,12 @@
 </template>
 
 <script>
-import Sortable from "sortablejs";
+import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
-import {runEnvList, postRunEnv, putRunEnv, runEnvSort} from "@/apis/config/runEnv";
-
+import { runEnvList, postRunEnv, putRunEnv, runEnvSort } from '@/apis/config/runEnv'
 
 export default {
-  name: "index",
+  name: 'Index',
   components: {
     Pagination
   },
@@ -176,15 +183,27 @@ export default {
       run_env_list: [],
       drawerIsShow: false,
       drawerType: '',
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       tempRunEnv: {},
 
       // 拖拽排序参数
       sortable: null,
       oldList: [],
-      newList: [],
+      newList: []
     }
+  },
+
+  created() {
+    this.oldList = this.run_env_list.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  mounted() {
+    this.getRunEnvList()
   },
 
   methods: {
@@ -247,7 +266,7 @@ export default {
       const el = this.$refs.listTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -261,7 +280,7 @@ export default {
           runEnvSort({
             List: this.newList,
             pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize,
+            pageSize: this.listQuery.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -269,18 +288,6 @@ export default {
         }
       })
     }
-  },
-
-  created() {
-    this.oldList = this.run_env_list.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-  mounted() {
-    this.getRunEnvList()
   }
 }
 </script>

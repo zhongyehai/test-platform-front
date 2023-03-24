@@ -20,7 +20,8 @@
               v-for="(item) in currentProjectList"
               :key="item.id"
               :label="item.name"
-              :value="item.id"></el-option>
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
       </el-col>
@@ -30,15 +31,16 @@
         <el-form-item label="用例集">
           <el-cascader
             ref="caseSelector"
+            v-model="selectedOptions"
             filterable
             placeholder="选择用例集"
             size="mini"
             style="min-width: 100%"
             :options="currentCaseSetList"
             :props="{ checkStrictly: true }"
-            v-model="selectedOptions"
+            clearable
             @change="getCaseList"
-            clearable></el-cascader>
+          />
         </el-form-item>
       </el-col>
     </el-row>
@@ -52,7 +54,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" label="用例名称" align="center" min-width="65%">
+        <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="center" min-width="65%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
@@ -66,11 +68,13 @@
               class="item"
               effect="dark"
               content="完全复制此用例的步骤为当前用例的步骤"
-              placement="top-start">
+              placement="top-start"
+            >
               <el-button
                 type="text"
                 size="mini"
-                @click.native="copyCaseStepAsStep(scope.row)">复制步骤
+                @click.native="copyCaseStepAsStep(scope.row)"
+              >复制步骤
               </el-button>
             </el-tooltip>
 
@@ -79,11 +83,13 @@
               class="item"
               effect="dark"
               content="引用此用例为当前用例的步骤"
-              placement="top-start">
+              placement="top-start"
+            >
               <el-button
                 type="text"
                 size="mini"
-                @click.native="addQuote(scope.row)">引用用例
+                @click.native="addQuote(scope.row)"
+              >引用用例
               </el-button>
             </el-tooltip>
 
@@ -113,25 +119,25 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {projectList as apiProjectList} from "@/apis/apiTest/project";
-import {caseSetTree as apiCaseSetTree} from "@/apis/apiTest/caseSet";
-import {caseList as apiCaseList, copyCaseStep as apiCopyCaseStep} from "@/apis/apiTest/case";
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
+import { caseSetTree as apiCaseSetTree } from '@/apis/apiTest/caseSet'
+import { caseList as apiCaseList, copyCaseStep as apiCopyCaseStep } from '@/apis/apiTest/case'
 
-import {projectList as webUiProjectList} from "@/apis/webUiTest/project";
-import {caseSetTree as webUiCaseSetTree} from "@/apis/webUiTest/caseSet";
-import {caseList as webUiCaseList, copyCaseStep as webUiCopyCaseStep} from "@/apis/webUiTest/case";
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
+import { caseSetTree as webUiCaseSetTree } from '@/apis/webUiTest/caseSet'
+import { caseList as webUiCaseList, copyCaseStep as webUiCopyCaseStep } from '@/apis/webUiTest/case'
 
-import {projectList as appUiProjectList} from "@/apis/appUiTest/project";
-import {caseSetTree as appUiCaseSetTree} from "@/apis/appUiTest/caseSet";
-import {caseList as appUiCaseList, copyCaseStep as appUiCopyCaseStep} from "@/apis/appUiTest/case";
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
+import { caseSetTree as appUiCaseSetTree } from '@/apis/appUiTest/caseSet'
+import { caseList as appUiCaseList, copyCaseStep as appUiCopyCaseStep } from '@/apis/appUiTest/case'
 
 export default {
-  name: "quoteCase",
-  components: {Pagination},
+  name: 'QuoteCase',
+  components: { Pagination },
   props: [
     'dataType',
-    "tempCase",
-    "caseId"
+    'tempCase',
+    'caseId'
   ],
   data() {
     return {
@@ -152,9 +158,10 @@ export default {
       copyCaseStepUrl: ''
     }
   },
+  watch: {},
 
   mounted() {
-    this.getProjectList()  // 获取服务列表
+    this.getProjectList() // 获取服务列表
   },
 
   created() {
@@ -181,20 +188,20 @@ export default {
     // 递归把列表转为树行结构
     arrayToTree(arr, parentId) {
       //  arr 是返回的数据  parendId 父id
-      let temp = [];
-      let treeArr = arr;
+      const temp = []
+      const treeArr = arr
       treeArr.forEach((item, index) => {
         if (item.parent === parentId) {
           if (this.arrayToTree(treeArr, treeArr[index].id).length > 0) {
             // 递归调用此函数
-            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id);
+            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id)
           }
           treeArr[index].value = treeArr[index].id
           treeArr[index].label = treeArr[index].name
-          temp.push(treeArr[index]);
+          temp.push(treeArr[index])
         }
-      });
-      return temp;
+      })
+      return temp
     },
 
     // 获取服务列表
@@ -206,7 +213,7 @@ export default {
 
     // 选中服务，获取对应的用例集
     selectedProject(projectId) {
-      this.caseSetTreeUrl({'project_id': projectId}).then(response => {
+      this.caseSetTreeUrl({ 'project_id': projectId }).then(response => {
         this.currentCaseSetList = this.arrayToTree(response.data, null)
       })
     },
@@ -214,7 +221,7 @@ export default {
     // 选中用例集，获取对应的用例列表
     getCaseList(caseSetList) {
       if (caseSetList.length > 0) {
-        this.currentSetId = caseSetList.slice(-1)[0]  // 取列表中的最后一个
+        this.currentSetId = caseSetList.slice(-1)[0] // 取列表中的最后一个
       }
       this.caseListUrl({
         pageNum: this.quotePageNum,
@@ -230,10 +237,9 @@ export default {
     addQuote(row) {
       // 如果有用例id，则添加步骤，否则先保存用例
       if (this.caseId) {
-
         // 不能自己引用自己
         if (row.id === this.caseId) {
-          this.$notify.error('不能自己引用自己');
+          this.$notify.error('不能自己引用自己')
           return
         }
 
@@ -246,12 +252,12 @@ export default {
         new_api['status'] = 1
         new_api['run_times'] = 1
         new_api['name'] = `引用【${name}/${row.name}】`
-        new_api['headers'] = [{"key": null, "remark": null, "value": null}]
-        new_api['params'] = [{"key": null, "value": null}]
-        new_api['data_form'] = [{"data_type": null, "key": null, "remark": null, "value": null}]
+        new_api['headers'] = [{ 'key': null, 'remark': null, 'value': null }]
+        new_api['params'] = [{ 'key': null, 'value': null }]
+        new_api['data_form'] = [{ 'data_type': null, 'key': null, 'remark': null, 'value': null }]
         new_api['data_json'] = {}
-        new_api['extracts'] = [{"key": "", "remark": null, "value": ""}]
-        new_api['validates'] = [{"key": "", "remark": null, "validate_type": "", "value": ""}]
+        new_api['extracts'] = [{ 'key': '', 'remark': null, 'value': '' }]
+        new_api['validates'] = [{ 'key': '', 'remark': null, 'validate_type': '', 'value': '' }]
         new_api['data_driver'] = []
         this.$bus.$emit(this.$busEvents.quoteCaseToStep, new_api, null)
       } else {
@@ -262,7 +268,7 @@ export default {
     // 复制指定用例的步骤为当前用例的步骤
     copyCaseStepAsStep(fromCase) {
       if (this.caseId) {
-        this.copyCaseStepUrl({source: fromCase.id, to: this.caseId}).then(response => {
+        this.copyCaseStepUrl({ source: fromCase.id, to: this.caseId }).then(response => {
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')
           }
@@ -275,8 +281,7 @@ export default {
     showCaseRemark(caseId) {
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'showStepList', caseId)
     }
-  },
-  watch: {}
+  }
 }
 </script>
 

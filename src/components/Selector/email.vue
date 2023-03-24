@@ -8,17 +8,16 @@
     style="min-width: 100%"
     size="mini"
   >
-    <el-option v-for="item in configEmailServerList" :key="item.id" :label="item.name" :value="item.value">
-    </el-option>
+    <el-option v-for="item in configEmailServerList" :key="item.id" :label="item.name" :value="item.value" />
   </el-select>
 </template>
 
 <script>
-import {configList} from "@/apis/config/config";
-import {configTypeList} from "@/apis/config/configType";
+import { configList } from '@/apis/config/config'
+import { configTypeList } from '@/apis/config/configType'
 
 export default {
-  name: "email",
+  name: 'Email',
   props: ['oldEmailServer'],
   data() {
     return {
@@ -26,22 +25,12 @@ export default {
       configEmailServerList: ''
     }
   },
-  methods: {
-    // 获取配置类型
-    getConfigTypeList() {
-      configTypeList().then(response => {
-        let configTypeData = 0
-        response.data.data.forEach(configType => {
-          if (configType.name === '邮箱'){
-            configTypeData = configType.id
-          }
-        })
 
-        // 获取对应的配置
-        configList({'queryType': configTypeData}).then(response => {
-          this.configEmailServerList = response.data.data
-        })
-      })
+  watch: {
+    'oldEmailServer': {
+      handler(newVal, oldVal) {
+        this.tempEmailServer = newVal
+      }
     }
   },
 
@@ -52,13 +41,23 @@ export default {
   created() {
     this.tempEmailServer = this.oldEmailServer
   },
+  methods: {
+    // 获取配置类型
+    getConfigTypeList() {
+      configTypeList().then(response => {
+        let configTypeData = 0
+        response.data.data.forEach(configType => {
+          if (configType.name === '邮箱') {
+            configTypeData = configType.id
+          }
+        })
 
-  watch: {
-    'oldEmailServer': {
-      handler(newVal, oldVal) {
-        this.tempEmailServer = newVal
-      }
-    },
+        // 获取对应的配置
+        configList({ 'queryType': configTypeData }).then(response => {
+          this.configEmailServerList = response.data.data
+        })
+      })
+    }
   }
 }
 </script>

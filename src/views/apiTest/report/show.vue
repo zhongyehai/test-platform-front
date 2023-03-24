@@ -1,6 +1,6 @@
 <template>
 
-  <reportShowView :data-type="'api'"></reportShowView>
+  <reportShowView :data-type="'api'" />
 
 </template>
 
@@ -9,7 +9,7 @@
 import reportShowView from '@/components/business/report/show.vue'
 
 export default {
-  name: 'show',
+  name: 'Show',
   components: {
     reportShowView
   }

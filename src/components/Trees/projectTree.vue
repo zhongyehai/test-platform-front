@@ -2,7 +2,7 @@
   <!-- 结构树/服务列表 -->
   <div class="tabs">
     <el-tabs v-model="projectTab">
-      <el-tab-pane :label=title name="project">
+      <el-tab-pane :label="title" name="project">
         <!-- 服务列表和操作 -->
         <el-scrollbar>
           <el-tree
@@ -16,17 +16,18 @@
             @node-click="projectClick"
           >
             <span
-              class="custom-tree-node"
               slot-scope="{ node, data }"
+              class="custom-tree-node"
               @mouseenter="mouseenter(data)"
-              @mouseleave="mouseleave(data)">
+              @mouseleave="mouseleave(data)"
+            >
               <span> {{ data.name }} </span>
-            <span v-show="data.showMenu" style="margin-left: 10px">
-              <el-button
-                size="mini"
-                type="text"
-                @click.stop="clickMenu(node, data)"
-              >{{ menuName }}</el-button>
+              <span v-show="data.showMenu" style="margin-left: 10px">
+                <el-button
+                  size="mini"
+                  type="text"
+                  @click.stop="clickMenu(node, data)"
+                >{{ menuName }}</el-button>
               </span>
             </span>
           </el-tree>
@@ -34,13 +35,12 @@
         <!-- 服务列表分页 -->
         <el-pagination
           small
-          @current-change="getCurrentPageProjectList"
           :current-page="projects.currentPage"
           :page-size="pageSize"
           layout="prev, pager, next"
           :total="projects.project_total"
-        >
-        </el-pagination>
+          @current-change="getCurrentPageProjectList"
+        />
 
       </el-tab-pane>
     </el-tabs>
@@ -49,24 +49,24 @@
 </template>
 
 <script>
-import {projectList as apiProjectList} from '@/apis/apiTest/project'
-import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
-import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import {dataTypeTitleMappingContent} from "@/utils/mapping";
-import {phoneList, serverList} from "@/apis/appUiTest/env";
-import {getConfigByName} from "@/apis/config/config";
+import { dataTypeTitleMappingContent } from '@/utils/mapping'
+import { phoneList, serverList } from '@/apis/appUiTest/env'
+import { getConfigByName } from '@/apis/config/config'
 
 export default {
-  name: 'projectTree',
-  directives: {waves},
+  name: 'ProjectTree',
+  directives: { waves },
   components: {
     Pagination
   },
   props: [
     'dataType',
-    'menuName',  // 菜单名
+    'menuName', // 菜单名
     'labelWidth' // 树名字显示长度
   ],
 
@@ -74,8 +74,8 @@ export default {
     return {
 
       title: `${dataTypeTitleMappingContent[this.dataType]}列表`,
-      projectTab: 'project',   //  tab页的显示
-      defaultProps: {children: 'children', label: 'name'},  // 树的显示规则详见element-ui
+      projectTab: 'project', //  tab页的显示
+      defaultProps: { children: 'children', label: 'name' }, // 树的显示规则详见element-ui
 
       // 初始化数据默认的数据
       pageNum: 1,
@@ -88,21 +88,32 @@ export default {
         currentPage: null,
         currentProject: null
       },
-      defaultSelectedProject: [],  //  默认选中的标识，用于判断是否需要默认选中第一个
-      treeClickCount: 0,  // 定义点击次数, 默认0次，区分单击和双击
-      currentProjectId: null,  // 当前选中的服务
-      currentLabel: '',  // 当前鼠标滑入的节点名
+      defaultSelectedProject: [], //  默认选中的标识，用于判断是否需要默认选中第一个
+      treeClickCount: 0, // 定义点击次数, 默认0次，区分单击和双击
+      currentProjectId: null, // 当前选中的服务
+      currentLabel: '', // 当前鼠标滑入的节点名
 
       projectListUrl: ''
     }
   },
 
+  // 当请求服务列表，返回的数据变了之后，默认点击第一条数据
+  watch: {
+    'defaultSelectedProject': function(newVal, oldVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          document.querySelector('.el-tree-node__content').click()
+        })
+      }
+    }
+  },
+
   created() {
-    if (this.dataType === "api") {
+    if (this.dataType === 'api') {
       this.projectListUrl = apiProjectList
-    } else if (this.dataType === "webUi") {
+    } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
-      getConfigByName({'name': 'browser_name'}).then(response => {
+      getConfigByName({ 'name': 'browser_name' }).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
       })
     } else {
@@ -116,7 +127,7 @@ export default {
     }
 
     // 初始化服务列表, 取20条数据
-    this.getProjectList({'pageNum': this.pageNum, 'pageSize': this.pageSize})
+    this.getProjectList({ 'pageNum': this.pageNum, 'pageSize': this.pageSize })
   },
 
   methods: {
@@ -127,7 +138,7 @@ export default {
         this.currentLabel = JSON.parse(JSON.stringify(data.name))
         data.name = this.ellipsis(data.name, this.labelWidth)
       }
-      this.$set(data, 'showMenu', true);
+      this.$set(data, 'showMenu', true)
     },
 
     // 鼠标滑出的时候，把可展示菜单的标识去掉
@@ -135,7 +146,7 @@ export default {
       if (this.labelWidth) {
         data.name = this.currentLabel
       }
-      this.$set(data, 'showMenu', false);
+      this.$set(data, 'showMenu', false)
     },
 
     ellipsis(value, len) {
@@ -182,17 +193,6 @@ export default {
       }
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', data)
       this.currentProjectId = data.id
-    }
-  },
-
-  // 当请求服务列表，返回的数据变了之后，默认点击第一条数据
-  watch: {
-    'defaultSelectedProject': function (newVal, oldVal) {
-      if (newVal) {
-        this.$nextTick(() => {
-          document.querySelector('.el-tree-node__content').click()
-        })
-      }
     }
   }
 }

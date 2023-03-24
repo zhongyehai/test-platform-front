@@ -1,6 +1,6 @@
 <template>
 
-  <reportView :data-type="'webUi'"></reportView>
+  <reportView :data-type="'webUi'" />
 
 </template>
 
@@ -9,7 +9,7 @@
 import reportView from '@/components/business/report/index.vue'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     reportView
   }

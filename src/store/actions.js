@@ -43,32 +43,32 @@ export const actions = {
     commit,
     state
   }) {
-    state.callbackQueue.forEach(function (ele) {
-      ele.apply(this, arguments);
+    state.callbackQueue.forEach(function(ele) {
+      ele.apply(this, arguments)
     })
   },
 
   isQuotaExceeded(e) {
-    var quotaExceeded = false;
+    var quotaExceeded = false
     if (e) {
       if (e.code) {
         switch (e.code) {
           case 22:
-            quotaExceeded = true;
-            break;
+            quotaExceeded = true
+            break
           case 1014:
             // Firefox
             if (e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-              quotaExceeded = true;
+              quotaExceeded = true
             }
-            break;
+            break
         }
       } else if (e.number === -2147024882) {
         // Internet Explorer 8
-        quotaExceeded = true;
+        quotaExceeded = true
       }
     }
-    return quotaExceeded;
+    return quotaExceeded
     index
   },
 
@@ -76,10 +76,10 @@ export const actions = {
     commit,
     state
   }, key) {
-    var value = window.localStorage.getItem(key);
+    var value = window.localStorage.getItem(key)
     var result = null || JSON.parse(value)
     // console.log('action:' + result);
-    return result;
+    return result
   },
 
   setMemory({
@@ -87,22 +87,22 @@ export const actions = {
     state
   }, data) {
     try {
-      window.localStorage.setItem(data.key, JSON.stringify(data.value));
-      return true;
+      window.localStorage.setItem(data.key, JSON.stringify(data.value))
+      return true
     } catch (e) {
       if (this.isQuotaExceeded(e)) {
-        return false;
+        return false
       }
     }
   },
 
   removeMemory(key) {
-    var value = window.localStorage.getItem(key);
-    window.localStorage.removeItem(key);
-    return value;
+    var value = window.localStorage.getItem(key)
+    window.localStorage.removeItem(key)
+    return value
   },
 
   clearMemory() {
-    window.localStorage.clear();
+    window.localStorage.clear()
   }
 }

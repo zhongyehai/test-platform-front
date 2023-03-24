@@ -13,8 +13,8 @@
             :placeholder="`${titleType}名，支持关键字查询`"
             size="mini"
             clearable
-            style="width: 200px">
-          </el-input>
+            style="width: 200px"
+          />
         </el-form-item>
 
         <el-form-item label="创建人" size="mini">
@@ -25,8 +25,9 @@
             default-first-option
             clearable
             size="mini"
-            class="filter-item">
-            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+            class="filter-item"
+          >
+            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
           </el-select>
         </el-form-item>
 
@@ -38,8 +39,9 @@
             default-first-option
             clearable
             size="mini"
-            class="filter-item">
-            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+            class="filter-item"
+          >
+            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
           </el-select>
         </el-form-item>
 
@@ -47,21 +49,24 @@
           v-waves
           type="primary"
           size="mini"
-          @click="handleFilter">
+          @click="handleFilter"
+        >
           {{ '搜索' }}
         </el-button>
 
         <el-button
           type="primary"
           size="mini"
-          @click="addProject">
+          @click="addProject"
+        >
           {{ '添加' }}
         </el-button>
 
         <el-button
           type="primary"
           size="mini"
-          @click="handleInitListQuery">
+          @click="handleInitListQuery"
+        >
           {{ '重置' }}
         </el-button>
 
@@ -69,14 +74,16 @@
           class="item"
           effect="dark"
           content="从yapi拉取项目列表"
-          placement="top-start">
+          placement="top-start"
+        >
           <el-button
             v-show="dataType === 'api'"
             disabled
             type="primary"
             size="mini"
             :loading="pullYapiProjectIsLoading"
-            @click="pullYapiProject">
+            @click="pullYapiProject"
+          >
             {{ '从yapi拉取' }}
           </el-button>
         </el-tooltip>
@@ -152,7 +159,8 @@
           <el-button
             type="text"
             size="mini"
-            @click="showEditForm(row)">修改
+            @click="showEditForm(row)"
+          >修改
           </el-button>
 
           <!-- 编辑服务环境 -->
@@ -160,15 +168,17 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            @click="showEditEnvForm(row)">环境
+            @click="showEditEnvForm(row)"
+          >环境
           </el-button>
 
           <!--删除服务-->
           <el-popover
             :ref="row.id"
+            v-model="row.deletePopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="row.deletePopoverIsShow">
+          >
             <p>确定删除【{{ row.name }}】?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>
@@ -194,22 +204,23 @@
       :total="total"
       :page.sync="listQuery.pageNum"
       :limit.sync="listQuery.pageSize"
-      @pagination="getProjectList"/>
+      @pagination="getProjectList"
+    />
 
     <!-- 接口拉取参数选择 -->
-    <pullDrawerView></pullDrawerView>
+    <pullDrawerView />
 
     <!-- 服务信息抽屉 -->
     <projectDrawer
-      :dataType="dataType"
-      :currentProject="currentProject"
-      :currentUserList="currentUserList"
-    ></projectDrawer>
+      :data-type="dataType"
+      :current-project="currentProject"
+      :current-user-list="currentUserList"
+    />
 
     <!-- 服务环境抽屉 -->
     <projectEnvDrawer
-      :dataType="dataType"
-    ></projectEnvDrawer>
+      :data-type="dataType"
+    />
   </div>
 </template>
 
@@ -229,27 +240,27 @@ import {
   projectList as appUiProjectList,
   projectSort as appUiProjectSort
 } from '@/apis/appUiTest/project'
-import {yapiPullProject} from '@/apis/assist/yapi'
-import {userList} from '@/apis/system/user'
+import { yapiPullProject } from '@/apis/assist/yapi'
+import { userList } from '@/apis/system/user'
 import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination/index.vue'
 import projectDrawer from '@/components/business/project/drawer.vue'
 import pullDrawerView from '@/components/business/project/pullDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
-import {getConfigByName} from "@/apis/config/config";
-import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/utils/mapping";
+import { getConfigByName } from '@/apis/config/config'
+import { swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType } from '@/utils/mapping'
 
 export default {
   name: 'Project',
-  props: ["dataType"],
   components: {
     Pagination,
     projectDrawer,
     pullDrawerView,
     projectEnvDrawer
   },
-  directives: {waves},
+  directives: { waves },
+  props: ['dataType'],
   data() {
     return {
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
@@ -257,21 +268,21 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 20,
-        name: '',  // 服务名
-        manager: '',  // 负责人
-        create_user: '', // 创建人
+        name: '', // 服务名
+        manager: '', // 负责人
+        create_user: '' // 创建人
       },
       fieldData: [
-        {fieldName: 'index', label: '序号', minWidth: '8%'},
-        {fieldName: 'name', label: this.dataType === 'appUi' ? 'APP名' : '项目名', minWidth: '20%'},
-        {fieldName: 'created_time', label: '创建时间', minWidth: '10%'},
-        {fieldName: 'manager', label: '负责人', minWidth: '10%'},
-        {fieldName: 'update_user', label: '最后修改人', minWidth: '10%'}
+        { fieldName: 'index', label: '序号', minWidth: '8%' },
+        { fieldName: 'name', label: this.dataType === 'appUi' ? 'APP名' : '项目名', minWidth: '20%' },
+        { fieldName: 'created_time', label: '创建时间', minWidth: '10%' },
+        { fieldName: 'manager', label: '负责人', minWidth: '10%' },
+        { fieldName: 'update_user', label: '最后修改人', minWidth: '10%' }
       ],
-      currentProject: {},  // 当前选中的服务
-      project_list: [],  // 服务列表
-      total: 0,  // 服务数据表格总条数
-      tableIsLoading: true,  // 请求加载状态
+      currentProject: {}, // 当前选中的服务
+      project_list: [], // 服务列表
+      total: 0, // 服务数据表格总条数
+      tableIsLoading: true, // 请求加载状态
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
@@ -288,20 +299,19 @@ export default {
   },
 
   created() {
-
-    if (this.dataType === "api") {
+    if (this.dataType === 'api') {
       this.deleteProjectUrl = apiDeleteProject
       this.projectListUrl = apiProjectList
       this.projectSortUrl = apiProjectSort
       this.fieldData = [
-        {fieldName: 'index', label: '序号', minWidth: '8%'},
-        {fieldName: 'name', label: '服务名', minWidth: '20%'},
-        {fieldName: 'swagger', label: 'swagger地址', minWidth: '32%'},
-        {fieldName: 'pullStatus', label: '最新拉取状态', minWidth: '10%'},
-        {fieldName: 'manager', label: '负责人', minWidth: '10%'},
-        {fieldName: 'update_user', label: '最后修改人', minWidth: '15%'}
+        { fieldName: 'index', label: '序号', minWidth: '8%' },
+        { fieldName: 'name', label: '服务名', minWidth: '20%' },
+        { fieldName: 'swagger', label: 'swagger地址', minWidth: '32%' },
+        { fieldName: 'pullStatus', label: '最新拉取状态', minWidth: '10%' },
+        { fieldName: 'manager', label: '负责人', minWidth: '10%' },
+        { fieldName: 'update_user', label: '最后修改人', minWidth: '15%' }
       ]
-    } else if (this.dataType === "webUi") {
+    } else if (this.dataType === 'webUi') {
       this.deleteProjectUrl = webUiDeleteProject
       this.projectListUrl = webUiProjectList
       this.projectSortUrl = webUiProjectSort
@@ -311,13 +321,30 @@ export default {
       this.projectSortUrl = appUiProjectSort
     }
 
-    this.getUserList(this.getProjectList)  // 先获取用户数据
+    this.getUserList(this.getProjectList) // 先获取用户数据
+  },
+  mounted() {
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+      if (['projectInfo', 'pullProjectData'].indexOf(_type) !== -1) {
+        this.getProjectList()
+      }
+    })
+
+    // 从后端获取数据类型映射
+    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -344,11 +371,11 @@ export default {
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
-      let that = this, data = row[column.property]
-      if (typeof (data) == 'string') {
+      const that = this; const data = row[column.property]
+      if (typeof (data) === 'string') {
         this.$copyText(data).then(
-          function (e) {
-            that.$message.success("复制成功")
+          function(e) {
+            that.$message.success('复制成功')
           }
         )
       }
@@ -389,10 +416,10 @@ export default {
     delProject(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteButtonIsLoading', true)
-      this.deleteProjectUrl({"id": row.id}).then(response => {
+      this.deleteProjectUrl({ 'id': row.id }).then(response => {
         this.$set(row, 'deleteButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.getProjectList(); // 重新从后台获取服务列表
+          this.getProjectList() // 重新从后台获取服务列表
         }
       })
     },
@@ -417,9 +444,9 @@ export default {
       this.listQuery = {
         pageNum: 1,
         pageSize: 20,
-        projectId: '',  // 服务id
-        manager: '',  // 负责人
-        create_user: '', // 创建人
+        projectId: '', // 服务id
+        manager: '', // 负责人
+        create_user: '' // 创建人
       }
       this.getProjectList()
     },
@@ -429,7 +456,7 @@ export default {
       const el = this.$refs.projectTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -444,34 +471,15 @@ export default {
           this.projectSortUrl({
             List: this.newList,
             pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize,
+            pageSize: this.listQuery.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableIsLoading = false
           })
         }
       })
-    },
-  },
-  mounted() {
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (['projectInfo', 'pullProjectData'].indexOf(_type) !== -1) {
-        this.getProjectList()
-      }
-    })
-
-    // 从后端获取数据类型映射
-    getConfigByName({'name': 'data_type_mapping'}).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
-    })
-
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
+    }
+  }
 
 }
 </script>

@@ -7,17 +7,17 @@
     default-first-option
     size="mini"
     style="width: 100%"
-    @change="choiceCaseSet">
-    <el-option v-for="item in caseSetLists" :key="item.id" :label="item.name" :value="item.id">
-    </el-option>
+    @change="choiceCaseSet"
+  >
+    <el-option v-for="item in caseSetLists" :key="item.id" :label="item.name" :value="item.id" />
   </el-select>
 </template>
 
 <script>
-import {caseSetList} from "@/apis/apiTest/caseSet";
+import { caseSetList } from '@/apis/apiTest/caseSet'
 
 export default {
-  name: "caseSetSelector",
+  name: 'CaseSetSelector',
   props: [
     'projectId',
     'caseSetId',
@@ -25,79 +25,22 @@ export default {
     'isMultiple',
     'busOnEventName',
     'busEmitEventName',
-    'busOnCaseSetDialogCommit',
+    'busOnCaseSetDialogCommit'
   ],
   data() {
     return {
       tempCaseSetId: '',
       caseSetLists: [],
 
-      projectIdHistory: [],  // 用于存服务改变的历史
-      caseSetIdHistory: []  // 用于存模块改变的历史
-    }
-  },
-
-  mounted() {
-
-    // 监听服务选择框选中的服务id，获取对应的模块列表
-    if (this.busOnEventName) {
-      this.$bus.$on(this.busOnEventName, (project) => {
-        this.getCaseSetListByProjectId(project.id)
-      })
-    }
-
-    // 是否监控用例集的改变
-    if (this.busOnCaseSetDialogCommit) {
-      this.$bus.$on(this.busOnCaseSetDialogCommit, (status) => {
-        this.caseSetIdHistory.push(status)
-      })
-    }
-  },
-
-  // 页面销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    if (this.busOnEventName) {
-      this.$bus.$off(this.busOnEventName)
-    }
-    if (this.busOnCaseSetDialogCommit) {
-      this.$bus.$off(this.busOnCaseSetDialogCommit)
-    }
-  },
-
-  methods: {
-
-    // 根据服务id获取用例集
-    getCaseSetListByProjectId(project_id) {
-      caseSetList({'projectId': project_id}).then(response => {
-        this.caseSetLists = response.data.data
-      })
-    },
-
-    sendEmit() {
-      if (this.busEmitEventName) {
-        this.$bus.$emit(this.busEmitEventName, this.tempCaseSetId)
-      }
-    },
-
-    // 通过bus发送选中的模块
-    choiceCaseSet(val) {
-      this.sendEmit()
-    }
-  },
-
-  created() {
-    this.tempCaseSetId = this.caseSetId
-
-    // 第一次加载的时候，如果传了服务id，则获取对应的用例集列表
-    if (this.projectId) {
-      this.getCaseSetListByProjectId(this.projectId)
+      projectIdHistory: [], // 用于存服务改变的历史
+      caseSetIdHistory: [] // 用于存模块改变的历史
     }
   },
 
   watch: {
 
     // 监控 状态，为true时，判断服务id是否有改变，有改变则重新请求用例集列表，用于监控dialog是否为打开状态
-    "isWatchStatus": {
+    'isWatchStatus': {
       handler(newVal, oldVal) {
         if (newVal) {
           if (this.projectIdHistory && this.projectIdHistory[0] !== this.projectIdHistory[1]) {
@@ -136,6 +79,62 @@ export default {
         }
         this.sendEmit()
       }
+    }
+  },
+
+  mounted() {
+    // 监听服务选择框选中的服务id，获取对应的模块列表
+    if (this.busOnEventName) {
+      this.$bus.$on(this.busOnEventName, (project) => {
+        this.getCaseSetListByProjectId(project.id)
+      })
+    }
+
+    // 是否监控用例集的改变
+    if (this.busOnCaseSetDialogCommit) {
+      this.$bus.$on(this.busOnCaseSetDialogCommit, (status) => {
+        this.caseSetIdHistory.push(status)
+      })
+    }
+  },
+
+  // 页面销毁前，关闭bus监听服务选中事件
+  beforeDestroy() {
+    if (this.busOnEventName) {
+      this.$bus.$off(this.busOnEventName)
+    }
+    if (this.busOnCaseSetDialogCommit) {
+      this.$bus.$off(this.busOnCaseSetDialogCommit)
+    }
+  },
+
+  created() {
+    this.tempCaseSetId = this.caseSetId
+
+    // 第一次加载的时候，如果传了服务id，则获取对应的用例集列表
+    if (this.projectId) {
+      this.getCaseSetListByProjectId(this.projectId)
+    }
+  },
+
+  methods: {
+
+    // 根据服务id获取用例集
+    getCaseSetListByProjectId(project_id) {
+      caseSetList({ 'projectId': project_id }).then(response => {
+        this.caseSetLists = response.data.data
+      })
+    },
+
+    sendEmit() {
+      if (this.busEmitEventName) {
+        this.$bus.$emit(this.busEmitEventName, this.tempCaseSetId)
+      }
+    },
+
+    // 通过bus发送选中的模块
+    choiceCaseSet(val) {
+      this.sendEmit()
     }
   }
 }

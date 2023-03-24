@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}"/>
+  <div :class="className" :style="{height:height,width:width}" />
 </template>
 
 <script>
@@ -70,7 +70,7 @@ export default {
         },
 
         legend: {
-          show: true,
+          show: true
           // top: '6%' //与上方的距离 可百分比% 可像素px
         },
 
@@ -86,7 +86,7 @@ export default {
         // x轴
         xAxis: [{
           type: 'category',
-          axisLabel:{
+          axisLabel: {
             interval: 0,
             rotate: 0
           },

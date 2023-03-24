@@ -41,7 +41,7 @@ const actions = {
         reject(error)
       })
     })
-  },
+  }
   //
   // // 获取用户信息
   // getInfo({ commit, state }) {

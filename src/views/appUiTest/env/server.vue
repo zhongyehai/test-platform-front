@@ -16,32 +16,37 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="服务器名称" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="服务器名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="os" align="center" label="服务器系统类型" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="os" align="center" label="服务器系统类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="ip" align="center" label="服务器ip地址" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" prop="ip" align="center" label="服务器ip地址" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.ip }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="port" align="center" label="服务器端口" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="port" align="center" label="服务器端口" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.port }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="status" align="center" label="最近一次访问状态"
-                       min-width="15%">
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="status"
+        align="center"
+        label="最近一次访问状态"
+        min-width="15%"
+      >
         <template slot-scope="scope">
           <el-tag size="small" :type="statusTagTypeMapping[scope.row.status]">
             {{ statusContentMapping[scope.row.status] }}
@@ -60,7 +65,7 @@
             icon="el-icon-video-play"
             :loading="scope.row.isShowRunLoading"
             @click="runServer(scope.row)"
-          ></el-button>
+          />
 
           <!-- 修改服务器 -->
           <el-button
@@ -68,15 +73,17 @@
             size="mini"
             icon="el-icon-edit"
             style="margin-right: 10px"
-            @click.native="showDrawer(scope.row)"></el-button>
+            @click.native="showDrawer(scope.row)"
+          />
 
           <!-- 复制服务器 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.copyPopoverIsShow"
             placement="top"
             style="margin-right: 10px"
             popper-class="down-popover"
-            v-model="scope.row.copyPopoverIsShow">
+          >
             <p>复制此服务器并生成新的服务器?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyServerPopover(scope.row)">取消</el-button>
@@ -88,15 +95,16 @@
               size="mini"
               icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
-            ></el-button>
+            />
           </el-popover>
 
           <!-- 删除服务器 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.deletePopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.deletePopoverIsShow">
+          >
             <p>确定删除【{{ scope.row.name }}】?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelDeleteServerPopover(scope.row)">取消</el-button>
@@ -109,7 +117,7 @@
               size="mini"
               icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            ></el-button>
+            />
           </el-popover>
 
         </template>
@@ -119,14 +127,15 @@
     <el-drawer
       :title="tempData.id ? '修改服务器' : '新增服务器'"
       size="65%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item label="别名" class="is-required">
-          <el-input v-model="tempData.name" size="mini" placeholder="服务器名字"></el-input>
+          <el-input v-model="tempData.name" size="mini" placeholder="服务器名字" />
         </el-form-item>
 
         <el-form-item label="系统类型" class="is-required">
@@ -138,13 +147,14 @@
             size="mini"
             style="width:100%"
             placeholder="请选择appium服务所在电脑的系统类型"
-            class="filter-item">
+            class="filter-item"
+          >
             <el-option
               v-for="osType in serverOsMapping"
               :key="osType"
               :label="osType"
               :value="osType"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
 
@@ -154,28 +164,28 @@
             size="mini"
             style="width: 98%"
             placeholder="服务器ip，如 196.128.123.123"
-          ></el-input>
+          />
           <el-popover
             class="el_popover_class"
             placement="top-start"
-            trigger="hover">
+            trigger="hover"
+          >
             <div>
               <div>请填写ip地址，勿填写http</div>
               <div>如：地址为http://192.168.0.1，请填写：192.168.0.1</div>
             </div>
-            <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
           </el-popover>
         </el-form-item>
 
         <el-form-item label="服务器端口" class="is-required">
-          <el-input v-model="tempData.port" size="mini" placeholder="服务器端口"></el-input>
+          <el-input v-model="tempData.port" size="mini" placeholder="服务器端口" />
         </el-form-item>
 
       </el-form>
 
-
       <div class="demo-drawer__footer">
-        <el-button @click="drawerIsShow = false" size="mini">取 消</el-button>
+        <el-button size="mini" @click="drawerIsShow = false">取 消</el-button>
         <el-button
           type="primary"
           size="mini"
@@ -211,13 +221,12 @@ import {
   sortServer,
   copyServer
 } from '@/apis/appUiTest/env'
-import {getConfigByName} from "@/apis/config/config";
-import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
-
+import { getConfigByName } from '@/apis/config/config'
+import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
 export default {
-  name: "index",
-  components: {Pagination, projectTreeView},
+  name: 'Index',
+  components: { Pagination, projectTreeView },
   data() {
     return {
       tableLoadingIsShow: false,
@@ -237,10 +246,10 @@ export default {
         name: '',
         os: '',
         ip: '',
-        port: '4723',
+        port: '4723'
       },
 
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       drawerIsShow: false,
 
@@ -251,13 +260,39 @@ export default {
     }
   },
 
+  mounted() {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
+      if (_type === 'appServer') {
+        this.showDrawer()
+      }
+    })
+
+    getConfigByName({ 'name': 'server_os_mapping' }).then(response => {
+      this.serverOsMapping = JSON.parse(response.data.value)
+    })
+
+    this.getServerList()
+  },
+
+  created() {
+    this.oldList = this.dataList.map(v => v.id)
+    this.newList = this.oldList.slice()
+    this.$nextTick(() => {
+      this.setSort()
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+  },
 
   methods: {
 
     // 复制用例
     runServer(row) {
       this.$set(row, 'isShowRunLoading', true)
-      runEnvServer({'id': row.id}).then(response => {
+      runEnvServer({ 'id': row.id }).then(response => {
         this.$set(row, 'isShowRunLoading', false)
         this.showMessage(this, response)
         this.getServerList()
@@ -327,7 +362,7 @@ export default {
       deleteServer().then(response => {
         this.$set(row, 'deletePopoverIsShow', false)
         this.$set(row, 'deleteLoadingIsShow', true)
-        deleteServer({id: row.id}).then(response => {
+        deleteServer({ id: row.id }).then(response => {
           this.$set(row, 'deleteLoadingIsShow', false)
           if (this.showMessage(this, response)) {
             this.getServerList()
@@ -340,7 +375,7 @@ export default {
     serverCopy(row) {
       this.$set(row, 'copyPopoverIsShow', false)
       this.$set(row, 'copyButtonIsLoading', true)
-      copyServer({'id': row.id}).then(response => {
+      copyServer({ 'id': row.id }).then(response => {
         this.$set(row, 'copyButtonIsLoading', false)
         if (this.showMessage(this, response)) {
           this.dataList.push(response.data)
@@ -362,7 +397,7 @@ export default {
       const el = this.$refs.taskTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -377,7 +412,7 @@ export default {
           sortServer({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -385,35 +420,7 @@ export default {
         }
       })
     }
-  },
-
-  mounted() {
-
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
-      if (_type === 'appServer'){
-        this.showDrawer()
-      }
-    })
-
-    getConfigByName({"name": "server_os_mapping"}).then(response => {
-      this.serverOsMapping = JSON.parse(response.data.value)
-    })
-
-    this.getServerList()
-  },
-
-  created() {
-    this.oldList = this.dataList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
+  }
 }
 </script>
 

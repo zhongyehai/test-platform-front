@@ -56,9 +56,6 @@
 //   return state.editor
 // }
 
-
-
-
 const getters = {
   // element-admin
   sidebar: state => state.app.sidebar,
@@ -74,7 +71,6 @@ const getters = {
   draging: state => state.working.draging,
   editing: state => state.working.editing,
 
-
   ctrlPanelMin: state => state.config.ctrlPanelMin,
   ctrlPanelWidth: state => state.config.ctrlPanelWidth,
   dividerWidth: state => state.config.dividerWidth,
@@ -82,6 +78,6 @@ const getters = {
   zoom: state => state.config.zoom,
 
   minder: state => state.minder,
-  editor: state => state.editor,
+  editor: state => state.editor
 }
 export default getters

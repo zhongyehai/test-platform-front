@@ -5,7 +5,8 @@
     filterable
     default-first-option
     clearable
-    placeholder="请选择用户">
+    placeholder="请选择用户"
+  >
     <el-option
       v-for="user in userList"
       :key="user.name"
@@ -16,15 +17,22 @@
 </template>
 
 <script>
-import {userList} from "@/apis/system/user";
+import { userList } from '@/apis/system/user'
 
 export default {
-  name: "user",
+  name: 'User',
   props: ['user'],
   data() {
     return {
       userList: [],
       tempData: ''
+    }
+  },
+  watch: {
+    'user': {
+      handler(newVal, oldVal) {
+        this.tempData = newVal
+      }
     }
   },
   mounted() {
@@ -39,13 +47,6 @@ export default {
       userList().then(response => {
         this.userList = response.data.data
       })
-    },
-  },
-  watch: {
-    'user': {
-      handler(newVal, oldVal) {
-        this.tempData = newVal
-      }
     }
   }
 }

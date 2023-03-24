@@ -5,16 +5,18 @@
     <el-drawer
       :title=" tempPage.id ? '修改页面' : '新增页面'"
       size="80%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <!-- 结构树/页面列表 -->
       <el-tabs
         v-model="showTab"
         class="table_padding table_api"
         style="margin-left: 20px;margin-right: 20px"
-        :before-leave="beforeLeave">
+        :before-leave="beforeLeave"
+      >
 
         <!--页面管理 -->
         <el-tab-pane label="页面信息" name="pageInfo">
@@ -23,8 +25,7 @@
           <el-form label-width="80px">
 
             <el-form-item label="页面名称" class="is-required" style="margin-bottom: 5px">
-              <el-input v-model="tempPage.name" placeholder="页面名称" size="mini">
-              </el-input>
+              <el-input v-model="tempPage.name" placeholder="页面名称" size="mini" />
             </el-form-item>
 
             <el-form-item label="所属模块" class="is-required" style="margin-bottom: 5px">
@@ -39,14 +40,13 @@
                     highlight-current
                     :props="defaultProps"
                     @check-change="handleNodeClick"
-                  ></el-tree>
+                  />
                 </el-option>
               </el-select>
             </el-form-item>
 
             <el-form-item label="页面描述" style="margin-bottom: 5px">
-              <el-input v-model="tempPage.desc" size="mini" type="textarea" :rows="5" :placeholder="'页面描述'">
-              </el-input>
+              <el-input v-model="tempPage.desc" size="mini" type="textarea" :rows="5" :placeholder="'页面描述'" />
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -54,21 +54,21 @@
         <!-- 页面元素 -->
         <el-tab-pane label="元素列表" name="elementInfo">
           <elementManage
-            :dataType="dataType"
-            :currentPageId="tempPage.id"
-            :currentModuleId="tempPage.module_id"
-            :currentProjectId="tempPage.project_id"
-          ></elementManage>
+            :data-type="dataType"
+            :current-page-id="tempPage.id"
+            :current-module-id="tempPage.module_id"
+            :current-project-id="tempPage.project_id"
+          />
         </el-tab-pane>
 
       </el-tabs>
 
       <div class="demo-drawer__footer">
         <el-button
+          v-show="showTab === 'elementInfo'"
           size="mini"
           type="primary"
           style="float: left"
-          v-show="showTab === 'elementInfo'"
           @click="addElement()"
         > {{ '新增元素' }}
         </el-button>
@@ -78,7 +78,8 @@
           type="primary"
           size="mini"
           :loading="isShowSubmitLoading"
-          @click=" tempPage.id ? changPage() : addPage() ">
+          @click=" tempPage.id ? changPage() : addPage() "
+        >
           {{ '保存页面' }}
         </el-button>
 
@@ -92,34 +93,33 @@
 <script>
 import elementManage from '@/components/business/element/index.vue'
 
-import {getModule as appUiGetModule} from "@/apis/appUiTest/module";
-import {postPage as appUiPostPage, putPage as appUiPutPage, copyPage as appUiCopyPage} from '@/apis/appUiTest/page'
-import {elementList as appUiElementList} from "@/apis/appUiTest/element";
+import { getModule as appUiGetModule } from '@/apis/appUiTest/module'
+import { postPage as appUiPostPage, putPage as appUiPutPage, copyPage as appUiCopyPage } from '@/apis/appUiTest/page'
+import { elementList as appUiElementList } from '@/apis/appUiTest/element'
 
-import {getModule as webUiGetModule} from "@/apis/webUiTest/module";
-import {postPage as webUiPostPage, putPage as webUiPutPage, copyPage as webUiCopyPage} from '@/apis/webUiTest/page'
-import {elementList as webUiElementList} from "@/apis/webUiTest/element";
-
+import { getModule as webUiGetModule } from '@/apis/webUiTest/module'
+import { postPage as webUiPostPage, putPage as webUiPutPage, copyPage as webUiCopyPage } from '@/apis/webUiTest/page'
+import { elementList as webUiElementList } from '@/apis/webUiTest/element'
 
 export default {
-  name: 'drawer',
+  name: 'Drawer',
+  components: {
+    elementManage
+  },
   props: [
     'dataType',
     'currentProjectId',
     'currentModuleId'
   ],
-  components: {
-    elementManage
-  },
   data() {
     return {
       drawerIsShow: false, // 抽屉是否打开
-      direction: 'rtl',  // 抽屉打开方式
-      showTab: 'pageInfo',  // 默认展示的tab页
+      direction: 'rtl', // 抽屉打开方式
+      showTab: 'pageInfo', // 默认展示的tab页
       moduleTree: [],
       defaultProps: {
-        children: "children",
-        label: "name"
+        children: 'children',
+        label: 'name'
       },
       moduleLabel: '',
       isShowSubmitLoading: false,
@@ -141,6 +141,37 @@ export default {
     }
   },
 
+  watch: {
+
+    // 监控父组件选中的服务, 实时获取对应的模块列表
+    'currentProjectId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.tempPage.project_id = newVal
+      }
+    },
+
+    // 监控父组件选中的模块
+    'currentModuleId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.tempPage.module_id = newVal
+      }
+    },
+
+    'drawerIsShow': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.getModuleUrl({ 'id': this.tempPage.module_id }).then(response => {
+            this.moduleLabel = response.data.name
+            this.$refs.moduleTree.setCheckedKeys([this.tempPage.module_id])
+          })
+        }
+      }
+    }
+  },
+
   created() {
     if (this.dataType === 'webUi') {
       this.getModuleUrl = webUiGetModule
@@ -157,12 +188,50 @@ export default {
     }
   },
 
+  mounted() {
+    // 监听、接收模块树
+    this.$bus.$on(this.$busEvents.treeIsDone, (_type, moduleTree) => {
+      if (_type === 'module') {
+        this.moduleTree = moduleTree
+      }
+    })
+
+    // 监听 页面编辑框命令事件
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, page) => {
+      if (_type === 'pageInfo') {
+        this.showTab = 'pageInfo'
+        if (command === 'add') {
+          this.tempPage.id = ''
+          this.initNewTempPage() // 新增
+        } else if (command === 'edit') {
+          this.initUpdateTempPage(page) // 修改
+          this.$bus.$emit(this.$busEvents.drawerIsOpen, 'pageInfo', page.id)
+        } else if (command === 'copy') {
+          this.copyPageUrl({ id: page.id }).then(response => {
+            if (this.showMessage(this, response)) {
+              this.tempPage = response.data.page
+              this.drawerIsShow = true
+              this.$bus.$emit(this.$busEvents.drawerIsCommit, 'pageInfo')
+            }
+          }
+          )
+        }
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+    this.$bus.$off(this.$busEvents.treeIsDone)
+  },
+
   methods: {
 
     // 勾选树事件
     handleNodeClick(data, checked, node) {
       if (checked && [data.id] !== this.$refs.moduleTree.getCheckedKeys()) {
-        this.$refs.moduleTree.setCheckedKeys([data.id])  // 选中
+        this.$refs.moduleTree.setCheckedKeys([data.id]) // 选中
         this.moduleLabel = data.name
       }
     },
@@ -244,77 +313,6 @@ export default {
     addElement() {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'add', this.tempPage.id)
     }
-  },
-
-  mounted() {
-
-    // 监听、接收模块树
-    this.$bus.$on(this.$busEvents.treeIsDone, (_type, moduleTree) => {
-      if (_type === 'module') {
-        this.moduleTree = moduleTree
-      }
-    })
-
-    // 监听 页面编辑框命令事件
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, page) => {
-      if (_type === 'pageInfo') {
-        this.showTab = 'pageInfo'
-        if (command === 'add') {
-          this.tempPage.id = ''
-          this.initNewTempPage()  // 新增
-        } else if (command === 'edit') {
-          this.initUpdateTempPage(page)  // 修改
-          this.$bus.$emit(this.$busEvents.drawerIsOpen, 'pageInfo', page.id)
-        } else if (command === 'copy') {
-          this.copyPageUrl({id: page.id}).then(response => {
-              if (this.showMessage(this, response)) {
-                this.tempPage = response.data.page
-                this.drawerIsShow = true
-                this.$bus.$emit(this.$busEvents.drawerIsCommit, 'pageInfo')
-              }
-            }
-          )
-        }
-      }
-    })
-
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-    this.$bus.$off(this.$busEvents.treeIsDone)
-  },
-
-  watch: {
-
-    // 监控父组件选中的服务, 实时获取对应的模块列表
-    'currentProjectId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        this.tempPage.project_id = newVal
-      }
-    },
-
-    // 监控父组件选中的模块
-    'currentModuleId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        this.tempPage.module_id = newVal
-      }
-    },
-
-    'drawerIsShow': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.getModuleUrl({'id': this.tempPage.module_id}).then(response => {
-            this.moduleLabel = response.data.name
-            this.$refs.moduleTree.setCheckedKeys([this.tempPage.module_id])
-          })
-        }
-      }
-    },
   }
 }
 </script>

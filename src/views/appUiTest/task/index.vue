@@ -1,16 +1,15 @@
 <template>
-  <taskView :dataType="'appUi'"></taskView>
+  <taskView :data-type="'appUi'" />
 </template>
 
 <script>
-import taskView from "@/components/business/task/index.vue";
-
+import taskView from '@/components/business/task/index.vue'
 
 export default {
-  name: "index",
+  name: 'Index',
   components: {
     taskView
-  },
+  }
 }
 </script>
 

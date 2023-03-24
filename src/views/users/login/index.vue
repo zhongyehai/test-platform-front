@@ -6,7 +6,8 @@
       :rules="loginRules"
       class="login-form"
       auto-complete="on"
-      label-position="left">
+      label-position="left"
+    >
 
       <div class="title-container">
         <h3 class="title">{{ platformName }}</h3>
@@ -14,7 +15,7 @@
 
       <el-form-item prop="account">
         <span class="svg-container">
-          <svg-icon icon-class="user"/>
+          <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
@@ -29,7 +30,7 @@
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password"/>
+          <svg-icon icon-class="password" />
         </span>
         <el-input
           :key="passwordType"
@@ -43,12 +44,15 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"/>
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
-                 @click.native.prevent="handleLogin"
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin"
       >登录
       </el-button>
 
@@ -63,9 +67,9 @@
 
 <script>
 import * as types from '@/store/types'
-import {validUsername} from '@/utils/validate'
-import {login} from '@/apis/system/user'
-import {getConfigByName} from '@/apis/config/config'
+import { validUsername } from '@/utils/validate'
+import { login } from '@/apis/system/user'
+import { getConfigByName } from '@/apis/config/config'
 
 export default {
   name: 'Login',
@@ -90,13 +94,27 @@ export default {
         password: ''
       },
       loginRules: {
-        account: [{required: true, trigger: 'blur', validator: validateAccount}],
-        password: [{required: true, trigger: 'blur', validator: validatePassword}]
+        account: [{ required: true, trigger: 'blur', validator: validateAccount }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
       redirect: undefined,
       platformName: null
+    }
+  },
+
+  mounted() {
+    // 请求测试平台名字
+    getConfigByName({ name: 'platform_name' }).then(response => {
+      this.platformName = response.data.value
+      document.title = this.platformName
+      localStorage.setItem('platformName', this.platformName)
+    })
+
+    // 用户名和密码输入框都为空的时候，自动聚焦到用户名输入框
+    if (this.loginForm.username === '' && this.loginForm.password === '') {
+      this.$refs.username.focus()
     }
   },
 
@@ -124,7 +142,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          login({'account': this.loginForm.account, 'password': this.loginForm.password}).then((response) => {
+          login({ 'account': this.loginForm.account, 'password': this.loginForm.password }).then((response) => {
             if (this.showMessage(this, response)) {
               // 存储状态
               this.$store.commit(types.token, response.data.token)
@@ -133,8 +151,8 @@ export default {
               localStorage.setItem('id', response.data.id)
               localStorage.setItem('business', JSON.stringify(response.data.business_id))
               // 重定向到指定路由
-              let redirect = this.$route.query.redirect || '/'
-              this.$router.push({path: redirect})  // 重定向到指定路由
+              const redirect = this.$route.query.redirect || '/'
+              this.$router.push({ path: redirect }) // 重定向到指定路由
               // this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由
             }
           })
@@ -143,21 +161,6 @@ export default {
           this.$message.error('数据校验不通过，请确认')
         }
       })
-    }
-  },
-
-  mounted() {
-
-    // 请求测试平台名字
-    getConfigByName({name: 'platform_name'}).then(response => {
-      this.platformName = response.data.value
-      document.title = this.platformName
-      localStorage.setItem('platformName', this.platformName)
-    })
-
-    // 用户名和密码输入框都为空的时候，自动聚焦到用户名输入框
-    if (this.loginForm.username === '' && this.loginForm.password === '') {
-      this.$refs.username.focus()
     }
   }
 }

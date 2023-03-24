@@ -5,7 +5,8 @@
     size="85%"
     :append-to-body="true"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
 
     <el-table
       ref="apiTable"
@@ -18,13 +19,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="接口对应步骤" align="center" min-width="50%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口对应步骤" align="center" min-width="50%">
         <template slot-scope="scope">
           <span>{{ scope.row.from }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="用例名称" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -36,12 +37,13 @@
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
               <div>2: 请务必将用例调试通过后再设为要运行</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -49,7 +51,8 @@
             v-model="scope.row.status"
             :inactive-value="0"
             :active-value="1"
-            @change="changeCaseIsRun(scope.row)"></el-switch>
+            @change="changeCaseIsRun(scope.row)"
+          />
         </template>
       </el-table-column>
 
@@ -60,29 +63,20 @@
 
 <script>
 
-import {putCaseIsRun} from "@/apis/apiTest/case";
+import { putCaseIsRun } from '@/apis/apiTest/case'
 
 export default {
-  name: "apiUseDrawer",
+  name: 'ApiUseDrawer',
+  components: {},
   props: [
     'caseList',
     'marker'
   ],
-  components: {},
   data() {
     return {
       drawerIsShow: false,
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl' // 抽屉打开方式
     }
-  },
-  methods: {
-
-    // 修改用例状态
-    changeCaseIsRun(row) {
-      putCaseIsRun({'id': row.id}).then(response => {
-        this.showMessage(this, response)
-      })
-    },
   },
 
   mounted() {
@@ -97,6 +91,15 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+  methods: {
+
+    // 修改用例状态
+    changeCaseIsRun(row) {
+      putCaseIsRun({ 'id': row.id }).then(response => {
+        this.showMessage(this, response)
+      })
+    }
+  }
 
 }
 </script>

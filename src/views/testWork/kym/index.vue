@@ -16,15 +16,19 @@
             :key="item.key"
             :label="item.value"
             :value="item.key"
-          >
-          </el-option>
+          />
         </el-select>
 
-        <el-button type="primary" @click.native="showDialog()" size="mini" style="margin-left: 20px">添加KYM分析
+        <el-button type="primary" size="mini" style="margin-left: 20px" @click.native="showDialog()">添加KYM分析
         </el-button>
 
-        <el-button type="primary" :loading="saveLoading" @click.native="changeKYM()" size="mini"
-                   style="margin-left: 20px">保存修改
+        <el-button
+          type="primary"
+          :loading="saveLoading"
+          size="mini"
+          style="margin-left: 20px"
+          @click.native="changeKYM()"
+        >保存修改
         </el-button>
 
         <el-button
@@ -32,39 +36,42 @@
           type="primary"
           size="mini"
           style="margin-left: 20px"
-          @click.native="downloadXmidSetup()">下载xmind8安装包
+          @click.native="downloadXmidSetup()"
+        >下载xmind8安装包
         </el-button>
 
         <el-tooltip class="item" effect="dark" content="下载后需用xmind8打开" placement="top-start">
           <el-button
             v-show="currentProject"
             type="primary"
-            @click.native="exportKymAsXmind()"
             size="mini"
-            style="margin-left: 20px">导出为xmind
+            style="margin-left: 20px"
+            @click.native="exportKymAsXmind()"
+          >导出为xmind
           </el-button>
         </el-tooltip>
-
 
       </el-form-item>
     </el-form>
 
     <!-- 脑图 -->
-    <div id="map" style="width: 100%; height: 1000px"></div>
+    <div id="map" style="width: 100%; height: 1000px" />
 
     <!-- 新增KYM分析 -->
     <el-dialog
       :close-on-click-modal="false"
       :title="'新增KYM分析'"
       :visible.sync="dialogIsShow"
-      width="40%">
+      width="40%"
+    >
       <el-form
         ref="dataForm"
         label-position="right"
         label-width="90px"
-        style="min-width: 400px;">
+        style="min-width: 400px;"
+      >
         <el-form-item :label="'服务名'" class="filter-item is-required" prop="name" size="mini">
-          <el-input v-model="formProject" placeholder="服务名称"/>
+          <el-input v-model="formProject" placeholder="服务名称" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -73,7 +80,8 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click=" addKYMProject() ">
+          @click=" addKYMProject() "
+        >
           {{ '保存' }}
         </el-button>
       </div>
@@ -84,7 +92,7 @@
 
 <script>
 // 使用方法详见：https://inspiring-golick-3c01b9.netlify.app/
-import MindElixir, {E} from "mind-elixir";
+import MindElixir, { E } from 'mind-elixir'
 
 import {
   getProjectKYM,
@@ -93,10 +101,10 @@ import {
   KYMProjectList,
   getKymAsXmind,
   getDiffRecordAsXmind
-} from "@/apis/testWork/kym";
+} from '@/apis/testWork/kym'
 
 export default {
-  name: 'index',
+  name: 'Index',
   data() {
     return {
 
@@ -122,20 +130,24 @@ export default {
 
       ME: null,
       data: {
-        "nodeData": {
-          "topic": "新建服务",
-          "root": true,
-          "children": []
+        'nodeData': {
+          'topic': '新建服务',
+          'root': true,
+          'children': []
         }
-      },
+      }
     }
+  },
+
+  mounted() {
+    this.getKYMProjectList()
   },
 
   methods: {
 
     initMindElixir() {
       this.ME = new MindElixir({
-        el: "#map",
+        el: '#map',
         direction: MindElixir.LEFT,
         data: this.data,
         draggable: true, // 启用拖动 default true
@@ -145,11 +157,11 @@ export default {
         keypress: true, // 启用快捷键 default true
         locale: 'zh_CN', // 设置语言，支持[zh_CN,zh_TW,en,ja,pt]
         overflowHidden: false, // default false
-        primaryLinkStyle: 2, // 线条形状，1为弧线，2为直线 default 1
+        primaryLinkStyle: 2 // 线条形状，1为弧线，2为直线 default 1
         // primaryNodeVerticalGap: 15, //节点之间的垂直距离 default 25
         // primaryNodeHorizontalGap: 15, //节点之间的水平距离 default 65
-      });
-      this.ME.init();
+      })
+      this.ME.init()
       E('node-id')
     },
 
@@ -161,11 +173,11 @@ export default {
     // 新增服务
     addKYMProject() {
       this.submitButtonIsLoading = true
-      addKYM({project: this.formProject}).then(response => {
+      addKYM({ project: this.formProject }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.dialogIsShow = false
-          this.projectList.push({'key': this.formProject, 'value': this.formProject})
+          this.projectList.push({ 'key': this.formProject, 'value': this.formProject })
 
           this.currentProject = this.formProject
           this.data = response.data.kym
@@ -186,13 +198,12 @@ export default {
     // 获取指定服务的KYM
     getKYMByProject(value) {
       this.getLoading = true
-      getProjectKYM({project: value}).then(response => {
+      getProjectKYM({ project: value }).then(response => {
         this.getLoading = false
         this.data = response.data.kym
 
         // 挂载分析图
         this.initMindElixir()
-
       })
     },
 
@@ -210,7 +221,7 @@ export default {
     changeKYM() {
       this.saveLoading = true
       this.filter(this.data['nodeData'])
-      putProjectKYM({project: this.currentProject, kym: this.data}).then(response => {
+      putProjectKYM({ project: this.currentProject, kym: this.data }).then(response => {
         this.saveLoading = false
         if (this.showMessage(this, response)) {
           // 重新挂载分析图
@@ -226,13 +237,13 @@ export default {
 
     // 导出为xmind
     exportKymAsXmind() {
-      getKymAsXmind({project: this.currentProject}).then(response => {
-        let blob = new Blob([response], {
-          type: 'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
-        });
+      getKymAsXmind({ project: this.currentProject }).then(response => {
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = this.currentProject + '.xmind'
         a.click()
       })
@@ -247,11 +258,7 @@ export default {
       this.formProject = ''
       this.dialogIsShow = true
     }
-  },
-
-  mounted() {
-    this.getKYMProjectList()
-  },
+  }
 }
 </script>
 

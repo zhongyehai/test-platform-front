@@ -7,7 +7,8 @@
       stripe
       :show-header="false"
       size="mini"
-      row-key="id">
+      row-key="id"
+    >
       <el-table-column label="id" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
@@ -30,8 +31,8 @@
               v-for="(item) in skipIfTypeMapping"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
-            </el-option>
+              :value="item.value"
+            />
           </el-select>
         </template>
       </el-table-column>
@@ -47,13 +48,14 @@
                 filterable
                 clearable
                 default-first-option
-                size="mini">
+                size="mini"
+              >
                 <el-option
                   v-for="(item) in skipIfDataSourceMapping"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                />
               </el-select>
             </el-row>
             <el-row>
@@ -63,7 +65,8 @@
                 type="textarea"
                 size="mini"
                 :rows="1"
-                :placeholder="getDataSourcePlaceholder(scope.row.data_source)"></el-input>
+                :placeholder="getDataSourcePlaceholder(scope.row.data_source)"
+              />
             </el-row>
           </el-row>
 
@@ -86,8 +89,8 @@
               v-for="(item) in validateTypeList"
               :key="item.value"
               :label="item.value"
-              :value="item.value">
-            </el-option>
+              :value="item.value"
+            />
           </el-select>
         </template>
       </el-table-column>
@@ -104,13 +107,14 @@
                 filterable
                 clearable
                 default-first-option
-                size="mini">
+                size="mini"
+              >
                 <el-option
                   v-for="(item) in dataTypeMapping"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                />
               </el-select>
             </el-row>
             <el-row>
@@ -122,10 +126,10 @@
                 :rows="1"
                 :placeholder="
                   scope.row.comparator === '契约校验' ?
-                  '详见：https://pypi.org/project/pactverify/，注：契约校验标识符改用@':
-                  '预期结果'
-                ">
-              </el-input>
+                    '详见：https://pypi.org/project/pactverify/，注：契约校验标识符改用@':
+                    '预期结果'
+                "
+              />
             </el-row>
           </el-row>
         </template>
@@ -139,8 +143,8 @@
               type="text"
               size="mini"
               icon="el-icon-plus"
-              @click.native="addRow(true)">
-            </el-button>
+              @click.native="addRow(true)"
+            />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
@@ -149,8 +153,8 @@
               size="mini"
               icon="el-icon-minus"
               style="color: red"
-              @click.native="delRow(scope.$index)">
-            </el-button>
+              @click.native="delRow(scope.$index)"
+            />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
             <el-button
@@ -160,8 +164,7 @@
               icon="el-icon-circle-close"
               style="color: red"
               @click.native="clearData()"
-            >
-            </el-button>
+            />
           </el-tooltip>
         </template>
       </el-table-column>
@@ -173,11 +176,11 @@
 
 <script>
 
-import {getSkipIfDataSourceMapping} from '@/apis/config/config'
-import Sortable from "sortablejs";
+import { getSkipIfDataSourceMapping } from '@/apis/config/config'
+import Sortable from 'sortablejs'
 
 export default {
-  name: "skipIf",
+  name: 'SkipIf',
   props: ['skipIfData', 'use_type'],
 
   data() {
@@ -189,18 +192,25 @@ export default {
       skipIfTypeMapping: [],
       sortable: null,
       oldList: [],
-      newList: [],
+      newList: []
+    }
+  },
+
+  watch: {
+    'skipIfData': {
+      handler(newVal, oldVal) {
+        this.initTempData(newVal)
+      }
     }
   },
 
   mounted() {
-
     if (this.skipIfDataSourceMapping.length === 0) {
       this.getSkipIfDataSourceMappings()
     }
 
     this.skipIfTypeMapping = this.$busEvents.data.skipIfTypeMappingList
-    this.validateTypeList = this.$busEvents.data.apiAssertMappingList
+    this.validateTypeList = this.$busEvents.data.apiTestAssertMappingList
     this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList
 
     this.initTempData(this.skipIfData)
@@ -211,12 +221,11 @@ export default {
     })
   },
 
-
   methods: {
 
     // 从后端获取跳过数据源
     getSkipIfDataSourceMappings() {
-      getSkipIfDataSourceMapping({type: this.use_type}).then(response => {
+      getSkipIfDataSourceMapping({ type: this.use_type }).then(response => {
         this.skipIfDataSourceMapping = response.data
       })
     },
@@ -254,7 +263,7 @@ export default {
 
     // 添加一行
     addRow(isRow) {
-      if (isRow){
+      if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
           skip_type: null,
@@ -264,7 +273,7 @@ export default {
           data_type: null,
           expect: null
         })
-      }else {
+      } else {
         this.tempData = [{
           id: `${Date.now()}`,
           skip_type: null,
@@ -279,7 +288,7 @@ export default {
 
     // 删除一行
     delRow(index) {
-      this.tempData.splice(index, 1);
+      this.tempData.splice(index, 1)
     },
 
     // 清除数据
@@ -305,7 +314,7 @@ export default {
       const el = this.$refs.dataTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -316,14 +325,6 @@ export default {
           this.newList.splice(evt.newIndex, 0, tempIndex)
         }
       })
-    },
-  },
-
-  watch: {
-    'skipIfData': {
-      handler(newVal, oldVal) {
-        this.initTempData(newVal)
-      }
     }
   }
 }

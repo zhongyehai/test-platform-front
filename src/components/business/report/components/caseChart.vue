@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}"/>
+  <div :class="className" :style="{height:height,width:width}" />
 </template>
 
 <script>
@@ -32,13 +32,13 @@ export default {
     height: {
       type: String,
       default: '350px'
-    },
+    }
   },
   data() {
     return {
       titleList: [],
       dataList: [],
-      chart: null,
+      chart: null
     }
   },
   mounted() {
@@ -67,11 +67,11 @@ export default {
           left: 'center',
           bottom: '10',
           // data: ['成功数', '失败数']  // 饼图元素
-          data: this.dataObj.titleList  // 饼图元素
+          data: this.dataObj.titleList // 饼图元素
         },
         series: [
           {
-            name: '用例统计',  // 饼图描述
+            name: '用例统计', // 饼图描述
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],

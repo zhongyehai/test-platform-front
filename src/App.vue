@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
@@ -15,7 +15,6 @@ export default {
     // 页面加载完毕时添加刷新页面的监听事件
     // window.addEventListener('unload', this.saveState)
     window.addEventListener('beforeunload', this.saveState)
-
   },
   methods: {
     saveState() {
@@ -23,8 +22,6 @@ export default {
       localStorage.setItem('state', JSON.stringify(this.$store.state))
     }
   }
-
-
 
   // 方案二：从监听事件解决，参考：https://www.cnblogs.com/attacking-cabbage/p/10846211.html
   // created() {

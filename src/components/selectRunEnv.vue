@@ -9,16 +9,16 @@
       </div>
       <div style="margin-top: 10px">
         <label>
-        <span style="color: red">
-          注：请确保此次运行中涉及到的所有服务都设置了当前选中环境的域名 <br>
-          比如选择的测试环境，那么在运行的时候所有步骤都会找自己所在服务的测试环境的域名
-        </span>
+          <span style="color: red">
+            注：请确保此次运行中涉及到的所有服务都设置了当前选中环境的域名 <br>
+            比如选择的测试环境，那么在运行的时候所有步骤都会找自己所在服务的测试环境的域名
+          </span>
         </label>
       </div>
       <div style="margin-top: 10px">
-        <el-radio v-model="runEnv" :label="env.code" v-for="(env) in runEnvData " :key="env.code">{{
-            env.name
-          }}
+        <el-radio v-for="(env) in runEnvData " :key="env.code" v-model="runEnv" :label="env.code">{{
+          env.name
+        }}
         </el-radio>
       </div>
     </div>
@@ -30,18 +30,20 @@
       </div>
       <div style="margin-top: 10px">
         <label>
-        <span style="color: red">
-          注： <br>
-          1、请确保服务器已安装此浏览器 <br>
-          2、请确webdriver版本与浏览器版本匹配
-        </span>
+          <span style="color: red">
+            注： <br>
+            1、请确保服务器已安装此浏览器 <br>
+            2、请确webdriver版本与浏览器版本匹配
+          </span>
         </label>
       </div>
       <div style="margin-top: 10px">
         <el-radio
+          v-for="(value, key) in $busEvents.data.runBrowserNameDict "
+          :key="key"
           v-model="runBrowser"
           :label="key"
-          v-for="(value, key) in $busEvents.data.runBrowserNameDict " :key="key">{{ value }}
+        >{{ value }}
         </el-radio>
       </div>
     </div>
@@ -63,7 +65,7 @@
       </div>
 
       <div style="margin-top: 10px">
-        <el-radio v-model="runType" :label="key" v-for="(value, key) in runModeData" :key="key">{{ value }}</el-radio>
+        <el-radio v-for="(value, key) in runModeData" :key="key" v-model="runType" :label="key">{{ value }}</el-radio>
       </div>
 
     </div>
@@ -114,8 +116,7 @@
                 :key="server.id"
                 :label="`${server.name}   (最近一次访问：${statusContentMapping[server.status]})`"
                 :value="server.id"
-              >
-              </el-option>
+              />
             </el-select>
           </div>
         </el-col>
@@ -136,8 +137,7 @@
                 :key="phone.id"
                 :label="phone.name"
                 :value="phone.id"
-              >
-              </el-option>
+              />
             </el-select>
           </div>
         </el-col>
@@ -146,23 +146,23 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="runData()">确 定</el-button>
+      <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
+      <el-button size="mini" type="primary" @click="runData()">确 定</el-button>
     </span>
 
   </el-dialog>
 </template>
 
 <script>
-import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/utils/mapping";
+import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
-import {getConfigByName, getRunModel} from "@/apis/config/config";
-import {runEnvList} from "@/apis/config/runEnv";
-import {phoneList, serverList} from "@/apis/appUiTest/env";  // 初始化超时时间
-import {getRunTimeout} from "@/utils/getConfig";
+import { getConfigByName, getRunModel } from '@/apis/config/config'
+import { runEnvList } from '@/apis/config/runEnv'
+import { phoneList, serverList } from '@/apis/appUiTest/env' // 初始化超时时间
+import { getRunTimeout } from '@/utils/getConfig'
 
 export default {
-  name: "selectRunEnv",
+  name: 'SelectRunEnv',
   props: [
     'dataType'
   ],
@@ -183,6 +183,33 @@ export default {
       statusContentMapping: appiumServerRequestStatusMappingContent,
       statusTagTypeMapping: appiumServerRequestStatusMappingTagType
     }
+  },
+
+  mounted() {
+    getRunTimeout(this) // 初始化等待用例运行超时时间
+
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel) => {
+      if (_type === 'selectRunEnv') {
+        this.runUnit = runUnit
+        this.showSelectRunModel = showSelectRunModel
+        if (this.dataType === 'api') {
+          this.initRunMode()
+        } else if (this.dataType === 'appUi') {
+          this.getRunAppEnv()
+          this.noReset = false
+        } else {
+          this.initRunMode()
+          this.initBrowserName()
+        }
+        this.initEnvList()
+        this.dialogIsShow = true
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
   methods: {
 
@@ -233,36 +260,7 @@ export default {
         this.runPhone = this.$busEvents.data.runPhoneList[0].id
       }
     }
-  },
-
-  mounted() {
-
-    getRunTimeout(this)  // 初始化等待用例运行超时时间
-
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel) => {
-      if (_type === 'selectRunEnv'){
-        this.runUnit = runUnit
-        this.showSelectRunModel = showSelectRunModel
-        if (this.dataType === 'api') {
-          this.initRunMode()
-        } else if (this.dataType === 'appUi') {
-          this.getRunAppEnv()
-          this.noReset = false
-        } else {
-          this.initRunMode()
-          this.initBrowserName()
-        }
-        this.initEnvList()
-        this.dialogIsShow = true
-      }
-    })
-
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
+  }
 }
 </script>
 

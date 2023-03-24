@@ -1,6 +1,6 @@
 <template>
 
-  <reportShowView :data-type="'webUi'"></reportShowView>
+  <reportShowView :data-type="'webUi'" />
 
 </template>
 
@@ -9,7 +9,7 @@
 import reportShowView from '@/components/business/report/show.vue'
 
 export default {
-  name: 'show',
+  name: 'Show',
   components: {
     reportShowView
   }

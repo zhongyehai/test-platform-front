@@ -9,8 +9,8 @@
             class="input-with-select"
             placeholder="请输入接口地址，如 /mock/{projectSystemId}"
             size="mini"
-            style="width: 75%">
-          </el-input>
+            style="width: 75%"
+          />
           <el-button
             v-show="queryAddr"
             type="primary"
@@ -37,8 +37,8 @@
           <el-form-item label="服务" style="margin-bottom: 5px">
             <projectSelectorView
               ref="projectSelectorView"
-              :busEmitEventName="$busEvents.selectorChoice"
-            ></projectSelectorView>
+              :bus-emit-event-name="$busEvents.selectorChoice"
+            />
           </el-form-item>
         </el-col>
 
@@ -46,15 +46,16 @@
         <el-col :span="13">
           <el-form-item label="模块" style="margin-bottom: 5px">
             <el-cascader
+              v-model="selectedOptions"
               placeholder="选择模块"
               filterable
               size="mini"
               style="min-width: 100%"
               :options="tempModuleList"
               :props="{ checkStrictly: true }"
-              v-model="selectedOptions"
+              clearable
               @change="getCaseList"
-              clearable></el-cascader>
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -74,11 +75,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" label="接口信息" align="center" min-width="90%">
+        <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="90%">
           <template slot-scope="scope">
             <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
-              <span class="block-method block_method_color"
-                    :class="`block_method_${scope.row.method.toLowerCase()}`">
+              <span
+                class="block-method block_method_color"
+                :class="`block_method_${scope.row.method.toLowerCase()}`"
+              >
                 {{ scope.row.method }}
               </span>
               <span class="block-method block_url">{{ scope.row.addr }}</span>
@@ -100,7 +103,8 @@
         :total="apiList.total"
         :page.sync="pageNum"
         :limit.sync="pageSize"
-        @pagination="getApiList"/>
+        @pagination="getApiList"
+      />
 
     </div>
 
@@ -108,34 +112,29 @@
       :api-list="showApiList"
       :case-id="currentCaseId"
       :marker="marker"
-    ></showApiFromDrawer>
+    />
 
     <showApiUseDrawer
       :case-list="showCaseList"
       :marker="marker"
-    ></showApiUseDrawer>
+    />
   </div>
 
 </template>
 
 <script>
-import projectSelectorView from "@/components/Selector/project";
-import moduleSelectorView from "@/components/Selector/module";
-import editStepView from "./editApiStep.vue";
+import projectSelectorView from '@/components/Selector/project'
+import moduleSelectorView from '@/components/Selector/module'
+import editStepView from './editApiStep.vue'
 import Pagination from '@/components/Pagination'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import {apiList, apiMsgBelongTo, apiMsgBelongToStep} from "@/apis/apiTest/api";
-import {moduleList} from "@/apis/apiTest/module";
+import { apiList, apiMsgBelongTo, apiMsgBelongToStep } from '@/apis/apiTest/api'
+import { moduleList } from '@/apis/apiTest/module'
 
 export default {
-  name: 'apiList',
-  props: [
-    'projectId',
-    'dialogIsShow',
-    'currentCaseId'
-  ],
+  name: 'ApiList',
   components: {
     Pagination,
     projectSelectorView,
@@ -144,6 +143,11 @@ export default {
     showApiFromDrawer,
     showApiUseDrawer
   },
+  props: [
+    'projectId',
+    'dialogIsShow',
+    'currentCaseId'
+  ],
   data() {
     return {
       selectedOptions: [],
@@ -162,12 +166,20 @@ export default {
       queryAddr: '',
       marker: 'caseApiList',
       showApiList: [],
-      showCaseList: [],
+      showCaseList: []
     }
   },
 
-  mounted() {
+  watch: {
+    'currentCaseId': {
+      handler(newVal, oldVal) {
+        this.caseId = newVal
+      }
+    }
 
+  },
+
+  mounted() {
     // 监听选中服务
     this.$bus.$on(this.$busEvents.selectorChoice, (project) => {
       if (project) {
@@ -190,8 +202,8 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
-      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showApiList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
         }
@@ -200,8 +212,8 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
-      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showCaseList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
         }
@@ -211,32 +223,32 @@ export default {
     // 递归把列表转为树行结构
     arrayToTree(arr, parentId) {
       //  arr 是返回的数据  parendId 父id
-      let temp = [];
-      let treeArr = arr;
+      const temp = []
+      const treeArr = arr
       treeArr.forEach((item, index) => {
         if (item.parent == parentId) {
           if (this.arrayToTree(treeArr, treeArr[index].id).length > 0) {
             // 递归调用此函数
-            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id);
+            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id)
           }
           treeArr[index].value = treeArr[index].id
           treeArr[index].label = treeArr[index].name
-          temp.push(treeArr[index]);
+          temp.push(treeArr[index])
         }
-      });
-      return temp;
+      })
+      return temp
     },
 
     // 获取服务id对应的模块列表
     getModulesByProjectId(project_id) {
-      moduleList({'projectId': project_id}).then(response => {
+      moduleList({ 'projectId': project_id }).then(response => {
         this.tempModuleList = this.arrayToTree(response.data.data, null)
       })
     },
 
     getCaseList(selectedModuleList) {
       if (selectedModuleList.length > 0) {
-        this.moduleId = selectedModuleList.slice(-1)[0]  // 取列表中的最后一个
+        this.moduleId = selectedModuleList.slice(-1)[0] // 取列表中的最后一个
         apiList({
           'moduleId': this.moduleId,
           'pageNum': this.pageNum,
@@ -275,18 +287,9 @@ export default {
       new_api['status'] = 1
       new_api['run_times'] = 1
       new_api['replace_host'] = false
-      new_api['skip_if'] = {"expect": null, "comparator": "", "data_type": "", "check_value": null}
+      new_api['skip_if'] = { 'expect': null, 'comparator': '', 'data_type': '', 'check_value': null }
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_api)
     }
-  },
-
-  watch: {
-    'currentCaseId': {
-      handler(newVal, oldVal) {
-        this.caseId = newVal
-      }
-    }
-
   }
 }
 </script>

@@ -16,13 +16,14 @@
               style="min-width: 100%"
               filterable
               default-first-option
-              @change="getModuleList">
+              @change="getModuleList"
+            >
               <el-option
                 v-for="(item) in tempProjectList"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -31,15 +32,16 @@
         <el-col :span="8">
           <el-form-item label="模块" style="margin-left: 5px; margin-bottom: 5px">
             <el-cascader
+              v-model="selectedOptions"
               placeholder="选择模块"
               filterable
               size="mini"
               style="min-width: 100%"
               :options="tempModuleList"
               :props="{ checkStrictly: true }"
-              v-model="selectedOptions"
+              clearable
               @change="getPageList"
-              clearable></el-cascader>
+            />
           </el-form-item>
         </el-col>
 
@@ -56,7 +58,7 @@
               default-first-option
               @change="getElementListByPageId"
             >
-              <el-option v-for="(item) in tempPageList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              <el-option v-for="(item) in tempPageList" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -77,19 +79,19 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="元素名称" min-width="20%">
+        <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="元素名称" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="addr" align="center" label="定位方式" min-width="20%">
+        <el-table-column :show-overflow-tooltip="true" prop="addr" align="center" label="定位方式" min-width="20%">
           <template slot-scope="scope">
             <span> {{ parseFindBy(scope.row.by) }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip=true prop="addr" align="center" label="定位元素" min-width="20%">
+        <el-table-column :show-overflow-tooltip="true" prop="addr" align="center" label="定位元素" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.element }} </span>
           </template>
@@ -108,7 +110,8 @@
         :total="elementList.total"
         :page.sync="pageNum"
         :limit.sync="pageSize"
-        @pagination="getElementListByPageId"/>
+        @pagination="getElementListByPageId"
+      />
 
     </div>
 
@@ -117,33 +120,32 @@
 </template>
 
 <script>
-import projectSelectorView from "@/components/Selector/project";
-import moduleSelectorView from "@/components/Selector/module";
+import projectSelectorView from '@/components/Selector/project'
+import moduleSelectorView from '@/components/Selector/module'
 import Pagination from '@/components/Pagination'
 
+import { moduleList as appUiModuleList } from '@/apis/appUiTest/module'
+import { pageList as appUiPageList } from '@/apis/appUiTest/page'
+import { elementList as appUiElementList } from '@/apis/appUiTest/element'
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 
-import {moduleList as appUiModuleList} from "@/apis/appUiTest/module";
-import {pageList as appUiPageList} from "@/apis/appUiTest/page";
-import {elementList as appUiElementList} from "@/apis/appUiTest/element";
-import {projectList as appUiProjectList} from "@/apis/appUiTest/project";
-
-import {moduleList as webUiModuleList} from "@/apis/webUiTest/module";
-import {pageList as webUiPageList} from "@/apis/webUiTest/page";
-import {elementList as webUiElementList} from "@/apis/webUiTest/element";
-import {projectList as webUiProjectList} from "@/apis/webUiTest/project";
+import { moduleList as webUiModuleList } from '@/apis/webUiTest/module'
+import { pageList as webUiPageList } from '@/apis/webUiTest/page'
+import { elementList as webUiElementList } from '@/apis/webUiTest/element'
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 
 export default {
-  name: 'elementList',
-  props: [
-    'dataType',
-    'dialogIsShow',
-    'currentCaseId'
-  ],
+  name: 'ElementList',
   components: {
     Pagination,
     projectSelectorView,
     moduleSelectorView
   },
+  props: [
+    'dataType',
+    'dialogIsShow',
+    'currentCaseId'
+  ],
   data() {
     return {
       selectedOptions: [],
@@ -168,9 +170,18 @@ export default {
       projectListUrl: ''
     }
   },
+  watch: {
+
+    'currentCaseId': {
+      handler(newVal, oldVal) {
+        this.caseId = newVal
+      }
+    }
+
+  },
 
   mounted() {
-    this.getProjectList()  // 项目列表
+    this.getProjectList() // 项目列表
   },
 
   created() {
@@ -197,20 +208,20 @@ export default {
     // 递归把列表转为树行结构
     arrayToTree(arr, parentId) {
       //  arr 是返回的数据  parendId 父id
-      let temp = [];
-      let treeArr = arr;
+      const temp = []
+      const treeArr = arr
       treeArr.forEach((item, index) => {
         if (item.parent == parentId) {
           if (this.arrayToTree(treeArr, treeArr[index].id).length > 0) {
             // 递归调用此函数
-            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id);
+            treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id)
           }
           treeArr[index].value = treeArr[index].id
           treeArr[index].label = treeArr[index].name
-          temp.push(treeArr[index]);
+          temp.push(treeArr[index])
         }
-      });
-      return temp;
+      })
+      return temp
     },
 
     // 获取项目列表
@@ -231,14 +242,14 @@ export default {
 
     // 获取项目id对应的模块列表
     getModulesByProjectId(project_id) {
-      this.moduleListUrl({'projectId': project_id}).then(response => {
+      this.moduleListUrl({ 'projectId': project_id }).then(response => {
         this.tempModuleList = this.arrayToTree(response.data.data, null)
       })
     },
 
     getPageList(selectedModuleList) {
       if (selectedModuleList.length > 0) {
-        this.moduleId = selectedModuleList.slice(-1)[0]  // 取列表中的最后一个
+        this.moduleId = selectedModuleList.slice(-1)[0] // 取列表中的最后一个
         this.pageListUrl({
           'moduleId': this.moduleId,
           'pageNum': this.pageNum,
@@ -287,15 +298,6 @@ export default {
       new_element['page_id'] = this.$refs.pageSelectorView.selected.value
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'stepInfo', 'add', new_element)
     }
-  },
-  watch: {
-
-    'currentCaseId': {
-      handler(newVal, oldVal) {
-        this.caseId = newVal
-      }
-    }
-
   }
 }
 </script>

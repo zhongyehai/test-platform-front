@@ -26,9 +26,14 @@
                   clearable
                   size="mini"
                   class="filter-item"
-                  @change="querySelectedProduct">
-                  <el-option v-for="product in productList" :key="product.id" :label="product.name"
-                             :value="product.id"/>
+                  @change="querySelectedProduct"
+                >
+                  <el-option
+                    v-for="product in productList"
+                    :key="product.id"
+                    :label="product.name"
+                    :value="product.id"
+                  />
                 </el-select>
               </el-form-item>
 
@@ -41,9 +46,14 @@
                   default-first-option
                   clearable
                   size="mini"
-                  class="filter-item">
-                  <el-option v-for="project in queryProjectList" :key="project.id" :label="project.name"
-                             :value="project.id"/>
+                  class="filter-item"
+                >
+                  <el-option
+                    v-for="project in queryProjectList"
+                    :key="project.id"
+                    :label="project.name"
+                    :value="project.id"
+                  />
                 </el-select>
               </el-form-item>
 
@@ -55,8 +65,9 @@
                   default-first-option
                   clearable
                   size="mini"
-                  class="filter-item">
-                  <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+                  class="filter-item"
+                >
+                  <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
                 </el-select>
               </el-form-item>
             </el-row>
@@ -70,22 +81,24 @@
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
-                  align="right">
-                </el-date-picker>
+                  align="right"
+                />
               </div>
             </el-form-item>
 
             <el-button
               type="primary"
               size="mini"
-              @click="selectData">
+              @click="selectData"
+            >
               {{ '搜索' }}
             </el-button>
 
             <el-button
               type="primary"
               size="mini"
-              @click="initListQuery">
+              @click="initListQuery"
+            >
               {{ '重置' }}
             </el-button>
 
@@ -94,7 +107,8 @@
               type="primary"
               size="mini"
               :loading="downloadLoadingIsShow"
-              @click="downloadCurrentWeekWeeklyList">
+              @click="downloadCurrentWeekWeeklyList"
+            >
               {{ '导出最近一周' }}
             </el-button>
 
@@ -111,7 +125,8 @@
             <el-button
               type="primary"
               size="mini"
-              @click="clickAddWeekly">
+              @click="clickAddWeekly"
+            >
               {{ '添加周报' }}
             </el-button>
 
@@ -131,37 +146,37 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="product_id" align="center" label="所属产品" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="product_id" align="center" label="所属产品" min-width="15%">
             <template slot-scope="scope">
               <span> {{ parseProduct(scope.row.product_id) }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="version" align="center" label="版本号" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="version" align="center" label="版本号" min-width="15%">
             <template slot-scope="scope">
               <span> {{ scope.row.version }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="开始时间" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="开始时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.start_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="结束时间" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="结束时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.end_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="创建者" min-width="15%">
             <template slot-scope="scope">
               <span>{{ parseUser(scope.row.create_user) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="15%">
+          <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="15%">
             <template slot-scope="scope">
               <span>{{ scope.row.desc }}</span>
             </template>
@@ -176,16 +191,17 @@
                 size="mini"
                 style="margin-right: 8px"
                 icon="el-icon-edit"
-                @click="showEditForm(scope.row)">
-              </el-button>
+                @click="showEditForm(scope.row)"
+              />
 
               <!-- 复制 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.copyPopoverIsShow"
                 placement="top"
                 style="margin-right: 10px"
                 popper-class="down-popover"
-                v-model="scope.row.copyPopoverIsShow">
+              >
                 <p>复制此周报并生成新的周报?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -196,15 +212,16 @@
                   type="text"
                   size="mini"
                   icon="el-icon-document-copy"
-                ></el-button>
+                />
               </el-popover>
 
               <!-- 删除 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.deletePopoverIsShow"
                 placement="top"
                 popper-class="down-popover"
-                v-model="scope.row.deletePopoverIsShow">
+              >
                 <p>确定删除此数据?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -219,7 +236,7 @@
                   icon="el-icon-delete"
                   :disabled="scope.row.status === 1"
                   :loading="scope.row.isShowDeleteLoading"
-                ></el-button>
+                />
               </el-popover>
 
             </template>
@@ -241,51 +258,55 @@
     <el-drawer
       :title="weeklyDrawerStatus === 'add' ? '新增周报' : weeklyDrawerStatus === 'copy' ? '复制周报' : '修改周报'"
       size="80%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="weeklyDrawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <el-form
         ref="dataForm"
         :model="tempWeekly"
         label-position="right"
         label-width="90px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      >
         <el-form-item label="所属产品" prop="product_id" class="is-required" size="mini">
           <el-select
-            style="width: 100%"
             v-model="tempWeekly.product_id"
+            style="width: 100%"
             size="mini"
             placeholder="选择产品"
             filterable
             default-first-option
-            @change="selectedProduct">
-            <el-option v-for="item in productList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+            @change="selectedProduct"
+          >
+            <el-option v-for="item in productList" :key="item.id" :value="item.id" :label="item.name" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="所属项目" prop="project_id" size="mini">
           <el-select
-            style="width: 100%"
             v-model="tempWeekly.project_id"
+            style="width: 100%"
             size="mini"
             placeholder="选择项目"
             filterable
-            clearable>
-            <el-option v-for="item in projectList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+            clearable
+          >
+            <el-option v-for="item in projectList" :key="item.id" :value="item.id" :label="item.name" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="版本号" prop="version" class="is-required" size="mini">
-          <el-input v-model="tempWeekly.version" size="mini" placeholder="任务所属系统版本号"></el-input>
+          <el-input v-model="tempWeekly.version" size="mini" placeholder="任务所属系统版本号" />
         </el-form-item>
 
         <el-form-item label="任务明细" prop="task_item" class="is-required" size="mini">
           <taskItemView
-            :currentData="tempWeekly.task_item"
-            :placeholderKey="'任务项'"
-            :placeholderValue="'任务进度'"
-            :placeholderDesc="'备注'"
-          ></taskItemView>
+            :current-data="tempWeekly.task_item"
+            :placeholder-key="'任务项'"
+            :placeholder-value="'任务进度'"
+            :placeholder-desc="'备注'"
+          />
         </el-form-item>
 
         <el-form-item label="时间段" prop="task_item" class="is-required" size="mini">
@@ -297,19 +318,20 @@
         </el-form-item>
 
         <el-form-item label="备注" prop="desc" size="mini">
-          <el-input v-model="tempWeekly.desc" size="mini" type="textarea" :rows="5"></el-input>
+          <el-input v-model="tempWeekly.desc" size="mini" type="textarea" :rows="5" />
         </el-form-item>
 
       </el-form>
 
       <!-- 判断是否展示抽屉的操作按钮，新增、用户为数据创建者、用户为系统管理员，才可操作 -->
       <div
-        class="demo-drawer__footer"
         v-show="
           weeklyDrawerStatus === 'add' ||
-          currentUserRole === '2' ||
-          parseInt(currentUserId) === parseInt(tempWeekly.create_user) &&
-          parseInt(weekPosition) > -99 && parseInt(weekPosition) < 99">
+            currentUserRole === '2' ||
+            parseInt(currentUserId) === parseInt(tempWeekly.create_user) &&
+            parseInt(weekPosition) > -99 && parseInt(weekPosition) < 99"
+        class="demo-drawer__footer"
+      >
         <el-button
           slot="reference"
           size="mini"
@@ -326,7 +348,8 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" tempWeekly.id ? changWeekly() : addWeekly() ">
+          @click=" tempWeekly.id ? changWeekly() : addWeekly() "
+        >
           {{ '保存' }}
         </el-button>
       </div>
@@ -347,15 +370,15 @@ import {
   deleteWeekly,
   weeklyListData,
   weeklyConfigList, downloadWeeklyData
-} from "@/apis/testWork/weekly";
+} from '@/apis/testWork/weekly'
 
-import {userList} from '@/apis/system/user'
-import {formatTime, getCurrentWeekStartTimeAndEndTime} from "@/utils/timeUtil";
-import {tryParseInt} from "@/utils/parseData";
+import { userList } from '@/apis/system/user'
+import { formatTime, getCurrentWeekStartTimeAndEndTime } from '@/utils/timeUtil'
+import { tryParseInt } from '@/utils/parseData'
 
 export default {
-  name: 'index',
-  components: {Pagination, taskItemView},
+  name: 'Index',
+  components: { Pagination, taskItemView },
 
   // 接收父组件传参的key
   props: [
@@ -366,12 +389,12 @@ export default {
   data() {
     return {
 
-      currentUserId: localStorage.getItem('id'),  // 用户id
-      currentUserRole: localStorage.getItem('roles'),  // 用户权限id
+      currentUserId: localStorage.getItem('id'), // 用户id
+      currentUserRole: localStorage.getItem('roles'), // 用户权限id
 
-      tableLoadingIsShow: false,  // 请求列表等待响应的状态
-      downloadLoadingIsShow: false,  // 导出按钮的loading
-      tabName: '周报列表',  //  tab页的显示
+      tableLoadingIsShow: false, // 请求列表等待响应的状态
+      downloadLoadingIsShow: false, // 导出按钮的loading
+      tabName: '周报列表', //  tab页的显示
 
       // 接口新增/编辑临时数据
       tempWeekly: {
@@ -379,7 +402,7 @@ export default {
         product_id: '',
         project_id: '',
         version: '',
-        task_item: [{key: "", value: "", remark: ""}],
+        task_item: [{ key: '', value: '', remark: '' }],
         desc: '',
         start_time: '',
         end_time: ''
@@ -393,38 +416,38 @@ export default {
       currentUserList: [],
       userDict: {},
 
-      weeklyDrawerIsShow: false,  // 抽屉展示状态
-      weeklyDrawerStatus: '',  // 抽屉类型
-      direction: 'rtl',  // 抽屉打开方式
+      weeklyDrawerIsShow: false, // 抽屉展示状态
+      weeklyDrawerStatus: '', // 抽屉类型
+      direction: 'rtl', // 抽屉打开方式
       productList: [], // 产品列表
-      productDict: {},  // 产品字典
+      productDict: {}, // 产品字典
       projectList: [], // 项目列表
       isShowLoading: false,
-      isDrawerSelectProduct: false,  // 是否在抽屉里面改变的产品id，是才重置项目id
-      weekPosition: 0,  // 周定位，上周、本周、下周
+      isDrawerSelectProduct: false, // 是否在抽屉里面改变的产品id，是才重置项目id
+      weekPosition: 0, // 周定位，上周、本周、下周
 
-      lastWeekStart: '',  // 上周开始的时间
-      lastWeekend: '',  // 上周结束的时间
+      lastWeekStart: '', // 上周开始的时间
+      lastWeekend: '', // 上周结束的时间
 
-      currentWeekStart: '',  // 本周开始的时间
-      currentWeekend: '',  // 本周结束的时间
+      currentWeekStart: '', // 本周开始的时间
+      currentWeekend: '', // 本周结束的时间
 
-      nextWeekStart: '',  // 下周开始的时间
-      nextWeekend: '',  // 下周结束的时间
+      nextWeekStart: '', // 下周开始的时间
+      nextWeekend: '', // 下周结束的时间
 
       listQuery: {
         product_id: '',
         project_id: '',
         create_user: '',
-        start_time: '',  // 查询开始时间
-        end_time: '',  // 查询结束时间
+        start_time: '', // 查询开始时间
+        end_time: '', // 查询结束时间
         download_type: '',
         pageNum: 1,
         pageSize: 20
       },
       queryProjectList: [],
       // 时间选择器
-      time_period: [],  // 查询开始、结束时间段
+      time_period: [], // 查询开始、结束时间段
       pickerOptions: {
         shortcuts: [
           {
@@ -436,7 +459,7 @@ export default {
                   formatTime(getCurrentWeekStartTimeAndEndTime(-14).startTime),
                   formatTime(getCurrentWeekStartTimeAndEndTime(-14).endTime)
                 ]
-              );
+              )
             }
           },
           {
@@ -448,7 +471,7 @@ export default {
                   formatTime(getCurrentWeekStartTimeAndEndTime(-7).startTime),
                   formatTime(getCurrentWeekStartTimeAndEndTime(-7).endTime)
                 ]
-              );
+              )
             }
           },
           {
@@ -460,7 +483,7 @@ export default {
                   formatTime(getCurrentWeekStartTimeAndEndTime(0).startTime),
                   formatTime(getCurrentWeekStartTimeAndEndTime(0).endTime)
                 ]
-              );
+              )
             }
           }, {
             text: '下周',
@@ -471,9 +494,44 @@ export default {
                   formatTime(getCurrentWeekStartTimeAndEndTime(7).startTime),
                   formatTime(getCurrentWeekStartTimeAndEndTime(7).endTime)
                 ]
-              );
+              )
             }
           }]
+      }
+    }
+  },
+
+  watch: {
+
+    // 监听父组件传过来的当前选中的产品，实时获取周报列表
+    'currentProductId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.listQuery.project_id = ''
+          this.selectedProduct()
+        }
+      }
+    },
+
+    // 监听父组件传过来的当前选中的项目，实时获取周报列表
+    'currentProjectId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.listQuery.product_id = ''
+          this.selectedProduct()
+        }
+      }
+    },
+
+    'tempWeekly.product_id': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        if (this.isDrawerSelectProduct) {
+          this.tempWeekly.project_id = ''
+        }
+        this.isDrawerSelectProduct = true
       }
     }
   },
@@ -483,15 +541,15 @@ export default {
     this.getUserList(this.getProductList)
 
     // 初始化上周、本周、下周的开始、结束时间节点
-    let lastWeek = getCurrentWeekStartTimeAndEndTime(-7)
+    const lastWeek = getCurrentWeekStartTimeAndEndTime(-7)
     this.lastWeekStart = formatTime(lastWeek.startTime)
     this.lastWeekend = formatTime(lastWeek.endTime)
 
-    let currentWeek = getCurrentWeekStartTimeAndEndTime(0)
+    const currentWeek = getCurrentWeekStartTimeAndEndTime(0)
     this.currentWeekStart = formatTime(currentWeek.startTime)
     this.currentWeekend = formatTime(currentWeek.endTime)
 
-    let nextWeek = getCurrentWeekStartTimeAndEndTime(7)
+    const nextWeek = getCurrentWeekStartTimeAndEndTime(7)
     this.nextWeekStart = formatTime(nextWeek.startTime)
     this.nextWeekend = formatTime(nextWeek.endTime)
   },
@@ -500,7 +558,7 @@ export default {
     this.getWeeklyList()
 
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, dataDict) => {
-      if (_type === 'testWork'){
+      if (_type === 'testWork') {
         this.getWeeklyList({
           'product_id': dataDict.product_id,
           'project_id': dataDict.project_id,
@@ -511,11 +569,10 @@ export default {
     })
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType) => {
-      if (_type === 'weekly'){
+      if (_type === 'weekly') {
         this.openDrawer(drawerType)
       }
     })
-
   },
 
   // 组件销毁前，关闭bus监听事件
@@ -553,7 +610,7 @@ export default {
     initTempWeekly() {
       this.tempWeekly.id = ''
       this.tempWeekly.version = ''
-      this.tempWeekly.task_item = [{key: "", value: "", remark: ""}]
+      this.tempWeekly.task_item = [{ key: '', value: '', remark: '' }]
       this.tempWeekly.desc = ''
       this.tempWeekly.start_time = ''
       this.tempWeekly.end_time = ''
@@ -561,7 +618,7 @@ export default {
 
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -583,7 +640,7 @@ export default {
 
     // 获取产品列表
     getProductList(isGetWeekly) {
-      weeklyConfigList({parent: ''}).then(response => {
+      weeklyConfigList({ parent: '' }).then(response => {
         response.data.data.forEach(product => {
           this.productDict[product.id.toString()] = product.name
         })
@@ -598,14 +655,14 @@ export default {
 
     // 选中产品，获取项目列表
     querySelectedProduct() {
-      weeklyConfigList({parent: this.listQuery.product_id}).then(response => {
+      weeklyConfigList({ parent: this.listQuery.product_id }).then(response => {
         this.queryProjectList = response.data.data
       })
     },
 
     // 选中产品，获取项目列表
     selectedProduct() {
-      weeklyConfigList({parent: this.tempWeekly.product_id}).then(response => {
+      weeklyConfigList({ parent: this.tempWeekly.product_id }).then(response => {
         this.projectList = response.data.data
       })
     },
@@ -633,16 +690,16 @@ export default {
       this.tempWeekly.project_id = tryParseInt(this.tempWeekly.project_id)
 
       // 处理时间段，判断是上周、本周、下周
-      let tempWeekly_start_time = this.thisFormatTime(this.tempWeekly.start_time)
-      if (tempWeekly_start_time > this.nextWeekStart) {  // 数据开始时间大于下周的开始时间，则说明是以后的周计划
+      const tempWeekly_start_time = this.thisFormatTime(this.tempWeekly.start_time)
+      if (tempWeekly_start_time > this.nextWeekStart) { // 数据开始时间大于下周的开始时间，则说明是以后的周计划
         this.weekPosition = 99
-      } else if (tempWeekly_start_time === this.nextWeekStart) {  // 数据开始时间等于下周的开始时间，则说明是下周的周计划
+      } else if (tempWeekly_start_time === this.nextWeekStart) { // 数据开始时间等于下周的开始时间，则说明是下周的周计划
         this.weekPosition = 7
-      } else if (tempWeekly_start_time === this.currentWeekStart) {  // 数据开始时间等于当前时间所在周的开始时间，则说明是本周的周计划
+      } else if (tempWeekly_start_time === this.currentWeekStart) { // 数据开始时间等于当前时间所在周的开始时间，则说明是本周的周计划
         this.weekPosition = 0
-      } else if (tempWeekly_start_time === this.lastWeekStart) {  // 数据开始时间等于上周的开始时间，则说明是上周的周计划
+      } else if (tempWeekly_start_time === this.lastWeekStart) { // 数据开始时间等于上周的开始时间，则说明是上周的周计划
         this.weekPosition = -7
-      } else {  // 超出时间范围，则说明是以前的周计划
+      } else { // 超出时间范围，则说明是以前的周计划
         this.weekPosition = -99
       }
 
@@ -654,7 +711,7 @@ export default {
 
     // 解析时间段
     parseTimeForCommit() {
-      let date = this.getWeekForCommit()
+      const date = this.getWeekForCommit()
       this.tempWeekly.start_time = date.start
       this.tempWeekly.end_time = date.end
     },
@@ -667,7 +724,7 @@ export default {
         putWeekly(this.tempWeekly).then(response => {
           this.isShowLoading = false
           if (this.showMessage(this, response)) {
-            this.initTempWeekly()  // 初始化数据
+            this.initTempWeekly() // 初始化数据
             this.weeklyDrawerStatus = 'add'
             this.getWeeklyList()
           }
@@ -677,7 +734,7 @@ export default {
         postWeekly(this.tempWeekly).then(response => {
           this.isShowLoading = false
           if (this.showMessage(this, response)) {
-            this.initTempWeekly()  // 初始化数据
+            this.initTempWeekly() // 初始化数据
             this.weeklyDrawerStatus = 'add'
             this.getWeeklyList()
           }
@@ -689,7 +746,7 @@ export default {
     thisDeleteWeekly(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
-      deleteWeekly({'id': row.id}).then(response => {
+      deleteWeekly({ 'id': row.id }).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
         if (this.showMessage(this, response)) {
           this.getWeeklyList()
@@ -697,11 +754,11 @@ export default {
       })
     },
 
-    cancelDeletePopover(weekly){
+    cancelDeletePopover(weekly) {
       this.$set(weekly, 'deletePopoverIsShow', false)
     },
 
-    cancelCopyPopover(weekly){
+    cancelCopyPopover(weekly) {
       this.$set(weekly, 'copyPopoverIsShow', false)
     },
 
@@ -723,15 +780,14 @@ export default {
 
     // 解析用户选择的时间段
     getWeekForCommit() {
-      let week = getCurrentWeekStartTimeAndEndTime(this.weekPosition)
-      let start = week.startTime
-      let end = week.endTime
+      const week = getCurrentWeekStartTimeAndEndTime(this.weekPosition)
+      const start = week.startTime
+      const end = week.endTime
       return {
         start: `${start.getFullYear()}-${start.getMonth() + 1 >= 10 ? (start.getMonth() + 1) : '0' + (start.getMonth() + 1)}-${start.getDate() < 10 ? '0' + start.getDate() : start.getDate()}`,
         end: `${end.getFullYear()}-${end.getMonth() + 1 >= 10 ? (end.getMonth() + 1) : '0' + (end.getMonth() + 1)}-${end.getDate() < 10 ? '0' + end.getDate() : end.getDate()}`
       }
     },
-
 
     // 添加周报
     addWeekly() {
@@ -741,7 +797,7 @@ export default {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
           this.weeklyDrawerIsShow = false
-          this.initTempWeekly()  // 初始化数据
+          this.initTempWeekly() // 初始化数据
           this.getWeeklyList()
         }
       })
@@ -755,7 +811,7 @@ export default {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
           this.weeklyDrawerIsShow = false
-          this.initTempWeekly()  // 初始化数据
+          this.initTempWeekly() // 初始化数据
           this.getWeeklyList()
         }
       })
@@ -764,7 +820,7 @@ export default {
     // 获取周报列表
     getWeeklyList(params) {
       this.tableLoadingIsShow = true
-      let data = params ? params : this.listQuery
+      const data = params || this.listQuery
       weeklyListData(data).then(response => {
         this.weeklyList = response.data.data
         this.weeklyTotal = response.data.total
@@ -788,52 +844,17 @@ export default {
         this.listQuery.start_time = ''
         this.listQuery.end_time = ''
         this.downloadLoadingIsShow = false
-        let blob = new Blob([response], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'   //将会被放入到blob中的数组内容的MIME类型
-        });
+        const blob = new Blob([response], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = `测试组周报（${this.lastWeekStart}_${this.lastWeekend}）`
         a.click()
       })
-    },
-
-  },
-
-  watch: {
-
-    // 监听父组件传过来的当前选中的产品，实时获取周报列表
-    'currentProductId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.listQuery.project_id = ''
-          this.selectedProduct()
-        }
-      }
-    },
-
-    // 监听父组件传过来的当前选中的项目，实时获取周报列表
-    'currentProjectId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.listQuery.product_id = ''
-          this.selectedProduct()
-        }
-      }
-    },
-
-    'tempWeekly.product_id': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (this.isDrawerSelectProduct) {
-          this.tempWeekly.project_id = ''
-        }
-        this.isDrawerSelectProduct = true
-      }
     }
+
   }
 
 }

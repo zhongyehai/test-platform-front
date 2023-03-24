@@ -1,13 +1,13 @@
 <template>
   <div class="navbar">
 
-<!--    <div style="float: left; margin-left: 10px;height: 100%;line-height: 50px; color: #5a5e66;">{{ platformName }}</div>-->
+    <!--    <div style="float: left; margin-left: 10px;height: 100%;line-height: 50px; color: #5a5e66;">{{ platformName }}</div>-->
 
-    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar"/>
+    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
-    <breadcrumb class="breadcrumb-container"/>
+    <breadcrumb class="breadcrumb-container" />
 
-<!--    <div style="float: left; margin-left: 40%;height: 100%;line-height: 50px; color: #5a5e66;">{{ platformName }}</div>-->
+    <!--    <div style="float: left; margin-left: 40%;height: 100%;line-height: 50px; color: #5a5e66;">{{ platformName }}</div>-->
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
@@ -29,13 +29,13 @@
     <el-dialog :title="'修改密码'" :modle="tempPassword" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" label-position="left" label-width="70px" style="min-width: 400px;">
         <el-form-item :label="'旧密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.oldPassword"/>
+          <el-input v-model="tempPassword.oldPassword" />
         </el-form-item>
         <el-form-item :label="'新密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.newPassword"/>
+          <el-input v-model="tempPassword.newPassword" />
         </el-form-item>
         <el-form-item :label="'确认密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.surePassword"/>
+          <el-input v-model="tempPassword.surePassword" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -44,7 +44,8 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click="changePassword"> {{ '确定' }}
+          @click="changePassword"
+        > {{ '确定' }}
         </el-button>
       </div>
 
@@ -54,11 +55,11 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import * as types from "@/store/types";
-import {userPassword} from "@/apis/system/user";
+import * as types from '@/store/types'
+import { userPassword } from '@/apis/system/user'
 
 export default {
   components: {
@@ -81,7 +82,7 @@ export default {
       tempPassword: {
         oldPassword: '',
         newPassword: '',
-        surePassword: '',
+        surePassword: ''
       }
     }
   },
@@ -98,7 +99,7 @@ export default {
       this.tempPassword = {
         oldPassword: '',
         newPassword: '',
-        surePassword: '',
+        surePassword: ''
       }
     },
 
@@ -122,9 +123,9 @@ export default {
     // 退出登录
     async logout() {
       // await this.$store.dispatch('user/logout')
-      this.$store.commit(types.token, '');
-      this.$store.commit(types.roles, '');
-      this.$store.commit(types.userName, '');
+      this.$store.commit(types.token, '')
+      this.$store.commit(types.roles, '')
+      this.$store.commit(types.userName, '')
       localStorage.setItem('state', '')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }

@@ -10,8 +10,8 @@
           placeholder="配置类型名，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 400px">
-        </el-input>
+          style="width: 400px"
+        />
       </el-form-item>
 
       <el-form-item :label="'创建人：'" size="mini">
@@ -22,15 +22,17 @@
           default-first-option
           clearable
           size="mini"
-          class="filter-item">
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
         </el-select>
       </el-form-item>
 
       <el-button
         type="primary"
         size="mini"
-        @click="getConfigTypeList()">
+        @click="getConfigTypeList()"
+      >
         搜索
       </el-button>
 
@@ -39,7 +41,8 @@
         style="margin-left: 10px"
         type="primary"
         size="mini"
-        @click="showAddConfigTypeDialog()">
+        @click="showAddConfigTypeDialog()"
+      >
         添加配置类型
       </el-button>
 
@@ -57,60 +60,62 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="参数类型" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="参数类型" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="备注" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="create_user" align="center" label="创建者" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="desc" align="center" label="操作" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
           <el-tooltip
             class="item"
             effect="dark"
             content="修改"
-            placement="top-start">
-          <el-button
-            type="text"
-            size="mini"
-            icon="el-icon-edit"
-            :disabled="roles !== '2'"
-            @click.native="showAddConfigTypeDialog(scope.row)"></el-button>
+            placement="top-start"
+          >
+            <el-button
+              type="text"
+              size="mini"
+              icon="el-icon-edit"
+              :disabled="roles !== '2'"
+              @click.native="showAddConfigTypeDialog(scope.row)"
+            />
           </el-tooltip>
         </template>
       </el-table-column>
 
     </el-table>
 
-
     <!-- 新增/修改配置类型 -->
     <el-drawer
       :title=" drawerType === 'add' ? '新增配置类型' : '修改配置类型'"
       size="60%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
 
       <el-form ref="dataForm" label-width="80px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item :label="'配置类型'" class="is-required" size="mini">
-          <el-input v-model="tempConfigType.name" :disabled="drawerType === 'edit'" size="mini"/>
+          <el-input v-model="tempConfigType.name" :disabled="drawerType === 'edit'" size="mini" />
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
-          <el-input v-model="tempConfigType.desc" type="textarea" autosize size="mini"/>
+          <el-input v-model="tempConfigType.desc" type="textarea" autosize size="mini" />
         </el-form-item>
 
       </el-form>
@@ -120,7 +125,8 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click=" drawerType === 'add' ? addConfigType() : changConfigType()">
+          @click=" drawerType === 'add' ? addConfigType() : changConfigType()"
+        >
           {{ '保存' }}
         </el-button>
       </div>
@@ -138,11 +144,11 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import {configTypeList, postConfigType, putConfigType, deleteConfigType, getConfigType} from "@/apis/config/configType";
-import {userList} from "@/apis/system/user";
+import { configTypeList, postConfigType, putConfigType, deleteConfigType, getConfigType } from '@/apis/config/configType'
+import { userList } from '@/apis/system/user'
 
 export default {
-  name: "index",
+  name: 'Index',
   components: {
     Pagination
   },
@@ -153,14 +159,14 @@ export default {
         pageSize: 20,
         create_user: '',
         name: ''
-    },
+      },
       // 请求列表等待响应的状态
       listLoading: false,
       total: 0,
       list: [],
       drawerIsShow: false,
       drawerType: '',
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       tempConfigType: {
         id: '',
@@ -170,19 +176,24 @@ export default {
       // 用户权限
       roles: localStorage.getItem('roles'),
       currentUserList: [],
-      userDict: {},
+      userDict: {}
     }
+  },
+
+  mounted() {
+    this.getUserList(this.getConfigTypeList)
+    // this.getConfigTypeList()
   },
 
   methods: {
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
       })
-      if (func){
+      if (func) {
         func()
       }
     },
@@ -197,7 +208,7 @@ export default {
         this.tempConfigType = row
         this.drawerType = 'edit'
       } else {
-        this.tempConfigType = {name: '', desc: ''}
+        this.tempConfigType = { name: '', desc: '' }
         this.drawerType = 'add'
       }
       this.drawerIsShow = true
@@ -236,11 +247,6 @@ export default {
         this.total = response.data.total
       })
     }
-  },
-
-  mounted() {
-    this.getUserList(this.getConfigTypeList)
-    // this.getConfigTypeList()
   }
 }
 </script>

@@ -4,9 +4,11 @@
     <div v-if="selectType === 'radio'">
       <div style="margin-top: 10px">
         <el-radio
+          v-for="businessItem in currentBusinessList"
+          :key="businessItem.id"
           v-model="business"
           :label="businessItem.id"
-          v-for="businessItem in currentBusinessList" :key="businessItem.id">{{ businessItem.name }}
+        >{{ businessItem.name }}
         </el-radio>
       </div>
     </div>
@@ -21,37 +23,38 @@
         size="mini"
         :style="selectStyle"
         placeholder="请选择业务线"
-        class="filter-item">
+        class="filter-item"
+      >
         <el-option
           v-for="business in currentBusinessList"
           :key="business.id"
           :label="business.name"
           :value="business.id"
-        ></el-option>
+        />
       </el-select>
       <el-popover
         class="el_popover_class"
         placement="top-start"
-        trigger="hover">
+        trigger="hover"
+      >
         <div>
           <div>1、仅有当前业务线权限的用户才能看到此服务</div>
           <div>2、若要修改用户业务线权限，需登录管理员账号，在用户管理处修改</div>
         </div>
-        <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+        <el-button slot="reference" type="text" icon="el-icon-question" />
       </el-popover>
     </div>
 
   </div>
 
-
 </template>
 
 <script>
 
-import {businessList} from '@/apis/system/business'
+import { businessList } from '@/apis/system/business'
 
 export default {
-  name: 'business',
+  name: 'Business',
   props: [
     'selectType',
     'isMultiple',
@@ -68,15 +71,25 @@ export default {
       currentBusinessList: []
     }
   },
+  watch: {
+    'currentBusiness': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.business = newVal
+        }
+      }
+    }
+  },
 
   mounted() {
     this.getBusinessList()
   },
 
   created() {
-    if (this.isMultiple){
+    if (this.isMultiple) {
       this.business = this.currentBusiness ? this.currentBusiness : [this.initBusiness()]
-    }else {
+    } else {
       this.business = this.currentBusiness ? this.currentBusiness : this.initBusiness()
     }
 
@@ -93,39 +106,29 @@ export default {
     getBusinessList() {
       businessList().then(response => {
         this.currentBusinessList = response.data.data
-        if (this.isMultiple){  // 可多选，数据类型为list
-          if (!this.business || this.business.length < 1){
+        if (this.isMultiple) { // 可多选，数据类型为list
+          if (!this.business || this.business.length < 1) {
             this.business = [this.initBusiness()]
           }
-        }else {
-          if (!this.business){
+        } else {
+          if (!this.business) {
             this.business = this.initBusiness()
           }
         }
       })
     },
 
-    initBusiness(){
+    initBusiness() {
       // 如果能从localStorage中获取到用户的business，则从中取默认值，否则以业务线列表的第一个为默认值
-      let userBusiness = localStorage.getItem('business');
-      if (userBusiness){
+      let userBusiness = localStorage.getItem('business')
+      if (userBusiness) {
         userBusiness = JSON.parse(userBusiness)
       }
 
-      if(userBusiness && userBusiness.length > 0){
+      if (userBusiness && userBusiness.length > 0) {
         return userBusiness[0]
-      }else {
+      } else {
         return this.currentBusinessList[0].id
-      }
-    }
-  },
-  watch: {
-    'currentBusiness': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal){
-          this.business = newVal
-        }
       }
     }
   }

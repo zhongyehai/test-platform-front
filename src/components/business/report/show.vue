@@ -13,7 +13,7 @@
             round
             style="margin-left: 10px; margin-top: 5px;padding: 4px 10px ;"
             @click="isShowPic()"
-          >{{ this.picStatus ? '隐藏统计图' : '展示统计图' }}
+          >{{ picStatus ? '隐藏统计图' : '展示统计图' }}
           </el-button>
 
           <el-select
@@ -25,51 +25,53 @@
             clearable
             default-first-option
           >
-            <el-option v-for="item in showReportResultList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-option v-for="item in showReportResultList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
 
           <span style="float: right;font-size: 13px;color: #3a8ee6">
-              <span v-if="dataType !== 'appUi'" style="margin-right: 30px">运行环境: {{ runEnvDict[reportData.run_env] }}</span>
-              <span style="margin-right: 30px">执行模式: {{
-                  this.reportData.is_async === 1 ? "并行运行" : "串行运行"
-                }}</span>
-              <span style="margin-right: 30px">开始时间: {{ this.reportData.time.start_at }}</span>
-              <span style="margin-right: 30px"> 总共耗时: {{ this.reportData.time.duration }} 秒</span>
-              <el-button
-                v-if="!this.reportData.success"
-                type="primary"
-                size="mini"
-                style="margin-right: 20px"
-                @click.native="showHitDrawer('add')"
-              >记录问题</el-button>
-            </span>
+            <span v-if="dataType !== 'appUi'" style="margin-right: 30px">运行环境: {{
+              runEnvDict[reportData.run_env]
+            }}</span>
+            <span style="margin-right: 30px">执行模式: {{
+              reportData.is_async === 1 ? '并行运行' : '串行运行'
+            }}</span>
+            <span style="margin-right: 30px">开始时间: {{ reportData.time.start_at }}</span>
+            <span style="margin-right: 30px"> 总共耗时: {{ reportData.time.duration }} 秒</span>
+            <el-button
+              v-if="!reportData.success"
+              type="primary"
+              size="mini"
+              style="margin-right: 20px"
+              @click.native="showHitDrawer('add')"
+            >记录问题</el-button>
+          </span>
         </div>
 
         <!-- 第二行，饼图 -->
-        <el-row v-show="this.picStatus">
+        <el-row v-show="picStatus">
           <!-- 步骤 -->
           <el-col :span="12">
             <div style="height: 200px;float:left;">
-              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"></ve-pie>
+              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px" />
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
-              <div style="color: #927B8B">总数: {{ this.reportData.stat.teststeps.total }}</div>
-              <div style="color: #19D4AE">成功: {{ this.reportData.stat.teststeps.successes }}</div>
-              <div style="color: #FA6E86">失败: {{ this.reportData.stat.teststeps.failures }}</div>
-              <div style="color: #E87C25">错误: {{ this.reportData.stat.teststeps.errors }}</div>
-              <div style="color: #60C0DD">跳过: {{ this.reportData.stat.teststeps.skipped }}</div>
+              <div style="color: #927B8B">总数: {{ reportData.stat.teststeps.total }}</div>
+              <div style="color: #19D4AE">成功: {{ reportData.stat.teststeps.successes }}</div>
+              <div style="color: #FA6E86">失败: {{ reportData.stat.teststeps.failures }}</div>
+              <div style="color: #E87C25">错误: {{ reportData.stat.teststeps.errors }}</div>
+              <div style="color: #60C0DD">跳过: {{ reportData.stat.teststeps.skipped }}</div>
             </div>
           </el-col>
 
           <!-- 用例 -->
           <el-col :span="12">
             <div style="height: 200px;float:left;">
-              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px"></ve-ring>
+              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px" />
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
-              <div style="color: #927B8B">总数: {{ this.reportData.stat.testcases.total }}</div>
-              <div style="color: #19D4AE">成功: {{ this.reportData.stat.testcases.success }}</div>
-              <div style="color: #FA6E86">失败: {{ this.reportData.stat.testcases.fail }}</div>
+              <div style="color: #927B8B">总数: {{ reportData.stat.testcases.total }}</div>
+              <div style="color: #19D4AE">成功: {{ reportData.stat.testcases.success }}</div>
+              <div style="color: #FA6E86">失败: {{ reportData.stat.testcases.fail }}</div>
             </div>
           </el-col>
         </el-row>
@@ -79,68 +81,73 @@
           <!-- 用例、步骤列表 -->
           <el-col :span="6">
             <el-scrollbar>
-              <div :style={height:caseScrollbarHeight}>
+              <div :style="{height:caseScrollbarHeight}">
                 <el-collapse accordion>
                   <!-- 遍历用例 -->
                   <el-collapse-item
                     v-for="(item, index) in reportData['details']"
-                    :key="index"
                     v-show="showReportResult === 'all' || showReportResult === item.success"
+                    :key="index"
                   >
                     <template slot="title">
                       <el-tooltip
                         class="item"
                         effect="dark"
                         :content="item.records ? `${item.records.length}个步骤` : ''"
-                        placement="top-start">
+                        placement="top-start"
+                      >
                         <div
                           style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                          :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'">
+                          :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
+                        >
                           {{ item.name }}
-<!--                          <span class="case-name">{{ item.name }}</span>-->
-<!--                          <span class="case-name">{{ item.time.duration }} ms</span>-->
+                          <!--                          <span class="case-name">{{ item.name }}</span>-->
+                          <!--                          <span class="case-name">{{ item.time.duration }} ms</span>-->
                         </div>
                       </el-tooltip>
                     </template>
                     <div>
                       <ol id="test" style="padding:5px;font-family:Times New Roman">
                         <!-- 遍历步骤 -->
-                        <li style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
-                            :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
-                            v-for="(item1, index1) in item['records']"
-                            :key="index1"
-                            @click="handleNodeClick(index, index1)"
+                        <li
+                          v-for="(item1, index1) in item['records']"
+                          :key="index1"
+                          style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
+                          :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
+                          @click="handleNodeClick(index, index1)"
                         >
-                          <div :style="
-                                item1.status === 'success' ? 'color:#67c23a':
-                                item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'">
+                          <div
+                            :style="
+                              item1.status === 'success' ? 'color:#67c23a':
+                              item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'"
+                          >
                             <span class="test-name">{{ item1.name }}</span>
                             <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
                             <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">
                               <el-button
                                 v-if="dataType === 'api'"
-                                size="mini"
-                                type="text"
-                                icon="el-icon-document-copy"
-                                class="test-status right pass"
                                 v-clipboard:copy="getCopyData(item1.meta_datas.data[0])"
                                 v-clipboard:success="onCopy"
                                 v-clipboard:error="onError"
-                              ></el-button>
-                              <el-button
-                                v-else
                                 size="mini"
                                 type="text"
                                 icon="el-icon-document-copy"
                                 class="test-status right pass"
+                              />
+                              <el-button
+                                v-else
                                 v-clipboard:copy="getCopyData({
-                                extract_msgs: item1.meta_datas.data[0].extract_msgs,
-                                request: item1.meta_datas.data[0].request,
-                                test_action: item1.meta_datas.data[0].test_action
+                                  extract_msgs: item1.meta_datas.data[0].extract_msgs,
+                                  request: item1.meta_datas.data[0].request,
+                                  test_action: item1.meta_datas.data[0].test_action
                                 })"
                                 v-clipboard:success="onCopy"
                                 v-clipboard:error="onError"
-                              ></el-button>
+                                size="mini"
+                                type="text"
+                                icon="el-icon-document-copy"
+                                class="test-status right pass"
+                              />
                             </el-tooltip>
                             <span class="test-status right pass">{{ resultMapping[item1.status] }}</span>
                           </div>
@@ -157,306 +164,319 @@
           <!-- 详情页 -->
           <el-col :span="18">
             <el-scrollbar>
-              <div :style={height:caseScrollbarHeight}>
+              <div :style="{height:caseScrollbarHeight}">
                 <div
-                  style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;">
+                  style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
+                >
                   <el-collapse v-model="defaultShowResponseInFo">
 
-                    <el-collapse-item name="1" v-if="dataType !== 'api'">
+                    <el-collapse-item v-if="dataType !== 'api'" name="1">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> 执行方式: {{this.meta_datas.data[0].test_action.execute_name}}</div>
+                        <div class="el-collapse-item-title"> 执行方式: {{
+                          meta_datas.data[0].test_action.execute_name
+                        }}
+                        </div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.execute_name }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.execute_name }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="2" v-if="dataType !== 'api'">
+                    <el-collapse-item v-if="dataType !== 'api'" name="2">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "执行方式映射的方法：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '执行方式映射的方法：' }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.action }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.action }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="3" v-if="dataType !== 'api'">
+                    <el-collapse-item v-if="dataType !== 'api'" name="3">
                       <template slot="title">
-                        <div class="el-collapse-item-title">元素定位方式: {{this.meta_datas.data[0].test_action.by_type}}</div>
+                        <div class="el-collapse-item-title">元素定位方式: {{
+                          meta_datas.data[0].test_action.by_type
+                        }}
+                        </div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.by_type }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.by_type }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="4" v-if="dataType !== 'api'">
+                    <el-collapse-item v-if="dataType !== 'api'" name="4">
                       <template slot="title">
-                        <div class="el-collapse-item-title">定位元素表达式 {{this.meta_datas.data[0].test_action.element}}</div>
+                        <div class="el-collapse-item-title">定位元素表达式 {{
+                          meta_datas.data[0].test_action.element
+                        }}
+                        </div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.element }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.element }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="5" v-if="dataType !== 'api' && this.meta_datas.data[0].test_action.text">
+                    <el-collapse-item v-if="dataType !== 'api' && meta_datas.data[0].test_action.text" name="5">
                       <template slot="title">
-                        <div class="el-collapse-item-title">输入内容: {{this.meta_datas.data[0].test_action.text}}</div>
+                        <div class="el-collapse-item-title">输入内容: {{ meta_datas.data[0].test_action.text }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].test_action.text }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.text }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="6" v-if="dataType !== 'api'" v-show="meta_datas.data[0].before">
+                    <el-collapse-item v-if="dataType !== 'api'" v-show="meta_datas.data[0].before" name="6">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "执行前页面：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                       </template>
                       <div class="el-collapse-item-content">
-                        <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].before "></el-image>
+                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].before " />
                       </div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="7" v-if="dataType !== 'api'" v-show="meta_datas.data[0].after">
+                    <el-collapse-item v-if="dataType !== 'api'" v-show="meta_datas.data[0].after" name="7">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "执行后页面：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                       </template>
                       <div class="el-collapse-item-content">
-                        <el-image :src="'data:image/jpg;base64,' + this.meta_datas.data[0].after "></el-image>
+                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].after " />
                       </div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="8" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="8">
                       <template slot="title">
-                        <div class="el-collapse-item-title">请求方法:  {{this.meta_datas.data[0].request.method}}</div>
+                        <div class="el-collapse-item-title">请求方法: {{ meta_datas.data[0].request.method }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.method }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].request.method }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="9" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="9">
                       <template slot="title">
-                        <div class="el-collapse-item-title">请求地址: {{this.meta_datas.data[0].request.url}}</div>
+                        <div class="el-collapse-item-title">请求地址: {{ meta_datas.data[0].request.url }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].request.url }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].request.url }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="10" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="10">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "查询字符串参数：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.params">
+                          <div v-if="meta_datas.data[0].request.params" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].request.params)"
+                              :value="strToJson(meta_datas.data[0].request.params)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.params"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.params)"
+                            v-if="meta_datas.data[0].request.params"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].request.params)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="11" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="11">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "头部参数：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '头部参数：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.headers">
+                          <div v-if="meta_datas.data[0].request.headers" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].request.headers)"
+                              :value="strToJson(meta_datas.data[0].request.headers)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.headers"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.headers)"
+                            v-if="meta_datas.data[0].request.headers"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].request.headers)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="12" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="12">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "json参数：" }}</div>
+                        <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.json">
+                          <div v-if="meta_datas.data[0].request.json" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].request.json)"
+                              :value="strToJson(meta_datas.data[0].request.json)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.json"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.json)"
+                            v-if="meta_datas.data[0].request.json"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].request.json)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="13" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="13">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "data参数：" }}</div>
+                        <div class="el-collapse-item-title"> {{ 'data参数：' }}</div>
                       </template>
-                      <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'object'">
+                      <el-row v-if=" typeof meta_datas.data[0].request.data === 'object'">
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
+                          <div v-if="meta_datas.data[0].request.data" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].request.data)"
+                              :value="strToJson(meta_datas.data[0].request.data)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.data"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.data)"
+                            v-if="meta_datas.data[0].request.data"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].request.data)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
-                      <el-row v-if=" typeof this.meta_datas.data[0].request.data === 'string'">
+                      <el-row v-if=" typeof meta_datas.data[0].request.data === 'string'">
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.data">
+                          <div v-if="meta_datas.data[0].request.data" style="margin-left: 100px">
                             <xmp>{{ formatXml(meta_datas.data[0].request.data) }}</xmp>
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.data"
-                            v-clipboard:copy="formatXml(this.meta_datas.data[0].request.data)"
+                            v-if="meta_datas.data[0].request.data"
+                            v-clipboard:copy="formatXml(meta_datas.data[0].request.data)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="14" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="14">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "文件参数：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].request.files">
+                          <div v-if="meta_datas.data[0].request.files" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].request.files)"
+                              :value="strToJson(meta_datas.data[0].request.files)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].request.files"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].request.files)"
+                            v-if="meta_datas.data[0].request.files"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].request.files)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="15" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="15">
                       <template slot="title">
-                        <div class="el-collapse-item-title">发送请求时间:  {{this.meta_datas.stat.request_at }}</div>
+                        <div class="el-collapse-item-title">发送请求时间: {{ meta_datas.stat.request_at }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.request_at }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.stat.request_at }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="16" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="16">
                       <template slot="title">
-                        <div class="el-collapse-item-title">请求响应时间:  {{this.meta_datas.stat.response_at }}</div>
+                        <div class="el-collapse-item-title">请求响应时间: {{ meta_datas.stat.response_at }}</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.stat.response_at }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.stat.response_at }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="17" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="17">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应json：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].response.json">
+                          <div v-if="meta_datas.data[0].response.json" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].response.json)"
+                              :value="strToJson(meta_datas.data[0].response.json)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].response.json"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].response.json)"
+                            v-if="meta_datas.data[0].response.json"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].response.json)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="18" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="18">
                       <template slot="title">
-                        <div class="el-collapse-item-title">响应状态码: {{this.meta_datas.data[0].response.status_code}}</div>
+                        <div class="el-collapse-item-title">响应状态码: {{
+                          meta_datas.data[0].response.status_code
+                        }}
+                        </div>
                       </template>
-                      <div class="el-collapse-item-content">{{ this.meta_datas.data[0].response.status_code }}</div>
+                      <div class="el-collapse-item-content">{{ meta_datas.data[0].response.status_code }}</div>
                     </el-collapse-item>
 
-                    <el-collapse-item name="19" v-if="dataType === 'api'">
+                    <el-collapse-item v-if="dataType === 'api'" name="19">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "响应文本：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
                       </template>
-                      <div class="el-collapse-item-content" v-html="this.meta_datas.data[0].response.text"></div>
+                      <div class="el-collapse-item-content" v-html="meta_datas.data[0].response.text" />
                     </el-collapse-item>
 
                     <el-collapse-item name="20">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "执行测试时内存中的公共变量：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '执行测试时内存中的公共变量：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.variables_mapping">
+                          <div v-if="meta_datas.variables_mapping" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.variables_mapping)"
+                              :value="strToJson(meta_datas.variables_mapping)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.variables_mapping"
-                            v-clipboard:copy="getCopyData(this.meta_datas.variables_mapping)"
+                            v-if="meta_datas.variables_mapping"
+                            v-clipboard:copy="getCopyData(meta_datas.variables_mapping)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
@@ -465,36 +485,36 @@
 
                     <el-collapse-item name="21">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "提取数据：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '提取数据：' }}</div>
                       </template>
                       <el-row>
                         <el-col :span="20">
-                          <div style="margin-left: 100px" v-if="this.meta_datas.data[0].extract_msgs">
+                          <div v-if="meta_datas.data[0].extract_msgs" style="margin-left: 100px">
                             <JsonViewer
-                              :value="strToJson(this.meta_datas.data[0].extract_msgs)"
+                              :value="strToJson(meta_datas.data[0].extract_msgs)"
                               :expand-depth="5"
                               copyable
-                            ></JsonViewer>
+                            />
                           </div>
                         </el-col>
                         <el-col :span="4">
                           <el-button
-                            size="mini"
-                            v-if="this.meta_datas.data[0].extract_msgs"
-                            v-clipboard:copy="getCopyData(this.meta_datas.data[0].extract_msgs)"
+                            v-if="meta_datas.data[0].extract_msgs"
+                            v-clipboard:copy="getCopyData(meta_datas.data[0].extract_msgs)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
+                            size="mini"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item name="22" v-show="this.attachment">
+                    <el-collapse-item v-show="attachment" name="22">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> {{ "错误信息：" }}</div>
+                        <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
                       </template>
-                      <pre class="el-collapse-item-content" style="overflow: auto">{{ this.attachment }}</pre>
+                      <pre class="el-collapse-item-content" style="overflow: auto">{{ attachment }}</pre>
                     </el-collapse-item>
                   </el-collapse>
                 </div>
@@ -505,11 +525,14 @@
       </div>
 
       <!-- 无测试报告数据 -->
-      <div class="str" v-show="reportData.details.length === 0">
+      <div v-show="reportData.details.length === 0" class="str">
         无运行数据或所有运行数据均已跳过
       </div>
 
-      <hitDrawer :runTestTypeList="runTestTypeList"></hitDrawer>
+      <hitDrawer
+        :run-test-type-list="runTestTypeList"
+        :run-env-list="envList"
+      />
 
     </div>
   </div>
@@ -518,47 +541,45 @@
 
 <script>
 
+import JsonViewer from 'vue-json-viewer'
+import vkbeautify from 'vkbeautify' // xml格式化组件
+import hitDrawer from '@/views/assist/hits/drawer'
 
-import JsonViewer from "vue-json-viewer";
-import vkbeautify from "vkbeautify";  // xml格式化组件
-import hitDrawer from "@/views/assist/hits/drawer";
+import { runEnvList } from '@/apis/config/runEnv'
+import { reportDetail as apiReportDetail } from '@/apis/apiTest/report'
+import { reportDetail as webUiReportDetail } from '@/apis/webUiTest/report'
+import { reportDetail as appUiReportDetail } from '@/apis/appUiTest/report'
 
-import {runEnvList} from "@/apis/config/runEnv";
-import {reportDetail as apiReportDetail} from '@/apis/apiTest/report'
-import {reportDetail as webUiReportDetail} from '@/apis/webUiTest/report'
-import {reportDetail as appUiReportDetail} from '@/apis/appUiTest/report'
-
-
-import {reportStepResultMapping} from "@/utils/mapping";
-
+import { reportStepResultMapping } from '@/utils/mapping'
 
 export default {
-  name: 'reportShow',
-  props: ['dataType'],
+  name: 'ReportShow',
   components: {
     JsonViewer,
     hitDrawer
   },
+  props: ['dataType'],
   data() {
     return {
       runTestTypeList: [],
+      envList: [],
       runEnvDict: {},
-      msg: {copyText: 'copy', copiedText: 'copied'},
-      defaultShowResponseInFo: ['6', '7', '21', '22'],  // 默认展开报告详情的项
+      msg: { copyText: 'copy', copiedText: 'copied' },
+      defaultShowResponseInFo: ['6', '7', '21', '22'], // 默认展开报告详情的项
       showReportResult: 'all',
       showReportResultList: [
-        {label: '展示全部用例', value: 'all'},
-        {label: '展示成功的用例', value: true},
-        {label: '展示失败的用例', value: false}
-      ],  // 根据结果类型展示报告
+        { label: '展示全部用例', value: 'all' },
+        { label: '展示成功的用例', value: true },
+        { label: '展示失败的用例', value: false }
+      ], // 根据结果类型展示报告
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,
         offsetY: 110,
         itemStyle: {
           normal: {
-            color: function (params) {
-              let colorList = [
+            color: function(params) {
+              const colorList = [
                 'rgb(25,212,174)', 'rgb(250,110,134)', '#FE8463', '#60C0DD', '#E87C25', '#27727B',
                 '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
                 '#D7504B', '#C6E579', '#F4E001', '#F0805A', '#26C0C0'
@@ -568,10 +589,10 @@ export default {
           }
         },
         label: {
-          normal: {position: 'center', show: false}
+          normal: { position: 'center', show: false }
         },
         labelLine: {
-          normal: {show: false}
+          normal: { show: false }
         }
 
       },
@@ -582,8 +603,8 @@ export default {
         offsetY: 110,
         itemStyle: {
           normal: {
-            color: function (params) {
-              let colorList = [
+            color: function(params) {
+              const colorList = [
                 'rgb(25,212,174)', 'rgb(250,110,134)', '#fb2828', '#E87C25', '#27727B',
                 '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
                 '#D7504B', '#C6E579', '#F4E001', '#F0805A', '#26C0C0'
@@ -593,48 +614,48 @@ export default {
           }
         },
         label: {
-          normal: {position: 'center', show: false}
+          normal: { position: 'center', show: false }
         },
         labelLine: {
-          normal: {show: false}
+          normal: { show: false }
         }
       },
-      caseScrollbarHeight: `${window.innerHeight * 0.85}px`,  // 用例和步骤内容的高度
-      picStatus: false,  // 是否展示饼图
+      caseScrollbarHeight: `${window.innerHeight * 0.85}px`, // 用例和步骤内容的高度
+      picStatus: false, // 是否展示饼图
       showColor: [],
       attachment: '',
       meta_datas: {
         data: [{
-          request: {body: null, url: null, headers: null, data: null, params: null, json: null},
-          response: {content: null, json: null, status_code: null},
-          test_action: {action: null, by_type: null, element: null, text: null}
+          request: { body: null, url: null, headers: null, data: null, params: null, json: null },
+          response: { content: null, json: null, status_code: null },
+          test_action: { action: null, by_type: null, element: null, text: null }
         }],
         stat: {
           elapsed_ms: '',
           request_at: '',
           response_at: '',
-          response_time_ms: '',
+          response_time_ms: ''
         }
       },
       caseChartData: {
         columns: ['caseName', 'num'],
         rows: [
-          {'caseName': '成功步骤', num: 0},
-          {'caseName': '失败步骤', num: 0},
-          {'caseName': '错误步骤', num: 0},
-          {'caseName': '跳过步骤', num: 0}
+          { 'caseName': '成功步骤', num: 0 },
+          { 'caseName': '失败步骤', num: 0 },
+          { 'caseName': '错误步骤', num: 0 },
+          { 'caseName': '跳过步骤', num: 0 }
         ]
       },
       suiteChartData: {
         columns: ['name', 'num'],
         rows: [
-          {'name': '成功case', 'num': 0}, {'name': '失败case', 'num': 0}
+          { 'name': '成功case', 'num': 0 }, { 'name': '失败case', 'num': 0 }
         ]
       },
 
       reportData: {
-        'details': [{name: ''}],
-        'platform': {'duration': '', 'python_version': ''},
+        'details': [{ name: '' }],
+        'platform': { 'duration': '', 'python_version': '' },
         'stat': {
           'teststeps': {
             'errors': '',
@@ -645,14 +666,35 @@ export default {
             'total': '',
             'unexpectedSuccesses': ''
           },
-          'testcases': {'fail': '', 'success': '', 'total': ''}
+          'testcases': { 'fail': '', 'success': '', 'total': '' }
         },
-        'time': {'start_at': '', 'duration': 1, 'start_datetime': ''}
+        'time': { 'start_at': '', 'duration': 1, 'start_datetime': '' }
       },
 
       resultMapping: reportStepResultMapping,
-      reportDetailUrl: '',
+      reportDetailUrl: ''
     }
+  },
+
+  created() {
+    if (this.dataType === 'api') {
+      this.reportDetailUrl = apiReportDetail
+      this.defaultShowResponseInFo = ['12', '17', '21', '22']
+    } else if (this.dataType === 'webUi') {
+      this.reportDetailUrl = webUiReportDetail
+    } else {
+      this.reportDetailUrl = appUiReportDetail
+    }
+
+    // 获取环境列表
+    runEnvList({}).then(response => {
+      this.envList = response.data.data
+      this.envList.forEach(env => {
+        this.runEnvDict[env.code] = env.name
+      })
+    })
+
+    this.getReportDataById()
   },
 
   methods: {
@@ -664,6 +706,8 @@ export default {
         {
           date: this.reportData.time.start_at,
           test_type: this.reportData.run_type,
+          run_env: this.reportData.run_env,
+          project_id: this.reportData.project_id,
           report_id: this.$route.query.id
         })
     },
@@ -727,21 +771,21 @@ export default {
         text: `${this.dataType === 'api' ? '测试报告' : 'ui自动化测试报告包含截图，'}数据较大，所以数据传输会稍久，请耐心等待`,
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
-      });
-      this.reportDetailUrl({'id': this.$route.query.id}).then((response) => {
-          loading.close()
-          if (this.showMessage(this, response)) {
-            this.reportData = response['data']
-            this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
-            this.attachment = this.reportData['details'][0]['records'][0]['attachment']
-            this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
-            this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
-            this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
-            this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
-            this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
-            this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
-          }
+      })
+      this.reportDetailUrl({ 'id': this.$route.query.id }).then((response) => {
+        loading.close()
+        if (this.showMessage(this, response)) {
+          this.reportData = response['data']
+          this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
+          this.attachment = this.reportData['details'][0]['records'][0]['attachment']
+          this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
+          this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
+          this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
+          this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
+          this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
+          this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
         }
+      }
       )
     },
 
@@ -749,30 +793,8 @@ export default {
     isShowPic() {
       this.picStatus = !this.picStatus
     }
-  },
-
-  created() {
-
-    if (this.dataType === 'api') {
-      this.reportDetailUrl = apiReportDetail
-      this.defaultShowResponseInFo = ['12', '17', '21', '22']
-    } else if (this.dataType === 'webUi') {
-      this.reportDetailUrl = webUiReportDetail
-    } else {
-      this.reportDetailUrl = appUiReportDetail
-    }
-
-    // 获取环境列表
-    runEnvList({}).then(response => {
-      response.data.data.forEach(env => {
-        this.runEnvDict[env.code] = env.name
-      })
-    })
-
-    this.getReportDataById()
-  },
+  }
 }
-
 
 </script>
 

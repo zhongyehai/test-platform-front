@@ -1,37 +1,36 @@
 import request from '@/utils/request'
-import {baseDirSystem} from "@/apis/base";
+import { baseDirSystem } from '@/apis/base'
 
-let currentBaseDir = baseDirSystem + '/user'
+const currentBaseDir = baseDirSystem + '/user'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 登录
 export function login(data) {
-  return request({url: currentBaseDir + '/login', method: 'post', data})
+  return request({ url: currentBaseDir + '/login', method: 'post', data })
 }
 
 // 退出登录
 export function logout() {
-  return request({url: currentBaseDir + '/logout', method: 'post'})
+  return request({ url: currentBaseDir + '/logout', method: 'post' })
 }
 
 // 用户列表
 export function userList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 修改用户状态
 export function userStatus(data) {
-  return request({url: currentBaseDir + '/status', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/status', method: 'put', data: data })
 }
 
 // 修改密码
 export function userPassword(data) {
-  return request({url: currentBaseDir + '/password', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/password', method: 'put', data: data })
 }
-
 
 // 获取用户信息
 export function getUser(params) {

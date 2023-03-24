@@ -16,23 +16,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" label="元素名称" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" label="元素名称" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" align="center" min-width="20%">
         <template slot="header">
           <span>定位方式</span>
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -40,23 +41,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="element" align="center" label="元素表达式" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="元素表达式" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.element }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" align="center" min-width="15%">
         <template slot="header">
           <span>等待时间(秒)</span>
           <el-tooltip
             class="item"
             effect="dark"
-            placement="top-start">
+            placement="top-start"
+          >
             <div slot="content">
               <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -72,16 +74,18 @@
             type="text"
             size="mini"
             style="margin-right: 8px"
-            @click="showEditForm(scope.row)">修改
+            @click="showEditForm(scope.row)"
+          >修改
           </el-button>
 
           <!-- 复制元素 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.copyPopoverIsShow"
             placement="top"
             style="margin-right: 10px"
             popper-class="down-popover"
-            v-model="scope.row.copyPopoverIsShow">
+          >
             <p>复制此元素并生成新的元素?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -97,9 +101,10 @@
           <!-- 删除元素 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.deletePopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.deletePopoverIsShow">
+          >
             <p>确定删除【{{ scope.row.name }}】?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -127,11 +132,11 @@
     />
 
     <elementDrawer
-      :dataType="dataType"
-      :currentProjectId="currentProjectId"
-      :currentModuleId="currentModuleId"
-      :currentPageId="pageId"
-    ></elementDrawer>
+      :data-type="dataType"
+      :current-project-id="currentProjectId"
+      :current-module-id="currentModuleId"
+      :current-page-id="pageId"
+    />
   </div>
 </template>
 
@@ -152,9 +157,8 @@ import {
   elementSort as appElementSort
 } from '@/apis/appUiTest/element'
 
-
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     Pagination,
     elementDrawer
@@ -169,8 +173,8 @@ export default {
   ],
   data() {
     return {
-      tableLoadingIsShow: false,  // 请求列表等待响应的状态
-      tempElement: {},  // 元素新增/编辑临时数据
+      tableLoadingIsShow: false, // 请求列表等待响应的状态
+      tempElement: {}, // 元素新增/编辑临时数据
 
       // 元素数据列表
       pageNum: 1,
@@ -187,6 +191,22 @@ export default {
       elementListUrl: '',
       deleteElementUrl: '',
       elementSortUrl: ''
+    }
+  },
+
+  watch: {
+
+    // 监听父组件传过来的当前选中的页面，获取对应的元素列表
+    'currentPageId': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.pageId = newVal
+          this.getElementList()
+        } else {
+          this.elementList = []
+        }
+      }
     }
   },
 
@@ -214,12 +234,16 @@ export default {
   },
 
   mounted() {
-
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
       if (_type === 'elementInfo') {
         this.getElementList()
       }
     })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
@@ -234,7 +258,7 @@ export default {
     delElement(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
-      this.deleteElementUrl({'id': row.id}).then(response => {
+      this.deleteElementUrl({ 'id': row.id }).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
         if (this.showMessage(this, response)) {
           this.getElementList()
@@ -259,7 +283,7 @@ export default {
     copyElement(element) {
       this.tempElement = element
       this.tempElement.id = ''
-      this.$bus.$emit(this.$busEvents.drawerIsShow,'elementInfo', 'copy', JSON.parse(JSON.stringify(this.tempElement)))
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'copy', JSON.parse(JSON.stringify(this.tempElement)))
       this.$set(element, 'copyPopoverIsShow', false)
     },
 
@@ -287,7 +311,7 @@ export default {
       const el = this.$refs.elementListTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -301,7 +325,7 @@ export default {
           this.elementSortUrl({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
@@ -310,27 +334,6 @@ export default {
       })
     }
 
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  watch: {
-
-    // 监听父组件传过来的当前选中的页面，获取对应的元素列表
-    'currentPageId': {
-      deep: true,  // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.pageId = newVal
-          this.getElementList()
-        } else {
-          this.elementList = []
-        }
-      }
-    }
   }
 }
 </script>

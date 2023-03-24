@@ -11,7 +11,8 @@
           style="width: 100%"
           class="filter-item"
           size="mini"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter"
+        />
       </el-form-item>
 
       <el-form-item :label="'账号：'" size="mini">
@@ -21,7 +22,8 @@
           style="width: 100%"
           class="filter-item"
           size="mini"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter"
+        />
       </el-form-item>
 
       <el-form-item :label="'状态：'" size="mini">
@@ -32,8 +34,9 @@
           filterable
           default-first-option
           size="mini"
-          class="filter-item">
-          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id" />
         </el-select>
       </el-form-item>
 
@@ -45,8 +48,9 @@
           filterable
           default-first-option
           size="mini"
-          class="filter-item">
-          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id" />
         </el-select>
       </el-form-item>
 
@@ -93,9 +97,10 @@
       <el-table-column align="center" prop="status" label="启用状态" min-width="15%">
         <template slot-scope="scope">
           <el-switch
-            :disabled="scope.row.changStatusIsDisabled"
             v-model="scope.row.status === 1"
-            @change="changStatus(scope.row)"></el-switch>
+            :disabled="scope.row.changStatusIsDisabled"
+            @change="changStatus(scope.row)"
+          />
         </template>
       </el-table-column>
 
@@ -108,27 +113,28 @@
             size="mini"
             style="margin-right: 10px"
             icon="el-icon-edit"
-            @click="handleUpdate(row)"></el-button>
+            @click="handleUpdate(row)"
+          />
 
           <!-- 删除账号 -->
-<!--          <el-popover-->
-<!--            :ref="row.id"-->
-<!--            placement="top"-->
-<!--            popper-class="down-popover"-->
-<!--            v-model="row.deletePopoverIsShow">-->
-<!--            <p>确定删除【{{ row.name }}】?</p>-->
-<!--            <div style="text-align: right; margin: 0">-->
-<!--              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>-->
-<!--              <el-button type="primary" size="mini" @click="delUser(row)">确定</el-button>-->
-<!--            </div>-->
-<!--            <el-button-->
-<!--              slot="reference"-->
-<!--              style="color: red"-->
-<!--              type="text"-->
-<!--              icon="el-icon-delete"-->
-<!--              :loading="row.deleteLoadingIsShow"-->
-<!--            ></el-button>-->
-<!--          </el-popover>-->
+          <!--          <el-popover-->
+          <!--            :ref="row.id"-->
+          <!--            placement="top"-->
+          <!--            popper-class="down-popover"-->
+          <!--            v-model="row.deletePopoverIsShow">-->
+          <!--            <p>确定删除【{{ row.name }}】?</p>-->
+          <!--            <div style="text-align: right; margin: 0">-->
+          <!--              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>-->
+          <!--              <el-button type="primary" size="mini" @click="delUser(row)">确定</el-button>-->
+          <!--            </div>-->
+          <!--            <el-button-->
+          <!--              slot="reference"-->
+          <!--              style="color: red"-->
+          <!--              type="text"-->
+          <!--              icon="el-icon-delete"-->
+          <!--              :loading="row.deleteLoadingIsShow"-->
+          <!--            ></el-button>-->
+          <!--          </el-popover>-->
 
         </template>
       </el-table-column>
@@ -140,45 +146,48 @@
       :total="total"
       :page.sync="listQuery.pageNum"
       :limit.sync="listQuery.pageSize"
-      @pagination="getUserList"/>
+      @pagination="getUserList"
+    />
 
     <!-- 新增/修改表单 -->
     <el-drawer
       :title=" drawerType === 'create' ? '新增用户' : '修改用户'"
       size="60%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <el-form
         ref="dataForm"
         :model="tempUser"
         label-width="100px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      >
 
         <!-- 用户信息 -->
         <el-form-item :label="'用户名'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.name" placeholder="2~12位"/>
+          <el-input v-model="tempUser.name" placeholder="2~12位" />
         </el-form-item>
 
         <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.account" placeholder="2~12位"/>
+          <el-input v-model="tempUser.account" placeholder="2~12位" />
         </el-form-item>
 
         <el-form-item v-if="drawerType === 'create'" :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，必填"/>
+          <el-input v-model="tempUser.password" placeholder="4~18位，必填" />
         </el-form-item>
 
         <el-form-item v-else :label="'密码'" prop="name" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改"/>
+          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改" />
         </el-form-item>
 
         <el-form-item :label="'业务线'" class="is-required" size="mini">
           <businessView
             ref="businessView"
-            :currentBusiness="tempUser.business_id"
-            :isMultiple="true"
-            :selectWidth="'97%'"
-          ></businessView>
+            :current-business="tempUser.business_id"
+            :is-multiple="true"
+            :select-width="'97%'"
+          />
         </el-form-item>
 
         <el-form-item :label="'角色'" class="is-required" size="mini">
@@ -187,7 +196,8 @@
               v-for="role in role_list"
               :key="role.name"
               :label="role.name"
-              :value="role.id"/>
+              :value="role.id"
+            />
           </el-select>
         </el-form-item>
 
@@ -198,7 +208,8 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click="drawerType==='create' ? addUser() : changUser()">保存
+          @click="drawerType==='create' ? addUser() : changUser()"
+        >保存
         </el-button>
       </div>
 
@@ -212,17 +223,17 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import businessView from '@/components/Selector/business'
 
-import {userList, deleteUser, postUser, putUser, getUser, userStatus} from '@/apis/system/user'
-import {roleList} from '@/apis/system/role'
-import {businessList} from '@/apis/system/business'
+import { userList, deleteUser, postUser, putUser, getUser, userStatus } from '@/apis/system/user'
+import { roleList } from '@/apis/system/role'
+import { businessList } from '@/apis/system/business'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     Pagination,
     businessView
   },
-  directives: {waves},
+  directives: { waves },
   data() {
     return {
       // 查询对象
@@ -230,8 +241,8 @@ export default {
         pageNum: 1,
         pageSize: 20,
         detail: 1,
-        name: undefined,  // 用户名
-        account: undefined,  // 账号
+        name: undefined, // 用户名
+        account: undefined, // 账号
         status: undefined, // 账号状态
         role_id: undefined // 角色
       },
@@ -243,32 +254,35 @@ export default {
         account: undefined,
         role_id: undefined,
         business_id: [],
-        password: undefined,
+        password: undefined
       },
 
       submitButtonIsLoading: false,
       userDict: {},
 
-      user_list: [],  // 用户列表
-      role_list: [{'id': 1, name: '启用'}, {'id': 2, name: '冻结'}],  // 角色列表
-      status_list: [],  // 状态列表
-      business_list: [],  // 业务线列表
-      tableKey: 0,  // 服务数据表格起始
-      total: 0,  // 服务数据表格总条数
-      drawerIsShow: false,  // 编辑框的显示状态
-      drawerType: '',   // dialog框状态，edit为编辑数据, create为新增数据
-      direction: 'rtl',  // 抽屉打开方式
-      listLoading: true,  // 请求加载状态
+      user_list: [], // 用户列表
+      role_list: [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }], // 角色列表
+      status_list: [], // 状态列表
+      business_list: [], // 业务线列表
+      tableKey: 0, // 服务数据表格起始
+      total: 0, // 服务数据表格总条数
+      drawerIsShow: false, // 编辑框的显示状态
+      drawerType: '', // dialog框状态，edit为编辑数据, create为新增数据
+      direction: 'rtl', // 抽屉打开方式
+      listLoading: true // 请求加载状态
     }
   },
+  computed: {},
+
+  watch: {},
 
   created() {
     this.getBusinessList()
     this.getAllUserList(this.getUserList)
-    this.initStatus()  // 初始化用户状态
-    this.getRoleList()  // 初始化角色列表
+    this.initStatus() // 初始化用户状态
+    this.getRoleList() // 初始化角色列表
     // this.getUserList()  // 初始化用户列表
-    this.initTempUser()  // 初始化临时数据
+    this.initTempUser() // 初始化临时数据
   },
 
   mounted() {
@@ -279,12 +293,12 @@ export default {
 
     // 获取所有用户信息，同步请求
     async getAllUserList(func) {
-      let response = await userList({'detail': 1})
+      const response = await userList({ 'detail': 1 })
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
       })
-      if (func){
+      if (func) {
         func()
       }
     },
@@ -296,7 +310,7 @@ export default {
 
     // 初始化用户状态
     initStatus() {
-      this.status_list = [{'id': 1, name: '启用'}, {'id': 2, name: '冻结'}]
+      this.status_list = [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }]
     },
 
     // 初始化临时服务数据
@@ -314,13 +328,13 @@ export default {
     // 初始化临时模板数据，点击新增按钮触发
     handleCreate() {
       this.initTempUser()
-      this.drawerType = 'create'  // dialog框标识为创建
+      this.drawerType = 'create' // dialog框标识为创建
       this.drawerIsShow = true
     },
 
     //  初始化临时模板数据，点击修改按钮触发
     handleUpdate(row) {
-      this.drawerType = 'edit'  // dialog框标识为编辑
+      this.drawerType = 'edit' // dialog框标识为编辑
       this.tempUser.id = row.id
       this.tempUser.name = row.name
       this.tempUser.account = row.account
@@ -335,9 +349,9 @@ export default {
       this.listQuery = {
         pageNum: 1,
         pageSize: 20,
-        name: undefined,  // 服务名
-        manager: undefined,  // 负责人
-        create_user: undefined, // 创建人
+        name: undefined, // 服务名
+        manager: undefined, // 负责人
+        create_user: undefined // 创建人
       }
       this.getUserList()
     },
@@ -373,8 +387,8 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.initTempUser(); // 初始化临时数据模板
-          this.getUserList(); // 重新从后台获取服务列表
+          this.initTempUser() // 初始化临时数据模板
+          this.getUserList() // 重新从后台获取服务列表
         }
       })
     },
@@ -387,13 +401,13 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.initTempUser(); // 初始化临时数据模板
-          this.getUserList(); // 重新从后台获取服务列表
+          this.initTempUser() // 初始化临时数据模板
+          this.getUserList() // 重新从后台获取服务列表
         }
       })
     },
 
-    cancelDeletePopover(row){
+    cancelDeletePopover(row) {
       this.$set(row, 'deletePopoverIsShow', false)
     },
 
@@ -401,10 +415,10 @@ export default {
     delUser(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      deleteUser({"id": row.id}).then(response => {
+      deleteUser({ 'id': row.id }).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
-          this.getUserList(); // 重新从后台获取用户列表
+          this.getUserList() // 重新从后台获取用户列表
         }
       })
     },
@@ -412,7 +426,7 @@ export default {
     // 启用禁用用户
     changStatus(row) {
       this.$set(row, 'changStatusIsDisabled', true)
-      userStatus({'id': row.id}).then(response => {
+      userStatus({ 'id': row.id }).then(response => {
         this.$set(row, 'changStatusIsDisabled', false)
         this.showMessage(this, response)
         this.getUserList()
@@ -423,11 +437,8 @@ export default {
     handleFilter() {
       this.listQuery.pageNum = 1
       this.getUserList()
-    },
+    }
 
-  },
-  computed: {},
-
-  watch: {},
+  }
 }
 </script>

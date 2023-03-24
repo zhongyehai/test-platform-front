@@ -10,8 +10,8 @@
           placeholder="函数名，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 250px">
-        </el-input>
+          style="width: 250px"
+        />
       </el-form-item>
 
       <el-form-item :label="'创建人：'" size="mini">
@@ -22,8 +22,9 @@
           default-first-option
           clearable
           size="mini"
-          class="filter-item">
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
         </el-select>
       </el-form-item>
 
@@ -35,15 +36,17 @@
           default-first-option
           clearable
           size="mini"
-          class="filter-item">
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id"/>
+          class="filter-item"
+        >
+          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
         </el-select>
       </el-form-item>
 
       <el-button
         type="primary"
         size="mini"
-        @click="getFuncFileList()">
+        @click="getFuncFileList()"
+      >
         搜索
       </el-button>
 
@@ -72,25 +75,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" prop="name" label="文件名称" min-width="30%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="文件名称" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" prop="desc" label="备注" min-width="30%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" prop="create_user" label="创建者" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="create_user" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true align="center" prop="update_user" label="最后修改人" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="update_user" label="最后修改人" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
@@ -104,15 +107,17 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            @click="sendEditEmit('update', scope.row)">修改
+            @click="sendEditEmit('update', scope.row)"
+          >修改
           </el-button>
 
           <!-- 复制 -->
           <el-popover
             :ref="scope.row.name"
+            v-model="scope.row.copyPopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.copyPopoverIsShow">
+          >
             <p>确定复制【{{ scope.row.name }}】并生成一条新的数据?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -129,9 +134,10 @@
           <!-- 删除文件 -->
           <el-popover
             :ref="scope.row.id"
+            v-model="scope.row.deletePopoverIsShow"
             placement="top"
             popper-class="down-popover"
-            v-model="scope.row.deletePopoverIsShow">
+          >
             <p>确定删除【{{ scope.row.name }}】?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -159,21 +165,21 @@
       @pagination="getFuncFileList"
     />
 
-    <funcFileDrawer></funcFileDrawer>
+    <funcFileDrawer />
 
   </div>
 </template>
 
 <script>
 import Sortable from 'sortablejs'
-import funcFileDrawer from "@/views/assist/funcFile/drawer";
+import funcFileDrawer from '@/views/assist/funcFile/drawer'
 import Pagination from '@/components/Pagination'
 
-import {funcFileList, deleteFuncFile, funcSort, copyFunc} from '@/apis/assist/funcFile'
-import {userList} from '@/apis/system/user'
+import { funcFileList, deleteFuncFile, funcSort, copyFunc } from '@/apis/assist/funcFile'
+import { userList } from '@/apis/system/user'
 
 export default {
-  name: "funcFile",
+  name: 'FuncFile',
   components: {
     Pagination,
     funcFileDrawer
@@ -197,17 +203,33 @@ export default {
       funcDebugData: '',
       funcFiles: {
         list: [],
-        total: 0,
+        total: 0
       },
       tableIsLoading: false
     }
+  },
+
+  mounted() {
+    this.getUserList(this.getFuncFileList)
+
+    // 修改函数文件成功，重新请求列表
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
+      if (_type === 'funcFileInfo') {
+        this.getFuncFileList()
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
 
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -244,9 +266,9 @@ export default {
     // },
 
     // 复制函数文件
-    copyFile(row){
+    copyFile(row) {
       this.$set(row, 'copyPopoverIsShow', false)
-      copyFunc({id: row.id}).then(response => {
+      copyFunc({ id: row.id }).then(response => {
         if (this.showMessage(this, response)) {
           this.getFuncFileList()
         }
@@ -257,18 +279,18 @@ export default {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'funcFileInfo', _type, row)
     },
 
-    cancelCopyPopover(row){
+    cancelCopyPopover(row) {
       this.$set(row, 'copyPopoverIsShow', false)
     },
 
-    cancelDeletePopover(row){
+    cancelDeletePopover(row) {
       this.$set(row, 'deletePopoverIsShow', false)
     },
 
     delFuncFile(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      deleteFuncFile({'id': row.id}).then(response => {
+      deleteFuncFile({ 'id': row.id }).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getFuncFileList()
@@ -281,7 +303,7 @@ export default {
       const el = this.$refs.funcTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -296,32 +318,16 @@ export default {
           funcSort({
             List: this.newList,
             pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize,
+            pageSize: this.listQuery.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableIsLoading = false
           })
         }
       })
-    },
+    }
 
-  },
-
-  mounted() {
-    this.getUserList(this.getFuncFileList)
-
-    // 修改函数文件成功，重新请求列表
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
-      if (_type === 'funcFileInfo'){
-        this.getFuncFileList()
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
+  }
 
 }
 </script>

@@ -9,16 +9,15 @@
     size="small"
     @change="choiceCase"
   >
-    <el-option v-for="item in tempCaseList" :key="item.id" :label="item.name" :value="item.id">
-    </el-option>
+    <el-option v-for="item in tempCaseList" :key="item.id" :label="item.name" :value="item.id" />
   </el-select>
 </template>
 
 <script>
-import {caseList} from '@/apis/apiTest/case'
+import { caseList } from '@/apis/apiTest/case'
 
 export default {
-  name: "caseSelector",
+  name: 'CaseSelector',
   props: [
     'module_id',
     'caseIds',
@@ -30,25 +29,28 @@ export default {
       caseSelectorIsDisabled: false,
       tempModuleId: '',
       tempCase: '',
-      tempCaseList: [],
+      tempCaseList: []
 
     }
   },
-  methods: {
-    getCaseList() {
-      caseList({moduleId: this.tempModuleId}).then(response => {
-        this.tempCaseList = response.data.data
-      })
+
+  watch: {
+
+    'caseIds': {
+      handler(newVal, oldVal) {
+        this.tempCase = newVal || []
+      }
     },
 
-    choiceCase(caseId) {
-      if (this.busEmitEventName) {
-        this.$bus.$emit(this.busEmitEventName, caseId)
+    'module_id': {
+      handler(newVal, oldVal) {
+        this.tempModuleId = newVal
+        this.tempCase = [] // 模块变了，则把选中的用例清空掉
+        this.getCaseList()
       }
     }
   },
   mounted() {
-
     if (this.busOnEventName) {
       this.$bus.$on(this.busOnEventName, (ModuleList) => {
         // 选中了多个模块，则清空选中的用例，并把用例选择框置为不可编辑
@@ -80,20 +82,16 @@ export default {
       this.getCaseList()
     }
   },
-
-  watch: {
-
-    'caseIds': {
-      handler(newVal, oldVal) {
-        this.tempCase = newVal ? newVal : []
-      }
+  methods: {
+    getCaseList() {
+      caseList({ moduleId: this.tempModuleId }).then(response => {
+        this.tempCaseList = response.data.data
+      })
     },
 
-    'module_id': {
-      handler(newVal, oldVal) {
-        this.tempModuleId = newVal
-        this.tempCase = []  // 模块变了，则把选中的用例清空掉
-        this.getCaseList()
+    choiceCase(caseId) {
+      if (this.busEmitEventName) {
+        this.$bus.$emit(this.busEmitEventName, caseId)
       }
     }
   }

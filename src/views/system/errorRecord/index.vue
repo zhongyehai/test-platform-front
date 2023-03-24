@@ -23,33 +23,33 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'请求方法'" prop="url" align="center" min-width="10%" :show-overflow-tooltip=true>
+      <el-table-column :label="'请求方法'" prop="url" align="center" min-width="10%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span> {{ scope.row.method }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'接口地址'" prop="url" align="center" min-width="20%" :show-overflow-tooltip=true>
+      <el-table-column :label="'接口地址'" prop="url" align="center" min-width="20%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span> {{ scope.row.url }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="40%" :show-overflow-tooltip=true>
+      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="40%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span>{{ scope.row.detail }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip=true>
+      <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip="true">
         <template slot-scope="{row, $index}">
 
           <el-button
             size="mini"
             icon="el-icon-view"
             type="text"
-            @click="showDetail(row)">
-          </el-button>
+            @click="showDetail(row)"
+          />
 
         </template>
       </el-table-column>
@@ -62,23 +62,25 @@
       :total="total"
       :page.sync="listQuery.pageNum"
       :limit.sync="listQuery.pageSize"
-      @pagination="getErrorRecordList"/>
+      @pagination="getErrorRecordList"
+    />
 
     <el-drawer
       :title="'错误详情'"
       size="60%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <div class="demo-drawer__content" style="margin-left: 20px">
         <div>
           <label class="label-style">请求方法：</label>
-          <el-input :value="currentRow.method" style="width: 85%" size="mini" disabled></el-input>
+          <el-input :value="currentRow.method" style="width: 85%" size="mini" disabled />
         </div>
 
         <div style="margin-top: 10px">
           <label class="label-style">接口地址：</label>
-          <el-input :value="currentRow.url" style="width: 85%" size="mini" disabled></el-input>
+          <el-input :value="currentRow.url" style="width: 85%" size="mini" disabled />
         </div>
 
         <div style="margin-top: 10px">
@@ -89,7 +91,8 @@
             style="width: 85%"
             size="mini"
             type="textarea"
-            :rows="2"></el-input>
+            :rows="2"
+          />
         </div>
 
         <div style="margin-top: 10px">
@@ -100,7 +103,8 @@
             style="width: 85%"
             size="mini"
             type="textarea"
-            :rows="2"></el-input>
+            :rows="2"
+          />
         </div>
 
         <div style="margin-top: 10px">
@@ -111,7 +115,8 @@
             style="width: 85%"
             size="mini"
             type="textarea"
-            :rows="2"></el-input>
+            :rows="2"
+          />
         </div>
 
         <div style="margin-top: 10px">
@@ -122,7 +127,8 @@
             style="width: 85%"
             size="mini"
             type="textarea"
-            :rows="2"></el-input>
+            :rows="2"
+          />
         </div>
 
         <div style="margin-top: 30px">
@@ -139,15 +145,15 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
-import {errorRecordList} from '@/apis/system/errorRecord'
-import {userList} from "@/apis/system/user";
+import { errorRecordList } from '@/apis/system/errorRecord'
+import { userList } from '@/apis/system/user'
 
 export default {
   name: 'Project',
   components: {
     Pagination
   },
-  directives: {waves},
+  directives: { waves },
   data() {
     return {
       // 查询对象
@@ -156,12 +162,12 @@ export default {
         pageSize: 20
       },
       record_list: [],
-      tableKey: 0,  // 数据表格起始
-      total: 0,  // 数据表格总条数
-      listLoading: true,  // 请求加载状态
+      tableKey: 0, // 数据表格起始
+      total: 0, // 数据表格总条数
+      listLoading: true, // 请求加载状态
       drawerIsShow: false,
       currentRow: {},
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       userList: [],
       userDict: {}
     }
@@ -175,12 +181,12 @@ export default {
 
     // 获取用户信息，同步请求
     async getUserList(func) {
-      let response = await userList()
+      const response = await userList()
       this.userList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user.name
       })
-      if (func){
+      if (func) {
         func()
       }
     },
@@ -195,12 +201,12 @@ export default {
       this.listLoading = false
     },
 
-    parseUser(user_id){
+    parseUser(user_id) {
       return this.userDict[user_id]
     },
 
     // 查看详情
-    showDetail(row){
+    showDetail(row) {
       this.currentRow = row
       this.drawerIsShow = true
     },
@@ -218,8 +224,8 @@ export default {
         pageSize: 20
       }
       this.getErrorRecordList()
-    },
-  },
+    }
+  }
 }
 </script>
 

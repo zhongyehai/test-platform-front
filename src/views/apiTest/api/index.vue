@@ -27,19 +27,24 @@
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip=true
+            :show-overflow-tooltip="true"
             prop="addr"
             label="接口信息"
             align="center"
-            min-width="50%">
+            min-width="50%"
+          >
             <template slot-scope="scope">
-              <div class="block"
-                   :class="`block_${scope.row.method.toLowerCase()}`"
-                   :style="{'backgroundColor': scope.row.deprecated === true ? '#909399' : ''}">
-                  <span class="block-method block_method_color"
-                        :class="`block_method_${scope.row.method.toLowerCase()}`">
-                    {{ scope.row.method }}
-                  </span>
+              <div
+                class="block"
+                :class="`block_${scope.row.method.toLowerCase()}`"
+                :style="{'backgroundColor': scope.row.deprecated === true ? '#909399' : ''}"
+              >
+                <span
+                  class="block-method block_method_color"
+                  :class="`block_method_${scope.row.method.toLowerCase()}`"
+                >
+                  {{ scope.row.method }}
+                </span>
                 <span class="block-method block_url">{{ scope.row.addr }}</span>
                 <span class="block-summary-description">{{ scope.row.name }}</span>
               </div>
@@ -47,43 +52,48 @@
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip=true
+            :show-overflow-tooltip="true"
             prop="level"
             align="center"
-            min-width="10%">
+            min-width="10%"
+          >
             <template slot="header">
               <span> 重要级别 </span>
               <el-tooltip
                 class="item"
                 effect="dark"
-                placement="top-start">
+                placement="top-start"
+              >
                 <div slot="content">
                   <div>标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口</div>
                 </div>
-                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <div :style="{
-                'backgroundColor': scope.row.level === 'P0' ?
-              '#F56C6C' : scope.row.level === 'P1' ?
-              '#E6A23C' : '#67C23A'}">
+              <div
+                :style="{
+                  'backgroundColor': scope.row.level === 'P0' ?
+                    '#F56C6C' : scope.row.level === 'P1' ?
+                      '#E6A23C' : '#67C23A'}"
+              >
                 <div style="width: 80%; margin-left:auto; margin-right:auto">
                   <el-select
+                    slot="prepend"
                     v-model="scope.row.level"
                     size="mini"
-                    slot="prepend"
                     placeholder="选择请求方式"
                     filterable
                     class="select"
                     default-first-option
-                    @change="selectApiLevel(scope.row)">
+                    @change="selectApiLevel(scope.row)"
+                  >
                     <el-option
                       v-for="item in [{label: '高', value: 'P0'}, {label: '中', value: 'P1'}, {label: '低', value: 'P2'}]"
                       :key="item.value"
                       :value="item.value"
                       :label="item.label"
-                    ></el-option>
+                    />
                   </el-select>
                 </div>
               </div>
@@ -96,11 +106,12 @@
               <el-tooltip
                 class="item"
                 effect="dark"
-                placement="top-start">
+                placement="top-start"
+              >
                 <div slot="content">
                   <div>标识接口是否被废弃</div>
                 </div>
-                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
@@ -108,27 +119,30 @@
                 v-model="scope.row.deprecated"
                 :inactive-value="true"
                 :active-value="false"
-                @change="changeStatus(scope.row)"></el-switch>
+                @change="changeStatus(scope.row)"
+              />
             </template>
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip=true
+            :show-overflow-tooltip="true"
             prop="quote_count"
             align="center"
-            min-width="10%">
+            min-width="10%"
+          >
             <template slot="header">
               <span> 使用次数 </span>
               <el-tooltip
                 class="item"
                 effect="dark"
-                placement="top-start">
+                placement="top-start"
+              >
                 <div slot="content">
                   <div>1: 统计有多少条用例里直接使用了此接口</div>
                   <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
                   <div>3: 被使用过的接口，点击使用次数数值可查看使用明细</div>
                 </div>
-                <span><i style="color: #409EFF" class="el-icon-question"></i></span>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
@@ -138,7 +152,7 @@
               >
                 {{ scope.row.quote_count }}
               </el-tag>
-              <el-tag type="info" v-else>0</el-tag>
+              <el-tag v-else type="info">0</el-tag>
             </template>
           </el-table-column>
 
@@ -160,15 +174,17 @@
                 type="text"
                 size="mini"
                 style="margin-left: 5px"
-                @click="showEditForm(scope.row)">修改
+                @click="showEditForm(scope.row)"
+              >修改
               </el-button>
 
               <!-- 复制接口 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.copyPopoverIsShow"
                 placement="top"
                 popper-class="down-popover"
-                v-model="scope.row.copyPopoverIsShow">
+              >
                 <p>复制此接口并生成新的接口?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
@@ -186,9 +202,10 @@
               <!-- 删除接口 -->
               <el-popover
                 :ref="scope.row.id"
+                v-model="scope.row.deletePopoverIsShow"
                 placement="top"
                 popper-class="down-popover"
-                v-model="scope.row.deletePopoverIsShow">
+              >
                 <p>确定删除【{{ scope.row.name }}】?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
@@ -221,14 +238,14 @@
     </el-tabs>
 
     <apiDrawer
-      :currentProjectId="currentProjectId"
-      :currentModuleId="currentModuleId"
-    ></apiDrawer>
+      :current-project-id="currentProjectId"
+      :current-module-id="currentModuleId"
+    />
 
     <showApiUseDrawer
       :case-list="showCaseList"
       :marker="marker"
-    ></showApiUseDrawer>
+    />
 
   </div>
 </template>
@@ -239,7 +256,7 @@ import Pagination from '@/components/Pagination'
 import apiDrawer from '@/views/apiTest/api/drawer'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import {userList} from '@/apis/system/user'
+import { userList } from '@/apis/system/user'
 import {
   apiList,
   deleteApi,
@@ -251,7 +268,7 @@ import {
 } from '@/apis/apiTest/api'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     Pagination,
     apiDrawer,
@@ -261,10 +278,10 @@ export default {
   data() {
     return {
 
-      tableLoadingIsShow: false,  // 请求列表等待响应的状态
-      isLoading: false,  // 运行接口按钮的loading状态
-      apiTab: 'api',  //  tab页的显示
-      tempApi: {},  // 接口新增/编辑临时数据
+      tableLoadingIsShow: false, // 请求列表等待响应的状态
+      isLoading: false, // 运行接口按钮的loading状态
+      apiTab: 'api', //  tab页的显示
+      tempApi: {}, // 接口新增/编辑临时数据
 
       currentModuleId: '',
       currentProjectId: '',
@@ -289,7 +306,6 @@ export default {
   },
 
   created() {
-
     this.oldList = this.api_list.map(v => v.id)
     this.newList = this.oldList.slice()
     this.$nextTick(() => {
@@ -298,7 +314,6 @@ export default {
   },
 
   mounted() {
-
     // 点击树时，请求对应的接口列表
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId) => {
       if (_type === 'module') {
@@ -330,7 +345,7 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep(row) {
-      apiMsgBelongToStep({id: row.id}).then(response => {
+      apiMsgBelongToStep({ id: row.id }).then(response => {
         if (this.showMessage(this, response)) {
           this.showCaseList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
@@ -359,17 +374,17 @@ export default {
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
-      let that = this, data = `${row.name}: ${row.addr}`
+      const that = this; const data = `${row.name}: ${row.addr}`
       this.$copyText(data).then(
-        function (e) {
-          that.$message.success("复制成功")
+        function(e) {
+          that.$message.success('复制成功')
         }
       )
     },
 
     // 获取用户信息，同步请求
     async getUserList() {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -391,7 +406,7 @@ export default {
     delApi(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'isShowDeleteLoading', true)
-      deleteApi({'id': row.id}).then(response => {
+      deleteApi({ 'id': row.id }).then(response => {
         this.$set(row, 'isShowDeleteLoading', false)
         if (this.showMessage(this, response)) {
           this.getApiList()
@@ -459,7 +474,7 @@ export default {
       const el = this.$refs.apiListTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -473,7 +488,7 @@ export default {
           apiMsgSort({
             List: this.newList,
             pageNum: this.pageNum,
-            pageSize: this.pageSize,
+            pageSize: this.pageSize
           }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false

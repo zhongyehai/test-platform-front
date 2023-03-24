@@ -1,22 +1,23 @@
 <template>
   <el-select
+    slot="prepend"
     v-model="tempMethod"
     size="mini"
     style="width: 150px;margin-right: 10px"
-    slot="prepend"
     placeholder="选择请求方式"
     filterable
     default-first-option
-    @change="choiceMethod">
-    <el-option v-for="item in methods_list" :key="item.value" :value="item.value" :label="item.value"></el-option>
+    @change="choiceMethod"
+  >
+    <el-option v-for="item in methods_list" :key="item.value" :value="item.value" :label="item.value" />
   </el-select>
 </template>
 
 <script>
-import {getMethodsMapping} from "@/apis/apiTest/api";
+import { getMethodsMapping } from '@/apis/apiTest/api'
 
 export default {
-  name: "methods",
+  name: 'Methods',
   props: [
     'method'
   ],
@@ -24,6 +25,15 @@ export default {
     return {
       tempMethod: 'POST',
       methods_list: []
+    }
+  },
+
+  watch: {
+    'method': {
+      handler(newVal, oldVal) {
+        this.tempMethod = newVal || 'POST'
+        this.emitSelectorChoice(newVal)
+      }
     }
   },
 
@@ -51,15 +61,6 @@ export default {
 
     choiceMethod() {
       this.emitSelectorChoice(this.tempMethod)
-    }
-  },
-
-  watch: {
-    'method': {
-      handler(newVal, oldVal) {
-        this.tempMethod = newVal ? newVal : 'POST'
-        this.emitSelectorChoice(newVal)
-      }
     }
   }
 }

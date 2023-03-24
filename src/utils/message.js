@@ -1,5 +1,5 @@
 // 测试过时间未运行结束的提示
-export function runTestTimeOutMessage(that){
+export function runTestTimeOutMessage(that) {
   return {
     title: '测试长时间未运行结束',
     dangerouslyUseHTMLString: true,

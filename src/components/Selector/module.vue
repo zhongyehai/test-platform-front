@@ -4,99 +4,41 @@
     placeholder="请选择模块"
     size="mini"
     style="width: 100%"
-    @change="clickModule"
     filterable
     default-first-option
+    @change="clickModule"
   >
-    <el-option v-for="(item) in tempModuleList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+    <el-option v-for="(item) in tempModuleList" :key="item.id" :label="item.name" :value="item.id" />
   </el-select>
 </template>
 
 <script>
-import {moduleList} from "@/apis/apiTest/module";
+import { moduleList } from '@/apis/apiTest/module'
 
 export default {
-  name: "module",
+  name: 'Module',
   props: [
-    "moduleId",
-    "projectId",
-    "status",  // 编辑框的显示状态，显示编辑框时才请求模块列表
+    'moduleId',
+    'projectId',
+    'status', // 编辑框的显示状态，显示编辑框时才请求模块列表
     'busOnEventName',
     'busOnModuleDialogCommit',
-    'busEmitEventName',
+    'busEmitEventName'
   ],
   data() {
     return {
       tempModuleId: '',
       tempModuleList: [],
 
-      projectIdHistory: [],  // 用于存服务改变的历史
-      moduleListHistory: [],  // 用于存模块改变的历史
-    }
-  },
-
-  mounted() {
-
-    // 监听服务选择框选中的服务id，获取对应的模块列表
-    if (this.busOnEventName) {
-      this.$bus.$on(this.busOnEventName, (project) => {
-        this.getModulesByProjectId(project.id)
-      })
-    }
-
-    // 是否监控模块的改变
-    if (this.busOnModuleDialogCommit) {
-      this.$bus.$on(this.busOnModuleDialogCommit, (status) => {
-        this.moduleListHistory.push(status)
-      })
-    }
-  },
-
-  // 组件销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    if (this.busOnEventName) {
-      this.$bus.$off(this.busOnEventName)
-    }
-    if (this.busOnModuleDialogCommit) {
-      this.$bus.$off(this.busOnModuleDialogCommit)
-    }
-  },
-
-  methods: {
-
-    // 获取服务id对应的模块列表
-    getModulesByProjectId(project_id) {
-      moduleList({'projectId': project_id}).then(response => {
-        this.tempModuleList = response.data.data
-      })
-    },
-
-    sendEmit() {
-      if (this.busEmitEventName) {
-        this.$bus.$emit(this.busEmitEventName, this.tempModuleId)
-      }
-    },
-
-    // 通过bus发送选中的模块
-    clickModule(val) {
-      this.sendEmit()
-    }
-
-  },
-
-  created() {
-    this.tempModuleId = this.moduleId
-
-    // 第一次加载的时候，获取对应的模块列表
-    if (this.projectId) {
-      this.getModulesByProjectId(this.projectId)
+      projectIdHistory: [], // 用于存服务改变的历史
+      moduleListHistory: [] // 用于存模块改变的历史
     }
   },
 
   watch: {
 
     // 监控 状态，为true时，判断服务id是否有改变，有改变则重新请求模块列表
-    "status": {
+    'status': {
       handler(newVal, oldVal) {
         if (newVal) {
           // 判断服务id是否有改变，有改变则重新请求模块列表
@@ -137,6 +79,63 @@ export default {
         this.sendEmit()
       }
     }
+  },
+
+  mounted() {
+    // 监听服务选择框选中的服务id，获取对应的模块列表
+    if (this.busOnEventName) {
+      this.$bus.$on(this.busOnEventName, (project) => {
+        this.getModulesByProjectId(project.id)
+      })
+    }
+
+    // 是否监控模块的改变
+    if (this.busOnModuleDialogCommit) {
+      this.$bus.$on(this.busOnModuleDialogCommit, (status) => {
+        this.moduleListHistory.push(status)
+      })
+    }
+  },
+
+  // 组件销毁前，关闭bus监听服务选中事件
+  beforeDestroy() {
+    if (this.busOnEventName) {
+      this.$bus.$off(this.busOnEventName)
+    }
+    if (this.busOnModuleDialogCommit) {
+      this.$bus.$off(this.busOnModuleDialogCommit)
+    }
+  },
+
+  created() {
+    this.tempModuleId = this.moduleId
+
+    // 第一次加载的时候，获取对应的模块列表
+    if (this.projectId) {
+      this.getModulesByProjectId(this.projectId)
+    }
+  },
+
+  methods: {
+
+    // 获取服务id对应的模块列表
+    getModulesByProjectId(project_id) {
+      moduleList({ 'projectId': project_id }).then(response => {
+        this.tempModuleList = response.data.data
+      })
+    },
+
+    sendEmit() {
+      if (this.busEmitEventName) {
+        this.$bus.$emit(this.busEmitEventName, this.tempModuleId)
+      }
+    },
+
+    // 通过bus发送选中的模块
+    clickModule(val) {
+      this.sendEmit()
+    }
+
   }
 }
 </script>

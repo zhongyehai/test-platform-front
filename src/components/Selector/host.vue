@@ -3,21 +3,22 @@
     v-model="tempHostIndex"
     clearable
     filterable
-    placeholder="请选择host" size="small"
+    placeholder="请选择host"
+    size="small"
     style="min-width: 20%;padding-right:10px"
   >
-    <el-option v-for="(item) in hostListToDict(tempHostList)"
-               :key="item.index"
-               :label="item.value"
-               :value="item.index"
-    >
-    </el-option>
+    <el-option
+      v-for="(item) in hostListToDict(tempHostList)"
+      :key="item.index"
+      :label="item.value"
+      :value="item.index"
+    />
   </el-select>
 </template>
 
 <script>
 export default {
-  name: "host",
+  name: 'Host',
   props: [
     'hostIndex',
     'hostList',
@@ -28,21 +29,59 @@ export default {
   data() {
     return {
       tempHostIndex: '',
-      tempHostList: [],
+      tempHostList: []
+    }
+  },
+
+  watch: {
+
+    // 实时更新接口选择的host索引
+    'hostIndex': {
+      handler(newVal, oldVal) {
+        this.tempHostIndex = newVal
+      }
+    },
+
+    // 实时更新服务的host列表
+    'hostList': {
+      handler(newVal, oldVal) {
+        this.tempHostList = newVal
+      }
+    }
+  },
+
+  created() {
+    this.tempHostIndex = this.hostIndex
+    this.tempHostList = this.hostList
+  },
+
+  mounted() {
+    // 监听服务选择器的变化
+    if (this.busOnEventName) {
+      this.$bus.$on(this.busOnEventName, (project) => {
+        this.tempHostList = project.hosts
+      })
+    }
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    if (this.busOnEventName) {
+      this.$bus.$off(this.busOnEventName)
     }
   },
 
   methods: {
     hostListToDict(data) {
-      let host_list = Array()
+      const host_list = Array()
       if (!data) {
         return host_list
       }
       for (let i = 0; i < data.length; i++) {
-        host_list.push({index: i, value: data[i]})
+        host_list.push({ index: i, value: data[i] })
       }
       return host_list
-    },
+    }
 
     // 把[xxx1,xxx2] 转为 [{value:xxx1},{value:xxx2}]，用于将后端数据转为前端能渲染的格式
     // hostListToDict(data) {
@@ -73,45 +112,6 @@ export default {
     //     return hostList[hostIndex]
     //   }
     // },
-  },
-
-  created() {
-    this.tempHostIndex = this.hostIndex
-    this.tempHostList = this.hostList
-  },
-
-  mounted() {
-
-    // 监听服务选择器的变化
-    if (this.busOnEventName) {
-      this.$bus.$on(this.busOnEventName, (project) => {
-        this.tempHostList = project.hosts
-      })
-    }
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    if (this.busOnEventName) {
-      this.$bus.$off(this.busOnEventName)
-    }
-  },
-
-  watch: {
-
-    // 实时更新接口选择的host索引
-    'hostIndex': {
-      handler(newVal, oldVal) {
-        this.tempHostIndex = newVal
-      }
-    },
-
-    // 实时更新服务的host列表
-    'hostList': {
-      handler(newVal, oldVal) {
-        this.tempHostList = newVal
-      }
-    }
   }
 }
 </script>

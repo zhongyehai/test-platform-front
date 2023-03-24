@@ -7,7 +7,7 @@
       <el-radio v-model="tempDataType" label="text">xml / 文本</el-radio>
       <el-popover class="el_popover_class" placement="top-start" trigger="hover">
         <div>发送请求时会使用此处选择的数据类型</div>
-        <el-button slot="reference" type="text" icon="el-icon-question"></el-button>
+        <el-button slot="reference" type="text" icon="el-icon-question" />
       </el-popover>
     </div>
 
@@ -15,7 +15,7 @@
       <dataFormView
         ref="dataFormView"
         :data-form="tempDataForm"
-      ></dataFormView>
+      />
     </div>
 
     <div v-show="tempDataType === 'urlencoded'">
@@ -45,9 +45,9 @@
         </el-collapse-item>
       </el-collapse>
       <jsonEditorView
-          ref="urlencodedEditorView"
-          :dataJson="dataUrlencoded"
-      ></jsonEditorView>
+        ref="urlencodedEditorView"
+        :data-json="dataUrlencoded"
+      />
     </div>
 
     <div v-show="tempDataType === 'json'">
@@ -77,13 +77,13 @@
         </el-collapse-item>
       </el-collapse>
       <jsonEditorView
-          ref="jsonEditorView"
-          :dataJson="dataJson"
-      ></jsonEditorView>
+        ref="jsonEditorView"
+        :data-json="dataJson"
+      />
     </div>
 
     <div v-show="tempDataType === 'text'">
-      <el-input v-model="tempDataText" type="textarea" :rows="17"></el-input>
+      <el-input v-model="tempDataText" type="textarea" :rows="17" />
     </div>
 
   </div>
@@ -91,13 +91,12 @@
 </template>
 
 <script>
-import dataFormView from "@/components/Inputs/dataForm";
-import dataJsonView from "@/components/Inputs/dataJson";
-import jsonEditorView from "@/components/jsonView";
-
+import dataFormView from '@/components/Inputs/dataForm'
+import dataJsonView from '@/components/Inputs/dataJson'
+import jsonEditorView from '@/components/jsonView'
 
 export default {
-  name: "apiEditBody",
+  name: 'ApiEditBody',
   components: {
     dataFormView,
     dataJsonView,
@@ -110,19 +109,9 @@ export default {
       tempDataJson: {},
       tempDataForm: [],
       tempDataUrlencoded: {},
-      tempDataText: null,
+      tempDataText: null
     }
   },
-
-  created() {
-    this.tempDataType = this.dataType || 'json'
-    this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
-    this.tempDataUrlencoded = JSON.stringify(this.dataUrlencoded) || JSON.stringify({})
-    this.tempDataForm = this.dataForm
-    this.tempDataText = this.dataText || null
-  },
-
-  methods: {},
   watch: {
 
     'dataType': {
@@ -153,9 +142,19 @@ export default {
       handler(newVal, oldVal) {
         this.tempDataText = newVal
       }
-    },
+    }
 
-  }
+  },
+
+  created() {
+    this.tempDataType = this.dataType || 'json'
+    this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
+    this.tempDataUrlencoded = JSON.stringify(this.dataUrlencoded) || JSON.stringify({})
+    this.tempDataForm = this.dataForm
+    this.tempDataText = this.dataText || null
+  },
+
+  methods: {}
 }
 </script>
 

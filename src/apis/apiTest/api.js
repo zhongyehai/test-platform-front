@@ -1,11 +1,11 @@
-import request from '@/utils/request';  //加载请求配置文件
-import {baseDirApiTest} from "@/apis/base";
+import request from '@/utils/request' // 加载请求配置文件
+import { baseDirApiTest } from '@/apis/base'
 
-let currentBaseDir = baseDirApiTest + '/apiMsg'
+const currentBaseDir = baseDirApiTest + '/apiMsg'
 export const uploadApiMsg = currentBaseDir + 'upload'
 
 function Func(method, data = null, params = null) {
-  return request({url: currentBaseDir, method: method, data: data, params: params});
+  return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
 
 // 添加接口信息
@@ -30,57 +30,56 @@ export function deleteApi(data) {
 
 // 导入接口
 export function uploadApi(data) {
-  return request({url: currentBaseDir + '/upload', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/upload', method: 'post', data: data })
 }
 
 // 下载导入接口模板
 export function downloadApiMsgTemplate() {
-  return request({url: currentBaseDir + '/template/download', method: 'get', responseType: 'blob'});
+  return request({ url: currentBaseDir + '/template/download', method: 'get', responseType: 'blob' })
 }
 
 // 指定模块下接口list
 export function apiList(params) {
-  return request({url: currentBaseDir + '/list', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
 // 接口调试
 export function runApi(data) {
-  return request({url: currentBaseDir + '/run', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/run', method: 'post', data: data })
 }
 
 // 获取请求方式
 export function getMethodsMapping() {
-  return request({url: currentBaseDir + '/methods', method: 'get'});
+  return request({ url: currentBaseDir + '/methods', method: 'get' })
 }
 
 // 获取断言类型
 export function getAssertMapping() {
-  return request({url: currentBaseDir + '/assertMapping', method: 'get'});
+  return request({ url: currentBaseDir + '/assertMapping', method: 'get' })
 }
 
 // 修改接口排序
 export function apiMsgSort(data) {
-  return request({url: currentBaseDir + '/sort', method: 'put', data: data});
+  return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }
 
 // 查询接口归属
 export function apiMsgBelongTo(params) {
-  return request({url: currentBaseDir + '/from', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/from', method: 'get', params: params })
 }
 
 // 查询使用接口转为步骤后的归属
 export function apiMsgBelongToStep(params) {
-  return request({url: currentBaseDir + '/toStep', method: 'get', params: params});
+  return request({ url: currentBaseDir + '/toStep', method: 'get', params: params })
 }
-
 
 // 修改接口重要程度
 export function changeApiLevel(data) {
-  return request({url: currentBaseDir + '/level', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/level', method: 'post', data: data })
 }
 
 // 修改接口废弃状态
 export function changeApiStatus(data) {
-  return request({url: currentBaseDir + '/status', method: 'post', data: data});
+  return request({ url: currentBaseDir + '/status', method: 'post', data: data })
 }
 

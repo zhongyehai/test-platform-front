@@ -8,9 +8,9 @@
         <!-- 服务列表树组件 -->
         <projectTreeView
           ref="projectTree"
-          :dataType="dataType"
-          :menuName="''"
-        ></projectTreeView>
+          :data-type="dataType"
+          :menu-name="''"
+        />
       </el-col>
 
       <!-- 测试报告 -->
@@ -28,8 +28,7 @@
                   placeholder="报告名，模糊查询"
                   size="mini"
                   clearable
-                >
-                </el-input>
+                />
               </el-form-item>
 
               <el-form-item label="创建人" size="mini" label-width="60px">
@@ -46,7 +45,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
 
@@ -64,21 +63,23 @@
                     :key="key"
                     :label="value"
                     :value="key"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
 
               <el-button
                 type="primary"
                 size="mini"
-                @click="getReportList">查询
+                @click="getReportList"
+              >查询
               </el-button>
 
               <el-popover
                 v-show="selectedList.length > 0"
+                v-model="showBatchDelete"
                 placement="top"
                 popper-class="down-popover"
-                v-model="showBatchDelete">
+              >
                 <p>确定删除所选中的测试报告?</p>
                 <p style="color: red">关联了失败记录的测试报告不会被删除</p>
                 <div style="text-align: right; margin: 0">
@@ -102,7 +103,7 @@
               stripe
               @selection-change="clickSelectAll"
             >
-              <el-table-column type="selection" min-width="2%"></el-table-column>
+              <el-table-column type="selection" min-width="2%" />
 
               <el-table-column prop="id" label="序号" align="center" min-width="5%">
                 <template slot-scope="scope">
@@ -110,8 +111,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="任务名称" min-width="18%">
-              </el-table-column>
+              <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="任务名称" min-width="18%" />
 
               <el-table-column label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
@@ -147,8 +147,9 @@
 
               <el-table-column label="是否生成" align="center" min-width="8%">
                 <template slot-scope="scope">
-                  <el-tag size="small"
-                          :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'"
+                  <el-tag
+                    size="small"
+                    :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'"
                   >
                     {{ scope.row.process === 3 && scope.row.status === 2 ? '已生成' : '未生成' }}
                   </el-tag>
@@ -160,21 +161,21 @@
 
                   <!--查看报告-->
                   <el-button
+                    v-show="scope.row.process === 3 && scope.row.status === 2"
                     type="text"
                     size="mini"
                     style="margin-right: 10px"
-                    v-show="scope.row.process === 3 && scope.row.status === 2"
                     @click.native="openReportById(scope.row.id)"
                   >查看
                   </el-button>
 
                   <!-- 删除报告 -->
                   <el-popover
-                    :ref="scope.row.id"
                     v-show="scope.row.process === 3 && scope.row.status === 2"
+                    :ref="scope.row.id"
+                    v-model="scope.row.deletePopoverIsShow"
                     placement="top"
                     popper-class="down-popover"
-                    v-model="scope.row.deletePopoverIsShow"
                   >
                     <p>确定删除【{{ scope.row.name }}】?</p>
                     <p style="color: red">关联了失败记录的测试报告不会被删除</p>
@@ -243,9 +244,9 @@ import {
 } from '@/utils/mapping'
 
 export default {
-  name: 'index',
-  props: ['dataType'],
+  name: 'Index',
   components: { Pagination, projectTreeView },
+  props: ['dataType'],
   data() {
     return {
       reportTab: 'reportTab',
@@ -274,6 +275,52 @@ export default {
       downloadReportUrl: ''
     }
   },
+
+  mounted() {
+    this.getUserList()
+
+    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
+      if (_type === 'project') {
+        this.projectId = project.id
+        this.query.pageNum = 1
+        this.query.pageSize = 20
+        this.query.total = 0
+        this.getReportList()
+      }
+    })
+
+    // 获取环境列表
+    runEnvList().then(response => {
+      response.data.data.forEach(env => {
+        this.eventDict[env.code] = env.name
+      })
+    })
+
+    getConfigByName({ 'name': 'run_type' }).then(response => {
+      this.runTypeDict = JSON.parse(response.data.value)
+    })
+  },
+
+  created() {
+    if (this.dataType === 'api') {
+      this.reportListUrl = apiReportList
+      this.deleteReportUrl = apiDeleteReport
+      this.downloadReportUrl = apiDownloadReport
+    } else if (this.dataType === 'webUi') {
+      this.reportListUrl = webUiReportList
+      this.deleteReportUrl = webUiDeleteReport
+      this.downloadReportUrl = webUiDownloadReport
+    } else {
+      this.reportListUrl = appUiReportList
+      this.deleteReportUrl = appUiDeleteReport
+      this.downloadReportUrl = appUiDownloadReport
+    }
+  },
+
+  // 页面销毁前，关闭bus监听服务选中事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.treeIsChoice)
+  },
   methods: {
 
     // 全选
@@ -283,7 +330,7 @@ export default {
 
     // 获取用户信息，同步请求
     async getUserList() {
-      let response = await userList()
+      const response = await userList()
       this.userList = response.data.data
     },
 
@@ -299,7 +346,7 @@ export default {
     // 打开测试报告
     openReportById(reportId) {
       // console.log(`api.dialogForm.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      let { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId } })
+      const { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId }})
       window.open(href, '_blank')
     },
 
@@ -313,28 +360,27 @@ export default {
 
     // 把数据转为html
     renderHtml(data, strFileName, strMimeType) {
-
-      let self = window, // this script is only for browsers anyway...
-        defaultMime = 'application/octet-stream', // this default mime also triggers iframe downloads
-        mimeType = strMimeType || defaultMime,
-        payload = data,
-        anchor = document.createElement('a'),
-        toString = function(a) {
-          return String(a)
-        },
-        myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
-        fileName = strFileName || 'download',
-        blob,
-        reader
+      const self = window // this script is only for browsers anyway...
+      const defaultMime = 'application/octet-stream' // this default mime also triggers iframe downloads
+      const mimeType = strMimeType || defaultMime
+      const payload = data
+      const anchor = document.createElement('a')
+      const toString = function(a) {
+        return String(a)
+      }
+      let myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString)
+      const fileName = strFileName || 'download'
+      let blob
+      let reader
       myBlob = myBlob.call ? myBlob.bind(self) : Blob
 
-      //go ahead and download dataURLs right away
-      blob = payload instanceof myBlob ?
-        payload :
-        new myBlob([payload], { type: mimeType })
+      // go ahead and download dataURLs right away
+      blob = payload instanceof myBlob
+        ? payload
+        : new myBlob([payload], { type: mimeType })
 
       function saver(url, winMode) {
-        if ('download' in anchor) { //html5 A[download]
+        if ('download' in anchor) { // html5 A[download]
           anchor.href = url
           anchor.setAttribute('download', fileName)
           anchor.className = 'download-js-link'
@@ -352,8 +398,7 @@ export default {
           }, 66)
           return true
         }
-
-      }//end saver
+      }// end saver
 
       if (self.URL) { // simple fast and modern way using Blob and URL:
         saver(self.URL.createObjectURL(blob), true)
@@ -404,52 +449,6 @@ export default {
         }
       })
     }
-  },
-
-  mounted() {
-    this.getUserList()
-
-    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
-      if (_type === 'project') {
-        this.projectId = project.id
-        this.query.pageNum = 1
-        this.query.pageSize = 20
-        this.query.total = 0
-        this.getReportList()
-      }
-    })
-
-    // 获取环境列表
-    runEnvList().then(response => {
-      response.data.data.forEach(env => {
-        this.eventDict[env.code] = env.name
-      })
-    })
-
-    getConfigByName({ 'name': 'run_type' }).then(response => {
-      this.runTypeDict = JSON.parse(response.data.value)
-    })
-  },
-
-  created() {
-    if (this.dataType === 'api') {
-      this.reportListUrl = apiReportList
-      this.deleteReportUrl = apiDeleteReport
-      this.downloadReportUrl = apiDownloadReport
-    } else if (this.dataType === 'webUi') {
-      this.reportListUrl = webUiReportList
-      this.deleteReportUrl = webUiDeleteReport
-      this.downloadReportUrl = webUiDownloadReport
-    } else {
-      this.reportListUrl = appUiReportList
-      this.deleteReportUrl = appUiDeleteReport
-      this.downloadReportUrl = appUiDownloadReport
-    }
-  },
-
-  // 页面销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.treeIsChoice)
   }
 }
 </script>

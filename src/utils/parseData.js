@@ -14,7 +14,7 @@ export function getDataDictById(dataDict, dataId) {
 
 // 根据id从list中获取数据
 export function getDataFormListById(data, data_id) {
-  for (let index in data) {
+  for (const index in data) {
     if (data[index].id === data_id) {
       return data[index]
     }
@@ -23,7 +23,7 @@ export function getDataFormListById(data, data_id) {
 
 // 根据name从list中获取数据
 export function getDataFormListByName(data, data_name) {
-  for (let index in data) {
+  for (const index in data) {
     if (data[index].name === data_name) {
       return data[index]
     }
@@ -33,18 +33,18 @@ export function getDataFormListByName(data, data_name) {
 // 递归把列表转为树行结构
 export function arrayToTree(arr, parentId) {
   //  arr 是返回的数据  parendId 父id
-  let temp = [];
-  let treeArr = arr;
+  const temp = []
+  const treeArr = arr
   treeArr.forEach((item, index) => {
     if (item.parent === parentId) {
       if (arrayToTree(treeArr, treeArr[index].id).length > 0) {
         // 递归调用此函数
-        treeArr[index].children = arrayToTree(treeArr, treeArr[index].id);
+        treeArr[index].children = arrayToTree(treeArr, treeArr[index].id)
       }
-      temp.push(treeArr[index]);
+      temp.push(treeArr[index])
     }
-  });
-  return temp;
+  })
+  return temp
 }
 
 // 把数据解析为int
@@ -73,17 +73,16 @@ export function tryParseString(data) {
 
 // 列表格式的查询字符串参数转为字符串
 export function paramsListToStr(paramsList) {
-  let queryStrList = []
+  const queryStrList = []
   paramsList.forEach((param) => {
-    let key = param["key"], value = param["value"]
-    if (key){
+    const key = param['key']; const value = param['value']
+    if (key) {
       queryStrList.push(`${key}=${value}`)
     }
   })
-  if (queryStrList.length > 0){
-    return '?' + queryStrList.join("&")
-  }else {
+  if (queryStrList.length > 0) {
+    return '?' + queryStrList.join('&')
+  } else {
     return ''
   }
-
 }

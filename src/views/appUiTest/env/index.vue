@@ -13,10 +13,10 @@
               style="margin-left: 10px"
               icon="el-icon-plus"
               @click="showAddDrawer(activeName)"
-            ></el-button>
+            />
           </el-popover>
         </template>
-        <serverView></serverView>
+        <serverView />
       </el-tab-pane>
 
       <el-tab-pane label="手机设备管理" name="appPhone">
@@ -30,10 +30,10 @@
               style="margin-left: 10px"
               icon="el-icon-plus"
               @click="showAddDrawer(activeName)"
-            ></el-button>
+            />
           </el-popover>
         </template>
-        <phoneView></phoneView>
+        <phoneView />
       </el-tab-pane>
 
     </el-tabs>
@@ -41,24 +41,24 @@
 </template>
 
 <script>
-import serverView from "@/views/appUiTest/env/server";
-import phoneView from "@/views/appUiTest/env/phone";
+import serverView from '@/views/appUiTest/env/server'
+import phoneView from '@/views/appUiTest/env/phone'
 
 export default {
-  name: "index",
-  components: {serverView, phoneView},
+  name: 'Index',
+  components: { serverView, phoneView },
   data() {
     return {
-      activeName: "appServer"
+      activeName: 'appServer'
     }
   },
 
   methods: {
     // 打开新增抽屉
-    showAddDrawer(drawerType){
+    showAddDrawer(drawerType) {
       this.$bus.$emit(this.$busEvents.drawerIsShow, drawerType)
     }
-  },
+  }
 
 }
 </script>

@@ -13,7 +13,7 @@
           default-first-option
           @change="getSetList"
         >
-          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
 
         <el-button
@@ -33,8 +33,8 @@
           placeholder="请输入接口地址"
           size="mini"
           clearable
-          style="width: 400px">
-        </el-input>
+          style="width: 400px"
+        />
         <el-button
           v-show="queryAddr"
           type="primary"
@@ -62,10 +62,10 @@
           <el-tab-pane :label="projectTab" :name="projectTab">
             <div class="custom-tree-container">
               <div class="block">
-                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini"></el-input>
+                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini" />
                 <el-tree
-                  class="project-tree"
                   ref="tree"
+                  class="project-tree"
                   :check-on-click-node="false"
                   :data="setListData"
                   :default-expanded-keys="[defaultCaseSet]"
@@ -76,50 +76,58 @@
                   lazy
                   node-key="id"
                   @node-click="clickTree"
-                  @node-drag-end="nodeDragEnd">
-                    <span slot-scope="{ node, data }"
-                          class="custom-tree-node"
-                          @mouseenter="mouseenter(data)"
-                          @mouseleave="mouseleave(data)">
-                      <span> {{ data.name }} </span>
-                      <span v-show="data.showMenu">
-                        <el-dropdown
-                          size="mini"
-                          type="primary"
-                          placement="top-start"
-                          @visible-change="changeDropdownStatus"
-                        >
-                          <i
-                            class="el-icon-more"
-                            style="float: right;padding-left: 5px;color: #409EFF;transform: rotate(90deg)"
-                          ></i>
+                  @node-drag-end="nodeDragEnd"
+                >
+                  <span
+                    slot-scope="{ node, data }"
+                    class="custom-tree-node"
+                    @mouseenter="mouseenter(data)"
+                    @mouseleave="mouseleave(data)"
+                  >
+                    <span> {{ data.name }} </span>
+                    <span v-show="data.showMenu">
+                      <el-dropdown
+                        size="mini"
+                        type="primary"
+                        placement="top-start"
+                        @visible-change="changeDropdownStatus"
+                      >
+                        <i
+                          class="el-icon-more"
+                          style="float: right;padding-left: 5px;color: #409EFF;transform: rotate(90deg)"
+                        />
 
-                          <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-menu slot="dropdown">
 
-                            <el-dropdown-item @click.native.stop="addCase(node, data)"
-                            >{{ "添加用例" }}
-                            </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.native.stop="addCase(node, data)"
+                          >{{ '添加用例' }}
+                          </el-dropdown-item>
 
-                            <el-dropdown-item @click.native.stop="showCaseSetDialog('add', node, data)"
-                            >{{ '添加用例集' }}
-                            </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.native.stop="showCaseSetDialog('add', node, data)"
+                          >{{ '添加用例集' }}
+                          </el-dropdown-item>
 
-                            <el-dropdown-item @click.native.stop="showCaseSetDialog('edit', node, data)"
-                            >{{ '修改当前用例集' }}
-                            </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.native.stop="showCaseSetDialog('edit', node, data)"
+                          >{{ '修改当前用例集' }}
+                          </el-dropdown-item>
 
-                            <el-dropdown-item @click.native.stop="clickDeleteChild(node, data)"
-                            >{{ "删除当前用例集" }}
-                            </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.native.stop="clickDeleteChild(node, data)"
+                          >{{ '删除当前用例集' }}
+                          </el-dropdown-item>
 
-                            <el-dropdown-item @click.native.stop="showRunCaseSet(node, data)"
-                            >{{ "运行当前用例集下的用例" }}
-                            </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.native.stop="showRunCaseSet(node, data)"
+                          >{{ '运行当前用例集下的用例' }}
+                          </el-dropdown-item>
 
-                          </el-dropdown-menu>
-                        </el-dropdown>
-                      </span>
+                        </el-dropdown-menu>
+                      </el-dropdown>
                     </span>
+                  </span>
                 </el-tree>
               </div>
 
@@ -132,10 +140,10 @@
       <el-col style="width: 79%; margin-left: 5px">
         <!-- 用例管理组件 -->
         <caseManage
-          :dataType="dataType"
-          :currentSetId="currentSetId"
-          :currentProjectId="currentProjectId"
-        ></caseManage>
+          :data-type="dataType"
+          :current-set-id="currentSetId"
+          :current-project-id="currentProjectId"
+        />
       </el-col>
 
     </el-row>
@@ -144,17 +152,19 @@
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增用例集' : '修改用例集'"
       size="40%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="moduleDrawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <el-form
         ref="dataForm"
         :model="tempDataForm"
         label-position="left"
         label-width="100px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px">
+        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      >
         <el-form-item :label="'用例集名称'" class="filter-item is-required" prop="name" size="mini">
-          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复"/>
+          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复" />
         </el-form-item>
       </el-form>
       <div class="demo-drawer__footer">
@@ -163,110 +173,113 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" moduleDrawerStatus === 'add' ? addCaseSet() : changCaseSet() ">
+          @click=" moduleDrawerStatus === 'add' ? addCaseSet() : changCaseSet() "
+        >
           {{ '保存' }}
         </el-button>
       </div>
     </el-drawer>
 
     <selectRunEnv
-      :dataType="dataType"
-    ></selectRunEnv>
+      :data-type="dataType"
+    />
 
     <runProcess
-      :dataType="dataType"
-    ></runProcess>
+      :data-type="dataType"
+    />
+
+    <ApiEditDrawer />
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
       :api-list="showApiList"
       :case-id="undefined"
       :marker="marker"
-    ></showApiFromDrawer>
+    />
 
     <showApiUseDrawer
       v-if="dataType === 'api'"
       :case-list="showCaseList"
       :marker="marker"
-    ></showApiUseDrawer>
+    />
   </div>
-
 
 </template>
 
 <script>
-import waves from "@/directive/waves";
-import caseManage from '@/components/business/case'  // 用例管理组件
-import selectRunEnv from '@/components/selectRunEnv'  // 环境选择组件
-import runProcess from '@/components/runProcess'  // 测试执行进度组件
+import waves from '@/directive/waves'
+import caseManage from '@/components/business/case' // 用例管理组件
+import selectRunEnv from '@/components/selectRunEnv' // 环境选择组件
+import runProcess from '@/components/runProcess' // 测试执行进度组件
+import ApiEditDrawer from '@/views/apiTest/api/drawer.vue'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import {getFindElementOption} from "@/utils/getConfig";
-import {ellipsis, arrayToTree} from "@/utils/parseData"
+import { getFindElementOption } from '@/utils/getConfig'
+import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import {apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping} from "@/apis/apiTest/api";  // 接口引用
-import {projectList as apiProjectList} from "@/apis/apiTest/project";
+import { apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping } from '@/apis/apiTest/api' // 接口引用
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import {
   caseSetTree as apiCaseSetTree,
   caseSetRun as apiCaseSetRun,
   deleteCaseSet as apiDeleteCaseSet,
   postCaseSet as apiPostCaseSet,
   putCaseSet as apiPutCaseSet
-} from "@/apis/apiTest/caseSet";
+} from '@/apis/apiTest/caseSet'
 
-import {projectList as webUiProjectList} from "@/apis/webUiTest/project";
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 import {
   caseSetTree as webUiCaseSetTree,
   caseSetRun as webUiCaseSetRun,
   deleteCaseSet as webUiDeleteCaseSet,
   postCaseSet as webUiPostCaseSet,
   putCaseSet as webUiPutCaseSet
-} from "@/apis/webUiTest/caseSet";
+} from '@/apis/webUiTest/caseSet'
 
-import {projectList as appUiProjectList} from "@/apis/appUiTest/project";
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import {
   caseSetTree as appUiCaseSetTree,
   caseSetRun as appUiCaseSetRun,
   deleteCaseSet as appUiDeleteCaseSet,
   postCaseSet as appUiPostCaseSet,
   putCaseSet as appUiPutCaseSet
-} from "@/apis/appUiTest/caseSet";
-import {getConfigByName, getSkipIfTypeMapping} from "@/apis/config/config";
-import {extractMappingList, keyBoardCodeMappingList} from "@/apis/webUiTest/step";
-import {phoneList, serverList} from "@/apis/appUiTest/env";
-
+} from '@/apis/appUiTest/caseSet'
+import { getConfigByName, getSkipIfTypeMapping } from '@/apis/config/config'
+import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
+import { phoneList, serverList } from '@/apis/appUiTest/env'
 
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     caseManage,
     selectRunEnv,
     runProcess,
     showApiFromDrawer,
-    showApiUseDrawer
+    showApiUseDrawer,
+    ApiEditDrawer
   },
+  directives: { waves },
   props: ['dataType'],
-  directives: {waves},
   data() {
     return {
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
       projectTab: '用例集列表',
       isShowLoading: false, // 用例集编辑框提交Loading
-      filterText: '',      // 查询关键字
-      projectListData: [],  // 项目列表
-      currentProjectId: '',  // 当前选中的项目id
-      setListData: [],  // 用例集列表
-      currentSetId: '',  // 当前选中的用例集id，用于数据传递，获取用例列表
-      currentSetIdForCommit: '',  // 当前选中的模块id，用于提交新增、修改
-      currentLevelForCommit: 1,  // 当前选中的模块id，用于提交新增、修改
+      filterText: '', // 查询关键字
+      projectListData: [], // 项目列表
+      currentProjectId: '', // 当前选中的项目id
+      setListData: [], // 用例集列表
+      currentSetId: '', // 当前选中的用例集id，用于数据传递，获取用例列表
+      currentSetIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
+      currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
       tempDataForm: {
         name: '',
         id: '',
         level: '',
         parent: '',
-        project_id: '',
+        project_id: ''
       },
       queryAddr: '',
       marker: 'suite',
@@ -275,8 +288,8 @@ export default {
       moduleDrawerIsShow: false,
       defaultCaseSet: {},
       moduleDrawerStatus: '',
-      dropdownStatus: false,  // el-dropdown 的展开/隐藏状态
-      currentLabel: '',  // 当前鼠标滑入的节点名
+      dropdownStatus: false, // el-dropdown 的展开/隐藏状态
+      currentLabel: '', // 当前鼠标滑入的节点名
       runType: 1,
       runEnv: 'test',
       runSetData: undefined,
@@ -287,6 +300,107 @@ export default {
       postCaseSetUrl: '',
       putCaseSetUrl: ''
     }
+  },
+
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
+
+  created() {
+    if (this.dataType === 'api') {
+      this.projectListUrl = apiProjectList
+      this.caseSetTreeUrl = apiCaseSetTree
+      this.caseSetRunUrl = apiCaseSetRun
+      this.deleteCaseSetUrl = apiDeleteCaseSet
+      this.postCaseSetUrl = apiPostCaseSet
+      this.putCaseSetUrl = apiPutCaseSet
+    } else if (this.dataType === 'webUi') {
+      this.projectListUrl = webUiProjectList
+      this.caseSetTreeUrl = webUiCaseSetTree
+      this.caseSetRunUrl = webUiCaseSetRun
+      this.deleteCaseSetUrl = webUiDeleteCaseSet
+      this.postCaseSetUrl = webUiPostCaseSet
+      this.putCaseSetUrl = webUiPutCaseSet
+      getFindElementOption(this) // 获取定位方式
+      getConfigByName({ 'name': 'browser_name' }).then(response => {
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+      })
+    } else {
+      this.projectListUrl = appUiProjectList
+      this.caseSetTreeUrl = appUiCaseSetTree
+      this.caseSetRunUrl = appUiCaseSetRun
+      this.deleteCaseSetUrl = appUiDeleteCaseSet
+      this.postCaseSetUrl = appUiPostCaseSet
+      this.putCaseSetUrl = appUiPutCaseSet
+      getFindElementOption(this) // 获取定位方式
+      serverList().then(response => {
+        this.$busEvents.data.runServerList = response.data.data
+      })
+      phoneList().then(response => {
+        this.$busEvents.data.runPhoneList = response.data.data
+      })
+    }
+
+    this.getProjectList()
+  },
+
+  mounted() {
+    // 从后端获取数据类型映射
+    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取app键盘code类型映射
+    if (this.dataType === 'appUi') {
+      getConfigByName({ 'name': 'app_key_code' }).then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+      })
+    }
+
+    // 从后端获取PC键盘code类型映射
+    if (this.dataType === 'webUi') {
+      // getConfigByName({'name': 'app_key_code'}).then(response => {
+      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+      // })
+      keyBoardCodeMappingList().then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = response.data
+      })
+    }
+
+    // 从后端获取响应对象数据源映射
+    if (this.dataType === 'api') {
+      getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
+        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+      })
+
+      // 从后端获取断言数方式映射
+      getAssertMapping().then(response => {
+        this.$busEvents.data.apiTestAssertMappingList = response.data
+      })
+    } else {
+      // 从后端获取UI测试数据提取方式映射
+      extractMappingList().then(response => {
+        this.$busEvents.data.uiTestExtractMappingList = response.data
+      })
+    }
+
+    // 从后端获取跳过方式映射
+    getSkipIfTypeMapping().then(response => {
+      this.$busEvents.data.skipIfTypeMappingList = response.data
+    })
+
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'selectRunEnv' && _runUnit === 'set') {
+        this.runCaseSet(runDict)
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
@@ -314,7 +428,7 @@ export default {
       this.currentSetIdForCommit = '' // 切换项目的时候，把选中用例集置为''
       this.currentParent = {}
       this.currentLevelForCommit = 1 // 切换项目的时候，把选中用例集置为''
-      this.caseSetTreeUrl({'project_id': projectId}).then(response => {
+      this.caseSetTreeUrl({ 'project_id': projectId }).then(response => {
         var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
         this.setListData = arrayToTree(response_data, null)
         this.sendSetTreeIsDone(this.setListData)
@@ -346,13 +460,13 @@ export default {
       }
       this.currentLabel = JSON.parse(JSON.stringify(data.name))
       data.name = ellipsis(data.name, 10)
-      this.$set(data, 'showMenu', true);
+      this.$set(data, 'showMenu', true)
     },
 
     // 鼠标滑出的时候，把可展示菜单的标识去掉
     mouseleave(data) {
       data.name = this.currentLabel
-      this.$set(data, 'showMenu', false);
+      this.$set(data, 'showMenu', false)
     },
 
     // 打开用例集编辑框
@@ -382,7 +496,7 @@ export default {
               this.$set(this.currentParent, 'children', [])
             }
             this.currentParent.children.push(response.data)
-            this.$refs.tree.store.nodesMap[this.currentParent.id].expanded = true  // 展开节点
+            this.$refs.tree.store.nodesMap[this.currentParent.id].expanded = true // 展开节点
           } else {
             this.setListData.push(response.data)
           }
@@ -399,7 +513,7 @@ export default {
         id: this.currentParent.id,
         level: this.currentParent.level,
         parent: this.currentParent.parent,
-        project_id: this.currentParent.project_id,
+        project_id: this.currentParent.project_id
       }).then(response => {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
@@ -413,8 +527,8 @@ export default {
 
     // 关键字查询用例集
     filterNode(value, data) {
-      if (!value) return true;
-      return data.name.indexOf(value) !== -1;
+      if (!value) return true
+      return data.name.indexOf(value) !== -1
     },
 
     // 点击删除节点
@@ -424,7 +538,7 @@ export default {
 
     // 删除节点
     deleteChild(data) {
-      this.deleteCaseSetUrl({'id': data.id}).then(response => {
+      this.deleteCaseSetUrl({ 'id': data.id }).then(response => {
         if (this.showMessage(this, response)) {
           this.$refs.tree.remove(data)
 
@@ -476,8 +590,8 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
-      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showApiList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
         }
@@ -486,118 +600,16 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
-      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
-        if (this.showMessage(this, response)){
+      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        if (this.showMessage(this, response)) {
           this.showCaseList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
         }
       })
     }
 
-  },
-
-  created() {
-    if (this.dataType === 'api') {
-      this.projectListUrl = apiProjectList
-      this.caseSetTreeUrl = apiCaseSetTree
-      this.caseSetRunUrl = apiCaseSetRun
-      this.deleteCaseSetUrl = apiDeleteCaseSet
-      this.postCaseSetUrl = apiPostCaseSet
-      this.putCaseSetUrl = apiPutCaseSet
-    } else if (this.dataType === 'webUi') {
-      this.projectListUrl = webUiProjectList
-      this.caseSetTreeUrl = webUiCaseSetTree
-      this.caseSetRunUrl = webUiCaseSetRun
-      this.deleteCaseSetUrl = webUiDeleteCaseSet
-      this.postCaseSetUrl = webUiPostCaseSet
-      this.putCaseSetUrl = webUiPutCaseSet
-      getFindElementOption(this)  // 获取定位方式
-      getConfigByName({'name': 'browser_name'}).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
-      })
-    } else {
-      this.projectListUrl = appUiProjectList
-      this.caseSetTreeUrl = appUiCaseSetTree
-      this.caseSetRunUrl = appUiCaseSetRun
-      this.deleteCaseSetUrl = appUiDeleteCaseSet
-      this.postCaseSetUrl = appUiPostCaseSet
-      this.putCaseSetUrl = appUiPutCaseSet
-      getFindElementOption(this)  // 获取定位方式
-      serverList().then(response => {
-        this.$busEvents.data.runServerList = response.data.data
-      })
-      phoneList().then(response => {
-        this.$busEvents.data.runPhoneList = response.data.data
-      })
-    }
-
-    this.getProjectList()
-  },
-
-  mounted() {
-
-    // 从后端获取数据类型映射
-    getConfigByName({'name': 'data_type_mapping'}).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
-    })
-
-    // 从后端获取app键盘code类型映射
-    if (this.dataType === 'appUi'){
-      getConfigByName({'name': 'app_key_code'}).then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
-      })
-    }
-
-    // 从后端获取PC键盘code类型映射
-    if (this.dataType === 'webUi'){
-      // getConfigByName({'name': 'app_key_code'}).then(response => {
-      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
-      // })
-      keyBoardCodeMappingList().then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = response.data
-      })
-    }
-
-    // 从后端获取响应对象数据源映射
-    if (this.dataType === 'api'){
-      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
-        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
-      })
-    }
-
-    // 从后端获取数据提取方式映射
-    extractMappingList().then(response => {
-      this.$busEvents.data.extractMappingList = response.data
-    })
-
-    // 从后端获取断言数方式映射
-    getAssertMapping().then(response => {
-      this.$busEvents.data.apiAssertMappingList = response.data
-    })
-
-    // 从后端获取跳过方式映射
-    getSkipIfTypeMapping().then(response => {
-      this.$busEvents.data.skipIfTypeMappingList = response.data
-    })
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'selectRunEnv' && _runUnit === 'set') {
-        this.runCaseSet(runDict)
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
-    }
-  },
-};
+  }
+}
 </script>
 
 <style scoped>

@@ -4,18 +4,19 @@
     title="同步环境"
     size="60%"
     :append-to-body="true"
-    :wrapperClosable="false"
+    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
-    :direction="direction">
+    :direction="direction"
+  >
     <div class="demo-drawer__content">
       <div style="margin-left: 20px; margin-right: 20px">
         <el-tabs v-model="fromActiveName">
           <el-tab-pane label="从" name="from">
             <el-radio
-              v-model="dataSourceFrom"
               v-for="(runEnv) in runEnvList"
-              :label="runEnv.id"
               :key="runEnv.id"
+              v-model="dataSourceFrom"
+              :label="runEnv.id"
               @change="changeRadio()"
             >{{ runEnv.name }}
             </el-radio>
@@ -28,10 +29,10 @@
           <el-tab-pane label="同步到" name="to">
             <el-checkbox-group v-model="dataSourceTo">
               <el-checkbox
-                :disabled="runEnv.id === dataSourceFrom"
-                :label="runEnv.id"
                 v-for="(runEnv) in runEnvList"
                 :key="runEnv.id"
+                :disabled="runEnv.id === dataSourceFrom"
+                :label="runEnv.id"
               >{{ runEnv.name }}
               </el-checkbox>
             </el-checkbox-group>
@@ -44,8 +45,8 @@
         <el-button
           type="primary"
           size="mini"
-          @click="saveEventSynchronizer() "
           :loading="submitButtonIsLoading"
+          @click="saveEventSynchronizer() "
         >{{ '确定' }}
         </el-button>
       </div>
@@ -57,19 +58,19 @@
 
 <script>
 
-import {projectEnvSynchronization as apiProjectEnvSynchronization} from '@/apis/apiTest/project'
-import {projectEnvSynchronization as webUiProjectEnvSynchronization} from '@/apis/webUiTest/project'
-import {projectEnvSynchronization as appProjectEnvSynchronization} from '@/apis/appUiTest/project'
+import { projectEnvSynchronization as apiProjectEnvSynchronization } from '@/apis/apiTest/project'
+import { projectEnvSynchronization as webUiProjectEnvSynchronization } from '@/apis/webUiTest/project'
+import { projectEnvSynchronization as appProjectEnvSynchronization } from '@/apis/appUiTest/project'
 
 export default {
-  name: 'envSynchronizer',
+  name: 'EnvSynchronizer',
   props: [
     'dataType'
   ],
   data() {
     return {
-      drawerIsShow: false,  // 抽屉的显示状态
-      direction: 'rtl',  // 抽屉打开方式
+      drawerIsShow: false, // 抽屉的显示状态
+      direction: 'rtl', // 抽屉打开方式
       projectEnvSynchronizationUrl: '',
       // 环境映射
       runEnvList: [],
@@ -78,48 +79,21 @@ export default {
       toActiveName: 'to',
       dataSourceFrom: '',
       dataSourceTo: [],
-      submitButtonIsLoading: false  // 提交按钮的loading状态
+      submitButtonIsLoading: false // 提交按钮的loading状态
     }
   },
 
-  methods: {
-
-    // 单选钮选中时，如果复选框已选中了单选的值，则去除多选按钮的选中状态
-    changeRadio(value){
-      let index = this.dataSourceTo.indexOf(this.dataSourceFrom)
-      if (index !== -1){
-        this.dataSourceTo.splice(index,1)
-      }
-    },
-
-    // 保存环境设置
-    saveEventSynchronizer() {
-      this.submitButtonIsLoading = true
-      this.projectEnvSynchronizationUrl({
-        projectId: this.projectId,
-        envFrom: this.dataSourceFrom,
-        envTo: this.dataSourceTo}).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'envSynchronizer', response.data)
-          this.drawerIsShow = false
-        }
-      })
-    },
-  },
-
   mounted() {
-
-    if (this.dataType === 'api'){
+    if (this.dataType === 'api') {
       this.projectEnvSynchronizationUrl = apiProjectEnvSynchronization
-    }else if (this.dataType === 'appUi'){
+    } else if (this.dataType === 'appUi') {
       this.projectEnvSynchronizationUrl = appProjectEnvSynchronization
-    }else{
+    } else {
       this.projectEnvSynchronizationUrl = webUiProjectEnvSynchronization
     }
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, projectId, runEnvList) => {
-      if (_type === 'envSynchronizer'){
+      if (_type === 'envSynchronizer') {
         this.projectId = projectId
         this.runEnvList = runEnvList
         this.drawerIsShow = true
@@ -131,6 +105,32 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+
+  methods: {
+
+    // 单选钮选中时，如果复选框已选中了单选的值，则去除多选按钮的选中状态
+    changeRadio(value) {
+      const index = this.dataSourceTo.indexOf(this.dataSourceFrom)
+      if (index !== -1) {
+        this.dataSourceTo.splice(index, 1)
+      }
+    },
+
+    // 保存环境设置
+    saveEventSynchronizer() {
+      this.submitButtonIsLoading = true
+      this.projectEnvSynchronizationUrl({
+        projectId: this.projectId,
+        envFrom: this.dataSourceFrom,
+        envTo: this.dataSourceTo }).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'envSynchronizer', response.data)
+          this.drawerIsShow = false
+        }
+      })
+    }
+  }
 }
 </script>
 

@@ -4,27 +4,39 @@
       type="primary"
       size="mini"
       style="margin-left:20px; float: right"
-      @click="formatDataToJson()">格式化
+      @click="formatDataToJson()"
+    >格式化
     </el-button>
     <dataJsonView
       ref="dataJsonView"
-      :dataJson="tempDataJson"
-    ></dataJsonView>
+      :data-json="tempDataJson"
+    />
   </div>
 </template>
 
 <script>
-import dataJsonView from "@/components/Inputs/dataJson";
+import dataJsonView from '@/components/Inputs/dataJson'
 
 export default {
-  name: "jsonEditorView",
-  components: {dataJsonView},
+  name: 'JsonEditorView',
+  components: { dataJsonView },
   props: ['dataJson'],
   data() {
     return {
-      tempDataJson: '',
+      tempDataJson: ''
     }
+  },
 
+  watch: {
+    'dataJson': {
+      handler(newVal, oldVal) {
+        this.tempDataJson = JSON.stringify(newVal) || JSON.stringify({})
+      }
+    }
+  },
+
+  created() {
+    this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
   },
 
   methods: {
@@ -33,19 +45,7 @@ export default {
       try {
         this.tempDataJson = JSON.stringify(JSON.parse(this.$refs.dataJsonView.tempDataJson), null, 4)
       } catch (err) {
-        this.$message({showClose: true, message: 'json格式错误', type: 'warning'})
-      }
-    },
-  },
-
-  created() {
-    this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
-  },
-
-  watch: {
-    'dataJson': {
-      handler(newVal, oldVal) {
-        this.tempDataJson = JSON.stringify(newVal) || JSON.stringify({})
+        this.$message({ showClose: true, message: 'json格式错误', type: 'warning' })
       }
     }
   }

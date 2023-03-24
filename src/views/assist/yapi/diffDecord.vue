@@ -16,8 +16,7 @@
             :key="item.key"
             :label="item.value"
             :value="item.key"
-          >
-          </el-option>
+          />
         </el-select>
 
         <el-button
@@ -25,7 +24,8 @@
           type="primary"
           size="mini"
           style="margin-left: 50px"
-          @click.native="downloadXmidSetup()">下载xmind8安装包
+          @click.native="downloadXmidSetup()"
+        >下载xmind8安装包
         </el-button>
 
       </el-form-item>
@@ -43,7 +43,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="project" align="center" label="名称" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="project" align="center" label="名称" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -61,7 +61,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip=true prop="name" align="center" label="是否有改变" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="是否有改变" min-width="10%">
         <template slot-scope="scope">
           <el-tag size="small" :type="scope.row.is_changed === 1 ? 'danger' : 'success'">
             {{ scope.row.is_changed === 1 ? '有改变' : '没有改变' }}
@@ -73,26 +73,27 @@
         <template slot-scope="scope">
 
           <el-button
+            v-show="scope.row.is_changed === 1"
             type="primary"
             size="mini"
-            v-show="scope.row.is_changed === 1"
-            @click.native="showDetail(scope.row)">查看详情
+            @click.native="showDetail(scope.row)"
+          >查看详情
           </el-button>
 
           <el-tooltip class="item" effect="dark" content="下载后需用xmind8打开" placement="top-start">
             <el-button
+              v-show="scope.row.is_changed === 1"
               type="primary"
               size="mini"
               :loading="scope.row.downloadLoadingIsShow"
-              v-show="scope.row.is_changed === 1"
-              @click.native="exportDiffRecordAsXmind(scope.row)">导出为xmind
+              @click.native="exportDiffRecordAsXmind(scope.row)"
+            >导出为xmind
             </el-button>
           </el-tooltip>
 
         </template>
       </el-table-column>
     </el-table>
-
 
     <!-- 分页组件 -->
     <pagination
@@ -108,12 +109,12 @@
 <script>
 import Pagination from '@/components/Pagination'
 
-import {getDiffRecordList, getDiffRecordProjectList, getDiffRecordAsXmind} from "@/apis/assist/yapi";
-import {userList} from "@/apis/system/user";
+import { getDiffRecordList, getDiffRecordProjectList, getDiffRecordAsXmind } from '@/apis/assist/yapi'
+import { userList } from '@/apis/system/user'
 
 export default {
-  name: 'diffDecord',
-  components: {Pagination},
+  name: 'DiffDecord',
+  components: { Pagination },
   data() {
     return {
       // 用户列表
@@ -132,13 +133,17 @@ export default {
       PageNum: 1,
       PageSize: 20,
 
-
       // 加载状态
       listLoading: false,
 
       // 数据列表
       currentDataList: []
     }
+  },
+
+  mounted() {
+    this.getUserList()
+    this.getKYMProjectList()
   },
 
   methods: {
@@ -152,7 +157,7 @@ export default {
 
     // 获取用户信息，同步请求
     async getUserList() {
-      let response = await userList()
+      const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -178,20 +183,20 @@ export default {
 
     // 查看报告详情
     showDetail(row) {
-      let {href} = this.$router.resolve({path: 'diffRecordShow', query: {id: row.id, name: row.name}})
+      const { href } = this.$router.resolve({ path: 'diffRecordShow', query: { id: row.id, name: row.name }})
       window.open(href, '_blank')
     },
 
     // 导出为xmind
     exportDiffRecordAsXmind(row) {
-      getDiffRecordAsXmind({id: row.id}).then(response => {
+      getDiffRecordAsXmind({ id: row.id }).then(response => {
         this.$set(row, 'downloadLoadingIsShow', false)
-        let blob = new Blob([response], {
-          type: 'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
-        });
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
         // 保存文件到本地
-        let a = document.createElement('a')
-        a.href = URL.createObjectURL(blob);  //生成一个url
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
         a.download = row.name + '.xmind'
         a.click()
       })
@@ -201,12 +206,7 @@ export default {
     downloadXmidSetup() {
       window.open('https://dl2.xmind.cn/xmind-8-update9-windows.exe')
     }
-  },
-
-  mounted() {
-    this.getUserList()
-    this.getKYMProjectList()
-  },
+  }
 }
 </script>
 

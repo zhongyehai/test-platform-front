@@ -16,17 +16,18 @@
             @node-click="projectClick"
           >
             <span
-              class="custom-tree-node"
               slot-scope="{ node, data }"
+              class="custom-tree-node"
               @mouseenter="mouseenter(data)"
-              @mouseleave="mouseleave(data)">
+              @mouseleave="mouseleave(data)"
+            >
               <span> {{ data.name }} </span>
-            <span v-show="data.showMenu" style="margin-left: 10px">
-              <el-button
-                size="mini"
-                type="text"
-                @click.stop="clickMenu(node, data)"
-              >{{ menuName }}</el-button>
+              <span v-show="data.showMenu" style="margin-left: 10px">
+                <el-button
+                  size="mini"
+                  type="text"
+                  @click.stop="clickMenu(node, data)"
+                >{{ menuName }}</el-button>
               </span>
             </span>
           </el-tree>
@@ -34,13 +35,12 @@
         <!-- 项目列表分页 -->
         <el-pagination
           small
-          @current-change="getCurrentPageProjectList"
           :current-page="projects.currentPage"
           :page-size="pageSize"
           layout="prev, pager, next"
           :total="projects.project_total"
-        >
-        </el-pagination>
+          @current-change="getCurrentPageProjectList"
+        />
 
       </el-tab-pane>
     </el-tabs>
@@ -49,14 +49,14 @@
 </template>
 
 <script>
-import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
-import {projectList as appProjectList} from '@/apis/appUiTest/project'
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
+import { projectList as appProjectList } from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'projectTree',
-  directives: {waves},
+  name: 'ProjectTree',
+  directives: { waves },
   components: {
     Pagination
   },
@@ -64,7 +64,7 @@ export default {
     'busEventClickTree',
     'busEventClickMenu',
     'sourceType',
-    'menuName',  // 菜单名
+    'menuName', // 菜单名
     'labelWidth' // 树名字显示长度
   ],
 
@@ -74,7 +74,7 @@ export default {
       projectTab: 'project',
 
       // 树的显示规则详见element-ui
-      defaultProps: {children: 'children', label: 'name'},
+      defaultProps: { children: 'children', label: 'name' },
 
       // 初始化数据默认的数据
       pageNum: 1,
@@ -104,11 +104,22 @@ export default {
     }
   },
 
+  // 当请求项目列表，返回的数据变了之后，默认点击第一条数据
+  watch: {
+    'defaultSelectedProject': function(newVal, oldVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          document.querySelector('.el-tree-node__content').click()
+        })
+      }
+    }
+  },
+
   created() {
     this.projectListUrl = this.sourceType === 'web_ui' ? webUiProjectList : appProjectList
 
     // 初始化项目列表, 取20条数据
-    this.getProjectList({'pageNum': this.pageNum, 'pageSize': this.pageSize})
+    this.getProjectList({ 'pageNum': this.pageNum, 'pageSize': this.pageSize })
   },
 
   methods: {
@@ -119,7 +130,7 @@ export default {
         this.currentLabel = JSON.parse(JSON.stringify(data.name))
         data.name = this.ellipsis(data.name, this.labelWidth)
       }
-      this.$set(data, 'showMenu', true);
+      this.$set(data, 'showMenu', true)
     },
 
     // 鼠标滑出的时候，把可展示菜单的标识去掉
@@ -127,7 +138,7 @@ export default {
       if (this.labelWidth) {
         data.name = this.currentLabel
       }
-      this.$set(data, 'showMenu', false);
+      this.$set(data, 'showMenu', false)
     },
 
     ellipsis(value, len) {
@@ -178,17 +189,6 @@ export default {
         this.$bus.$emit(this.busEventClickMenu, 'add', data)
       }
       this.currentProjectId = data.id
-    }
-  },
-
-  // 当请求项目列表，返回的数据变了之后，默认点击第一条数据
-  watch: {
-    'defaultSelectedProject': function (newVal, oldVal) {
-      if (newVal) {
-        this.$nextTick(() => {
-          document.querySelector('.el-tree-node__content').click()
-        })
-      }
     }
   }
 }

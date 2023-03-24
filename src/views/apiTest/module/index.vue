@@ -1,20 +1,18 @@
 <template>
 
-  <moduleView :dataType="'api'"></moduleView>
-
+  <moduleView :data-type="'api'" />
 
 </template>
 
 <script>
 import moduleView from '@/components/business/module/index.vue'
 
-
 export default {
-  name: 'index',
+  name: 'Index',
   components: {
     moduleView
   }
-};
+}
 </script>
 
 <style scoped>

@@ -1,26 +1,26 @@
 // title
 export const dataTypeTitleMappingContent = {
-  'api': '服务','webUi': '项目','appUi': 'APP',
+  'api': '服务', 'webUi': '项目', 'appUi': 'APP'
 }
 
 // swagger拉取状态
 export const swaggerPullStatusMappingContent = {
-  0: '拉取失败', 1: '未拉取', 2: '拉取成功',
+  0: '拉取失败', 1: '未拉取', 2: '拉取成功'
 }
 
 // swagger拉取状态
 export const swaggerPullStatusMappingTagType = {
-  0: 'danger', 1: 'warning', 2: 'success',
+  0: 'danger', 1: 'warning', 2: 'success'
 }
 
 // appium服务器请求状态
 export const appiumServerRequestStatusMappingContent = {
-  0: '未尝试访问', 1: '访问失败', 2: '访问成功',
+  0: '未尝试访问', 1: '访问失败', 2: '访问成功'
 }
 
 // appium服务器请求状态tagType
 export const appiumServerRequestStatusMappingTagType = {
-  0: 'info', 1: 'danger', 2: 'success',
+  0: 'info', 1: 'danger', 2: 'success'
 }
 
 // 测试报告步骤结果枚举

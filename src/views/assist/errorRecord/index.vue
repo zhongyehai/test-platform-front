@@ -23,27 +23,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'错误类型'" prop="name" align="center" min-width="20%" :show-overflow-tooltip=true>
+      <el-table-column :label="'错误类型'" prop="name" align="center" min-width="20%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="50%" :show-overflow-tooltip=true>
+      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="50%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span>{{ scope.row.detail }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip=true>
+      <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip="true">
         <template slot-scope="{row, $index}">
 
           <el-button
             size="mini"
             icon="el-icon-view"
             type="text"
-            @click="showDetail(row)">
-          </el-button>
+            @click="showDetail(row)"
+          />
 
         </template>
       </el-table-column>
@@ -56,14 +56,16 @@
       :total="total"
       :page.sync="listQuery.pageNum"
       :limit.sync="listQuery.pageSize"
-      @pagination="getErrorRecordList"/>
+      @pagination="getErrorRecordList"
+    />
 
     <el-drawer
       :title="currentRow.name"
       size="70%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
-      :direction="direction">
+      :direction="direction"
+    >
       <div class="demo-drawer__content" style="margin-left: 20px">
         <pre class="el-collapse-item-content" style="overflow: auto">{{ currentRow.detail }}</pre>
       </div>
@@ -75,14 +77,14 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
-import {errorRecordList} from '@/apis/assist/errorRecord'
+import { errorRecordList } from '@/apis/assist/errorRecord'
 
 export default {
   name: 'Project',
   components: {
     Pagination
   },
-  directives: {waves},
+  directives: { waves },
   data() {
     return {
       // 查询对象
@@ -106,14 +108,13 @@ export default {
 
       currentRow: {},
 
-      direction: 'rtl',  // 抽屉打开方式
+      direction: 'rtl' // 抽屉打开方式
     }
   },
 
   created() {
     // 初始化服务列表
     this.getErrorRecordList()
-
   },
 
   methods: {
@@ -129,7 +130,7 @@ export default {
     },
 
     // 查看详情
-    showDetail(row){
+    showDetail(row) {
       this.currentRow = row
       this.drawerIsShow = true
     },
@@ -147,7 +148,7 @@ export default {
         pageSize: 20
       }
       this.getErrorRecordList()
-    },
-  },
+    }
+  }
 }
 </script>
