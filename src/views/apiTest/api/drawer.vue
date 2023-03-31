@@ -105,7 +105,7 @@
           class="input-with-select"
           placeholder="请输入接口地址"
           size="mini"
-          style="width: 78%;margin-right: 5px"
+          style="width: 76%;margin-right: 5px"
           @change="changeUrl"
         />
 
@@ -457,11 +457,11 @@ export default {
       runApi({
         'projectId': this.tempApi.project_id,
         'apis': [this.tempApi.id],
-        env_code: runConf.runEnv
+        env_list: runConf.runEnv
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         } else {
           this.isShowDebugLoading = false
         }

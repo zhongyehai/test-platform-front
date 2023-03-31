@@ -29,7 +29,7 @@ export function deleteStep(data) {
 
 // 修改步骤状态
 export function putStepIsRun(data) {
-  return request({ url: currentBaseDir + '/changeIsRun', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/status', method: 'put', data: data })
 }
 
 // 修改步骤引用的host

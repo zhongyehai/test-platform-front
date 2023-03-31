@@ -34,7 +34,7 @@ export function caseRun(data) {
 
 // 修改用例状态
 export function putCaseIsRun(data) {
-  return request({ url: currentBaseDir + '/changeIsRun', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/status', method: 'put', data: data })
 }
 
 // 获取用例list

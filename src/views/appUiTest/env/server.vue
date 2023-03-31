@@ -127,18 +127,17 @@
     <el-drawer
       :title="tempData.id ? '修改服务器' : '新增服务器'"
       size="65%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
 
       <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
-        <el-form-item label="别名" class="is-required">
+        <el-form-item label="别名" class="is-required" size="mini">
           <el-input v-model="tempData.name" size="mini" placeholder="服务器名字" />
         </el-form-item>
 
-        <el-form-item label="系统类型" class="is-required">
+        <el-form-item label="系统类型" class="is-required" size="mini">
           <el-select
             v-model="tempData.os"
             filterable
@@ -158,7 +157,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="服务器ip" class="is-required">
+        <el-form-item label="服务器ip" class="is-required" size="mini">
           <el-input
             v-model="tempData.ip"
             size="mini"
@@ -178,7 +177,7 @@
           </el-popover>
         </el-form-item>
 
-        <el-form-item label="服务器端口" class="is-required">
+        <el-form-item label="服务器端口" class="is-required" size="mini">
           <el-input v-model="tempData.port" size="mini" placeholder="服务器端口" />
         </el-form-item>
 

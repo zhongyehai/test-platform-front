@@ -21,7 +21,7 @@
 
     <el-drawer
       title="选择具体项"
-      size="40%"
+      size="75%"
       :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"

@@ -1,10 +1,11 @@
 <template>
   <el-select
     v-model="current_env"
+    :multiple="isMultiple"
     filterable
     default-first-option
     placeholder="请选择运行环境"
-    style="width: 90%"
+    style="width: 98%"
     size="mini"
   >
     <el-option
@@ -21,10 +22,15 @@ import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Environment',
-  props: ['env'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'isMultiple',
+    // eslint-disable-next-line vue/require-prop-types
+    'env'
+  ],
   data() {
     return {
-      current_env: '',
+      current_env: [],
       env_list: []
     }
   },

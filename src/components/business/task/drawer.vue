@@ -2,7 +2,6 @@
   <el-drawer
     :title=" tempTask.id ? '修改定时任务' : '新增定时任务'"
     size="75%"
-    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
@@ -14,49 +13,20 @@
             <el-input v-model="tempTask.name" auto-complete="off" />
           </el-form-item>
 
-          <!-- 服务选择 -->
-          <el-row>
-            <el-col :span="dataType !== 'appUi' ? 12 : 24">
-              <el-form-item :label="`选择${dataTypeTitleMappingContent[this.dataType]}`" class="is-required">
-                <el-select
-                  v-model="projectSelectedId"
-                  placeholder="请选择服务"
-                  size="mini"
-                  filterable
-                  default-first-option
-                  :style="{'width': dataType !== 'appUi' ? '90%' : '97%'}"
-                  :disabled="true"
-                >
-                  <el-option
-                    v-for="(item) in projectLists"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                  <div>若没有选择用例集，则默认运行此服务下的所有用例</div>
-                  <el-button slot="reference" type="text" icon="el-icon-question" />
-                </el-popover>
-              </el-form-item>
-            </el-col>
-
-            <!-- 选择环境 -->
-            <el-col v-if="dataType !== 'appUi'" :span="12">
-              <el-form-item label="运行环境" class="is-required">
-                <environmentSelectorView
-                  ref="environmentSelectorView"
-                  :env="tempTask.env"
-                />
-                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                  <div>
-                    触发此定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名
-                  </div>
-                  <el-button slot="reference" type="text" icon="el-icon-question" />
-                </el-popover>
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <!-- 选择运行环境 -->
+          <el-form-item v-if="dataType !== 'appUi'" label="运行环境" class="is-required">
+            <environmentSelectorView
+              ref="environmentSelectorView"
+              :env="tempTask.env_list"
+              :is-multiple="true"
+            />
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>
+                触发此定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名
+              </div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
+          </el-form-item>
 
           <el-form-item v-if="dataType==='webUi'" label="运行浏览器" class="is-required">
             <el-radio
@@ -602,7 +572,7 @@ export default {
         id: '',
         num: '',
         name: '',
-        env: '',
+        env_list: [],
         task_type: 'cron',
         cron: '',
         is_send: '1',
@@ -633,7 +603,7 @@ export default {
         id: this.tempTask.id,
         num: this.tempTask.num,
         name: this.tempTask.name,
-        env: this.dataType !== 'appUi' ? this.$refs.environmentSelectorView.current_env : undefined,
+        env_list: this.dataType !== 'appUi' ? this.$refs.environmentSelectorView.current_env : [],
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
         is_send: this.tempTask.is_send,
@@ -712,7 +682,7 @@ export default {
       this.isShowDebugLoading = true
       this.runTaskUrl({
         id: taskId,
-        env: runConf.runEnv,
+        env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
         server_id: runConf.runServer,
@@ -722,7 +692,7 @@ export default {
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         }
       })
     }

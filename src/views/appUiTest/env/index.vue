@@ -8,6 +8,7 @@
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>添加appium执行服务器</div>
             <el-button
+              v-show="activeName === 'appServer'"
               slot="reference"
               type="text"
               style="margin-left: 10px"
@@ -25,6 +26,7 @@
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>添加手机设备</div>
             <el-button
+              v-show="activeName === 'appPhone'"
               slot="reference"
               type="text"
               style="margin-left: 10px"

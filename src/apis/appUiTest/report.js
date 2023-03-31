@@ -32,6 +32,11 @@ export function reportIsDone(params) {
   return request({ url: reportDir + '/status', method: 'get', data: null, params: params })
 }
 
+// 获取运行批次中要展示的报告id
+export function reportShowId(params) {
+  return request({ url: reportDir + '/showId', method: 'get', data: null, params: params })
+}
+
 // 报告详情
 export function reportDetail(params) {
   return request({ url: reportDir + '/detail', method: 'get', data: null, params: params })

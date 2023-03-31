@@ -3,7 +3,6 @@
     <el-drawer
       :title="tempProject.id ? `修改${titleType}` : `新增${titleType}`"
       size="70%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >

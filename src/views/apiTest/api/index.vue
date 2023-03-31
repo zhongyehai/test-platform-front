@@ -460,11 +460,11 @@ export default {
       runApi({
         projectId: this.currentApi.project_id,
         apis: [this.currentApi.id],
-        env_code: runConf.runEnv
+        env_list: runConf.runEnv
       }).then(response => {
         this.$set(this.currentApi, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         }
       })
     },

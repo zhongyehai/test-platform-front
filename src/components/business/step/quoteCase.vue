@@ -74,7 +74,7 @@
                 type="text"
                 size="mini"
                 @click.native="copyCaseStepAsStep(scope.row)"
-              >复制步骤
+              >拉取
               </el-button>
             </el-tooltip>
 
@@ -89,7 +89,7 @@
                 type="text"
                 size="mini"
                 @click.native="addQuote(scope.row)"
-              >引用用例
+              >引用
               </el-button>
             </el-tooltip>
 
@@ -100,7 +100,7 @@
               size="mini"
               style="margin-right: 5px"
               @click="showCaseRemark(scope.row.id)"
-            >查看详情</el-button>
+            >详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -271,6 +271,7 @@ export default {
         this.copyCaseStepUrl({ source: fromCase.id, to: this.caseId }).then(response => {
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')
+            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess') // 重新请求用例更新变量
           }
         })
       } else {

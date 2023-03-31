@@ -370,22 +370,6 @@ export default {
       if (status) {
         this.getCaseUrl({ id: this.tempCase.id }).then(response => {
           this.tempCase.variables = response.data.variables
-          // let tempCase_variables = {}, response_variables = {}
-          //
-          // response.data.variables.forEach(variable => {
-          //   response_variables[variable["key"]] = variable
-          // })
-          //
-          // this.tempCase.variables.forEach(variable => {
-          //   tempCase_variables[variable["key"]] = variable
-          // })
-          //
-          // for (let key in response_variables) {
-          //   if (!(key in tempCase_variables)) {
-          //     this.tempCase.variables.push(response_variables[key])
-          //     // tempCase_variables[key] = response_variables[key]
-          //   }
-          // }
         })
       }
     })
@@ -586,7 +570,7 @@ export default {
       this.isShowDebugLoading = true
       this.caseRunUrl({
         caseId: [caseId],
-        env_code: runConf.runEnv,
+        env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
         server_id: runConf.runServer,
@@ -597,7 +581,7 @@ export default {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         }
       })
     }

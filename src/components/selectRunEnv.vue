@@ -16,10 +16,24 @@
         </label>
       </div>
       <div style="margin-top: 10px">
-        <el-radio v-for="(env) in runEnvData " :key="env.code" v-model="runEnv" :label="env.code">{{
-          env.name
-        }}
-        </el-radio>
+        <el-checkbox
+          v-model="checkAll"
+          :indeterminate="isIndeterminate"
+          @change="handleCheckAllChange"
+        >全选
+        </el-checkbox>
+        <div style="margin: 15px 0;" />
+        <el-checkbox-group v-model="runEnv" @change="handleCheckedItemChange">
+          <div v-for="(group, index) in envGroupList" :key="index">
+            <div style="margin: 15px 0;" />
+            <el-checkbox disabled>{{ group }}</el-checkbox>
+            <br>
+            <el-checkbox v-for="(env) in envGroupDataList[group]" :key="env.code" :label="env.code">{{
+              env.name
+            }}
+            </el-checkbox>
+          </div>
+        </el-checkbox-group>
       </div>
     </div>
 
@@ -157,7 +171,7 @@
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
 import { getConfigByName, getRunModel } from '@/apis/config/config'
-import { runEnvList } from '@/apis/config/runEnv'
+import { runEnvGroupList, runEnvList } from '@/apis/config/runEnv'
 import { phoneList, serverList } from '@/apis/appUiTest/env' // 初始化超时时间
 import { getRunTimeout } from '@/utils/getConfig'
 
@@ -169,9 +183,8 @@ export default {
   data() {
     return {
       dialogIsShow: false,
-      runEnvData: [],
       runModeData: {},
-      runEnv: undefined,
+      runEnv: [],
       runBrowser: undefined,
       runServer: undefined,
       runPhone: undefined,
@@ -180,12 +193,30 @@ export default {
       runType: '0',
       showSelectRunModel: false,
 
+      checkAll: false,
+      isIndeterminate: true,
+      runEnvDataSource: [],
+      envCodeList: [], // ['envCode1', 'envCode2']
+      envGroupList: [], // ['qa', 'dev']
+      envGroupDataList: {
+        // dev: [{'envCode': 'envName'}],
+        // test: [{'envCode': 'envName'}]
+      },
+
       statusContentMapping: appiumServerRequestStatusMappingContent,
       statusTagTypeMapping: appiumServerRequestStatusMappingTagType
     }
   },
 
   mounted() {
+    // 获取环境分组
+    runEnvGroupList().then(res => {
+      this.envGroupList = res.data
+      res.data.forEach(group => {
+        this.envGroupDataList[group] = []
+      })
+    })
+
     getRunTimeout(this) // 初始化等待用例运行超时时间
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel) => {
@@ -211,7 +242,44 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+
   methods: {
+
+    // 获取环境配置
+    initEnvList() {
+      // 初始化运行环境
+      runEnvList().then(response => {
+        this.runEnvDataSource = response.data.data
+        this.envCodeList = []
+        this.runEnvDataSource.forEach(env => {
+          this.envCodeList.push(env.code)
+          this.envGroupDataList[env.group].push(env)
+        })
+        if (this.runEnvDataSource && this.runEnvDataSource.length > 0) {
+          this.runEnv = [this.runEnvDataSource[0].code]
+        }
+      })
+    },
+
+    initEnvGroupDataList() {
+      this.envGroupDataList = {}
+      this.envGroupList.forEach(group => {
+        this.envGroupDataList[group] = []
+      })
+    },
+
+    // 点全选
+    handleCheckAllChange(val) {
+      this.runEnv = val ? this.envCodeList : []
+      this.isIndeterminate = false
+    },
+
+    // 当选中选项时，全选按钮的状态变化
+    handleCheckedItemChange(value) {
+      const checkedCount = value.length
+      this.checkAll = checkedCount === this.envCodeList.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.envCodeList.length
+    },
 
     // 点确定
     runData() {
@@ -224,17 +292,6 @@ export default {
         noReset: this.noReset
       })
       this.dialogIsShow = false
-    },
-
-    // 获取环境配置
-    initEnvList() {
-      // 初始化运行环境
-      runEnvList().then(response => {
-        this.runEnvData = response.data.data
-        if (this.runEnvData && this.runEnvData.length > 0) {
-          this.runEnv = this.runEnvData[0].code
-        }
-      })
     },
 
     // 获取浏览器配置

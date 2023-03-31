@@ -36,7 +36,7 @@
       </el-form-item>
 
       <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
-        <el-input v-model="tempHit.report_id" size="mini" />
+        <el-input v-model="tempHit.report_id" size="mini"/>
       </el-form-item>
 
       <el-form-item :label="'触发时间'" prop="date" class="is-required" size="mini">
@@ -88,11 +88,11 @@
       </el-form-item>
 
       <el-form-item :label="'问题内容'" prop="hit_detail" class="is-required" size="mini">
-        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'" />
+        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'"/>
       </el-form-item>
 
       <el-form-item :label="'备注'" prop="desc" size="mini">
-        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'" />
+        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'"/>
       </el-form-item>
 
     </el-form>
@@ -186,34 +186,36 @@ export default {
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (status, data) => {
-      this.initHitTypeList() // 获取问题类型列表
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
+      if (_type === 'hit') {
+        this.initHitTypeList() // 获取问题类型列表
 
-      this.getRunType() // 获取测试类型列表
+        this.getRunType() // 获取测试类型列表
 
-      if (status === 'add') {
-        this.tempHit.id = ''
-        this.tempHit.date = data ? data.date : ''
-        this.tempHit.hit_type = ''
-        this.tempHit.hit_detail = ''
-        this.tempHit.test_type = data ? data.test_type : ''
-        this.tempHit.project_id = data ? data.project_id : ''
-        this.tempHit.env = data ? data.run_env : ''
-        this.tempHit.report_id = data ? data.report_id : ''
-        this.tempHit.desc = ''
-      } else if (status === 'update') {
-        this.tempHit.id = data.id
-        this.tempHit.date = data.date
-        this.tempHit.hit_type = data.hit_type
-        this.tempHit.hit_detail = data.hit_detail
-        this.tempHit.test_type = data.test_type
-        this.tempHit.project_id = data.project_id
-        this.tempHit.env = data.env
-        this.tempHit.report_id = data.report_id
-        this.tempHit.desc = data.desc
+        if (status === 'add') {
+          this.tempHit.id = ''
+          this.tempHit.date = data ? data.date : ''
+          this.tempHit.hit_type = ''
+          this.tempHit.hit_detail = ''
+          this.tempHit.test_type = data ? data.test_type : ''
+          this.tempHit.project_id = data ? data.project_id : ''
+          this.tempHit.env = data ? data.run_env : ''
+          this.tempHit.report_id = data ? data.report_id : ''
+          this.tempHit.desc = ''
+        } else if (status === 'update') {
+          this.tempHit.id = data.id
+          this.tempHit.date = data.date
+          this.tempHit.hit_type = data.hit_type
+          this.tempHit.hit_detail = data.hit_detail
+          this.tempHit.test_type = data.test_type
+          this.tempHit.project_id = data.project_id
+          this.tempHit.env = data.env
+          this.tempHit.report_id = data.report_id
+          this.tempHit.desc = data.desc
+        }
+
+        this.drawerIsShow = true
       }
-
-      this.drawerIsShow = true
     })
   },
 

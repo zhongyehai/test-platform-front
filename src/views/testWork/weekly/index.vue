@@ -158,7 +158,7 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" productDrawerStatus === 'add' ? addProduct() : changProduct() "
+          @click=" werStatus === 'add' ? addProduct() : changProduct() "
         >
           {{ '保存' }}
         </el-button>

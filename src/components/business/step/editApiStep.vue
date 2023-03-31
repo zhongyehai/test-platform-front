@@ -314,8 +314,7 @@ export default {
         'data_text': '',
         'data_driver': [],
         'case_id': this.caseId,
-        'api_id': '',
-        'project_id': ''
+        'api_id': ''
       },
 
       validateTypeList: [],
@@ -404,8 +403,7 @@ export default {
         'data_driver': data_driver ? JSON.parse(data_driver) : [],
         'quote_case': null,
         'case_id': this.currentStep.case_id ? this.currentStep.case_id : this.caseId,
-        'api_id': this.currentStep.api_id,
-        'project_id': this.currentStep.project_id
+        'api_id': this.currentStep.api_id
       }
     },
 

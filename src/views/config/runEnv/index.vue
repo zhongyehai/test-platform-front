@@ -3,6 +3,25 @@
 
     <el-form label-width="100px" :inline="true">
 
+      <el-form-item :label="'环境分组：'" size="mini">
+        <el-select
+          v-model="listQuery.group"
+          style="width: 100%"
+          placeholder="环境分组"
+          size="mini"
+          filterable
+          clearable
+          default-first-option
+        >
+          <el-option
+            v-for="item in groupList"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
+
       <el-form-item :label="'环境名字：'" size="mini">
         <el-input
           v-model="listQuery.name"
@@ -10,7 +29,7 @@
           placeholder="环境名字，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 300px"
+          style="width: 200px"
         />
       </el-form-item>
 
@@ -21,7 +40,7 @@
           placeholder="环境code，支持模糊搜索"
           size="mini"
           clearable
-          style="width: 300px"
+          style="width: 200px"
         />
       </el-form-item>
 
@@ -60,19 +79,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="环境名字" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="group" align="center" label="环境分组" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.group }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="环境名字" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="code" align="center" label="环境code" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="code" align="center" label="环境code" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.code }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="35%">
+      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
@@ -102,7 +127,6 @@
     <el-drawer
       :title=" drawerType === 'add' ? '新增环境' : '修改环境'"
       size="60%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
@@ -112,6 +136,25 @@
         label-width="80px"
         style="min-width: 400px;margin-left: 20px;margin-right: 20px"
       >
+        <el-form-item :label="'环境分组'" class="is-required" size="mini">
+          <el-select
+            v-model="tempRunEnv.group"
+            style="width: 100%"
+            placeholder="环境分组"
+            size="mini"
+            filterable
+            allow-create
+            default-first-option
+          >
+            <el-option
+              v-for="item in groupList"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+
         <el-form-item :label="'环境名字'" class="is-required" size="mini">
           <el-input
             v-model="tempRunEnv.name"
@@ -130,7 +173,7 @@
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
-          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini" />
+          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini"/>
         </el-form-item>
 
       </el-form>
@@ -161,7 +204,7 @@
 <script>
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
-import { runEnvList, postRunEnv, putRunEnv, runEnvSort } from '@/apis/config/runEnv'
+import { runEnvList, postRunEnv, putRunEnv, runEnvSort, runEnvGroupList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Index',
@@ -175,8 +218,10 @@ export default {
         pageSize: 20,
         create_user: '',
         name: '',
-        code: ''
+        code: '',
+        group: ''
       },
+      groupList: [],
       // 请求列表等待响应的状态
       tableLoadingIsShow: false,
       run_env_total: 0,
@@ -203,6 +248,11 @@ export default {
   },
 
   mounted() {
+    // 获取环境分组
+    runEnvGroupList().then(res => {
+      this.groupList = res.data
+    })
+
     this.getRunEnvList()
   },
 
@@ -217,6 +267,7 @@ export default {
           id: '',
           name: '',
           code: '',
+          group: '',
           desc: ''
         }
         this.drawerType = 'add'

@@ -350,7 +350,6 @@ export default {
   },
   props: [
     'dataType',
-    'projectId',
     'caseId'
   ],
   data() {
@@ -416,7 +415,6 @@ export default {
           this.currentStep.extracts = []
           this.currentStep.validates = []
           this.currentStep.data_driver = []
-          this.currentStep.project_id = this.projectId
           this.currentStep.case_id = this.caseId
           this.currentStep.page_id = this.currentElement.page_id
           this.currentStep.element_id = this.currentElement.id

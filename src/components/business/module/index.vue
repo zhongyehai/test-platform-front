@@ -16,14 +16,14 @@
           <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
 
-        <el-button
-          v-show="tempDataForm.project_id"
-          type="primary"
-          size="mini"
-          style="margin-left: 10px"
-          @click.native="addParentModule()"
-        >添加一级模块
-        </el-button>
+<!--        <el-button-->
+<!--          v-show="tempDataForm.project_id"-->
+<!--          type="primary"-->
+<!--          size="mini"-->
+<!--          style="margin-left: 10px"-->
+<!--          @click.native="addParentModule()"-->
+<!--        >添加一级模块-->
+<!--        </el-button>-->
 
       </el-form-item>
 
@@ -61,7 +61,23 @@
       <!-- 第一列服务树 -->
       <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="projectTab" class="table_padding table_project">
-          <el-tab-pane :label="projectTab" :name="projectTab">
+<!--          <el-tab-pane :label="projectTab" :name="projectTab">-->
+          <el-tab-pane :name="projectTab">
+
+            <template slot="label">
+              <span> 模块列表 </span>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>{{ `为当前${titleType}添加一级模块` }}</div>
+                <el-button
+                  v-show="tempDataForm.project_id"
+                  slot="reference"
+                  type="text"
+                  style="margin-left: 50px"
+                  @click="addParentModule()"
+                >添加</el-button>
+              </el-popover>
+            </template>
+
             <div class="custom-tree-container">
               <div class="block">
                 <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini" />
@@ -188,7 +204,6 @@
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增模块' : '修改模块'"
       size="40%"
-      :wrapper-closable="false"
       :visible.sync="moduleDrawerIsShow"
       :direction="direction"
     >

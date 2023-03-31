@@ -1,5 +1,78 @@
 <template>
   <div class="app-container">
+    <el-form label-width="80px" inline v-show="selectedList.length > 0">
+      <!--  批量删除 -->
+
+      <el-popover
+        v-show="selectedList.length > 0"
+        placement="top"
+        popper-class="down-popover"
+        v-model="showBatchDelete"
+      >
+        <p>确定删除所选中的测试步骤?</p>
+        <div style="text-align: right; margin: 0">
+          <el-button size="mini" type="text" @click="cancelBatchDeletePopover()">取消</el-button>
+          <el-button type="primary" size="mini" @click="deleteStepOnList">确定</el-button>
+        </div>
+        <el-button
+          slot="reference"
+          type="primary"
+          size="mini"
+          style="margin-left: 5px"
+        >批量删除
+        </el-button>
+      </el-popover>
+
+      <el-popover
+        v-model="showBatchChangeStatusToRun"
+        placement="top"
+        popper-class="down-popover"
+      >
+        <p>确定把所选步骤状态改为要执行?</p>
+        <div style="text-align: right; margin: 0">
+          <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToRun()">取消</el-button>
+          <el-button type="primary" size="mini" @click="changeStatus(null, 1, true)">确定</el-button>
+        </div>
+        <el-button
+          slot="reference"
+          type="primary"
+          size="mini"
+          style="margin-left: 5px"
+        >批量改为要执行
+        </el-button>
+      </el-popover>
+
+      <el-popover
+        v-model="showBatchChangeStatusToNotRun"
+        placement="top"
+        popper-class="down-popover"
+      >
+        <p>确定把所选步骤状态改为不执行?</p>
+        <div style="text-align: right; margin: 0">
+          <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToNotRun()">取消</el-button>
+          <el-button type="primary" size="mini" @click="changeStatus(null, 0, true)">确定</el-button>
+        </div>
+        <el-button
+          slot="reference"
+          type="primary"
+          size="mini"
+          style="margin-left: 5px"
+        >批量改为不执行
+        </el-button>
+      </el-popover>
+
+      <el-tooltip
+        class="item"
+        effect="dark"
+        placement="top-start"
+      >
+        <div slot="content">
+          <div>执行测试时只会将状态为要运行的步骤拿出来运行</div>
+        </div>
+        <span><i style="color: #409EFF; margin-left: 10px" class="el-icon-question"/></span>
+      </el-tooltip>
+
+    </el-form>
 
     <!-- 步骤列表 -->
     <el-table
@@ -13,7 +86,10 @@
       highlight-current-row
       style="width: 100%"
       :height="tableHeight"
+      @selection-change="clickSelectAll"
     >
+      <el-table-column type="selection" min-width="2%"/>
+
       <el-table-column prop="num" label="序号" min-width="8%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
@@ -31,7 +107,7 @@
             <div slot="content">
               <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
             </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+            <span><i style="color: #409EFF" class="el-icon-question"/></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
@@ -39,7 +115,7 @@
             v-model="scope.row.status"
             :inactive-value="0"
             :active-value="1"
-            @change="changeStepIsRun(scope.row.id)"
+            @change="changeStatus(scope.row, null, true)"
           />
         </template>
       </el-table-column>
@@ -66,7 +142,8 @@
             size="mini"
             style="margin-right: 10px"
             @click.native="editStep(scope.row)"
-          >修改</el-button>
+          >修改
+          </el-button>
 
           <!-- 复制引用用例的步骤 -->
           <el-popover
@@ -87,7 +164,8 @@
               type="text"
               size="mini"
               :loading="scope.row.pullIsLoading"
-            >复制步骤</el-button>
+            >拉取
+            </el-button>
           </el-popover>
 
           <!-- 复制步骤 -->
@@ -108,7 +186,8 @@
               type="text"
               size="mini"
               :loading="scope.row.copyIsLoading"
-            >复制</el-button>
+            >复制
+            </el-button>
           </el-popover>
 
           <!-- 查看用例详情 -->
@@ -119,11 +198,11 @@
             size="mini"
             style="margin-right: 5px"
             @click="showCaseRemark(scope.row.quote_case)"
-          >查看</el-button>
+          >查看
+          </el-button>
 
           <!-- 删除步骤 -->
           <el-popover
-            v-if="!scope.row.quote_case"
             :ref="scope.row.id"
             v-model="scope.row.deletePopoverIsShow"
             placement="top"
@@ -135,7 +214,7 @@
               <el-button
                 type="primary"
                 size="mini"
-                @click="deleteStepOnList({id: scope.row.id, index: scope.$index, row: scope.row})"
+                @click="deleteStepOnList(scope.row)"
               >确定
               </el-button>
             </div>
@@ -144,34 +223,8 @@
               style="color: red"
               type="text"
               size="mini"
-            >删除</el-button>
-          </el-popover>
-
-          <!-- 解除引用 -->
-          <el-popover
-            v-if="scope.row.quote_case"
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            width="160"
-            popper-class="down-popover"
-          >
-            <p>是否解除引用【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button
-                type="primary"
-                size="mini"
-                @click="deleteStepOnList({id: scope.row.id, index: scope.$index, row: scope.row})"
-              >确定
-              </el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-            >删除</el-button>
+            >删除
+            </el-button>
           </el-popover>
 
         </template>
@@ -285,7 +338,7 @@
                     <div slot="content">
                       <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    <span><i style="color: #409EFF" class="el-icon-question"/></span>
                   </el-tooltip>
                 </template>
                 <template slot-scope="scope">
@@ -293,7 +346,7 @@
                     v-model="scope.row.status"
                     :inactive-value="0"
                     :active-value="1"
-                    @change="changeStepIsRun(scope.row.id)"
+                    @change="changeStatus(scope.row, null, false)"
                   />
                 </template>
               </el-table-column>
@@ -320,7 +373,8 @@
                       type="text"
                       size="mini"
                       :loading="scope.row.pullIsLoading"
-                    >复制步骤</el-button>
+                    >复制步骤
+                    </el-button>
                   </el-popover>
 
                   <!-- 复制步骤 -->
@@ -341,7 +395,8 @@
                       type="text"
                       size="mini"
                       :loading="scope.row.copyIsLoading"
-                    >复制</el-button>
+                    >复制
+                    </el-button>
                   </el-popover>
 
                   <!-- 查看用例详情 -->
@@ -352,7 +407,8 @@
                     size="mini"
                     style="margin-right: 5px"
                     @click="showCaseRemark(scope.row.quote_case)"
-                  >查看</el-button>
+                  >查看
+                  </el-button>
 
                   <!-- 点击编辑步骤 -->
                   <el-button
@@ -362,7 +418,8 @@
                     size="mini"
                     style="margin-right: 5px"
                     @click="editStep(scope.row)"
-                  >修改</el-button>
+                  >修改
+                  </el-button>
 
                 </template>
               </el-table-column>
@@ -416,7 +473,9 @@ export default {
     variablesView
   },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType',
+    // eslint-disable-next-line vue/require-prop-types
     'caseId'
   ],
   data() {
@@ -444,6 +503,11 @@ export default {
       },
       caseIdList: [], // 用于记录查看的用例的来源
       caseRemarkIsShow: false, // 是否展示被引用用例的描述
+
+      selectedList: [],
+      showBatchDelete: false,
+      showBatchChangeStatusToRun: false,
+      showBatchChangeStatusToNotRun: false,
 
       deleteStepUrl: '',
       putStepIsRunUrl: '',
@@ -522,6 +586,46 @@ export default {
   },
   methods: {
 
+    // 全选
+    clickSelectAll(val) {
+      this.selectedList = val
+    },
+
+    cancelShowBatchChangeStatusToRun() {
+      this.showBatchChangeStatusToRun = false
+    },
+
+    cancelShowBatchChangeStatusToNotRun() {
+      this.showBatchChangeStatusToNotRun = false
+    },
+
+    cancelBatchDeletePopover() {
+      this.showBatchDelete = false
+    },
+
+    changeStatus(row, status, isGetStepList) {
+      let selectedIdList = []
+      // eslint-disable-next-line no-unused-vars
+      let changeStatus = 0
+      if (row === null) { // 批量修改
+        this.showBatchChangeStatusToRun = false
+        this.showBatchChangeStatusToNotRun = false
+        this.selectedList.forEach(data => {
+          selectedIdList.push(data.id)
+        })
+        changeStatus = status
+      } else {
+        selectedIdList = [row.id]
+        changeStatus = row.status
+      }
+      this.putStepIsRunUrl({ 'id': selectedIdList, 'status': changeStatus }).then(response => {
+        this.showMessage(this, response)
+        if (isGetStepList) {
+          this.getStepList()
+        }
+      })
+    },
+
     // 获取步骤列表
     getStepList() {
       this.tableIsLoading = true
@@ -537,21 +641,23 @@ export default {
       this.tableIsLoading = false
     },
 
-    // 修改步骤的执行状态
-    changeStepIsRun(step_id) {
-      this.putStepIsRunUrl({ 'id': step_id }).then(response => {
-        this.showMessage(this, response)
-      })
-    },
-
     // 删除步骤
-    deleteStepOnList(stepInfo) {
-      this.$set(stepInfo.row, 'deletePopoverIsShow', false)
+    deleteStepOnList(row) {
+      let selectedIdList = []
+      if (row.id) {
+        this.$set(row, 'deletePopoverIsShow', false)
+        selectedIdList = [row.id]
+      } else { // 批量删除
+        this.showBatchDelete = false
+        this.selectedList.forEach(report => {
+          selectedIdList.push(report.id)
+        })
+      }
       this.tableLoadingIsShow = true
-      this.deleteStepUrl({ 'id': stepInfo.id }).then(response => {
+      this.deleteStepUrl({ 'id': selectedIdList }).then(response => {
         this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
-          this.stepList.splice(stepInfo.index, 1) // 从步骤列表中删除步骤
+          this.getStepList()
         }
       })
     },

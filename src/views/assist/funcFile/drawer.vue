@@ -21,7 +21,7 @@
 
       <!-- 备注 -->
       <el-form-item :label="'备注'" prop="desc" style="margin-bottom: 8px">
-        <el-input v-model="tempFunc.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'" />
+        <el-input v-model="tempFunc.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'"/>
       </el-form-item>
 
       <el-form-item label="调试函数" size="mini">
@@ -37,14 +37,14 @@
           style="margin-left: 5px"
           size="mini"
           :loading="deBugButtonIsLoading"
-          @click="debugFunc"
+          @click="dialogIsShow = true"
         >调试
         </el-button>
         <el-popover class="el_popover_class" placement="top-start" trigger="hover">
           <div>1、输入运行表达式，调试自定义函数</div>
           <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
           <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
-          <el-button slot="reference" type="text" icon="el-icon-question" />
+          <el-button slot="reference" type="text" icon="el-icon-question"/>
         </el-popover>
       </el-form-item>
 
@@ -92,17 +92,75 @@
       </el-button>
     </div>
 
+    <!-- 选择环境和运行模式 -->
+    <el-dialog title="选择运行环境" append-to-body :visible.sync="dialogIsShow" :close-on-click-modal="false"
+               width="50%"
+    >
+
+      <div>
+        <label>选择环境：</label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>
+          <span style="color: red">
+            注：请确保此次运行中涉及到的所有服务都设置了当前选中环境的域名 <br>
+            比如选择的测试环境，那么在运行的时候所有步骤都会找自己所在服务的测试环境的域名
+          </span>
+        </label>
+      </div>
+      <div style="margin-top: 10px">
+        <el-radio v-for="(env) in runEnvList " :key="env.code" v-model="runEnv" :label="env.code">{{
+          env.name
+        }}
+        </el-radio>
+      </div>
+      <span slot="footer" class="dialog-footer">
+      <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
+      <el-button size="mini" type="primary" @click="debugFunc">确 定</el-button>
+    </span>
+
+    </el-dialog>
+
     <!-- 展示调试结果 -->
     <el-drawer
       :title="debugResultMessage"
-      size="60%"
+      size="70%"
       append-to-body
-      :wrapper-closable="false"
       :visible.sync="debugResultDrawerIsShow"
       :direction="direction"
     >
       <div class="demo-drawer__content" style="margin-left: 20px">
-        <pre class="el-collapse-item-content" style="overflow: auto">{{ debugResultDetail || '没有返回值或返回值为null' }}</pre>
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="执行结果" name="debugResult">
+            <div>运行环境：{{ runEnvDict[runEnv] }}</div>
+            <br>
+
+            <div>运行表达式：{{ expression }}</div>
+            <br>
+
+            <div>执行结果：</div>
+            <pre class="el-collapse-item-content" style="overflow: auto">{{
+                debugResultDetail.result || '没有返回值或返回值为null'
+              }}</pre>
+          </el-tab-pane>
+
+          <el-tab-pane label="执行脚本" name="script">
+            <div v-if="debugResultDrawerIsShow">
+              <el-container style="margin-left: 20px">
+                <editor
+                  v-model="debugResultDetail.script"
+                  :style="{'min-height': funcFileEditHeight, 'font-size': '15px'}"
+                  lang="python"
+                  theme="monokai"
+                  :options="{enableSnippets:true, enableBasicAutocompletion: true, enableLiveAutocompletion: true}"
+                  @init="editorInit"
+                />
+              </el-container>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+
+
       </div>
     </el-drawer>
 
@@ -110,7 +168,8 @@
 </template>
 
 <script>
-import { postFuncFile, putFuncFile, debugFuncFile } from '@/apis/assist/funcFile'
+import { postFuncFile, putFuncFile, debugFuncFile, getFuncFile } from '@/apis/assist/funcFile'
+import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Drawer',
@@ -120,6 +179,7 @@ export default {
   data() {
     return {
       direction: 'rtl', // 抽屉打开方式
+      dialogIsShow: false,
       submitButtonIsLoading: false,
       funcFileDrawerIsShow: false,
       tempFunc: {
@@ -128,11 +188,14 @@ export default {
         desc: '',
         func_data: ''
       },
-
+      runEnv: '',
+      runEnvList: [],
+      runEnvDict: {},
       deBugButtonIsLoading: false,
       saveButtonIsLoading: false,
       expression: '', // 表达式
       debugResultDrawerIsShow: false,
+      activeName: 'debugResult',
       debugResultDetail: '',
       debugResultMessage: ''
     }
@@ -146,6 +209,17 @@ export default {
   },
 
   mounted() {
+    // 初始化运行环境
+    runEnvList().then(response => {
+      this.runEnvList = response.data.data
+      if (this.runEnvList && this.runEnvList.length > 0) {
+        this.runEnv = this.runEnvList[0].code
+      }
+      this.runEnvList.forEach(env => {
+        this.runEnvDict[env.code] = env.name
+      })
+    })
+
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
       if (_type === 'funcFileInfo') {
         if (status === 'add') {
@@ -157,7 +231,10 @@ export default {
           this.tempFunc.id = data.id
           this.tempFunc.name = data.name
           this.tempFunc.desc = data.desc
-          this.tempFunc.func_data = data.func_data
+          getFuncFile({ id: data.id }).then(res => {
+            console.log(res)
+            this.tempFunc.func_data = res.func_data
+          })
         }
         this.funcFileDrawerIsShow = true
       }
@@ -170,10 +247,10 @@ export default {
   },
 
   methods: {
-
     showDetail(res) {
       this.debugResultDetail = res.message.result
       this.debugResultMessage = res.message.msg
+      this.activeName = 'debugResult'
       this.debugResultDrawerIsShow = true
     },
 
@@ -242,10 +319,16 @@ export default {
 
     runDeBug() {
       this.deBugButtonIsLoading = true
-      debugFuncFile({ 'id': this.tempFunc.id, 'expression': this.expression }).then(res => {
+      debugFuncFile({
+        'id': this.tempFunc.id,
+        'expression': this.expression,
+        'env': this.runEnv
+      }).then(res => {
         this.deBugButtonIsLoading = false
+        this.dialogIsShow = false
         this.debugResultDetail = res.result
         this.debugResultMessage = res.message
+        this.activeName = 'debugResult'
         this.debugResultDrawerIsShow = true
       })
     },

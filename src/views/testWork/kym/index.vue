@@ -80,7 +80,7 @@
           size="mini"
           type="primary"
           :loading="submitButtonIsLoading"
-          @click=" addKYMProject() "
+          @click=" ect() "
         >
           {{ '保存' }}
         </el-button>

@@ -21,7 +21,7 @@
         <el-tab-pane v-if="dataType === 'api'" label="接口列表" name="apiList">
           <apiListView
             ref="apiListView"
-            :project-id="this.projectId"
+            :project-id="projectId"
             :dialog-is-show="dialogIsShow"
             :current-case-id="caseId"
           />
@@ -32,7 +32,7 @@
           <elementListView
             ref="elementList"
             :data-type="dataType"
-            :project-id="this.projectId"
+            :project-id="projectId"
             :dialog-is-show="dialogIsShow"
             :current-case-id="caseId"
           />
@@ -64,7 +64,6 @@
       v-else
       ref="editStepView"
       :data-type="dataType"
-      :project-id="projectId"
       :case-id="caseId"
     />
   </el-row>

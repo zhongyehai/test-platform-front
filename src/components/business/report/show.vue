@@ -17,31 +17,48 @@
           </el-button>
 
           <el-select
-            v-model="showReportResult"
-            placeholder="展示类型"
+            v-model="showCaseResultType"
+            placeholder="用例展示类型"
             size="mini"
-            style="margin-left: 20px; width: 200px"
+            style="margin-left: 10px; width: 130px"
             filterable
-            clearable
             default-first-option
           >
-            <el-option v-for="item in showReportResultList" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in showCaseResultTypeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+
+          <el-select
+            v-model="showStepResultType"
+            placeholder="步骤展示类型"
+            size="mini"
+            style="margin-left: 10px; width: 130px"
+            filterable
+            default-first-option
+          >
+            <el-option
+              v-for="item in showStepResultTypeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
 
           <span style="float: right;font-size: 13px;color: #3a8ee6">
-            <span v-if="dataType !== 'appUi'" style="margin-right: 30px">运行环境: {{
-              runEnvDict[reportData.run_env]
-            }}</span>
-            <span style="margin-right: 30px">执行模式: {{
-              reportData.is_async === 1 ? '并行运行' : '串行运行'
-            }}</span>
-            <span style="margin-right: 30px">开始时间: {{ reportData.time.start_at }}</span>
-            <span style="margin-right: 30px"> 总共耗时: {{ reportData.time.duration }} 秒</span>
+            <span v-if="dataType !== 'appUi'" style="margin-right: 20px">运行环境: {{ runEnvDict[reportData.run_env] }}</span>
+            <span style="margin-right: 20px">执行模式: {{ reportData.is_async === 1 ? '并行运行' : '串行运行' }}</span>
+            <span style="margin-right: 20px">开始时间: {{ reportData.time.start_at }}</span>
+            <!-- 执行耗时保留3为小数 -->
+            <span style="margin-right: 20px"> 总共耗时: {{ reportData.time.duration.toString().slice(0, 5) }} 秒</span>
             <el-button
               v-if="!reportData.success"
               type="primary"
               size="mini"
-              style="margin-right: 20px"
+              style="margin-right: 10px"
               @click.native="showHitDrawer('add')"
             >记录问题</el-button>
           </span>
@@ -52,7 +69,7 @@
           <!-- 步骤 -->
           <el-col :span="12">
             <div style="height: 200px;float:left;">
-              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px" />
+              <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px"/>
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
               <div style="color: #927B8B">总数: {{ reportData.stat.teststeps.total }}</div>
@@ -66,7 +83,7 @@
           <!-- 用例 -->
           <el-col :span="12">
             <div style="height: 200px;float:left;">
-              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px" />
+              <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px"/>
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
               <div style="color: #927B8B">总数: {{ reportData.stat.testcases.total }}</div>
@@ -85,24 +102,21 @@
                 <el-collapse accordion>
                   <!-- 遍历用例 -->
                   <el-collapse-item
-                    v-for="(item, index) in reportData['details']"
-                    v-show="showReportResult === 'all' || showReportResult === item.success"
-                    :key="index"
+                    v-for="(case_data, case_index) in reportData['details']"
+                    v-show="showCaseResultType === 'all' || showCaseResultType === case_data.success"
+                    :key="case_index"
                   >
                     <template slot="title">
                       <el-tooltip
                         class="item"
                         effect="dark"
-                        :content="item.records ? `${item.records.length}个步骤` : ''"
+                        :content="case_data.records ? `${case_data.records.length}个步骤` : ''"
                         placement="top-start"
                       >
                         <div
                           style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                          :style="item.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
-                        >
-                          {{ item.name }}
-                          <!--                          <span class="case-name">{{ item.name }}</span>-->
-                          <!--                          <span class="case-name">{{ item.time.duration }} ms</span>-->
+                          :style="case_data.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
+                        > {{ case_data.name }}
                         </div>
                       </el-tooltip>
                     </template>
@@ -110,46 +124,68 @@
                       <ol id="test" style="padding:5px;font-family:Times New Roman">
                         <!-- 遍历步骤 -->
                         <li
-                          v-for="(item1, index1) in item['records']"
-                          :key="index1"
+                          v-for="(step_data, step_index) in case_data['records']"
+                          v-show="showStepResultType === 'all' || showStepResultType === step_data.status"
+                          :key="step_index"
                           style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
-                          :class="{'active':index === showColor[0] && index1 === showColor[1], 'wire': index1 === 0}"
-                          @click="handleNodeClick(index, index1)"
+                          :class="{
+                            'active':step_index === showColor[0] && step_index === showColor[1],
+                            'wire': step_index === 0
+                          }"
+                          @click="handleNodeClick(case_index, step_index)"
                         >
                           <div
-                            :style="
-                              item1.status === 'success' ? 'color:#67c23a':
-                              item1.status === 'skipped' ? 'color:#60C0DD': 'color:rgb(255, 74, 74)'"
+                            :style="getStepColor(step_data)"
                           >
-                            <span class="test-name">{{ item1.name }}</span>
-                            <span class="test-time">{{ item1.meta_datas.stat.response_time_ms }} ms</span>
+                            <span class="test-name">{{ step_data.name }}</span>
+                            <span class="test-time">{{ step_data.meta_datas.stat.response_time_ms }} ms</span>
+                            <el-tooltip class="item" effect="dark" content="打开此步骤所在的用例" placement="top-start">
+                              <el-button
+                                v-if="step_data.meta_datas.case_id"
+                                style="margin-left: 30px"
+                                :style="getStepColor(step_data)"
+                                size="mini"
+                                type="text"
+                                class="test-time"
+                                @click="showCaseInfo(step_data.meta_datas.case_id)"
+                              >打开用例
+                              </el-button>
+                            </el-tooltip>
                             <el-tooltip class="item" effect="dark" content="复制此步骤的数据" placement="top-start">
                               <el-button
                                 v-if="dataType === 'api'"
-                                v-clipboard:copy="getCopyData(item1.meta_datas.data[0])"
+                                v-clipboard:copy="getCopyData(step_data.meta_datas.data[0])"
                                 v-clipboard:success="onCopy"
                                 v-clipboard:error="onError"
                                 size="mini"
                                 type="text"
-                                icon="el-icon-document-copy"
-                                class="test-status right pass"
-                              />
+                                class="test-time"
+                                style="margin-left: 30px"
+                                :style="getStepColor(step_data)"
+                              >复制数据
+                              </el-button>
                               <el-button
                                 v-else
                                 v-clipboard:copy="getCopyData({
-                                  extract_msgs: item1.meta_datas.data[0].extract_msgs,
-                                  request: item1.meta_datas.data[0].request,
-                                  test_action: item1.meta_datas.data[0].test_action
+                                  extract_msgs: step_data.meta_datas.data[0].extract_msgs,
+                                  request: step_data.meta_datas.data[0].request,
+                                  test_action: step_data.meta_datas.data[0].test_action
                                 })"
                                 v-clipboard:success="onCopy"
                                 v-clipboard:error="onError"
                                 size="mini"
                                 type="text"
-                                icon="el-icon-document-copy"
-                                class="test-status right pass"
-                              />
+                                class="test-time"
+                                style="margin-left: 30px"
+                                :style="getStepColor(step_data)"
+                              >复制数据
+                              </el-button>
                             </el-tooltip>
-                            <span class="test-status right pass">{{ resultMapping[item1.status] }}</span>
+                            <span
+                              class="test-time"
+                              style="margin-left: 30px"
+                              :style="getStepColor(step_data)"
+                            >{{ resultMapping[step_data.status] }}</span>
                           </div>
                         </li>
                       </ol>
@@ -173,8 +209,8 @@
                     <el-collapse-item v-if="dataType !== 'api'" name="1">
                       <template slot="title">
                         <div class="el-collapse-item-title"> 执行方式: {{
-                          meta_datas.data[0].test_action.execute_name
-                        }}
+                            meta_datas.data[0].test_action.execute_name
+                          }}
                         </div>
                       </template>
                       <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.execute_name }}</div>
@@ -190,8 +226,8 @@
                     <el-collapse-item v-if="dataType !== 'api'" name="3">
                       <template slot="title">
                         <div class="el-collapse-item-title">元素定位方式: {{
-                          meta_datas.data[0].test_action.by_type
-                        }}
+                            meta_datas.data[0].test_action.by_type
+                          }}
                         </div>
                       </template>
                       <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.by_type }}</div>
@@ -200,8 +236,8 @@
                     <el-collapse-item v-if="dataType !== 'api'" name="4">
                       <template slot="title">
                         <div class="el-collapse-item-title">定位元素表达式 {{
-                          meta_datas.data[0].test_action.element
-                        }}
+                            meta_datas.data[0].test_action.element
+                          }}
                         </div>
                       </template>
                       <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.element }}</div>
@@ -219,7 +255,7 @@
                         <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                       </template>
                       <div class="el-collapse-item-content">
-                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].before " />
+                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].before "/>
                       </div>
                     </el-collapse-item>
 
@@ -228,7 +264,7 @@
                         <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                       </template>
                       <div class="el-collapse-item-content">
-                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].after " />
+                        <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].after "/>
                       </div>
                     </el-collapse-item>
 
@@ -442,8 +478,8 @@
                     <el-collapse-item v-if="dataType === 'api'" name="18">
                       <template slot="title">
                         <div class="el-collapse-item-title">响应状态码: {{
-                          meta_datas.data[0].response.status_code
-                        }}
+                            meta_datas.data[0].response.status_code
+                          }}
                         </div>
                       </template>
                       <div class="el-collapse-item-content">{{ meta_datas.data[0].response.status_code }}</div>
@@ -453,7 +489,7 @@
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
                       </template>
-                      <div class="el-collapse-item-content" v-html="meta_datas.data[0].response.text" />
+                      <div class="el-collapse-item-content" v-html="meta_datas.data[0].response.text"/>
                     </el-collapse-item>
 
                     <el-collapse-item name="20">
@@ -534,6 +570,9 @@
         :run-env-list="envList"
       />
 
+      <showCaseDetail
+        :data-type="dataType"
+      />
     </div>
   </div>
 
@@ -544,6 +583,7 @@
 import JsonViewer from 'vue-json-viewer'
 import vkbeautify from 'vkbeautify' // xml格式化组件
 import hitDrawer from '@/views/assist/hits/drawer'
+import showCaseDetail from '@/components/business/case/showCaseDetail.vue'
 
 import { runEnvList } from '@/apis/config/runEnv'
 import { reportDetail as apiReportDetail } from '@/apis/apiTest/report'
@@ -556,7 +596,8 @@ export default {
   name: 'ReportShow',
   components: {
     JsonViewer,
-    hitDrawer
+    hitDrawer,
+    showCaseDetail
   },
   props: ['dataType'],
   data() {
@@ -566,12 +607,21 @@ export default {
       runEnvDict: {},
       msg: { copyText: 'copy', copiedText: 'copied' },
       defaultShowResponseInFo: ['6', '7', '21', '22'], // 默认展开报告详情的项
-      showReportResult: 'all',
-      showReportResultList: [
+      showCaseResultType: 'all',
+      showCaseResultTypeList: [
         { label: '展示全部用例', value: 'all' },
         { label: '展示成功的用例', value: true },
         { label: '展示失败的用例', value: false }
-      ], // 根据结果类型展示报告
+      ], // 根据用例结果类型展示报告
+
+      showStepResultType: 'all',
+      showStepResultTypeList: [
+        { label: '展示全部步骤', value: 'all' },
+        { label: '展示成功的步骤', value: 'success' },
+        { label: '展示失败的步骤', value: 'failure' },
+        { label: '展示错误的步骤', value: 'error' },
+        { label: '展示跳过的步骤', value: 'skipped' }
+      ], // 根据步骤结果类型展示报告
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,
@@ -699,9 +749,22 @@ export default {
 
   methods: {
 
+    getStepColor(step_data) {
+      return step_data.status === 'success' ? 'color:#19D4AE'
+        : step_data.status === 'failure' ? 'color:#FA6E86'
+          : step_data.status === 'skipped' ? 'color:#60C0DD' : 'color:#E87C25'
+    },
+
+    // 打开用例信息
+    showCaseInfo(caseId) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'showCaseInfo', caseId)
+    },
+
+    // 记录问题
     showHitDrawer(status) {
       this.$bus.$emit(
         this.$busEvents.drawerIsShow,
+        'hit',
         status,
         {
           date: this.reportData.time.start_at,
@@ -773,19 +836,19 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       })
       this.reportDetailUrl({ 'id': this.$route.query.id }).then((response) => {
-        loading.close()
-        if (this.showMessage(this, response)) {
-          this.reportData = response['data']
-          this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
-          this.attachment = this.reportData['details'][0]['records'][0]['attachment']
-          this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
-          this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
-          this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
-          this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
-          this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
-          this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
+          loading.close()
+          if (this.showMessage(this, response)) {
+            this.reportData = response['data']
+            this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
+            this.attachment = this.reportData['details'][0]['records'][0]['attachment']
+            this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
+            this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
+            this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
+            this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
+            this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
+            this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
+          }
         }
-      }
       )
     },
 

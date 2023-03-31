@@ -3,7 +3,7 @@
     slot="prepend"
     v-model="tempMethod"
     size="mini"
-    style="width: 150px;margin-right: 10px"
+    style="margin-right: 10px"
     placeholder="选择请求方式"
     filterable
     default-first-option

@@ -263,7 +263,7 @@ export default {
 
     // 新增问题记录
     showHitDrawer(status, row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, status, row)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'hit', status, row)
     },
 
     // 查看报告

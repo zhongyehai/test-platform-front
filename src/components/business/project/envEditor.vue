@@ -9,7 +9,8 @@
 
       <el-row>
         <el-col :span="dataType !== 'appUi' ? 3 : 0">
-          <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">
+          <!--          <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">-->
+          <el-tabs v-model="activeName" :tab-position="tabPosition">
             <el-tab-pane
               v-for="(runEnv) in runEnvList"
               :key="runEnv.id"
@@ -23,14 +24,14 @@
           <div>
             <el-form v-show="dataType !== 'appUi'" label-width="120px">
               <el-form-item :label="'环境域名'" class="is-required" size="mini">
-                <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%" />
+                <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%"/>
                 <el-popover
                   class="el_popover_class"
                   placement="top-start"
                   trigger="hover"
                 >
                   <div>当前服务在当前环境的域名</div>
-                  <el-button slot="reference" type="text" icon="el-icon-question" />
+                  <el-button slot="reference" type="text" icon="el-icon-question"/>
                 </el-popover>
               </el-form-item>
             </el-form>
@@ -52,7 +53,7 @@
                       4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                       5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    <span><i style="color: #409EFF" class="el-icon-question"/></span>
                   </el-tooltip>
                 </template>
                 <variablesView
@@ -79,7 +80,7 @@
                       3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                       4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    <span><i style="color: #409EFF" class="el-icon-question"/></span>
                   </el-tooltip>
                 </template>
                 <headersView
@@ -112,10 +113,19 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click="saveEnv()"
-        >
-          {{ '保存当前环境信息' }}
+          @click="saveEnv(false)"
+        >保存并继续填写
         </el-button>
+
+        <el-button
+          v-show="activeName"
+          type="primary"
+          size="mini"
+          :loading="submitButtonIsLoading"
+          @click="saveEnv(true)"
+        >保存并关闭抽屉
+        </el-button>
+
         <el-popover
           class="el_popover_class"
           placement="top-start"
@@ -126,7 +136,7 @@
             <div>2、若其他环境没有当前的key，则会自动将变量的key和value同步到该环境</div>
             <div>3、若其他环境已有当前的key，则不会同步当前key的信息到该环境</div>
           </div>
-          <el-button slot="reference" type="text" icon="el-icon-question" />
+          <el-button slot="reference" type="text" icon="el-icon-question"/>
         </el-popover>
       </div>
     </div>
@@ -259,7 +269,7 @@ export default {
     },
 
     // 保存环境设置
-    saveEnv() {
+    saveEnv(isClose) {
       this.submitButtonIsLoading = true
       this.tempEnv.env_id = parseInt(this.activeName)
       this.tempEnv.variables = this.$refs.variablesView.tempData
@@ -268,7 +278,7 @@ export default {
       }
       this.putProjectEnvUrl(this.tempEnv).then(response => {
         this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
+        if (this.showMessage(this, response) && isClose) {
           this.drawerIsShow = false
         }
       })
@@ -276,7 +286,14 @@ export default {
 
     // 获取环境信息
     getEnv(envId, projectId) {
+      const loading = this.$loading({
+        lock: true,
+        text: `获取环境数据中，请耐心等待`,
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.getProjectEnvUrl({ env_id: envId, projectId: projectId }).then(response => {
+        loading.close()
         this.tempEnv.id = response.data.id
         this.tempEnv.env_id = response.data.env_id
         this.tempEnv.host = response.data.host

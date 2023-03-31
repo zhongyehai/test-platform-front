@@ -457,7 +457,7 @@ export default {
     runCase(runConf) {
       this.caseRunUrl({
         caseId: this.runCaseId,
-        env_code: runConf.runEnv,
+        env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
         server_id: runConf.runServer,
@@ -466,7 +466,7 @@ export default {
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         }
       })
     },

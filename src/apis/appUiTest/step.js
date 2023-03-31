@@ -29,7 +29,7 @@ export function deleteStep(data) {
 
 // 修改步骤状态
 export function putStepIsRun(data) {
-  return request({ url: stepDir + '/changeIsRun', method: 'put', data: data })
+  return request({ url: stepDir + '/status', method: 'put', data: data })
 }
 
 // 获取步骤执行类型list

@@ -103,7 +103,6 @@
     <el-drawer
       :title=" drawerType === 'add' ? '新增配置类型' : '修改配置类型'"
       size="60%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >

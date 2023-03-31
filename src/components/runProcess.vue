@@ -28,15 +28,13 @@
         </el-step>
         <el-step title="执行测试">
           <template slot="description">
-            <span>若一直卡在此节点</span><br>
-            <span>1、可能是用例设计的测试步骤耗时较多，确实需要花一些时间</span><br>
-            <span>2、可能是执行测试的时候报错了，此情况请查看日志</span>
+            <span>执行耗时多久取决于用例设计，请耐心等待</span>
           </template>
         </el-step>
         <el-step title="写入报告">
           <template slot="description">
-            <span>用例执行完毕，写入测试报告</span><br>
-            <span>写入完毕后会自动打开测试报告</span>
+            <span>1、用例执行完毕，写入测试报告</span><br>
+            <span>2、写入完毕后会自动打开测试报告</span>
           </template>
         </el-step>
       </el-steps>
@@ -45,14 +43,15 @@
 
 </template>
 <script>
-import { getReport as apiTestGetReport } from '@/apis/apiTest/report'
-import { getReport as appUiTestGetReport } from '@/apis/appUiTest/report'
-import { getReport as webUiTestGetReport } from '@/apis/webUiTest/report'
+import { reportIsDone as apiReportIsDone, reportShowId as apiGetReport } from '@/apis/apiTest/report'
+import { reportIsDone as appUiReportIsDone, reportShowId as appUiGetReport } from '@/apis/appUiTest/report'
+import { reportIsDone as webUiReportIsDone, reportShowId as webUiGetReport } from '@/apis/webUiTest/report'
 import { runTestTimeOutMessage } from '@/utils/message'
 
 export default {
   name: 'RunStep',
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType'
   ],
 
@@ -60,35 +59,39 @@ export default {
     return {
       processIsShow: false,
       statusMapping: {
-        1: 'wait',
+        1: 'finish',
         2: 'success',
         3: 'error',
         4: 'finish'
       },
       activeProcess: 0,
       activeStatus: 1,
-      getReportUrl: ''
+      reportIsDoneUrl: '',
+      reportShowIdUrl: ''
     }
   },
 
   created() {
     if (this.dataType === 'api') {
-      this.getReportUrl = apiTestGetReport
+      this.reportIsDoneUrl = apiReportIsDone
+      this.reportShowIdUrl = apiGetReport
     } else if (this.dataType === 'webUi') {
-      this.getReportUrl = webUiTestGetReport
+      this.reportIsDoneUrl = webUiReportIsDone
+      this.reportShowIdUrl = webUiGetReport
     } else {
-      this.getReportUrl = appUiTestGetReport
+      this.reportIsDoneUrl = appUiReportIsDone
+      this.reportShowIdUrl = appUiGetReport
     }
   },
 
   mounted() {
     // 监听运行申请的提交状态，提交成功，则获取对应的测试报告
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, reportId) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, run_id) => {
       if (_type === 'process') {
-        this.activeProcess = 0
+        this.activeProcess = 1
         this.activeStatus = 1
         this.processIsShow = true
-        this.getReport(reportId)
+        this.getReport(run_id)
       }
     })
   },
@@ -99,23 +102,33 @@ export default {
 
   methods: {
 
-    getReport(reportId) {
+    getShowReportId(run_id) {
+      const that = this
+      this.reportShowIdUrl({ run_id: run_id }).then(response => (
+        that.openReportById(response.data)
+      ))
+    },
+
+    getReport(run_id) {
       // 触发运行成功，每三秒查询一次，
       // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
       // 已出结果，则停止查询，展示测试报告
 
-      var that = this
-      var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-      var queryCount = 1
-      var timer = setInterval(function() {
+      const that = this
+      const runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
+      let queryCount = 1
+      const timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
-          that.getReportUrl({ 'id': reportId }).then(response => {
+          that.reportIsDoneUrl({
+            run_id: run_id,
+            process: that.activeProcess,
+            status: that.activeStatus
+          }).then(response => {
             that.activeProcess = response.data.process
             that.activeStatus = response.data.status
-
             if (that.activeProcess === 3 && that.activeStatus === 2) {
-              this.processIsShow = false // 关闭进度框
-              that.openReportById(reportId)
+              that.processIsShow = false // 关闭进度框
+              that.getShowReportId(run_id)
               clearInterval(timer) // 关闭定时器
             }
           })

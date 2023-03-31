@@ -97,18 +97,17 @@
     <el-drawer
       :title="tempData.id ? '修改手机' : '新增手机'"
       size="65%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
 
       <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
-        <el-form-item label="别名" class="is-required">
+        <el-form-item label="别名" class="is-required" size="mini">
           <el-input v-model="tempData.name" size="mini" placeholder="手机名字" />
         </el-form-item>
 
-        <el-form-item label="系统类型" class="is-required">
+        <el-form-item label="系统类型" class="is-required" size="mini">
           <el-select
             v-model="tempData.os"
             filterable
@@ -128,7 +127,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="系统版本" class="is-required">
+        <el-form-item label="系统版本" class="is-required" size="mini">
           <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本" />
         </el-form-item>
 

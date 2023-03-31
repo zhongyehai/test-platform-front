@@ -3,27 +3,27 @@
   <div class="app-container">
 
     <el-form label-width="60px" inline>
-      <el-form-item label="服务" size="mini">
+      <el-form-item :label="`${titleType}`" size="mini">
         <el-select
           v-model="currentProjectId"
-          placeholder="选择服务"
+          :placeholder="`选择${titleType}`"
           size="mini"
           style="width: 250px"
           filterable
           default-first-option
           @change="getSetList"
         >
-          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
 
-        <el-button
-          v-show="currentProjectId"
-          type="primary"
-          size="mini"
-          style="margin-left: 10px"
-          @click.native="addParentSet()"
-        >添加一级用例集
-        </el-button>
+        <!--        <el-button-->
+        <!--          v-show="currentProjectId"-->
+        <!--          type="primary"-->
+        <!--          size="mini"-->
+        <!--          style="margin-left: 10px"-->
+        <!--          @click.native="addParentSet()"-->
+        <!--        >添加一级用例集-->
+        <!--        </el-button>-->
       </el-form-item>
 
       <el-form-item v-if="dataType === 'api'" label="查接口" size="mini">
@@ -60,9 +60,24 @@
       <el-col style="width: 20%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="projectTab" class="table_padding table_project">
           <el-tab-pane :label="projectTab" :name="projectTab">
+            <template slot="label">
+              <span> 用例集列表 </span>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>{{ `为当前${titleType}添加一级用例集` }}</div>
+                <el-button
+                  v-show="currentProjectId"
+                  slot="reference"
+                  type="text"
+                  style="margin-left: 50px"
+                  @click="addParentSet()"
+                >添加
+                </el-button>
+              </el-popover>
+            </template>
+
             <div class="custom-tree-container">
               <div class="block">
-                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini" />
+                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini"/>
                 <el-tree
                   ref="tree"
                   class="project-tree"
@@ -152,7 +167,6 @@
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增用例集' : '修改用例集'"
       size="40%"
-      :wrapper-closable="false"
       :visible.sync="moduleDrawerIsShow"
       :direction="direction"
     >
@@ -164,7 +178,7 @@
         style="min-width: 400px;margin-left: 20px;margin-right: 20px"
       >
         <el-form-item :label="'用例集名称'" class="filter-item is-required" prop="name" size="mini">
-          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复" />
+          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复"/>
         </el-form-item>
       </el-form>
       <div class="demo-drawer__footer">
@@ -188,7 +202,7 @@
       :data-type="dataType"
     />
 
-    <ApiEditDrawer />
+    <ApiEditDrawer/>
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
@@ -215,11 +229,11 @@ import ApiEditDrawer from '@/views/apiTest/api/drawer.vue'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import { getFindElementOption } from '@/utils/getConfig'
-import { ellipsis, arrayToTree } from '@/utils/parseData'
+import {getFindElementOption} from '@/utils/getConfig'
+import {ellipsis, arrayToTree} from '@/utils/parseData'
 
-import { apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping } from '@/apis/apiTest/api' // 接口引用
-import { projectList as apiProjectList } from '@/apis/apiTest/project'
+import {apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping} from '@/apis/apiTest/api' // 接口引用
+import {projectList as apiProjectList} from '@/apis/apiTest/project'
 import {
   caseSetTree as apiCaseSetTree,
   caseSetRun as apiCaseSetRun,
@@ -228,7 +242,7 @@ import {
   putCaseSet as apiPutCaseSet
 } from '@/apis/apiTest/caseSet'
 
-import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
+import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
 import {
   caseSetTree as webUiCaseSetTree,
   caseSetRun as webUiCaseSetRun,
@@ -237,7 +251,7 @@ import {
   putCaseSet as webUiPutCaseSet
 } from '@/apis/webUiTest/caseSet'
 
-import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
+import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
 import {
   caseSetTree as appUiCaseSetTree,
   caseSetRun as appUiCaseSetRun,
@@ -245,9 +259,9 @@ import {
   postCaseSet as appUiPostCaseSet,
   putCaseSet as appUiPutCaseSet
 } from '@/apis/appUiTest/caseSet'
-import { getConfigByName, getSkipIfTypeMapping } from '@/apis/config/config'
-import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
-import { phoneList, serverList } from '@/apis/appUiTest/env'
+import {getConfigByName, getSkipIfTypeMapping} from '@/apis/config/config'
+import {extractMappingList, keyBoardCodeMappingList} from '@/apis/webUiTest/step'
+import {phoneList, serverList} from '@/apis/appUiTest/env'
 
 export default {
   name: 'Index',
@@ -259,10 +273,11 @@ export default {
     showApiUseDrawer,
     ApiEditDrawer
   },
-  directives: { waves },
+  directives: {waves},
   props: ['dataType'],
   data() {
     return {
+      titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       direction: 'rtl', // 抽屉打开方式
       projectTab: '用例集列表',
       isShowLoading: false, // 用例集编辑框提交Loading
@@ -324,7 +339,7 @@ export default {
       this.postCaseSetUrl = webUiPostCaseSet
       this.putCaseSetUrl = webUiPutCaseSet
       getFindElementOption(this) // 获取定位方式
-      getConfigByName({ 'name': 'browser_name' }).then(response => {
+      getConfigByName({'name': 'browser_name'}).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
       })
     } else {
@@ -348,13 +363,13 @@ export default {
 
   mounted() {
     // 从后端获取数据类型映射
-    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
+    getConfigByName({'name': 'data_type_mapping'}).then(response => {
       this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
     })
 
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {
-      getConfigByName({ 'name': 'app_key_code' }).then(response => {
+      getConfigByName({'name': 'app_key_code'}).then(response => {
         this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
       })
     }
@@ -371,7 +386,7 @@ export default {
 
     // 从后端获取响应对象数据源映射
     if (this.dataType === 'api') {
-      getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
+      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
         this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
       })
 
@@ -428,7 +443,7 @@ export default {
       this.currentSetIdForCommit = '' // 切换项目的时候，把选中用例集置为''
       this.currentParent = {}
       this.currentLevelForCommit = 1 // 切换项目的时候，把选中用例集置为''
-      this.caseSetTreeUrl({ 'project_id': projectId }).then(response => {
+      this.caseSetTreeUrl({'project_id': projectId}).then(response => {
         var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
         this.setListData = arrayToTree(response_data, null)
         this.sendSetTreeIsDone(this.setListData)
@@ -538,7 +553,7 @@ export default {
 
     // 删除节点
     deleteChild(data) {
-      this.deleteCaseSetUrl({ 'id': data.id }).then(response => {
+      this.deleteCaseSetUrl({'id': data.id}).then(response => {
         if (this.showMessage(this, response)) {
           this.$refs.tree.remove(data)
 
@@ -590,7 +605,7 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
-      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
         if (this.showMessage(this, response)) {
           this.showApiList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
@@ -600,7 +615,7 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
-      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
         if (this.showMessage(this, response)) {
           this.showCaseList = response.data
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)

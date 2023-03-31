@@ -28,6 +28,11 @@ export function deleteRunEnv(data) {
 }
 
 // 获取配置类型list
+export function runEnvGroupList(params) {
+  return request({ url: currentBaseDir + '/group', method: 'get', params: params })
+}
+
+// 获取配置类型list
 export function runEnvList(params) {
   return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
