@@ -251,6 +251,7 @@ export default {
       runEnvList().then(response => {
         this.runEnvDataSource = response.data.data
         this.envCodeList = []
+        this.initEnvGroupDataList()
         this.runEnvDataSource.forEach(env => {
           this.envCodeList.push(env.code)
           this.envGroupDataList[env.group].push(env)
