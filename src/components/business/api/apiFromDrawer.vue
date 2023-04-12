@@ -134,12 +134,22 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.quote_count">{{ scope.row.quote_count }}</el-tag>
-          <el-tag v-else type="info">0</el-tag>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
+            </div>
+            <el-tag
+              v-if="scope.row.quote_count"
+              @click="getApiMsgBelongToStep(scope.row)"
+            >
+              {{ scope.row.quote_count }}
+            </el-tag>
+            <el-tag v-else type="info">0</el-tag>
+          </el-tooltip>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="10%">
+      <el-table-column align="center" label="操作" min-width="15%">
         <template slot-scope="scope">
           <el-button
             type="text"
@@ -150,7 +160,7 @@
 
           <el-button
             v-if="caseId"
-            type="primary"
+            type="text"
             size="mini"
             @click.native="addApiToStep(scope.row)"
           >转步骤</el-button>
@@ -163,26 +173,30 @@
 
 <script>
 
-import { changeApiLevel, changeApiStatus } from '@/apis/apiTest/api'
+import { apiMsgBelongToStep, changeApiLevel, changeApiStatus } from '@/apis/apiTest/api'
 
 export default {
   name: 'ShowApiFromDrawer',
   components: {},
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'caseId',
-    'apiList',
+    // eslint-disable-next-line vue/require-prop-types
     'marker'
   ],
   data() {
     return {
       drawerIsShow: false,
-      direction: 'rtl' // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
+      showCaseList: [],
+      apiList: []
     }
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, marker) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, marker, apiList) => {
       if (_type === 'apiFromIsShow' && marker === this.marker) {
+        this.apiList = apiList
         this.drawerIsShow = true
       }
     })
@@ -193,6 +207,14 @@ export default {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
   methods: {
+
+    getApiMsgBelongToStep(row) {
+      apiMsgBelongToStep({ id: row.id }).then(response => {
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
+        }
+      })
+    },
 
     // 打开编辑框
     showEditForm(row) {

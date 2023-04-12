@@ -20,6 +20,24 @@
         <el-tabs v-model="reportTab" class="table_padding" style="margin-left: 5px">
           <el-tab-pane label="测试报告列表" :name="reportTab">
 
+            <el-form-item label="环境" size="mini" label-width="60px">
+              <el-select
+                v-model="query.env"
+                placeholder="运行环境"
+                size="mini"
+                filterable
+                clearable
+                default-first-option
+              >
+                <el-option
+                  v-for="item in eventList"
+                  :key="item.code"
+                  :label="item.name"
+                  :value="item.code"
+                />
+              </el-select>
+            </el-form-item>
+
             <el-form label-width="60px" inline>
               <el-form-item label="报告名" size="mini">
                 <el-input
@@ -111,7 +129,13 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="任务名称" min-width="18%" />
+              <el-table-column
+                :show-overflow-tooltip="true"
+                prop="name"
+                align="center"
+                label="任务名称"
+                min-width="18%"
+              />
 
               <el-table-column label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
@@ -259,10 +283,12 @@ export default {
         total: 0,
         projectName: undefined,
         createUser: undefined,
+        env: undefined,
         run_type: undefined
       },
       userList: [],
       eventDict: {},
+      eventList: {},
       runTypeDict: {},
       reportStatusContent: reportStatusMappingContent,
       reportStatusTagType: reportStatusMappingTagType,
@@ -291,6 +317,7 @@ export default {
 
     // 获取环境列表
     runEnvList().then(response => {
+      this.eventList = response.data.data
       response.data.data.forEach(env => {
         this.eventDict[env.code] = env.name
       })

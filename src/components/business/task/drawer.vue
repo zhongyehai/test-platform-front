@@ -300,7 +300,7 @@
         style="float: left"
         :loading="isShowDebugLoading"
         @click="clickRunDebug()"
-      >调试
+      >运行
       </el-button>
 
       <el-button size="mini" @click="drawerIsShow = false">取 消</el-button>

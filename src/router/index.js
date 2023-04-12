@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import { can_not_get_page } from '@/utils/auth'
 
 /*
 路由参数说明：
@@ -100,35 +101,6 @@ export const constantRoutes = [
       }]
   },
 
-  // 配置管理
-  {
-    path: '/config',
-    component: Layout,
-    redirect: '/config',
-    name: 'Config',
-    meta: { title: '配置管理', icon: 'el-icon-setting' },
-    children: [
-      {
-        path: 'type',
-        name: 'ConfigType',
-        meta: { title: '类型管理', icon: 'el-icon-star-off' },
-        component: () => import('@/views/config/configType/index')
-      },
-      {
-        path: 'args',
-        name: 'Args',
-        meta: { title: '参数管理', icon: 'el-icon-star-on' },
-        component: () => import('@/views/config/configs/index')
-      },
-      {
-        path: 'runEnv',
-        name: 'RunEnv',
-        meta: { title: '运行环境', icon: 'el-icon-orange' },
-        component: () => import('@/views/config/runEnv/index')
-      }
-    ]
-  },
-
   // 接口测试
   {
     path: '/apiTest',
@@ -173,13 +145,6 @@ export const constantRoutes = [
         name: 'apiReport',
         meta: { title: '测试报告', icon: 'el-icon-s-data' },
         component: () => import('@/views/apiTest/report/index')
-      },
-      {
-        path: 'debug',
-        name: 'debug',
-        hidden: true,
-        meta: { title: '调试界面', icon: 'form' },
-        component: () => import('@/views/debug/index')
       }
     ]
   },
@@ -286,116 +251,49 @@ export const constantRoutes = [
     ]
   },
 
-  // 自动化辅助
+  // Python脚本
   {
-    path: '/assist',
+    path: '/script',
     component: Layout,
-    redirect: '/assist/funcFile',
-    name: 'Assist',
-    meta: { title: '自动化辅助', icon: 'el-icon-s-opportunity' },
+    redirect: '/script/python',
+    name: 'Script',
+    meta: { title: 'Python脚本', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'funcFile',
-        name: 'apiFuncFile',
-        component: () => import('@/views/assist/funcFile/index'),
-        meta: { title: '函数文件', icon: 'el-icon-help' }
-      },
-      {
-        path: 'hit',
-        name: 'Hit',
-        component: () => import('@/views/assist/hits'),
-        meta: { title: '触发问题', icon: 'el-icon-circle-close' }
-      },
-      {
-        path: 'callBack',
-        name: 'CallBack',
-        component: () => import('@/views/assist/callBack'),
-        meta: { title: '回调记录', icon: 'el-icon-refresh' }
-      },
-      {
-        path: 'file',
-        name: 'File',
-        component: () => import('@/views/assist/files'),
-        meta: { title: '文件管理', icon: 'el-icon-files' }
-      },
-      {
-        path: 'autoTestUser',
-        name: 'AutoTestUser',
-        component: () => import('@/views/assist/autoTestUser'),
-        meta: { title: '自动化用户数据', icon: 'el-icon-s-custom' }
-      },
-      {
-        path: 'diffRecord',
-        name: 'DiffRecord',
-        hidden: true,
-        component: () => import('@/views/assist/yapi/diffDecord'),
-        meta: { title: 'yapi监控记录', icon: 'el-icon-video-camera-solid' }
-      },
-      {
-        path: 'diffRecordShow',
-        name: 'DiffRecordShow',
-        hidden: true,
-        component: () => import('@/views/assist/yapi/diffDetailShow'),
-        meta: { title: 'yapi对比详情' }
-      },
-      {
-        path: 'errorRecord',
-        name: 'apiErrorRecord',
-        meta: { title: '执行错误记录', icon: 'el-icon-video-camera-solid' },
-        component: () => import('@/views/assist/errorRecord/index')
+        path: '/python',
+        name: 'Script',
+        component: () => import('@/views/assist/script/index'),
+        meta: { title: 'Python脚本', icon: 'el-icon-help' }
       }
     ]
   },
 
-  // 测试管理
-  {
-    path: '/testManage',
-    component: Layout,
-    redirect: '/testManage/kym',
-    name: 'TestManage',
-    meta: { title: '测试管理', icon: 'el-icon-magic-stick' },
-    children: [
-      {
-        path: 'weekly',
-        name: 'Weekly',
-        component: () => import('@/views/testWork/weekly'),
-        meta: { title: '周报', icon: 'el-icon-s-check' }
-      },
-      {
-        path: 'kym',
-        name: 'KYM',
-        hidden: true,
-        component: () => import('@/views/testWork/kym'),
-        meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
-      },
-      {
-        path: 'makeTestCase',
-        name: 'MakeTestCase',
-        hidden: true,
-        component: () => import('@/views/testWork/makeTestCase'),
-        meta: { title: '用例编写', icon: 'el-icon-s-opportunity' }
-      },
-      {
-        path: 'account',
-        name: 'Account',
-        component: () => import('@/views/testWork/account'),
-        meta: { title: '测试账号', icon: 'el-icon-s-check' }
-      }
-    ]
-  },
+  // 数据池
+  // {
+  //   path: '/tools',
+  //   component: Layout,
+  //   redirect: '/tools/dataPool',
+  //   children: [
+  //     {
+  //       path: 'dataPool',
+  //       name: 'DataPool',
+  //       component: () => import('@/views/tools/dataPool'),
+  //       meta: { title: '数据池', icon: 'el-icon-coin' }
+  //     },
+  //   ]
+  // },
 
-  // 小工具
+  // 造数小工具
   {
     path: '/tools',
     component: Layout,
-    redirect: '/apiTest/project',
+    redirect: '/tools/dataPool',
     name: 'Tools',
-    meta: { title: '小工具', icon: 'el-icon-s-tools' },
+    meta: { title: '造数小工具', icon: 'el-icon-s-tools' },
     children: [
       {
         path: 'examination',
         name: 'Examination',
-        hidden: true,
         component: () => import('@/views/tools/examination'),
         meta: { title: '征信考试', icon: 'form' }
       },
@@ -414,37 +312,160 @@ export const constantRoutes = [
     ]
   },
 
+  // 自动化辅助
+  {
+    path: '/assist',
+    component: Layout,
+    redirect: '/assist/hit',
+    name: 'Assist',
+    meta: { title: '自动化辅助', icon: 'el-icon-s-opportunity' },
+    children: [
+      {
+        path: 'callBack',
+        name: 'CallBack',
+        component: () => import('@/views/assist/callBack'),
+        meta: { title: '回调记录', icon: 'el-icon-refresh' }
+      },
+      {
+        path: 'file',
+        name: 'File',
+        component: () => import('@/views/assist/files'),
+        meta: { title: '文件管理', icon: 'el-icon-files' }
+      },
+      {
+        path: 'errorRecord',
+        name: 'apiErrorRecord',
+        meta: { title: '执行错误记录', icon: 'el-icon-video-camera-solid' },
+        component: () => import('@/views/assist/errorRecord/index')
+      },
+      {
+        path: 'autoTestUser',
+        name: 'AutoTestUser',
+        component: () => import('@/views/assist/autoTestUser'),
+        meta: { title: '自动化用户数据', icon: 'el-icon-s-custom' }
+      },
+      {
+        path: 'hit',
+        name: 'Hit',
+        component: () => import('@/views/assist/hits'),
+        meta: { title: '自动化问题记录', icon: 'el-icon-circle-close' }
+      },
+      {
+        path: 'diffRecord',
+        name: 'DiffRecord',
+        component: () => import('@/views/assist/yapi/diffDecord'),
+        meta: { title: 'yapi监控记录', icon: 'el-icon-video-camera-solid' }
+      },
+      {
+        path: 'diffRecordShow',
+        name: 'DiffRecordShow',
+        hidden: true,
+        component: () => import('@/views/assist/yapi/diffDetailShow'),
+        meta: { title: 'yapi对比详情' }
+      }
+    ]
+  },
+
+  // 测试管理
+  {
+    path: '/testManage',
+    component: Layout,
+    redirect: '/testManage/account',
+    name: 'TestManage',
+    meta: { title: '测试管理', icon: 'el-icon-magic-stick' },
+    children: [
+      {
+        path: 'weekly',
+        name: 'Weekly',
+        component: () => import('@/views/testWork/weekly'),
+        meta: { title: '周报', icon: 'el-icon-s-check' }
+      },
+      {
+        path: 'kym',
+        name: 'KYM',
+        component: () => import('@/views/testWork/kym'),
+        meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
+      },
+      {
+        path: 'makeTestCase',
+        name: 'MakeTestCase',
+        component: () => import('@/views/testWork/makeTestCase'),
+        meta: { title: '用例编写', icon: 'el-icon-s-opportunity' }
+      },
+      {
+        path: 'account',
+        name: 'Account',
+        component: () => import('@/views/testWork/account'),
+        meta: { title: '测试账号', icon: 'el-icon-s-check' }
+      }
+    ]
+  },
+
+  // 配置管理
+  {
+    path: '/config',
+    component: Layout,
+    redirect: '/config/args',
+    name: 'Config',
+    meta: { title: '配置管理', icon: 'el-icon-setting' },
+    children: [
+      {
+        path: 'type',
+        name: 'ConfigType',
+        meta: { title: '类型管理', icon: 'el-icon-star-off' },
+        component: () => import('@/views/config/configType/index')
+      },
+      {
+        path: 'args',
+        name: 'Args',
+        meta: { title: '参数管理', icon: 'el-icon-star-on' },
+        component: () => import('@/views/config/configs/index')
+      },
+      {
+        path: 'runEnv',
+        name: 'RunEnv',
+        meta: { title: '运行环境', icon: 'el-icon-orange' },
+        component: () => import('@/views/config/runEnv/index')
+      }
+    ]
+  },
+
   // 系统管理
   {
     path: '/system',
     component: Layout,
-    redirect: '/manage/user',
-    name: 'Manage',
-    hidden: localStorage.getItem('roles') !== '2', // 非管理员直接隐藏菜单
-    meta: { title: '系统管理', icon: 'el-icon-s-management', roles: [2, '2'] },
+    redirect: '/system/user',
+    name: 'System',
+    meta: { title: '系统管理', icon: 'el-icon-s-management' },
     children: [
       {
-        path: 'business',
-        name: 'Business',
-        meta: { title: '业务线管理', icon: 'el-icon-s-operation', roles: [2, '2'] },
-        component: () => import('@/views/users/business/index')
+        path: 'permission',
+        name: 'Permission',
+        component: () => import('@/views/users/permission/index'),
+        meta: { title: '权限管理', icon: 'el-icon-user' }
       },
       {
         path: 'role',
         name: 'Role',
         component: () => import('@/views/users/role/index'),
-        meta: { title: '权限管理', icon: 'el-icon-user', roles: [2, '2'] }
+        meta: { title: '角色管理', icon: 'el-icon-user' }
       },
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/users/user/index'),
-        meta: { title: '用户管理', icon: 'el-icon-user-solid', roles: [2, '2'] }
+        meta: { title: '用户管理', icon: 'el-icon-user-solid' }
+      },
+      {
+        path: 'business',
+        name: 'Business',
+        meta: { title: '业务线管理', icon: 'el-icon-s-operation' },
+        component: () => import('@/views/users/business/index')
       },
       {
         path: 'errorRecord',
         name: 'systemErrorRecord',
-        meta: { title: '系统错误记录', icon: 'el-icon-video-camera-solid', roles: [2, '2'] },
+        meta: { title: '系统错误记录', icon: 'el-icon-video-camera-solid' },
         component: () => import('@/views/system/errorRecord/index')
       }
     ]
@@ -456,7 +477,6 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/help/gitee',
     name: 'Help',
-    hidden: true,
     meta: { title: '帮助', icon: 'el-icon-document' },
     children: [
       {

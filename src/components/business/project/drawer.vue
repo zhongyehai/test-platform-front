@@ -76,12 +76,12 @@
               <el-input v-model="tempProject.app_activity" />
             </el-form-item>
 
-            <!-- 函数文件 -->
-            <el-form-item label="函数文件" prop="func_files" size="mini">
-              <funcFileView
-                ref="funcFiles"
-                :func-files="tempProject.func_files"
-                :current-func-file-list="funcFilesList"
+            <!-- 脚本文件 -->
+            <el-form-item label="脚本文件" prop="func_files" size="mini">
+              <scriptView
+                ref="scriptView"
+                :script-list="tempProject.script_list"
+                :current-script-list-data="scriptListData"
               />
               <el-popover
                 class="el_popover_class"
@@ -89,8 +89,8 @@
                 trigger="hover"
               >
                 <div>
-                  <div>1、若服务下要用到自定义函数可以在这里统一引用对应的函数文件</div>
-                  <div>2、此处引用的函数文件，对于当前服务下的接口、用例均有效</div>
+                  <div>1、若服务下要用到自定义函数可以在这里统一引用对应的脚本文件</div>
+                  <div>2、此处引用的脚本文件，对于当前服务下的接口、用例均有效</div>
                 </div>
                 <el-button slot="reference" type="text" icon="el-icon-question" />
               </el-popover>
@@ -143,24 +143,27 @@
 
 <script>
 import userSelector from '@/components/Selector/user.vue'
-import funcFileView from '@/components/Selector/funcFile.vue'
+import scriptView from '@/components/Selector/script.vue'
 import businessView from '@/components/Selector/business.vue'
 
 import { postProject as apiPostProject, putProject as apiPutProject } from '@/apis/apiTest/project'
 import { postProject as webUiPostProject, putProject as webUiPutProject } from '@/apis/webUiTest/project'
 import { postProject as AppPostProject, putProject as AppPutProject } from '@/apis/appUiTest/project'
-import { funcFileList } from '@/apis/assist/funcFile'
+import { scriptList } from '@/apis/assist/script'
 
 export default {
   name: 'Drawer',
   components: {
     userSelector,
-    funcFileView,
+    scriptView,
     businessView
   },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'currentProject',
+    // eslint-disable-next-line vue/require-prop-types
     'currentUserList',
+    // eslint-disable-next-line vue/require-prop-types
     'dataType'
   ],
   data() {
@@ -176,12 +179,12 @@ export default {
         business_id: '',
         app_package: '',
         app_activity: '',
-        func_files: [],
+        script_list: [],
         create_user: null
       },
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       user_list: [], // 用户列表
-      funcFilesList: [],
+      scriptListData: [],
       business_list: [], // 业务线列表
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
@@ -218,7 +221,7 @@ export default {
   },
 
   mounted() {
-    this.getFuncFileList()
+    this.getScriptList()
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
       if (_type === 'projectInfo') {
@@ -254,9 +257,9 @@ export default {
     },
 
     // 获取自定义函数列表
-    getFuncFileList() {
-      funcFileList().then(response => {
-        this.funcFilesList = response.data.data
+    getScriptList() {
+      scriptList().then(response => {
+        this.scriptListData = response.data.data
       })
     },
 
@@ -269,7 +272,7 @@ export default {
         swagger: '',
         app_package: '',
         app_activity: '',
-        func_files: []
+        script_list: []
       }
       this.submitButtonIsShow = true
     },
@@ -283,7 +286,7 @@ export default {
       this.tempProject.business_id = row.business_id
       this.tempProject.app_package = row.app_package
       this.tempProject.app_activity = row.app_activity
-      this.tempProject.func_files = row.func_files
+      this.tempProject.script_list = row.script_list
       this.submitButtonIsShow = true
     },
 
@@ -297,7 +300,7 @@ export default {
         app_activity: this.tempProject.app_activity,
         manager: this.$refs.userSelect.tempData,
         business_id: this.$refs.businessView.business,
-        func_files: this.$refs.funcFiles.tempFuncFiles
+        script_list: this.$refs.scriptView.tempScriptList
       }
     },
 

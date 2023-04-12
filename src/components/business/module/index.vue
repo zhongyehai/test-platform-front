@@ -15,16 +15,6 @@
         >
           <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
-
-<!--        <el-button-->
-<!--          v-show="tempDataForm.project_id"-->
-<!--          type="primary"-->
-<!--          size="mini"-->
-<!--          style="margin-left: 10px"-->
-<!--          @click.native="addParentModule()"-->
-<!--        >添加一级模块-->
-<!--        </el-button>-->
-
       </el-form-item>
 
       <el-form-item v-if="dataType === 'api'" label="查接口" size="mini">
@@ -247,14 +237,12 @@
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
-      :api-list="showApiList"
       :case-id="undefined"
       :marker="marker"
     />
 
     <showApiUseDrawer
       v-if="dataType === 'api'"
-      :case-list="showCaseList"
       :marker="marker"
     />
   </div>
@@ -354,8 +342,6 @@ export default {
 
       queryAddr: '',
       marker: 'module',
-      showApiList: [],
-      showCaseList: [],
 
       projectListUrl: '',
       moduleTreeUrl: '',
@@ -428,8 +414,7 @@ export default {
     getApiMsgBelongTo() {
       apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
         if (this.showMessage(this, response)) {
-          this.showApiList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
       })
     },
@@ -438,8 +423,7 @@ export default {
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
         if (this.showMessage(this, response)) {
-          this.showCaseList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
       })
     },

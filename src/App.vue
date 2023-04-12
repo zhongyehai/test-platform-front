@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
@@ -15,11 +15,20 @@ export default {
     // 页面加载完毕时添加刷新页面的监听事件
     // window.addEventListener('unload', this.saveState)
     window.addEventListener('beforeunload', this.saveState)
+    window.addEventListener('load', ev => this.getPermissions())
   },
   methods: {
     saveState() {
       // 把this.$store.state保存到localStorage.state
       localStorage.setItem('state', JSON.stringify(this.$store.state))
+      localStorage.setItem('permissions', JSON.stringify(this.$busEvents.data.permissions))
+    },
+
+    getPermissions() {
+      const permissions = localStorage.getItem('permissions')
+      this.$busEvents.data.permissions = permissions ? JSON.parse(permissions) : []
+      // 根据权限更新菜单，自动收缩一下侧边栏，展示效果，否则需要手动进行收缩才会展示
+      this.$store.dispatch('app/toggleSideBar')
     }
   }
 

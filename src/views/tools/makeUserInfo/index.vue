@@ -22,7 +22,6 @@
     <el-drawer
       title="选择具体项"
       size="75%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
@@ -93,7 +92,7 @@ export default {
   name: 'MakeUserInfo',
   data() {
     return {
-      drawerIsShow: false, // 抽屉的显示状态
+      drawerIsShow: true, // 抽屉的显示状态
       direction: 'rtl', // 抽屉打开方式
       makeLoadingIsShow: false,
       isIndeterminate: true,

@@ -337,7 +337,7 @@ export default {
       this.$set(this.currentTask, 'runButtonIsLoading', true)
       this.runTaskUrl({
         id: this.currentTask.id,
-        env: runConf.runEnv,
+        env_list: runConf.runEnv,
         is_async: runConf.runType,
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,

@@ -1,10 +1,10 @@
 <template>
   <!-- 新增/修改函数文件表单 -->
   <el-drawer
-    :title="tempFunc.id ? '修改函数文件' : '新增函数文件'"
+    :title="tempScript.id ? '修改Python脚本' : '新增Python脚本'"
     size="85%"
-    :wrapper-closable="false"
-    :visible.sync="funcFileDrawerIsShow"
+    :append-to-body="true"
+    :visible.sync="scriptDrawerIsShow"
     :direction="direction"
   >
     <el-form
@@ -14,14 +14,14 @@
       style="min-width: 400px;margin-left: 20px;margin-right: 20px"
     >
 
-      <!-- 函数文件名 -->
-      <el-form-item :label="'函数文件名'" prop="name" class="is-required" size="mini" style="margin-bottom: 0">
-        <el-input v-model="tempFunc.name" size="mini" />
+      <!-- 脚本文件名 -->
+      <el-form-item :label="'脚本文件名'" prop="name" class="is-required" size="mini" style="margin-bottom: 0">
+        <el-input v-model="tempScript.name" size="mini" :disabled="tempScript.id !== ''" />
       </el-form-item>
 
       <!-- 备注 -->
       <el-form-item :label="'备注'" prop="desc" style="margin-bottom: 8px">
-        <el-input v-model="tempFunc.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'"/>
+        <el-input v-model="tempScript.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'" />
       </el-form-item>
 
       <el-form-item label="调试函数" size="mini">
@@ -44,7 +44,7 @@
           <div>1、输入运行表达式，调试自定义函数</div>
           <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
           <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
-          <el-button slot="reference" type="text" icon="el-icon-question"/>
+          <el-button slot="reference" type="text" icon="el-icon-question" />
         </el-popover>
       </el-form-item>
 
@@ -71,8 +71,8 @@
 
     <el-container style="margin-left: 20px">
       <editor
-        v-model="tempFunc.func_data"
-        :style="{'min-height': funcFileEditHeight, 'font-size': '15px'}"
+        v-model="tempScript.script_data"
+        :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
         lang="python"
         theme="monokai"
         :options="{enableSnippets:true, enableBasicAutocompletion: true, enableLiveAutocompletion: true}"
@@ -81,20 +81,24 @@
     </el-container>
 
     <div class="demo-drawer__footer">
-      <el-button size="mini" @click="funcFileDrawerIsShow = false"> {{ '取消' }}</el-button>
+      <el-button size="mini" @click="scriptDrawerIsShow = false"> {{ '取消' }}</el-button>
       <el-button
         type="primary"
         size="mini"
         :loading="submitButtonIsLoading"
-        @click="tempFunc.id ? editFuncFile(): creteFuncFile()"
+        @click="tempScript.id ? editScript(): creteScript()"
       >
         {{ '保存' }}
       </el-button>
     </div>
 
     <!-- 选择环境和运行模式 -->
-    <el-dialog title="选择运行环境" append-to-body :visible.sync="dialogIsShow" :close-on-click-modal="false"
-               width="50%"
+    <el-dialog
+      title="选择运行环境"
+      append-to-body
+      :visible.sync="dialogIsShow"
+      :close-on-click-modal="false"
+      width="50%"
     >
 
       <div>
@@ -115,9 +119,9 @@
         </el-radio>
       </div>
       <span slot="footer" class="dialog-footer">
-      <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
-      <el-button size="mini" type="primary" @click="debugFunc">确 定</el-button>
-    </span>
+        <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
+        <el-button size="mini" type="primary" @click="debugFunc">确 定</el-button>
+      </span>
 
     </el-dialog>
 
@@ -141,7 +145,7 @@
             <div>执行结果：</div>
             <pre class="el-collapse-item-content" style="overflow: auto">{{
                 debugResultDetail.result || '没有返回值或返回值为null'
-              }}</pre>
+            }}</pre>
           </el-tab-pane>
 
           <el-tab-pane label="执行脚本" name="script">
@@ -149,7 +153,7 @@
               <el-container style="margin-left: 20px">
                 <editor
                   v-model="debugResultDetail.script"
-                  :style="{'min-height': funcFileEditHeight, 'font-size': '15px'}"
+                  :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
                   lang="python"
                   theme="monokai"
                   :options="{enableSnippets:true, enableBasicAutocompletion: true, enableLiveAutocompletion: true}"
@@ -160,7 +164,6 @@
           </el-tab-pane>
         </el-tabs>
 
-
       </div>
     </el-drawer>
 
@@ -168,7 +171,7 @@
 </template>
 
 <script>
-import { postFuncFile, putFuncFile, debugFuncFile, getFuncFile } from '@/apis/assist/funcFile'
+import { postScript, putScript, debugScript, getScript } from '@/apis/assist/script'
 import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
@@ -181,12 +184,12 @@ export default {
       direction: 'rtl', // 抽屉打开方式
       dialogIsShow: false,
       submitButtonIsLoading: false,
-      funcFileDrawerIsShow: false,
-      tempFunc: {
+      scriptDrawerIsShow: false,
+      tempScript: {
         id: '',
         name: '',
         desc: '',
-        func_data: ''
+        script_data: ''
       },
       runEnv: '',
       runEnvList: [],
@@ -203,7 +206,7 @@ export default {
 
   computed: {
     // 实时获 取屏幕高度-150px 作为函数文件代码编辑器的高度
-    funcFileEditHeight() {
+    scriptEditHeight() {
       return `${window.innerHeight - 100}px`
     }
   },
@@ -221,22 +224,27 @@ export default {
     })
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
-      if (_type === 'funcFileInfo') {
+      if (_type === 'scriptInfo') {
         if (status === 'add') {
-          this.tempFunc.name = ''
-          this.tempFunc.desc = ''
-          this.tempFunc.id = ''
-          this.tempFunc.func_data = ''
+          this.tempScript.id = ''
+          this.tempScript.script_data = ''
+          this.tempScript.name = data ? data.name : ''
+          this.tempScript.desc = data ? data.desc : ''
+          if (data) {
+            getScript({ id: data.id }).then(res => {
+              this.tempScript.script_data = res.script_data
+            })
+          }
+          this.tempScript.script_data = data ? data.script_data : ''
         } else if (status === 'update') {
-          this.tempFunc.id = data.id
-          this.tempFunc.name = data.name
-          this.tempFunc.desc = data.desc
-          getFuncFile({ id: data.id }).then(res => {
-            console.log(res)
-            this.tempFunc.func_data = res.func_data
+          this.tempScript.id = data.id
+          this.tempScript.name = data.name
+          this.tempScript.desc = data.desc
+          getScript({ id: data.id }).then(res => {
+            this.tempScript.script_data = res.script_data
           })
         }
-        this.funcFileDrawerIsShow = true
+        this.scriptDrawerIsShow = true
       }
     })
   },
@@ -255,33 +263,33 @@ export default {
     },
 
     // 新增函数文件
-    creteFuncFile() {
+    creteScript() {
       this.submitButtonIsLoading = true
-      postFuncFile(this.tempFunc).then(res => {
+      postScript(this.tempScript).then(res => {
         this.submitButtonIsLoading = false
         if (res.message.msg) {
           this.showDetail(res)
         } else {
           if (this.showMessage(this, res)) {
-            this.tempFunc.id = res.data.id
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
-            this.funcFileDrawerIsShow = false
+            this.tempScript.id = res.data.id
+            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'scriptInfo')
+            this.scriptDrawerIsShow = false
           }
         }
       })
     },
 
     // 修改函数文件
-    editFuncFile() {
+    editScript() {
       this.submitButtonIsLoading = true
-      putFuncFile(this.tempFunc).then(res => {
+      putScript(this.tempScript).then(res => {
         this.submitButtonIsLoading = false
         if (res.message.msg) {
           this.showDetail(res)
         } else {
           if (this.showMessage(this, res)) {
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'funcFileInfo')
-            this.funcFileDrawerIsShow = false
+            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'scriptInfo')
+            this.scriptDrawerIsShow = false
           }
         }
       })
@@ -291,8 +299,8 @@ export default {
     debugFunc() {
       // 先保存
       this.submitButtonIsLoading = true
-      if (this.tempFunc.id) {
-        putFuncFile(this.tempFunc).then(res => {
+      if (this.tempScript.id) {
+        putScript(this.tempScript).then(res => {
           this.submitButtonIsLoading = false
           if (res.message.msg) {
             this.showDetail(res)
@@ -303,13 +311,13 @@ export default {
           }
         })
       } else {
-        postFuncFile(this.tempFunc).then(res => {
+        postScript(this.tempScript).then(res => {
           this.submitButtonIsLoading = false
           if (res.message.msg) {
             this.showDetail(res)
           } else {
             if (this.showMessage(this, res)) {
-              this.tempFunc.id = res.data.id
+              this.tempScript.id = res.data.id
               this.runDeBug()
             }
           }
@@ -319,8 +327,8 @@ export default {
 
     runDeBug() {
       this.deBugButtonIsLoading = true
-      debugFuncFile({
-        'id': this.tempFunc.id,
+      debugScript({
+        'id': this.tempScript.id,
         'expression': this.expression,
         'env': this.runEnv
       }).then(res => {

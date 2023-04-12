@@ -145,10 +145,11 @@ export default {
           login({ 'account': this.loginForm.account, 'password': this.loginForm.password }).then((response) => {
             if (this.showMessage(this, response)) {
               // 存储状态
+              this.$busEvents.data.permissions = response.data.front_permissions
               this.$store.commit(types.token, response.data.token)
-              this.$store.commit(types.roles, response.data.role_id)
               this.$store.commit(types.userName, response.data.name)
               localStorage.setItem('id', response.data.id)
+              localStorage.setItem('permissions', JSON.stringify(response.data.front_permissions))
               localStorage.setItem('business', JSON.stringify(response.data.business_id))
               // 重定向到指定路由
               const redirect = this.$route.query.redirect || '/'

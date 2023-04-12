@@ -221,6 +221,22 @@
           :data-json="currentStep.data_driver"
         />
       </el-tab-pane>
+
+      <!-- Python脚本 -->
+      <el-tab-pane label="python脚本">
+        <template slot="label">
+          <span> Python脚本 </span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
+              2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </template>
+        <pythonScriptIndex />
+      </el-tab-pane>
+
     </el-tabs>
 
     <div class="demo-drawer__footer">
@@ -258,10 +274,12 @@ import validatesView from '@/components/Inputs/validates'
 import { postStep, putStep } from '@/apis/apiTest/step'
 import { getApi, apiMsgBelongTo } from '@/apis/apiTest/api'
 import { assertStrIsJson } from '@/utils/validate'
+import pythonScriptIndex from '@/views/assist/script/index.vue'
 
 export default {
   name: 'EditStep',
   components: {
+    pythonScriptIndex,
     skipIfView,
     headersView,
     paramsView,

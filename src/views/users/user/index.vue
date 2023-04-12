@@ -36,23 +36,23 @@
           size="mini"
           class="filter-item"
         >
-          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id" />
+          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id"/>
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="'角色：'" size="mini">
-        <el-select
-          v-model="listQuery.role_id"
-          :placeholder="'角色'"
-          clearable
-          filterable
-          default-first-option
-          size="mini"
-          class="filter-item"
-        >
-          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id" />
-        </el-select>
-      </el-form-item>
+<!--      <el-form-item :label="'角色：'" size="mini">-->
+<!--        <el-select-->
+<!--          v-model="listQuery.role_id"-->
+<!--          :placeholder="'角色'"-->
+<!--          clearable-->
+<!--          filterable-->
+<!--          default-first-option-->
+<!--          size="mini"-->
+<!--          class="filter-item"-->
+<!--        >-->
+<!--          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id"/>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
 
       <el-button v-waves class="filter-item" type="primary" size="mini" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" size="mini" @click="handleCreate">添加</el-button>
@@ -88,12 +88,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'角色'" prop="role_id" align="center" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.role_id === 1 ? '测试人员' : '管理人员' }}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column align="center" prop="status" label="启用状态" min-width="15%">
         <template slot-scope="scope">
           <el-switch
@@ -101,6 +95,12 @@
             :disabled="scope.row.changStatusIsDisabled"
             @change="changStatus(scope.row)"
           />
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
+        <template slot-scope="scope">
+          <span>{{ scope.row.created_time }}</span>
         </template>
       </el-table-column>
 
@@ -112,9 +112,9 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            icon="el-icon-edit"
             @click="handleUpdate(row)"
-          />
+          >修改
+          </el-button>
 
           <!-- 删除账号 -->
           <!--          <el-popover-->
@@ -153,7 +153,6 @@
     <el-drawer
       :title=" drawerType === 'create' ? '新增用户' : '修改用户'"
       size="60%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
@@ -166,19 +165,19 @@
 
         <!-- 用户信息 -->
         <el-form-item :label="'用户名'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.name" placeholder="2~12位" />
+          <el-input v-model="tempUser.name" placeholder="2~12位"/>
         </el-form-item>
 
         <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.account" placeholder="2~12位" />
+          <el-input v-model="tempUser.account" placeholder="2~12位"/>
         </el-form-item>
 
         <el-form-item v-if="drawerType === 'create'" :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，必填" />
+          <el-input v-model="tempUser.password" placeholder="4~18位，必填"/>
         </el-form-item>
 
         <el-form-item v-else :label="'密码'" prop="name" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改" />
+          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改"/>
         </el-form-item>
 
         <el-form-item :label="'业务线'" class="is-required" size="mini">
@@ -191,7 +190,13 @@
         </el-form-item>
 
         <el-form-item :label="'角色'" class="is-required" size="mini">
-          <el-select v-model="tempUser.role_id" placeholder="请选择角色" style="width:100%">
+          <el-select
+            v-model="tempUser.role_list"
+            placeholder="请选择角色"
+            multiple
+            filterable
+            style="width:100%"
+          >
             <el-option
               v-for="role in role_list"
               :key="role.name"
@@ -223,7 +228,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import businessView from '@/components/Selector/business'
 
-import { userList, deleteUser, postUser, putUser, getUser, userStatus } from '@/apis/system/user'
+import { userList, deleteUser, postUser, putUser, getUser, userStatus, userRoles } from '@/apis/system/user'
 import { roleList } from '@/apis/system/role'
 import { businessList } from '@/apis/system/business'
 
@@ -244,7 +249,7 @@ export default {
         name: undefined, // 用户名
         account: undefined, // 账号
         status: undefined, // 账号状态
-        role_id: undefined // 角色
+        // role_id: undefined // 角色
       },
 
       // 临时数据，添加、修改
@@ -252,7 +257,7 @@ export default {
         id: undefined,
         name: undefined,
         account: undefined,
-        role_id: undefined,
+        role_list: [],
         business_id: [],
         password: undefined
       },
@@ -261,8 +266,8 @@ export default {
       userDict: {},
 
       user_list: [], // 用户列表
-      role_list: [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }], // 角色列表
-      status_list: [], // 状态列表
+      role_list: [], // 角色列表
+      status_list: [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }], // 状态列表
       business_list: [], // 业务线列表
       tableKey: 0, // 服务数据表格起始
       total: 0, // 服务数据表格总条数
@@ -320,7 +325,7 @@ export default {
         name: undefined,
         account: undefined,
         password: undefined,
-        role_id: undefined,
+        role_list: [],
         business_id: []
       }
     },
@@ -335,12 +340,15 @@ export default {
     //  初始化临时模板数据，点击修改按钮触发
     handleUpdate(row) {
       this.drawerType = 'edit' // dialog框标识为编辑
+
       this.tempUser.id = row.id
       this.tempUser.name = row.name
       this.tempUser.account = row.account
       this.tempUser.password = row.password
-      this.tempUser.role_id = row.role_id
       this.tempUser.business_id = row.business_id
+      userRoles({ id: row.id }).then(response => {
+        this.tempUser.role_list = response.data
+      })
       this.drawerIsShow = true
     },
 
@@ -366,7 +374,7 @@ export default {
     // 获取角色列表
     getRoleList() {
       roleList().then(response => {
-        this.role_list = response.data
+        this.role_list = response.data.data
       })
     },
 

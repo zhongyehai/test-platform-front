@@ -36,13 +36,13 @@
 
           <el-row>
 
-            <!-- 用例集选择 -->
+            <!-- 脚本文件选择 -->
             <el-col :span="18">
-              <el-form-item label="函数文件">
-                <funcFilesView
-                  ref="funcFilesView"
+              <el-form-item label="脚本文件">
+                <scriptView
+                  ref="scriptView"
                   :cite="'case'"
-                  :func-files="tempCase.func_files"
+                  :script-list="tempCase.script_list"
                 />
                 <el-popover
                   class="el_popover_class"
@@ -50,9 +50,9 @@
                   trigger="hover"
                 >
                   <div>
-                    <div>1、用例下要用到自定义函数可以在这里统一引用对应的函数文件</div>
-                    <div>2、此处引用的函数文件，对于当前用例下的测试步骤均有效</div>
-                    <div>3、若此处引用了函数文件，服务处也引用了函数文件，则会把两边引用的合并去重</div>
+                    <div>1、用例下要用到自定义函数可以在这里统一引用对应的脚本文件</div>
+                    <div>2、此处引用的脚本文件，对于当前用例下的测试步骤均有效</div>
+                    <div>3、若此处引用了脚本文件，服务处也引用了脚本文件，则会把两边引用的合并去重</div>
                   </div>
                   <el-button slot="reference" type="text" icon="el-icon-question" />
                 </el-popover>
@@ -184,6 +184,21 @@
         <el-input v-model="tempCase.desc" size="mini" type="textarea" :rows="20" :placeholder="'用例的描述、备注'" />
       </el-tab-pane>
 
+      <!-- Python脚本 -->
+      <el-tab-pane label="python脚本">
+        <template slot="label">
+          <span> Python脚本 </span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
+              2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </template>
+        <pythonScriptIndex />
+      </el-tab-pane>
+
     </el-tabs>
 
     <div class="demo-drawer__footer">
@@ -195,7 +210,7 @@
         style="float: left"
         :loading="isShowDebugLoading"
         @click="clickRunDebug()"
-      >调试
+      >运行
       </el-button>
 
       <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
@@ -215,8 +230,7 @@
 
 <script>
 import skipIfView from '@/components/Inputs/skipIf'
-import moduleSelectorView from '@/components/Selector/module'
-import funcFilesView from '@/components/Selector/funcFile'
+import scriptView from '@/components/Selector/script.vue'
 import headersView from '@/components/Inputs/changeRow'
 import variablesView from '@/components/Inputs/variables'
 import stepView from '@/components/business/step/index.vue'
@@ -247,20 +261,24 @@ import {
   getCase as appUiGetCase
 } from '@/apis/appUiTest/case'
 import { getCaseSet as appUiGetCaseSet } from '@/apis/appUiTest/caseSet'
+import pythonScriptIndex from '@/views/assist/script/index.vue'
 
 export default {
   name: 'Drawer',
   components: {
+    pythonScriptIndex,
     skipIfView,
-    moduleSelectorView,
-    funcFilesView,
+    scriptView,
     headersView,
     variablesView,
     stepView
   },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType',
+    // eslint-disable-next-line vue/require-prop-types
     'currentProjectId',
+    // eslint-disable-next-line vue/require-prop-types
     'currentSetId'
   ],
   data() {
@@ -284,7 +302,7 @@ export default {
         desc: '',
         status: 0,
         run_times: '',
-        func_files: [],
+        script_list: [],
         variables: [{ key: null, value: null, remark: null, data_type: '' }],
         headers: [{ key: null, value: null, remark: null }],
         skip_if: {
@@ -429,7 +447,7 @@ export default {
       this.tempCase.name = ''
       this.tempCase.desc = ''
       this.tempCase.run_times = ''
-      this.tempCase.func_files = []
+      this.tempCase.script_list = []
       this.tempCase.before_case = []
       this.tempCase.after_case = []
       this.tempCase.variables = [{ key: null, value: null, remark: null, data_type: '' }]
@@ -460,7 +478,7 @@ export default {
     getCaseDataToCommit() {
       const caseData = JSON.parse(JSON.stringify(this.tempCase))
       caseData.set_id = this.$refs.setTree.getCheckedKeys()[0] || this.tempCase.set_id
-      caseData.func_files = this.$refs.funcFilesView.tempFuncFiles
+      caseData.script_list = this.$refs.scriptView.tempScriptList
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.dataType === 'api' ? this.$refs.headersView.tempData : []
       caseData.skip_if = this.$refs.skipIfView.tempData

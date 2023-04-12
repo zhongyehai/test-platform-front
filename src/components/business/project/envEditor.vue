@@ -24,14 +24,14 @@
           <div>
             <el-form v-show="dataType !== 'appUi'" label-width="120px">
               <el-form-item :label="'环境域名'" class="is-required" size="mini">
-                <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%"/>
+                <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%" />
                 <el-popover
                   class="el_popover_class"
                   placement="top-start"
                   trigger="hover"
                 >
                   <div>当前服务在当前环境的域名</div>
-                  <el-button slot="reference" type="text" icon="el-icon-question"/>
+                  <el-button slot="reference" type="text" icon="el-icon-question" />
                 </el-popover>
               </el-form-item>
             </el-form>
@@ -53,7 +53,7 @@
                       4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                       5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question"/></span>
+                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
                   </el-tooltip>
                 </template>
                 <variablesView
@@ -80,7 +80,7 @@
                       3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                       4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
                     </div>
-                    <span><i style="color: #409EFF" class="el-icon-question"/></span>
+                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
                   </el-tooltip>
                 </template>
                 <headersView
@@ -90,6 +90,21 @@
                   :placeholder-value="'value'"
                   :placeholder-desc="'备注'"
                 />
+              </el-tab-pane>
+
+              <!-- Python脚本 -->
+              <el-tab-pane label="python脚本">
+                <template slot="label">
+                  <span> Python脚本 </span>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <div slot="content">
+                      1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
+                      2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+                    </div>
+                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                  </el-tooltip>
+                </template>
+                <pythonScriptIndex />
               </el-tab-pane>
             </el-tabs>
 
@@ -136,7 +151,7 @@
             <div>2、若其他环境没有当前的key，则会自动将变量的key和value同步到该环境</div>
             <div>3、若其他环境已有当前的key，则不会同步当前key的信息到该环境</div>
           </div>
-          <el-button slot="reference" type="text" icon="el-icon-question"/>
+          <el-button slot="reference" type="text" icon="el-icon-question" />
         </el-popover>
       </div>
     </div>
@@ -153,6 +168,7 @@
 import headersView from '@/components/Inputs/changeRow.vue'
 import variablesView from '@/components/Inputs/variables.vue'
 import envSynchronizer from '@/components/business/project/synchronizer.vue'
+import pythonScriptIndex from '@/views/assist/script/index.vue'
 
 import { getProjectEnv as apiGetProjectEnv, putProjectEnv as apiPutProjectEnv } from '@/apis/apiTest/project'
 import { getProjectEnv as webUiGetProjectEnv, putProjectEnv as webUiPutProjectEnv } from '@/apis/webUiTest/project'
@@ -164,7 +180,8 @@ export default {
   components: {
     headersView,
     variablesView,
-    envSynchronizer
+    envSynchronizer,
+    pythonScriptIndex
   },
   props: [
     'dataType',

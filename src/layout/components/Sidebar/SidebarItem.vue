@@ -14,6 +14,7 @@
       </template>
       <sidebar-item
         v-for="child in item.children"
+        v-show="can_get_page(item, child.path)"
         :key="child.path"
         :is-nest="true"
         :item="child"
@@ -57,6 +58,13 @@ export default {
     return {}
   },
   methods: {
+    // 子菜单的访问权限
+    can_get_page(item, path) {
+      // console.log('`${item.path}/${path}`: ', `${item.path}/${path}`)
+      const permissions = this.$busEvents.data.permissions
+      return permissions.indexOf('admin') > -1 || permissions.indexOf(`${item.path}/${path}`) > -1
+    },
+
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter(item => {
         if (item.hidden) {

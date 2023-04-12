@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import router from '@/router/index'
+import { Message } from 'element-ui';
 
 // 创建对象，自定义实例默认值
 const service = axios.create({
@@ -23,7 +24,7 @@ service.interceptors.request.use(
   /* eslint-disable */
   error => {
     // 在请求发生错误时做的处理
-    this.$message.error('发送请求失败')
+    Message.error('发送请求失败')
     return Promise.reject();
   }
 );
@@ -38,6 +39,8 @@ service.interceptors.response.use(
       }else {
         router.push({path: `/login?redirect=${router.history.current.fullPath}`});
       }
+    }else if(response.data.status === 403){
+      Message.error(response.data.message)
     }
     return response.data
   }

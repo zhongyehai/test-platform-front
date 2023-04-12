@@ -13,9 +13,18 @@
       style="min-width: 400px;margin-left: 20px;margin-right: 20px"
     >
 
-      <!--      <el-form-item :label="'服务id'" prop="project_id" class="is-required" size="mini">-->
-      <!--        <el-input v-model="tempHit.project_id" size="mini"/>-->
-      <!--      </el-form-item>-->
+      <el-form-item :label="'选择服务'" prop="project_id" class="is-required" size="mini">
+        <el-select
+          v-model="tempHit.project_id"
+          :placeholder="`选择服务`"
+          size="mini"
+          style="width: 100%"
+          filterable
+          default-first-option
+        >
+          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+      </el-form-item>
 
       <el-form-item :label="'运行环境'" prop="env" class="is-required" size="mini">
         <el-select
@@ -36,7 +45,7 @@
       </el-form-item>
 
       <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
-        <el-input v-model="tempHit.report_id" size="mini"/>
+        <el-input v-model="tempHit.report_id" size="mini" />
       </el-form-item>
 
       <el-form-item :label="'触发时间'" prop="date" class="is-required" size="mini">
@@ -88,11 +97,11 @@
       </el-form-item>
 
       <el-form-item :label="'问题内容'" prop="hit_detail" class="is-required" size="mini">
-        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'"/>
+        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'" />
       </el-form-item>
 
       <el-form-item :label="'备注'" prop="desc" size="mini">
-        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'"/>
+        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'" />
       </el-form-item>
 
     </el-form>
@@ -115,6 +124,8 @@
 <script>
 import { getConfigByName } from '@/apis/config/config'
 import { postHit, putHit, getHitTypeList } from '@/apis/assist/hit'
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
+import { getReport as apiGetReport } from '@/apis/apiTest/report'
 
 export default {
   name: 'Drawer',
@@ -124,7 +135,9 @@ export default {
     // eslint-disable-next-line vue/require-prop-types
     'currentHitTypeList',
     // eslint-disable-next-line vue/require-prop-types
-    'runEnvList'
+    'runEnvList',
+    // eslint-disable-next-line vue/require-prop-types
+    'projectList'
   ],
   data() {
     return {
@@ -133,6 +146,7 @@ export default {
       drawerIsShow: false,
       hitTypeList: this.currentHitTypeList,
       runTestType: this.runTestTypeList,
+      projectListData: [], // 项目列表
       tempHit: {
         id: '',
         date: '',
@@ -161,7 +175,9 @@ export default {
             picker.$emit('pick', date)
           }
         }]
-      }
+      },
+      projectListUrl: '',
+      getReportUrl: ''
     }
   },
 
@@ -182,15 +198,47 @@ export default {
           this.hitTypeList = newVal
         }
       }
+    },
+
+    'projectList': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.projectListData = newVal
+        }
+      }
     }
+  },
+
+  created() {
+    this.projectListData = this.projectList
+    this.projectListUrl = apiProjectList
+    this.getReportUrl = apiGetReport
   },
 
   mounted() {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
       if (_type === 'hit') {
-        this.initHitTypeList() // 获取问题类型列表
+        // 获取服务列表
+        if (!this.projectListData || this.projectListData.length < 1) {
+          this.projectListUrl().then(response => {
+            this.projectListData = response.data.data
+          })
+        }
 
-        this.getRunType() // 获取测试类型列表
+        // 获取问题类型列表
+        if (!this.hitTypeList || this.hitTypeList.length < 1) {
+          getHitTypeList().then(response => {
+            this.hitTypeList = response.data
+          })
+        }
+
+        // 获取测试类型列表
+        if (!this.runTestType || this.runTestType.length < 1) {
+          getConfigByName({ name: 'test_type' }).then(response => {
+            this.runTestType = JSON.parse(response.data.value)
+          })
+        }
 
         if (status === 'add') {
           this.tempHit.id = ''
@@ -202,6 +250,12 @@ export default {
           this.tempHit.env = data ? data.run_env : ''
           this.tempHit.report_id = data ? data.report_id : ''
           this.tempHit.desc = ''
+          // 新增时，如果接收到了报告id，则获取报告对应的服务id
+          if (this.tempHit.report_id) {
+            this.getReportUrl({ id: this.tempHit.report_id }).then(response => {
+              this.tempHit.project_id = response.data.project_id
+            })
+          }
         } else if (status === 'update') {
           this.tempHit.id = data.id
           this.tempHit.date = data.date
@@ -247,22 +301,6 @@ export default {
           this.drawerIsShow = false
         }
       })
-    },
-
-    initHitTypeList() {
-      if (!this.hitTypeList || this.hitTypeList.length < 1) {
-        getHitTypeList().then(response => {
-          this.hitTypeList = response.data
-        })
-      }
-    },
-
-    getRunType() {
-      if (!this.runTestType || this.runTestType.length < 1) {
-        getConfigByName({ name: 'test_type' }).then(response => {
-          this.runTestType = JSON.parse(response.data.value)
-        })
-      }
     }
   }
 }

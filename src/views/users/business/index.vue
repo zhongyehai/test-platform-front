@@ -106,10 +106,9 @@
             <el-button
               type="text"
               size="mini"
-              icon="el-icon-edit"
               :disabled="roles !== '2'"
               @click.native="showAddBusinessDialog(scope.row)"
-            />
+            >修改</el-button>
           </el-tooltip>
         </template>
       </el-table-column>

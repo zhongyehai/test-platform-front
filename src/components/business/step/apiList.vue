@@ -109,13 +109,11 @@
     </div>
 
     <showApiFromDrawer
-      :api-list="showApiList"
       :case-id="currentCaseId"
       :marker="marker"
     />
 
     <showApiUseDrawer
-      :case-list="showCaseList"
       :marker="marker"
     />
   </div>
@@ -164,9 +162,7 @@ export default {
       pageNum: 0,
       pageSize: 10,
       queryAddr: '',
-      marker: 'caseApiList',
-      showApiList: [],
-      showCaseList: []
+      marker: 'caseApiList'
     }
   },
 
@@ -204,8 +200,7 @@ export default {
     getApiMsgBelongTo() {
       apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
         if (this.showMessage(this, response)) {
-          this.showApiList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
       })
     },
@@ -214,8 +209,7 @@ export default {
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
         if (this.showMessage(this, response)) {
-          this.showCaseList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
       })
     },

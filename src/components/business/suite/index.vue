@@ -206,14 +206,12 @@
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
-      :api-list="showApiList"
       :case-id="undefined"
       :marker="marker"
     />
 
     <showApiUseDrawer
       v-if="dataType === 'api'"
-      :case-list="showCaseList"
       :marker="marker"
     />
   </div>
@@ -298,8 +296,6 @@ export default {
       },
       queryAddr: '',
       marker: 'suite',
-      showApiList: [],
-      showCaseList: [],
       moduleDrawerIsShow: false,
       defaultCaseSet: {},
       moduleDrawerStatus: '',
@@ -579,7 +575,7 @@ export default {
       console.log('runConf: ', JSON.stringify(runConf))
       this.caseSetRunUrl({
         'id': this.runSetData ? this.runSetData.id : undefined,
-        env_code: runConf.runEnv,
+        env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
         server_id: runConf.runServer,
@@ -588,7 +584,7 @@ export default {
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.report_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
         }
       })
     },
@@ -607,8 +603,7 @@ export default {
     getApiMsgBelongTo() {
       apiMsgBelongTo({addr: this.queryAddr}).then(response => {
         if (this.showMessage(this, response)) {
-          this.showApiList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
       })
     },
@@ -617,8 +612,7 @@ export default {
     getApiMsgBelongToStep() {
       apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
         if (this.showMessage(this, response)) {
-          this.showCaseList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
       })
     }

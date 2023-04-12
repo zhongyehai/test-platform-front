@@ -12,7 +12,13 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
+        <sidebar-item
+          v-for="route in routes"
+          v-show="can_get_page(route.path)"
+          :key="route.path"
+          :item="route"
+          :base-path="route.path"
+        />
       </el-menu>
     </el-scrollbar>
   </div>
@@ -26,6 +32,14 @@ import variables from '@/styles/variables.scss'
 
 export default {
   components: { SidebarItem, Logo },
+  methods: {
+    // 主菜单的访问权限
+    can_get_page(path) {
+      const permissions = this.$busEvents.data.permissions
+      return permissions.indexOf('admin') > -1 || permissions.indexOf(path) > -1
+    }
+  },
+  // eslint-disable-next-line vue/order-in-components
   computed: {
     ...mapGetters(['sidebar']),
     routes() {

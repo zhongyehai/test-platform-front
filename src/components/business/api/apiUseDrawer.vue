@@ -69,19 +69,20 @@ export default {
   name: 'ApiUseDrawer',
   components: {},
   props: [
-    'caseList',
     'marker'
   ],
   data() {
     return {
       drawerIsShow: false,
-      direction: 'rtl' // 抽屉打开方式
+      direction: 'rtl', // 抽屉打开方式
+      caseList: []
     }
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, marker) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, marker, dataList) => {
       if (_type === 'apiUseIsShow' && marker === this.marker) {
+        this.caseList = dataList
         this.drawerIsShow = true
       }
     })

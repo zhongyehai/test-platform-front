@@ -146,13 +146,18 @@
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <el-tag
-                v-if="scope.row.quote_count"
-                @click="getApiMsgBelongToStep(scope.row)"
-              >
-                {{ scope.row.quote_count }}
-              </el-tag>
-              <el-tag v-else type="info">0</el-tag>
+              <el-tooltip class="item" effect="dark" placement="top-start">
+                <div slot="content">
+                  <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
+                </div>
+                <el-tag
+                  v-if="scope.row.quote_count"
+                  @click="getApiMsgBelongToStep(scope.row)"
+                >
+                  {{ scope.row.quote_count }}
+                </el-tag>
+                <el-tag v-else type="info">0</el-tag>
+              </el-tooltip>
             </template>
           </el-table-column>
 
@@ -243,7 +248,6 @@
     />
 
     <showApiUseDrawer
-      :case-list="showCaseList"
       :marker="marker"
     />
 
@@ -293,7 +297,6 @@ export default {
       api_list: [],
 
       marker: 'apiList',
-      showCaseList: [],
 
       // 拖拽排序参数
       sortable: null,
@@ -347,8 +350,7 @@ export default {
     getApiMsgBelongToStep(row) {
       apiMsgBelongToStep({ id: row.id }).then(response => {
         if (this.showMessage(this, response)) {
-          this.showCaseList = response.data
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
       })
     },
@@ -374,7 +376,8 @@ export default {
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
-      const that = this; const data = `${row.name}: ${row.addr}`
+      const that = this
+      const data = `${row.name}: ${row.addr}`
       this.$copyText(data).then(
         function(e) {
           that.$message.success('复制成功')

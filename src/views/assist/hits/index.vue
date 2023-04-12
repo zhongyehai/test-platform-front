@@ -80,6 +80,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="project_id" label="所属服务" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ projectDictData[scope.row.project_id] }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column :show-overflow-tooltip="true" align="center" prop="test_type" label="测试类型" min-width="10%">
         <template slot-scope="scope">
           <span>{{ runTestTypeDict[scope.row.test_type] }}</span>
@@ -92,13 +98,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题类型" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题类型" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.hit_type }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题详情" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题详情" min-width="15%">
         <template slot-scope="scope">
           <span>{{ scope.row.hit_detail }}</span>
         </template>
@@ -118,7 +124,8 @@
             type="text"
             size="mini"
             @click="showReport(scope.row)"
-          >查看报告</el-button>
+          >查看报告
+          </el-button>
 
           <!--修改问题记录-->
           <el-button
@@ -126,7 +133,8 @@
             size="mini"
             style="margin-right: 8px"
             @click="showHitDrawer('update', scope.row)"
-          >修改</el-button>
+          >修改
+          </el-button>
 
           <!-- 删除问题记录 -->
           <el-popover
@@ -146,7 +154,8 @@
               type="text"
               size="mini"
               :loading="scope.row.deleteLoadingIsShow"
-            >删除</el-button>
+            >删除
+            </el-button>
           </el-popover>
 
         </template>
@@ -166,6 +175,7 @@
       :run-test-type-list="runTestTypeList"
       :current-hit-type-list="hitTypeList"
       :run-env-list="envList"
+      :project-list="projectListData"
     />
 
   </div>
@@ -178,6 +188,7 @@ import hitDrawer from '@/views/assist/hits/drawer'
 import { deleteHit, getHitTypeList, hitList } from '@/apis/assist/hit'
 import { getConfigByName } from '@/apis/config/config'
 import { runEnvList } from '@/apis/config/runEnv'
+import { projectList } from '@/apis/apiTest/project'
 
 export default {
   name: 'FuncFile',
@@ -199,6 +210,8 @@ export default {
       tableIsLoading: false,
       envList: [],
       envDict: {},
+      projectListData: [],
+      projectDictData: {},
       queryData: {
         test_type: undefined,
         hit_type: undefined,
@@ -210,6 +223,16 @@ export default {
   },
 
   mounted() {
+    // 获取服务列表
+    if (!this.projectListData || this.projectListData.length < 1) {
+      projectList().then(response => {
+        this.projectListData = response.data.data
+        this.projectListData.forEach(project => {
+          this.projectDictData[project.id] = project.name
+        })
+      })
+    }
+
     // 获取环境列表
     runEnvList({}).then(response => {
       this.envList = response.data.data
