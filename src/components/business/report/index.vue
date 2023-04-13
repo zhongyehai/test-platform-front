@@ -20,25 +20,26 @@
         <el-tabs v-model="reportTab" class="table_padding" style="margin-left: 5px">
           <el-tab-pane label="测试报告列表" :name="reportTab">
 
-            <el-form-item label="环境" size="mini" label-width="60px">
-              <el-select
-                v-model="query.env"
-                placeholder="运行环境"
-                size="mini"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option
-                  v-for="item in eventList"
-                  :key="item.code"
-                  :label="item.name"
-                  :value="item.code"
-                />
-              </el-select>
-            </el-form-item>
-
             <el-form label-width="60px" inline>
+
+              <el-form-item label="环境" size="mini">
+                <el-select
+                  v-model="query.env"
+                  placeholder="运行环境"
+                  size="mini"
+                  filterable
+                  clearable
+                  default-first-option
+                >
+                  <el-option
+                    v-for="item in eventList"
+                    :key="item.code"
+                    :label="item.name"
+                    :value="item.code"
+                  />
+                </el-select>
+              </el-form-item>
+
               <el-form-item label="报告名" size="mini">
                 <el-input
                   v-model="query.projectName"

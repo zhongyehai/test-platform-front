@@ -16,7 +16,11 @@
 
       <!-- 脚本文件名 -->
       <el-form-item :label="'脚本文件名'" prop="name" class="is-required" size="mini" style="margin-bottom: 0">
-        <el-input v-model="tempScript.name" size="mini" :disabled="tempScript.id !== ''" />
+        <el-input
+          v-model="tempScript.name"
+          size="mini"
+          placeholder="支持大小写字母和下划线"
+          :disabled="tempScript.id !== ''" />
       </el-form-item>
 
       <!-- 备注 -->

@@ -49,7 +49,7 @@
       </el-form-item>
 
       <el-button
-        :loading="loading"
+        :disabled="loginButtonIsDisabled"
         type="primary"
         style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleLogin"
@@ -97,7 +97,7 @@ export default {
         account: [{ required: true, trigger: 'blur', validator: validateAccount }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
-      loading: false,
+      loginButtonIsDisabled: false,
       passwordType: 'password',
       redirect: undefined,
       platformName: null
@@ -141,8 +141,9 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
+          this.loginButtonIsDisabled = true
           login({ 'account': this.loginForm.account, 'password': this.loginForm.password }).then((response) => {
+            this.loginButtonIsDisabled = false
             if (this.showMessage(this, response)) {
               // 存储状态
               this.$busEvents.data.permissions = response.data.front_permissions
@@ -157,7 +158,6 @@ export default {
               // this.$router.push({path: redirect.slice(redirect.indexOf('=') + 1)})  // 重定向到指定路由
             }
           })
-          this.loading = false
         } else {
           this.$message.error('数据校验不通过，请确认')
         }
