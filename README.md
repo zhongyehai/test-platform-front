@@ -1,6 +1,6 @@
 # 基于 vue-admin-template 开发测试平台前端
 
-## [体验demo](http://139.196.100.202/#/login) ，  账号：tester、密码：123456
+## [体验demo](http://139.196.100.202/#/login) ，  账号：admin、密码：admin123456Aliyun
 
 ## [去后端](https://github.com/zhongyehai/test-platform-api)
 
