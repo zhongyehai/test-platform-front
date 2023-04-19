@@ -270,6 +270,7 @@ export default {
         name: null,
         manager: null,
         swagger: '',
+        business_id: '',
         app_package: '',
         app_activity: '',
         script_list: []
@@ -292,6 +293,7 @@ export default {
 
     // 获取数据提交给后端
     getProjectForCommit() {
+      this.tempProject.business_id = this.$refs.businessView.business
       return {
         id: this.tempProject.id,
         name: this.tempProject.name,
@@ -299,7 +301,7 @@ export default {
         app_package: this.tempProject.app_package,
         app_activity: this.tempProject.app_activity,
         manager: this.$refs.userSelect.tempData,
-        business_id: this.$refs.businessView.business,
+        business_id: this.tempProject.business_id,
         script_list: this.$refs.scriptView.tempScriptList
       }
     },

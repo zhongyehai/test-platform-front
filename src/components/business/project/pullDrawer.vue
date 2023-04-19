@@ -34,6 +34,7 @@ import { swaggerPull } from '@/apis/assist/swagger'
 
 export default {
   name: 'Project',
+  // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
   data() {
     return {

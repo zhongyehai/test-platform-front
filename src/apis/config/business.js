@@ -1,7 +1,7 @@
 import request from '@/utils/request'
-import { baseDirSystem } from '@/apis/base' // 加载请求业务线文件
+import { baseDirConfig } from '@/apis/base' // 加载请求业务线文件
 
-const currentBaseDir = baseDirSystem + '/business'
+const currentBaseDir = baseDirConfig + '/business'
 
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })

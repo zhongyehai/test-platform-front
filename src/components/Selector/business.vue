@@ -51,7 +51,7 @@
 
 <script>
 
-import { businessList } from '@/apis/system/business'
+import { businessList } from '@/apis/config/business'
 
 export default {
   name: 'Business',

@@ -78,7 +78,7 @@
     <el-table
       ref="stepListTable"
       v-loading="tableLoadingIsShow"
-      element-loading-text="正在排序中"
+      element-loading-text="正在获取数据..."
       element-loading-spinner="el-icon-loading"
       :data="stepList"
       fit
@@ -618,7 +618,9 @@ export default {
         selectedIdList = [row.id]
         changeStatus = row.status
       }
+      this.tableLoadingIsShow = true
       this.putStepIsRunUrl({ 'id': selectedIdList, 'status': changeStatus }).then(response => {
+        this.tableLoadingIsShow = false
         this.showMessage(this, response)
         if (isGetStepList) {
           this.getStepList()

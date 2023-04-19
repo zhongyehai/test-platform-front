@@ -230,7 +230,7 @@ import businessView from '@/components/Selector/business'
 
 import { userList, deleteUser, postUser, putUser, getUser, userStatus, userRoles } from '@/apis/system/user'
 import { roleList } from '@/apis/system/role'
-import { businessList } from '@/apis/system/business'
+import { businessList } from '@/apis/config/business'
 
 export default {
   name: 'Index',

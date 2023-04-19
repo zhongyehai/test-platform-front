@@ -5,7 +5,6 @@
     <el-drawer
       :title=" tempPage.id ? '修改页面' : '新增页面'"
       size="80%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >

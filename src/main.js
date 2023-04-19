@@ -6,7 +6,6 @@ import VueClipboard from 'vue-clipboard2' // 复制内容到粘贴板
 import 'default-passive-events'
 import 'normalize.css/normalize.css' // CSS重置的现代替代方案
 import 'element-ui/lib/theme-chalk/index.css'
-
 import '@/styles/index.scss' // 全局css
 import '@/icons' // icon
 import '@/permission' // 权限控制

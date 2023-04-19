@@ -229,6 +229,7 @@
 
     <selectRunEnv
       :data-type="dataType"
+      :project-business-id="projectBusinessId"
     />
 
     <runProcess
@@ -339,7 +340,7 @@ export default {
 
       // 当前鼠标滑入的节点名
       currentLabel: '',
-
+      projectBusinessId: '',
       queryAddr: '',
       marker: 'module',
 
@@ -450,6 +451,13 @@ export default {
         this.moduleListData = arrayToTree(response_data, null)
 
         this.sendModuleTreeIsDone(this.moduleListData)
+      })
+
+      // 获取所选服务的业务线id
+      this.projectListData.forEach(project =>{
+        if (project.id === projectId){
+          this.projectBusinessId = project.business_id
+        }
       })
     },
 

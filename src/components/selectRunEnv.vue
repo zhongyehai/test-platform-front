@@ -170,15 +170,17 @@
 <script>
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
-import { getConfigByName, getRunModel } from '@/apis/config/config'
+import { getRunModel } from '@/apis/config/config'
 import { runEnvGroupList, runEnvList } from '@/apis/config/runEnv'
-import { phoneList, serverList } from '@/apis/appUiTest/env' // 初始化超时时间
 import { getRunTimeout } from '@/utils/getConfig'
 
 export default {
   name: 'SelectRunEnv',
   props: [
-    'dataType'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType',
+    // eslint-disable-next-line vue/require-prop-types
+    'projectBusinessId'
   ],
   data() {
     return {
@@ -225,14 +227,15 @@ export default {
         this.showSelectRunModel = showSelectRunModel
         if (this.dataType === 'api') {
           this.initRunMode()
+          this.initEnvList()
         } else if (this.dataType === 'appUi') {
           this.getRunAppEnv()
           this.noReset = false
         } else {
           this.initRunMode()
           this.initBrowserName()
+          this.initEnvList()
         }
-        this.initEnvList()
         this.dialogIsShow = true
       }
     })
@@ -248,7 +251,7 @@ export default {
     // 获取环境配置
     initEnvList() {
       // 初始化运行环境
-      runEnvList().then(response => {
+      runEnvList({ business_id: this.projectBusinessId }).then(response => {
         this.runEnvDataSource = response.data.data
         this.envCodeList = []
         this.initEnvGroupDataList()
@@ -256,9 +259,10 @@ export default {
           this.envCodeList.push(env.code)
           this.envGroupDataList[env.group].push(env)
         })
-        if (this.runEnvDataSource && this.runEnvDataSource.length > 0) {
-          this.runEnv = [this.runEnvDataSource[0].code]
-        }
+        this.runEnv = []
+        // if (this.runEnvDataSource && this.runEnvDataSource.length > 0) {
+        //   this.runEnv = [this.runEnvDataSource[0].code]
+        // }
       })
     },
 

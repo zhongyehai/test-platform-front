@@ -84,7 +84,7 @@
         <el-table
           ref="caseTable"
           v-loading="tableLoadingIsShow"
-          element-loading-text="正在排序中"
+          element-loading-text="正在获取数据..."
           element-loading-spinner="el-icon-loading"
           :data="case_list"
           row-key="id"
@@ -189,7 +189,6 @@
                   style="color: red"
                   type="text"
                   size="mini"
-                  :loading="scope.row.isShowDeleteLoading"
                 >删除
                 </el-button>
               </el-popover>
@@ -257,8 +256,11 @@ export default {
 
   // 接收父组件传参的key
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType',
+    // eslint-disable-next-line vue/require-prop-types
     'currentProjectId',
+    // eslint-disable-next-line vue/require-prop-types
     'currentSetId'
   ],
   data() {
@@ -406,7 +408,6 @@ export default {
       let selectedIdList = []
       if (row.id) {
         this.$set(row, 'deletePopoverIsShow', false)
-        this.$set(row, 'isShowDeleteLoading', true)
         selectedIdList = [row.id]
       } else { // 批量删除
         this.showBatchDelete = false
@@ -414,10 +415,9 @@ export default {
           selectedIdList.push(report.id)
         })
       }
+      this.tableLoadingIsShow = true
       this.deleteCaseUrl({ 'id': selectedIdList }).then(response => {
-        if (row.id) {
-          this.$set(row, 'isShowDeleteLoading', false)
-        }
+        this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.getCaseList()
         }
@@ -428,7 +428,9 @@ export default {
     copyCase(caseData) {
       this.tempCase = caseData
       this.tempCase.num = ''
+      this.tableLoadingIsShow = true
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', JSON.parse(JSON.stringify(this.tempCase)))
+      this.tableLoadingIsShow = false
       this.$set(caseData, 'copyPopoverIsShow', false)
     },
 
@@ -486,7 +488,9 @@ export default {
         selectedIdList = [row.id]
         changeStatus = row.status
       }
+      this.tableLoadingIsShow = true
       this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus }).then(response => {
+        this.tableLoadingIsShow = false
         this.showMessage(this, response)
         this.getCaseList()
       })

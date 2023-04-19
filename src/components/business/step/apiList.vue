@@ -77,10 +77,20 @@
 
         <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="90%">
           <template slot-scope="scope">
-            <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
+            <div
+              class="block"
+              :class="`block_${scope.row.method.toLowerCase()}`"
+              :style="{
+                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
+                  'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+                }"
+            >
               <span
                 class="block-method block_method_color"
                 :class="`block_method_${scope.row.method.toLowerCase()}`"
+                :style="{
+                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                }"
               >
                 {{ scope.row.method }}
               </span>

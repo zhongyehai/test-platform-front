@@ -21,7 +21,7 @@
             <el-table
               ref="taskTable"
               v-loading="tableLoadingIsShow"
-              element-loading-text="正在排序中"
+              element-loading-text="正在获取数据..."
               element-loading-spinner="el-icon-loading"
               :data="taskList"
               row-key="id"
@@ -68,7 +68,6 @@
                     v-model="scope.row.status"
                     :inactive-value="0"
                     :active-value="1"
-                    :disabled="scope.row.taskIsDisabled"
                     @change="changeStatus(scope.row)"
                   />
                 </template>
@@ -112,7 +111,6 @@
                       slot="reference"
                       type="text"
                       size="mini"
-                      :loading="scope.row.copyButtonIsLoading"
                     >复制</el-button>
                   </el-popover>
 
@@ -134,7 +132,6 @@
                       type="text"
                       size="mini"
                       :disabled="scope.row.status === 1"
-                      :loading="scope.row.deleteLoadingIsShow"
                     >删除</el-button>
                   </el-popover>
                 </template>
@@ -155,6 +152,7 @@
 
     <selectRunEnv
       :data-type="dataType"
+      :project-business-id="projectBusinessId"
     />
 
     <runProcess
@@ -208,6 +206,7 @@ import {
 export default {
   name: 'Index',
   components: { Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess },
+  // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
   data() {
     return {
@@ -223,7 +222,7 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-
+      projectBusinessId: '',
       currentTask: {},
       runEvent: 'runTaskEventOnIndex',
       callBackEvent: 'runTaskOnIndex',
@@ -285,6 +284,7 @@ export default {
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
       if (_type === 'project') {
         this.projectId = project.id
+        this.projectBusinessId = project.business_id
         this.getTaskList()
       }
     })
@@ -316,9 +316,9 @@ export default {
     // 复制任务
     copy(task) {
       this.$set(task, 'copyPopoverIsShow', false)
-      this.$set(task, 'copyButtonIsLoading', true)
+      this.tableLoadingIsShow = true
       this.copyTaskUrl({ 'id': task.id }).then(response => {
-        this.$set(task, 'copyButtonIsLoading', false)
+        this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.taskList.push(response.data)
           this.editTask(response.data)
@@ -355,9 +355,9 @@ export default {
     // 删除任务
     delTask(task) {
       this.$set(task, 'deletePopoverIsShow', false)
-      this.$set(task, 'deleteLoadingIsShow', true)
+      this.tableLoadingIsShow = true
       this.deleteTaskUrl({ id: task.id }).then(response => {
-        this.$set(task, 'deleteLoadingIsShow', false)
+        this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.getTaskList()
         }
@@ -366,17 +366,18 @@ export default {
 
     // 修改定时任务状态，el-switch组件是先改变状态，再发送请求
     changeStatus(task) {
-      this.$set(task, 'taskIsDisabled', true)
       if (task.status === 1) {
+        this.tableLoadingIsShow = true
         this.enableTaskUrl({ id: task.id }).then(response => {
-          this.$set(task, 'taskIsDisabled', false)
+          this.tableLoadingIsShow = false
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
         })
       } else {
+        this.tableLoadingIsShow = true
         this.disableTaskUrl({ id: task.id }).then(response => {
-          this.$set(task, 'taskIsDisabled', false)
+          this.tableLoadingIsShow = false
           if (this.showMessage(this, response)) {
             this.getTaskList()
           }
@@ -386,11 +387,13 @@ export default {
 
     // 获取任务列表
     getTaskList() {
+      this.tableLoadingIsShow = true
       this.taskListUrl({
         projectId: this.projectId,
         pageNum: this.pageNum,
         pageSize: this.pageSize
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.taskList = response.data.data
         this.taskTotal = response.data.total
 

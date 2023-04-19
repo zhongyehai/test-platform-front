@@ -9,8 +9,8 @@
 
       <el-row>
         <el-col :span="dataType !== 'appUi' ? 3 : 0">
-          <!--          <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">-->
-          <el-tabs v-model="activeName" :tab-position="tabPosition">
+          <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">
+            <!--          <el-tabs v-model="activeName" :tab-position="tabPosition">-->
             <el-tab-pane
               v-for="(runEnv) in runEnvList"
               :key="runEnv.id"
@@ -116,6 +116,7 @@
         <!-- 同步环境信息 -->
         <el-button
           v-if="dataType !== 'appUi'"
+          v-show="runEnvList.length > 1"
           style="float: left"
           type="primary"
           size="mini"
@@ -174,6 +175,7 @@ import { getProjectEnv as apiGetProjectEnv, putProjectEnv as apiPutProjectEnv } 
 import { getProjectEnv as webUiGetProjectEnv, putProjectEnv as webUiPutProjectEnv } from '@/apis/webUiTest/project'
 import { getProjectEnv as appGetProjectEnv, putProjectEnv as appPutProjectEnv } from '@/apis/appUiTest/project'
 import { runEnvList } from '@/apis/config/runEnv'
+import { getLoading } from '@/utils/getLoading'
 
 export default {
   name: 'EnvEditor',
@@ -184,7 +186,9 @@ export default {
     pythonScriptIndex
   },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType',
+    // eslint-disable-next-line vue/require-prop-types
     'dataTypeMapping'
   ],
   data() {
@@ -209,26 +213,7 @@ export default {
     }
   },
 
-  watch: {
-    'activeName': {
-      deep: true, // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal && this.tempEnv.project_id) {
-          this.getEnv(newVal, this.tempEnv.project_id)
-        }
-      }
-    }
-  },
-
   mounted() {
-    // 获取环境配置
-    runEnvList().then(response => {
-      this.runEnvList = response.data.data
-      if (this.runEnvList.length > 0) {
-        this.activeName = this.runEnvList[0].id.toString()
-      }
-    })
-
     if (this.dataType === 'api') {
       this.getProjectEnvUrl = apiGetProjectEnv
       this.putProjectEnvUrl = apiPutProjectEnv
@@ -243,8 +228,18 @@ export default {
     // 监听打开环境编辑抽屉
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, project) => {
       if (_type === 'env') {
+        this.runEnvList = []
+        this.tempEnv.project_id = project.id
         this.drawerIsShow = true
-        this.getEnv(this.activeName, project.id)
+        // 获取环境配置
+        runEnvList({ business_id: project.business_id }).then(response => {
+          this.runEnvList = response.data.data
+          if (this.runEnvList.length > 0) {
+            this.activeName = this.runEnvList[0].id.toString()
+            this.getEnv(this.activeName, this.tempEnv.project_id)
+          }
+          // this.getEnv(this.activeName, this.tempEnv.project_id)
+        })
       }
     })
 
@@ -267,22 +262,28 @@ export default {
 
   methods: {
 
-    // 切换环境时，自动保存，保存失败则不切换
+    // 切换环境时，
     changeTab(activeName, oldActiveName) {
-      return new Promise((resolve, reject) => {
-        if (oldActiveName && oldActiveName !== '0') {
-          this.submitButtonIsLoading = true
-          this.tempEnv.env_id = parseInt(this.activeName)
-          this.tempEnv.variables = this.$refs.variablesView.tempData
-          if (this.dataType === 'api') {
-            this.tempEnv.headers = this.$refs.headersView.tempData
-          }
-          this.putProjectEnvUrl(this.tempEnv).then(response => {
-            this.submitButtonIsLoading = false
-            return this.showMessage(this, response) ? resolve() : reject()
-          })
-        }
-      })
+      // 自动保存，保存失败则不切换
+      // return new Promise((resolve, reject) => {
+      //   if (oldActiveName && oldActiveName !== '0') {
+      //     this.submitButtonIsLoading = true
+      //     this.tempEnv.env_id = parseInt(this.activeName)
+      //     this.tempEnv.variables = this.$refs.variablesView.tempData
+      //     if (this.dataType === 'api') {
+      //       this.tempEnv.headers = this.$refs.headersView.tempData
+      //     }
+      //     this.putProjectEnvUrl(this.tempEnv).then(response => {
+      //       this.submitButtonIsLoading = false
+      //       return this.showMessage(this, response) ? resolve() : reject()
+      //     })
+      //   }
+      // })
+
+      // 请求对应的数据
+      if (activeName && oldActiveName !== '0') {
+        this.getEnv(activeName, this.tempEnv.project_id)
+      }
     },
 
     // 保存环境设置
@@ -303,12 +304,7 @@ export default {
 
     // 获取环境信息
     getEnv(envId, projectId) {
-      const loading = this.$loading({
-        lock: true,
-        text: `获取环境数据中，请耐心等待`,
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
+      const loading = getLoading(this, '获取环境数据中，请耐心等待')
       this.getProjectEnvUrl({ env_id: envId, projectId: projectId }).then(response => {
         loading.close()
         this.tempEnv.id = response.data.id

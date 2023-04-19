@@ -3,6 +3,7 @@
   <el-drawer
     :title="tempScript.id ? '修改Python脚本' : '新增Python脚本'"
     size="85%"
+    :wrapper-closable="false"
     :append-to-body="true"
     :visible.sync="scriptDrawerIsShow"
     :direction="direction"
@@ -20,7 +21,8 @@
           v-model="tempScript.name"
           size="mini"
           placeholder="支持大小写字母和下划线"
-          :disabled="tempScript.id !== ''" />
+          :disabled="tempScript.id !== ''"
+        />
       </el-form-item>
 
       <!-- 备注 -->
@@ -142,13 +144,22 @@
           <el-tab-pane label="执行结果" name="debugResult">
             <div>运行环境：{{ runEnvDict[runEnv] }}</div>
             <br>
+            <br>
 
             <div>运行表达式：{{ expression }}</div>
+            <br>
             <br>
 
             <div>执行结果：</div>
             <pre class="el-collapse-item-content" style="overflow: auto">{{
                 debugResultDetail.result || '没有返回值或返回值为null'
+            }}</pre>
+            <br>
+            <br>
+
+            <div>脚本print内容：</div>
+            <pre class="el-collapse-item-content" style="overflow: auto">{{
+                debugResultDetail.script_print || '没有print内容'
             }}</pre>
           </el-tab-pane>
 
@@ -203,6 +214,7 @@ export default {
       expression: '', // 表达式
       debugResultDrawerIsShow: false,
       activeName: 'debugResult',
+      scriptPrintLog: '',
       debugResultDetail: '',
       debugResultMessage: ''
     }

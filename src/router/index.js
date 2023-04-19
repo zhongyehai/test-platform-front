@@ -155,7 +155,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/webUiTest/project',
     name: 'WebUiTest',
-    meta: { title: 'webUi自动化', icon: 'el-icon-connection' },
+    meta: { title: 'webUI自动化', icon: 'el-icon-connection' },
     children: [
       {
         path: 'project',
@@ -203,7 +203,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/appUiTest/project',
     name: 'AppUiTest',
-    meta: { title: 'app自动化', icon: 'el-icon-mobile' },
+    meta: { title: 'appUI自动化', icon: 'el-icon-mobile' },
     children: [
       {
         path: 'env',
@@ -290,13 +290,14 @@ export const constantRoutes = [
     redirect: '/tools/dataPool',
     name: 'Tools',
     meta: { title: '造数小工具', icon: 'el-icon-s-tools' },
+    alwaysShow: true,
     children: [
-      {
-        path: 'examination',
-        name: 'Examination',
-        component: () => import('@/views/tools/examination'),
-        meta: { title: '征信考试', icon: 'form' }
-      },
+      // {
+      //   path: 'examination',
+      //   name: 'Examination',
+      //   component: () => import('@/views/tools/examination'),
+      //   meta: { title: '征信考试', icon: 'form' }
+      // },
       {
         path: 'dataPool',
         name: 'DataPool',
@@ -350,19 +351,19 @@ export const constantRoutes = [
         component: () => import('@/views/assist/hits'),
         meta: { title: '自动化问题记录', icon: 'el-icon-circle-close' }
       },
-      {
-        path: 'diffRecord',
-        name: 'DiffRecord',
-        component: () => import('@/views/assist/yapi/diffDecord'),
-        meta: { title: 'yapi监控记录', icon: 'el-icon-video-camera-solid' }
-      },
-      {
-        path: 'diffRecordShow',
-        name: 'DiffRecordShow',
-        hidden: true,
-        component: () => import('@/views/assist/yapi/diffDetailShow'),
-        meta: { title: 'yapi对比详情' }
-      }
+      // {
+      //   path: 'diffRecord',
+      //   name: 'DiffRecord',
+      //   component: () => import('@/views/assist/yapi/diffDecord'),
+      //   meta: { title: 'yapi监控记录', icon: 'el-icon-video-camera-solid' }
+      // },
+      // {
+      //   path: 'diffRecordShow',
+      //   name: 'DiffRecordShow',
+      //   hidden: true,
+      //   component: () => import('@/views/assist/yapi/diffDetailShow'),
+      //   meta: { title: 'yapi对比详情' }
+      // }
     ]
   },
 
@@ -374,18 +375,18 @@ export const constantRoutes = [
     name: 'TestManage',
     meta: { title: '测试管理', icon: 'el-icon-magic-stick' },
     children: [
-      {
-        path: 'weekly',
-        name: 'Weekly',
-        component: () => import('@/views/testWork/weekly'),
-        meta: { title: '周报', icon: 'el-icon-s-check' }
-      },
-      {
-        path: 'kym',
-        name: 'KYM',
-        component: () => import('@/views/testWork/kym'),
-        meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
-      },
+      // {
+      //   path: 'weekly',
+      //   name: 'Weekly',
+      //   component: () => import('@/views/testWork/weekly'),
+      //   meta: { title: '周报', icon: 'el-icon-s-check' }
+      // },
+      // {
+      //   path: 'kym',
+      //   name: 'KYM',
+      //   component: () => import('@/views/testWork/kym'),
+      //   meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
+      // },
       {
         path: 'makeTestCase',
         name: 'MakeTestCase',
@@ -426,6 +427,12 @@ export const constantRoutes = [
         name: 'RunEnv',
         meta: { title: '运行环境', icon: 'el-icon-orange' },
         component: () => import('@/views/config/runEnv/index')
+      },
+      {
+        path: 'business',
+        name: 'Business',
+        meta: { title: '业务线管理', icon: 'el-icon-s-operation' },
+        component: () => import('@/views/config/business/index')
       }
     ]
   },
@@ -457,12 +464,6 @@ export const constantRoutes = [
         meta: { title: '用户管理', icon: 'el-icon-user-solid' }
       },
       {
-        path: 'business',
-        name: 'Business',
-        meta: { title: '业务线管理', icon: 'el-icon-s-operation' },
-        component: () => import('@/views/users/business/index')
-      },
-      {
         path: 'errorRecord',
         name: 'systemErrorRecord',
         meta: { title: '系统错误记录', icon: 'el-icon-video-camera-solid' },
@@ -489,12 +490,12 @@ export const constantRoutes = [
         path: 'https://github.com/zhongyehai/api-test-api/blob/main/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
         meta: { title: '操作手册：GitHub', icon: 'el-icon-document' }
       },
-      {
-        path: 'debug',
-        name: 'Debug',
-        component: () => import('@/views/debug/index'),
-        meta: { title: '调试页面' }
-      }
+      // {
+      //   path: 'debug',
+      //   name: 'Debug',
+      //   component: () => import('@/views/debug/index'),
+      //   meta: { title: '调试页面' }
+      // }
     ]
   },
 

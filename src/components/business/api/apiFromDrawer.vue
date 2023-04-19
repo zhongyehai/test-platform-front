@@ -27,10 +27,20 @@
 
       <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="40%">
         <template slot-scope="scope">
-          <div class="block" :class="`block_${scope.row.method.toLowerCase()}`">
+          <div
+            class="block"
+            :class="`block_${scope.row.method.toLowerCase()}`"
+            :style="{
+              'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
+              'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+            }"
+          >
             <span
               class="block-method block_method_color"
               :class="`block_method_${scope.row.method.toLowerCase()}`"
+              :style="{
+                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+              }"
             >
               {{ scope.row.method }}
             </span>
@@ -42,9 +52,9 @@
 
       <el-table-column
         :show-overflow-tooltip="true"
-        prop="create_user"
+        prop="level"
         align="center"
-        min-width="12%"
+        min-width="10%"
       >
         <template slot="header">
           <span> 重要级别 </span>
@@ -60,29 +70,21 @@
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <div
-            :style="{
-              'backgroundColor': scope.row.level === 'P0' ?
-                '#F56C6C' : scope.row.level === 'P1' ?
-                  '#E6A23C' : '#67C23A'}"
-          >
+          <div>
             <div style="width: 80%; margin-left:auto; margin-right:auto">
               <el-select
+                :ref="`levelSelector${scope.row.id}`"
                 slot="prepend"
                 v-model="scope.row.level"
                 size="mini"
-                placeholder="选择请求方式"
+                placeholder="选择重要程度"
                 filterable
                 class="select"
-                default-first-option
                 @change="selectApiLevel(scope.row)"
               >
-                <el-option
-                  v-for="item in [{label: '高', value: 'P0'}, {label: '中', value: 'P1'}, {label: '低', value: 'P2'}]"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
-                />
+                <el-option label="高" value="P0"><span style="color: #F56C6C">高</span></el-option>
+                <el-option label="中" value="P1"><span style="color: #E6A23C">中</span></el-option>
+                <el-option label="低" value="P2"><span style="color: #67C23A">低</span></el-option>
               </el-select>
             </div>
           </div>
@@ -189,7 +191,26 @@ export default {
       drawerIsShow: false,
       direction: 'rtl', // 抽屉打开方式
       showCaseList: [],
-      apiList: []
+      apiList: [],
+      colorDict: {
+        'P0': '#F56C6C',
+        'P1': '#E6A23C',
+        'P2': '#67C23A'
+      }
+    }
+  },
+
+  watch: {
+    // 重新获取接口列表后，修改对应的重要等级背景色颜色
+    'apiList': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.$nextTick(function() {
+          newVal.forEach(api => {
+            this.changeSelectColor(api)
+          })
+        })
+      }
     }
   },
 
@@ -206,6 +227,7 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+
   methods: {
 
     getApiMsgBelongToStep(row) {
@@ -246,12 +268,22 @@ export default {
 
     // 修改接口的重要等级
     selectApiLevel(row) {
+      this.tableLoadingIsShow = true
       changeApiLevel({
         id: row.id,
         level: row.level
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.showMessage(this, response)
+
+        // 修改选择框颜色
+        this.changeSelectColor(row)
       })
+    },
+
+    // 修改选择框颜色
+    changeSelectColor(row) {
+      this.$refs[`levelSelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.colorDict[row.level]
     }
 
   }

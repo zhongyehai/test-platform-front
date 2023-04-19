@@ -4,7 +4,6 @@
     title="同步环境"
     size="60%"
     :append-to-body="true"
-    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
@@ -65,6 +64,7 @@ import { projectEnvSynchronization as appProjectEnvSynchronization } from '@/api
 export default {
   name: 'EnvSynchronizer',
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType'
   ],
   data() {

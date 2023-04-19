@@ -196,6 +196,7 @@
 
     <selectRunEnv
       :data-type="dataType"
+      :project-business-id="projectBusinessId"
     />
 
     <runProcess
@@ -294,6 +295,7 @@ export default {
         parent: '',
         project_id: ''
       },
+      projectBusinessId: '',
       queryAddr: '',
       marker: 'suite',
       moduleDrawerIsShow: false,
@@ -444,6 +446,13 @@ export default {
         this.setListData = arrayToTree(response_data, null)
         this.sendSetTreeIsDone(this.setListData)
       })
+
+      // 获取所选服务的业务线id
+      this.projectListData.forEach(project =>{
+        if (project.id === projectId){
+          this.projectBusinessId = project.business_id
+        }
+      })
     },
 
     // 点击树
@@ -572,7 +581,6 @@ export default {
 
     // 运行用例集的用例
     runCaseSet(runConf) {
-      console.log('runConf: ', JSON.stringify(runConf))
       this.caseSetRunUrl({
         'id': this.runSetData ? this.runSetData.id : undefined,
         env_list: runConf.runEnv,

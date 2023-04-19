@@ -106,7 +106,6 @@
             <el-button
               type="text"
               size="mini"
-              :disabled="roles !== '2'"
               @click.native="showAddBusinessDialog(scope.row)"
             >修改</el-button>
           </el-tooltip>
@@ -119,7 +118,6 @@
     <el-drawer
       :title=" drawerType === 'add' ? '新增业务线' : '修改业务线'"
       size="60%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
@@ -136,6 +134,32 @@
 
         <el-form-item :label="'备注'" size="mini">
           <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini" />
+        </el-form-item>
+
+        <el-form-item :label="'运行环境'" size="mini">
+          <el-select
+            v-model="tempBusiness.env_list"
+            :placeholder="'选择运行环境'"
+            filterable
+            multiple
+            default-first-option
+            clearable
+            style="width: 97%"
+            size="mini"
+            class="filter-item"
+          >
+            <el-option v-for="env in run_env_list" :key="env.id" :label="`${env.group}_${env.name}`" :value="env.id" />
+          </el-select>
+          <el-popover
+            class="el_popover_class"
+            placement="top-start"
+            trigger="hover"
+          >
+            <div>
+              <div>属于此业务线的项目，执行测试时，只能跑此处选择的环境</div>
+            </div>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
+          </el-popover>
         </el-form-item>
 
       </el-form>
@@ -163,9 +187,10 @@
 </template>
 
 <script>
-import Pagination from '@/components/Pagination'
-import { businessList, postBusiness, putBusiness, deleteBusiness, getBusiness } from '@/apis/system/business'
+import Pagination from '@/components/Pagination/index.vue'
+import { businessList, postBusiness, putBusiness, deleteBusiness, getBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
+import {runEnvList} from "@/apis/config/runEnv";
 
 export default {
   name: 'Index',
@@ -190,20 +215,24 @@ export default {
       drawerType: '',
       direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
+      run_env_list: [],
       tempBusiness: {
         id: '',
         name: '',
         code: '',
+        env_list: [],
         desc: ''
       },
-      // 用户权限
-      roles: localStorage.getItem('roles'),
       currentUserList: [],
       userDict: {}
     }
   },
 
   mounted() {
+    runEnvList(this.listQuery).then(response => {
+      this.run_env_list = response.data.data
+    })
+
     this.getUserList(this.getBusinessList)
     // this.getBusinessList()
   },
@@ -228,10 +257,16 @@ export default {
 
     showAddBusinessDialog(row) {
       if (row) {
-        this.tempBusiness = row
+        this.tempBusiness = JSON.parse(JSON.stringify(row))
         this.drawerType = 'edit'
       } else {
-        this.tempBusiness = { name: '', desc: '' }
+        this.tempBusiness = {
+          id: '',
+          name: '',
+          code: '',
+          env_list: [],
+          desc: ''
+        }
         this.drawerType = 'add'
       }
       this.drawerIsShow = true

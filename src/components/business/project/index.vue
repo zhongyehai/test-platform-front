@@ -94,7 +94,7 @@
     <el-table
       ref="projectTable"
       v-loading="tableIsLoading"
-      element-loading-text="正在排序中"
+      element-loading-text="数据获取中"
       element-loading-spinner="el-icon-loading"
       :data="project_list"
       row-key="id"
@@ -144,7 +144,7 @@
       </el-table-column>
 
       <el-table-column :label="'操作'" align="center" min-width="20%" class-name="small-padding fixed-width">
-        <template slot-scope="{row, $index}">
+        <template slot-scope="{row}">
 
           <!-- 从yapi拉取此服务下的模块、接口信息 -->
           <el-button
@@ -189,7 +189,6 @@
               style="color: red"
               type="text"
               size="mini"
-              :loading="row.deleteButtonIsLoading"
             >删除</el-button>
           </el-popover>
 
@@ -260,6 +259,7 @@ export default {
     projectEnvDrawer
   },
   directives: { waves },
+  // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
   data() {
     return {
@@ -282,7 +282,7 @@ export default {
       currentProject: {}, // 当前选中的服务
       project_list: [], // 服务列表
       total: 0, // 服务数据表格总条数
-      tableIsLoading: true, // 请求加载状态
+      tableIsLoading: false, // 请求加载状态
       pullYapiProjectIsLoading: false,
       currentUserList: [],
       userDict: {},
@@ -400,6 +400,7 @@ export default {
     getProjectList() {
       this.tableIsLoading = true
       this.projectListUrl(this.listQuery).then(response => {
+        this.tableIsLoading = false
         this.project_list = response.data.data
         this.total = response.data.total
 
@@ -409,15 +410,14 @@ export default {
           this.setSort()
         })
       })
-      this.tableIsLoading = false
     },
 
     // 删除服务
     delProject(row) {
       this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'deleteButtonIsLoading', true)
+      this.tableIsLoading = true
       this.deleteProjectUrl({ 'id': row.id }).then(response => {
-        this.$set(row, 'deleteButtonIsLoading', false)
+        this.tableIsLoading = false
         if (this.showMessage(this, response)) {
           this.getProjectList() // 重新从后台获取服务列表
         }
@@ -473,8 +473,8 @@ export default {
             pageNum: this.listQuery.pageNum,
             pageSize: this.listQuery.pageSize
           }).then(response => {
-            this.showMessage(this, response)
             this.tableIsLoading = false
+            this.showMessage(this, response)
           })
         }
       })

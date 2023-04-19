@@ -12,7 +12,7 @@
           ref="apiListTable"
           v-loading="tableLoadingIsShow"
           show-overflow-tooltip
-          element-loading-text="正在排序中"
+          element-loading-text="数据获取中"
           element-loading-spinner="el-icon-loading"
           :header-cell-style="{'text-align':'center'}"
           :data="api_list"
@@ -37,11 +37,17 @@
               <div
                 class="block"
                 :class="`block_${scope.row.method.toLowerCase()}`"
-                :style="{'backgroundColor': scope.row.deprecated === true ? '#909399' : ''}"
+                :style="{
+                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
+                  'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+                }"
               >
                 <span
                   class="block-method block_method_color"
                   :class="`block_method_${scope.row.method.toLowerCase()}`"
+                  :style="{
+                    'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                  }"
                 >
                   {{ scope.row.method }}
                 </span>
@@ -71,29 +77,21 @@
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <div
-                :style="{
-                  'backgroundColor': scope.row.level === 'P0' ?
-                    '#F56C6C' : scope.row.level === 'P1' ?
-                      '#E6A23C' : '#67C23A'}"
-              >
+              <div>
                 <div style="width: 80%; margin-left:auto; margin-right:auto">
                   <el-select
+                    :ref="`levelSelector${scope.row.id}`"
                     slot="prepend"
                     v-model="scope.row.level"
                     size="mini"
-                    placeholder="选择请求方式"
+                    placeholder="选择重要程度"
                     filterable
                     class="select"
-                    default-first-option
                     @change="selectApiLevel(scope.row)"
                   >
-                    <el-option
-                      v-for="item in [{label: '高', value: 'P0'}, {label: '中', value: 'P1'}, {label: '低', value: 'P2'}]"
-                      :key="item.value"
-                      :value="item.value"
-                      :label="item.label"
-                    />
+                    <el-option label="高" value="P0"><span style="color: #F56C6C">高</span></el-option>
+                    <el-option label="中" value="P1"><span style="color: #E6A23C">中</span></el-option>
+                    <el-option label="低" value="P2"><span style="color: #67C23A">低</span></el-option>
                   </el-select>
                 </div>
               </div>
@@ -221,7 +219,6 @@
                   style="color: red; margin-left: 5px"
                   type="text"
                   size="mini"
-                  :loading="scope.row.isShowDeleteLoading"
                 >删除
                 </el-button>
               </el-popover>
@@ -263,12 +260,12 @@ import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 import { userList } from '@/apis/system/user'
 import {
   apiList,
-  deleteApi,
-  runApi,
+  apiMsgBelongToStep,
   apiMsgSort,
   changeApiLevel,
   changeApiStatus,
-  apiMsgBelongToStep
+  deleteApi,
+  runApi
 } from '@/apis/apiTest/api'
 
 export default {
@@ -298,6 +295,12 @@ export default {
 
       marker: 'apiList',
 
+      colorDict: {
+        'P0': '#F56C6C',
+        'P1': '#E6A23C',
+        'P2': '#67C23A'
+      },
+
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -305,6 +308,20 @@ export default {
       userList: [],
       userDict: {},
       currentApi: {}
+    }
+  },
+
+  watch: {
+    // 重新获取接口列表后，修改对应的重要等级背景色颜色
+    'api_list': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.$nextTick(function() {
+          newVal.forEach(api => {
+            this.changeSelectColor(api)
+          })
+        })
+      }
     }
   },
 
@@ -356,21 +373,33 @@ export default {
     },
 
     changeStatus(row) {
+      this.tableLoadingIsShow = true
       changeApiStatus({
         id: row.id,
         deprecated: row.deprecated
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.showMessage(this, response)
       })
     },
 
+    // 修改选择框颜色
+    changeSelectColor(row) {
+      this.$refs[`levelSelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.colorDict[row.level]
+    },
+
     // 修改接口的重要等级
     selectApiLevel(row) {
+      this.tableLoadingIsShow = true
       changeApiLevel({
         id: row.id,
         level: row.level
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.showMessage(this, response)
+
+        // 修改选择框颜色
+        this.changeSelectColor(row)
       })
     },
 
@@ -408,9 +437,9 @@ export default {
     // 删除接口
     delApi(row) {
       this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'isShowDeleteLoading', true)
+      this.tableLoadingIsShow = true
       deleteApi({ 'id': row.id }).then(response => {
-        this.$set(row, 'isShowDeleteLoading', false)
+        this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.getApiList()
         }
@@ -442,13 +471,13 @@ export default {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.api_list = response.data.data
         this.api_total = response.data.total
 
         this.oldList = this.api_list.map(v => v.id)
         this.newList = this.oldList.slice()
       })
-      this.tableLoadingIsShow = false
     },
 
     // 点击运行接口
@@ -493,8 +522,8 @@ export default {
             pageNum: this.pageNum,
             pageSize: this.pageSize
           }).then(response => {
-            this.showMessage(this, response)
             this.tableLoadingIsShow = false
+            this.showMessage(this, response)
           })
         }
       })
