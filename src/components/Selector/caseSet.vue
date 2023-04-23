@@ -1,39 +1,39 @@
 <template>
   <el-select
-    v-model="tempCaseSetId"
+    v-model="tempCaseSuiteId"
     placeholder="请选择用例集"
     value-key="id"
     filterable
     default-first-option
     size="mini"
     style="width: 100%"
-    @change="choiceCaseSet"
+    @change="choiceCaseSuite"
   >
-    <el-option v-for="item in caseSetLists" :key="item.id" :label="item.name" :value="item.id" />
+    <el-option v-for="item in caseSuiteLists" :key="item.id" :label="item.name" :value="item.id" />
   </el-select>
 </template>
 
 <script>
-import { caseSetList } from '@/apis/apiTest/caseSet'
+import { caseSuiteList } from '@/apis/apiTest/caseSuite'
 
 export default {
-  name: 'CaseSetSelector',
+  name: 'CaseSuiteSelector',
   props: [
     'projectId',
-    'caseSetId',
+    'caseSuiteId',
     'isWatchStatus',
     'isMultiple',
     'busOnEventName',
     'busEmitEventName',
-    'busOnCaseSetDialogCommit'
+    'busOnCaseSuiteDialogCommit'
   ],
   data() {
     return {
-      tempCaseSetId: '',
-      caseSetLists: [],
+      tempCaseSuiteId: '',
+      caseSuiteLists: [],
 
       projectIdHistory: [], // 用于存服务改变的历史
-      caseSetIdHistory: [] // 用于存模块改变的历史
+      caseSuiteIdHistory: [] // 用于存模块改变的历史
     }
   },
 
@@ -44,9 +44,9 @@ export default {
       handler(newVal, oldVal) {
         if (newVal) {
           if (this.projectIdHistory && this.projectIdHistory[0] !== this.projectIdHistory[1]) {
-            this.getCaseSetListByProjectId(this.projectIdHistory[0])
+            this.getCaseSuiteListByProjectId(this.projectIdHistory[0])
           } else {
-            this.getCaseSetListByProjectId(this.projectId)
+            this.getCaseSuiteListByProjectId(this.projectId)
           }
         }
       }
@@ -56,25 +56,25 @@ export default {
     'projectId': {
       handler(newVal, oldVal) {
         if (this.isWatchStatus) {
-          this.getCaseSetListByProjectId(newVal)
+          this.getCaseSuiteListByProjectId(newVal)
         } else {
           this.projectIdHistory = [newVal, oldVal]
         }
       }
     },
 
-    'caseSetId': {
+    'caseSuiteId': {
       handler(newVal, oldVal) {
-        this.tempCaseSetId = newVal
+        this.tempCaseSuiteId = newVal
       }
     },
 
-    'caseSetLists': {
+    'caseSuiteLists': {
       handler(newVal, oldVal) {
         // 如果没有选中用例集id，则默认选择用例集列表中的第一条数据
-        if (newVal && !this.caseSetId) {
+        if (newVal && !this.caseSuiteId) {
           if (newVal[0]) {
-            this.caseSetId = newVal[0].id
+            this.caseSuiteId = newVal[0].id
           }
         }
         this.sendEmit()
@@ -86,14 +86,14 @@ export default {
     // 监听服务选择框选中的服务id，获取对应的模块列表
     if (this.busOnEventName) {
       this.$bus.$on(this.busOnEventName, (project) => {
-        this.getCaseSetListByProjectId(project.id)
+        this.getCaseSuiteListByProjectId(project.id)
       })
     }
 
     // 是否监控用例集的改变
-    if (this.busOnCaseSetDialogCommit) {
-      this.$bus.$on(this.busOnCaseSetDialogCommit, (status) => {
-        this.caseSetIdHistory.push(status)
+    if (this.busOnCaseSuiteDialogCommit) {
+      this.$bus.$on(this.busOnCaseSuiteDialogCommit, (status) => {
+        this.caseSuiteIdHistory.push(status)
       })
     }
   },
@@ -103,37 +103,37 @@ export default {
     if (this.busOnEventName) {
       this.$bus.$off(this.busOnEventName)
     }
-    if (this.busOnCaseSetDialogCommit) {
-      this.$bus.$off(this.busOnCaseSetDialogCommit)
+    if (this.busOnCaseSuiteDialogCommit) {
+      this.$bus.$off(this.busOnCaseSuiteDialogCommit)
     }
   },
 
   created() {
-    this.tempCaseSetId = this.caseSetId
+    this.tempCaseSuiteId = this.caseSuiteId
 
     // 第一次加载的时候，如果传了服务id，则获取对应的用例集列表
     if (this.projectId) {
-      this.getCaseSetListByProjectId(this.projectId)
+      this.getCaseSuiteListByProjectId(this.projectId)
     }
   },
 
   methods: {
 
     // 根据服务id获取用例集
-    getCaseSetListByProjectId(project_id) {
-      caseSetList({ 'projectId': project_id }).then(response => {
-        this.caseSetLists = response.data.data
+    getCaseSuiteListByProjectId(project_id) {
+      caseSuiteList({ 'projectId': project_id }).then(response => {
+        this.caseSuiteLists = response.data.data
       })
     },
 
     sendEmit() {
       if (this.busEmitEventName) {
-        this.$bus.$emit(this.busEmitEventName, this.tempCaseSetId)
+        this.$bus.$emit(this.busEmitEventName, this.tempCaseSuiteId)
       }
     },
 
     // 通过bus发送选中的模块
-    choiceCaseSet(val) {
+    choiceCaseSuite(val) {
       this.sendEmit()
     }
   }

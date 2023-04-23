@@ -132,8 +132,6 @@
 
 <script>
 import projectSelectorView from '@/components/Selector/project'
-import moduleSelectorView from '@/components/Selector/module'
-import editStepView from './editApiStep.vue'
 import Pagination from '@/components/Pagination'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
@@ -146,14 +144,15 @@ export default {
   components: {
     Pagination,
     projectSelectorView,
-    moduleSelectorView,
-    editStepView,
     showApiFromDrawer,
     showApiUseDrawer
   },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'projectId',
+    // eslint-disable-next-line vue/require-prop-types
     'dialogIsShow',
+    // eslint-disable-next-line vue/require-prop-types
     'currentCaseId'
   ],
   data() {

@@ -327,7 +327,7 @@
                         <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.params" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].request.params)"
@@ -336,13 +336,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.params"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].request.params)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -354,7 +355,7 @@
                         <div class="el-collapse-item-title"> {{ '头部参数：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.headers" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].request.headers)"
@@ -363,13 +364,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.headers"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].request.headers)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -381,7 +383,7 @@
                         <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.json" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].request.json)"
@@ -390,13 +392,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.json"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].request.json)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -408,7 +411,7 @@
                         <div class="el-collapse-item-title"> {{ 'data参数：' }}</div>
                       </template>
                       <el-row v-if=" typeof meta_datas.data[0].request.data === 'object'">
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.data" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].request.data)"
@@ -417,30 +420,32 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.data"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].request.data)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                       <el-row v-if=" typeof meta_datas.data[0].request.data === 'string'">
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.data" style="margin-left: 100px">
                             <xmp>{{ formatXml(meta_datas.data[0].request.data) }}</xmp>
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.data"
                             v-clipboard:copy="formatXml(meta_datas.data[0].request.data)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -452,7 +457,7 @@
                         <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].request.files" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].request.files)"
@@ -461,13 +466,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].request.files"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].request.files)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -493,7 +499,7 @@
                         <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].response.json" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].response.json)"
@@ -502,13 +508,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].response.json"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].response.json)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -537,7 +544,7 @@
                         <div class="el-collapse-item-title"> {{ '执行测试时内存中的公共变量：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.variables_mapping" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.variables_mapping)"
@@ -546,13 +553,14 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.variables_mapping"
                             v-clipboard:copy="getCopyData(meta_datas.variables_mapping)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
@@ -564,7 +572,7 @@
                         <div class="el-collapse-item-title"> {{ '提取数据：' }}</div>
                       </template>
                       <el-row>
-                        <el-col :span="20">
+                        <el-col :span="22">
                           <div v-if="meta_datas.data[0].extract_msgs" style="margin-left: 100px">
                             <JsonViewer
                               :value="strToJson(meta_datas.data[0].extract_msgs)"
@@ -573,25 +581,53 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="2">
                           <el-button
                             v-if="meta_datas.data[0].extract_msgs"
                             v-clipboard:copy="getCopyData(meta_datas.data[0].extract_msgs)"
                             v-clipboard:success="onCopy"
                             v-clipboard:error="onError"
                             size="mini"
+                            type="primary"
                           >复制
                           </el-button>
                         </el-col>
                       </el-row>
                     </el-collapse-item>
 
-                    <el-collapse-item v-show="attachment" name="22">
+                    <el-collapse-item name="22">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ '脚本print打印信息：' }}</div>
+                      </template>
+                      <el-row>
+                        <el-col :span="22">
+                          <pre
+                            class="el-collapse-item-content"
+                            style="text-align: left; overflow: auto"
+                          >{{ meta_datas.redirect_print }}</pre>
+                        </el-col>
+                        <el-col :span="2">
+                          <el-button
+                            v-if="meta_datas.redirect_print"
+                            v-clipboard:copy="getCopyData(meta_datas.redirect_print)"
+                            v-clipboard:success="onCopy"
+                            v-clipboard:error="onError"
+                            size="mini"
+                            type="primary"
+                          >复制
+                          </el-button>
+                        </el-col>
+                      </el-row>
+
+                    </el-collapse-item>
+
+                    <el-collapse-item v-show="attachment" name="23">
                       <template slot="title">
                         <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
                       </template>
                       <pre class="el-collapse-item-content" style="overflow: auto">{{ attachment }}</pre>
                     </el-collapse-item>
+
                   </el-collapse>
                 </div>
               </div>
@@ -605,11 +641,13 @@
         无运行数据或所有运行数据均已跳过
       </div>
 
+      <!-- 记录问题 -->
       <hitDrawer
         :run-test-type-list="runTestTypeList"
         :run-env-list="envList"
       />
 
+      <!-- 打开用例 -->
       <showCaseDetail
         :data-type="dataType"
       />
@@ -663,7 +701,7 @@ export default {
       envList: [],
       runEnvDict: {},
       msg: { copyText: 'copy', copiedText: 'copied' },
-      defaultShowResponseInFo: ['6', '7', '21', '22'], // 默认展开报告详情的项
+      defaultShowResponseInFo: ['6', '7', '23'], // 默认展开报告详情的项
       showCaseResultType: 'all',
       showCaseResultTypeList: [
         { label: '展示全部用例', value: 'all' },
@@ -788,7 +826,7 @@ export default {
     if (this.dataType === 'api') {
       this.reportDetailUrl = apiReportDetail
       this.deleteReportUrl = deleteApiReport
-      this.defaultShowResponseInFo = ['12', '17', '21', '22']
+      this.defaultShowResponseInFo = ['12', '17', '21', '23']
     } else if (this.dataType === 'webUi') {
       this.reportDetailUrl = webUiReportDetail
       this.deleteReportUrl = deleteWebUiReport
@@ -908,6 +946,7 @@ export default {
           this.reportData = response['data']
           this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
           this.attachment = this.reportData['details'][0]['records'][0]['attachment']
+          // 渲染饼图需要的数据
           this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
           this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
           this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors

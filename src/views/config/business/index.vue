@@ -132,6 +132,23 @@
           <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini" />
         </el-form-item>
 
+        <el-form-item :label="'统计通知'" class="is-required" size="mini">
+          <el-radio v-model="tempBusiness.receive_type" label="0">不接收</el-radio>
+          <el-radio v-model="tempBusiness.receive_type" label="ding_ding">钉钉</el-radio>
+          <el-radio v-model="tempBusiness.receive_type" label="we_chat">企业微信</el-radio>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
+          </el-popover>
+        </el-form-item>
+
+        <el-form-item :label="'webhook'" v-show="tempBusiness.receive_type !== '0'" class="is-required" size="mini">
+          <oneColumnRow
+            ref="oneColumnRow"
+            :current-data="tempBusiness.webhook_list"
+          ></oneColumnRow>
+        </el-form-item>
+
         <el-form-item :label="'备注'" size="mini">
           <el-input v-model="tempBusiness.desc" type="textarea" autosize size="mini" />
         </el-form-item>
@@ -188,6 +205,7 @@
 
 <script>
 import Pagination from '@/components/Pagination/index.vue'
+import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 import { businessList, postBusiness, putBusiness, deleteBusiness, getBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
 import {runEnvList} from "@/apis/config/runEnv";
@@ -195,7 +213,8 @@ import {runEnvList} from "@/apis/config/runEnv";
 export default {
   name: 'Index',
   components: {
-    Pagination
+    Pagination,
+    oneColumnRow
   },
   data() {
     return {
@@ -220,6 +239,8 @@ export default {
         id: '',
         name: '',
         code: '',
+        receive_type: '0',
+        webhook_list: [],
         env_list: [],
         desc: ''
       },
@@ -264,6 +285,8 @@ export default {
           id: '',
           name: '',
           code: '',
+          receive_type: '0',
+          webhook_list: [],
           env_list: [],
           desc: ''
         }
@@ -274,6 +297,7 @@ export default {
 
     // 增加配置类型
     addBusiness() {
+      this.tempBusiness.webhook_list = this.$refs.oneColumnRow.getData()
       this.submitButtonIsLoading = true
       postBusiness(this.tempBusiness).then(response => {
         this.submitButtonIsLoading = false
@@ -286,6 +310,7 @@ export default {
 
     // 修改配置类型
     changBusiness() {
+      this.tempBusiness.webhook_list = this.$refs.oneColumnRow.getData()
       this.submitButtonIsLoading = true
       putBusiness(this.tempBusiness).then(response => {
         this.submitButtonIsLoading = false

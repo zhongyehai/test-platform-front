@@ -106,7 +106,7 @@
                   <div slot="content">
                     <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
                   </div>
-                  <span><i style="color: #409EFF" class="el-icon-question"/></span>
+                  <span><i style="color: #409EFF" class="el-icon-question" /></span>
                 </el-tooltip>
               </template>
               <template slot-scope="scope">
@@ -234,6 +234,8 @@ import {
   pullStep as appUiPullStep,
   putCase as appUiPutCase
 } from '@/apis/appUiTest/case'
+import {getConfigByName} from "@/apis/config/config";
+import {getAssertMapping} from "@/apis/apiTest/api";
 
 export default {
   name: 'ShowCaseDetail',
@@ -284,6 +286,28 @@ export default {
       if (_type === 'showCaseInfo') {
         this.caseId = caseId
         this.showCaseRemark(caseId)
+
+        // 从内获取响应对象数据源映射, 如果内存中没有数据，则调接口获取
+        if (this.$busEvents.data.responseDataSourceMappingList < 1){
+          getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
+            this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+          })
+        }
+
+        // 从内存中获取数据类型映射, 如果内存中没有数据，则调接口获取
+        if (this.$busEvents.data.dataTypeMappingList < 1){
+          getConfigByName({'name': 'data_type_mapping'}).then(response => {
+            this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+          })
+        }
+
+        // 从内存中获取断言类型映射, 如果内存中没有数据，则调接口获取
+        if (this.$busEvents.data.apiTestAssertMappingList < 1){
+          getAssertMapping().then(response => {
+            this.$busEvents.data.apiTestAssertMappingList = response.data
+          })
+        }
+
       }
     })
   },

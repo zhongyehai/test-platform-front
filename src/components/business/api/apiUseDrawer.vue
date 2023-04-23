@@ -31,28 +31,46 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" min-width="15%">
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="level"
+        align="center"
+        min-width="15%"
+      >
         <template slot="header">
-          <span>用例是否执行</span>
+          <span> 调试结果 </span>
           <el-tooltip
             class="item"
             effect="dark"
             placement="top-start"
           >
             <div slot="content">
-              <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
-              <div>2: 请务必将用例调试通过后再设为要运行</div>
+              <div>1: 批量运行时，只有调试结果为通过的才会执行</div>
+              <div>2: 请务必将用例调试通过后再设为调试通过</div>
             </div>
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
         <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.status"
-            :inactive-value="0"
-            :active-value="1"
-            @change="changeCaseIsRun(scope.row)"
-          />
+          <div>
+            <div style="width: 80%; margin-left:auto; margin-right:auto">
+              <el-select
+                :ref="`statusSelector${scope.row.id}`"
+                slot="prepend"
+                v-model="scope.row.status"
+                size="mini"
+                placeholder="选择调试结果"
+                filterable
+                class="select"
+                @change="changeCaseIsRun(scope.row)"
+              >
+                <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span></el-option>
+                <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span></el-option>
+                <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span></el-option>
+                <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span></el-option>
+              </el-select>
+            </div>
+          </div>
         </template>
       </el-table-column>
 
@@ -69,13 +87,35 @@ export default {
   name: 'ApiUseDrawer',
   components: {},
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'marker'
   ],
   data() {
     return {
       drawerIsShow: false,
       direction: 'rtl', // 抽屉打开方式
+      colorDict: {
+        0: '#dcdfe6',
+        1: '#67C23A',
+        2: '#909399',
+        3: '#F56C6C'
+      },
       caseList: []
+    }
+  },
+
+  watch: {
+
+    // 重新获取用例列表后，修改对应的重要等级背景色颜色
+    'caseList': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.$nextTick(function() {
+          newVal.forEach(test_case => {
+            this.changeSelectCaseColor(test_case)
+          })
+        })
+      }
     }
   },
 
@@ -92,12 +132,18 @@ export default {
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
+
   methods: {
+
+    changeSelectCaseColor(row) {
+      this.$refs[`statusSelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.colorDict[row.status]
+    },
 
     // 修改用例状态
     changeCaseIsRun(row) {
-      putCaseIsRun({ 'id': row.id }).then(response => {
+      putCaseIsRun({ id: [row.id], status: row.status }).then(response => {
         this.showMessage(this, response)
+        this.changeSelectCaseColor(row)
       })
     }
   }

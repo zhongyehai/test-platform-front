@@ -11,7 +11,7 @@
           style="width: 250px"
           filterable
           default-first-option
-          @change="getSetList"
+          @change="getSuiteList"
         >
           <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
@@ -21,7 +21,7 @@
         <!--          type="primary"-->
         <!--          size="mini"-->
         <!--          style="margin-left: 10px"-->
-        <!--          @click.native="addParentSet()"-->
+        <!--          @click.native="addParentSuite()"-->
         <!--        >添加一级用例集-->
         <!--        </el-button>-->
       </el-form-item>
@@ -69,7 +69,7 @@
                   slot="reference"
                   type="text"
                   style="margin-left: 50px"
-                  @click="addParentSet()"
+                  @click="addParentSuite()"
                 >添加
                 </el-button>
               </el-popover>
@@ -83,7 +83,7 @@
                   class="project-tree"
                   :check-on-click-node="false"
                   :data="setListData"
-                  :default-expanded-keys="[defaultCaseSet]"
+                  :default-expanded-keys="[defaultCaseSuite]"
                   :empty-text="'请先添加一级用例集'"
                   :expand-on-click-node="false"
                   :filter-node-method="filterNode"
@@ -120,12 +120,12 @@
                           </el-dropdown-item>
 
                           <el-dropdown-item
-                            @click.native.stop="showCaseSetDialog('add', node, data)"
+                            @click.native.stop="showCaseSuiteDialog('add', node, data)"
                           >{{ '添加用例集' }}
                           </el-dropdown-item>
 
                           <el-dropdown-item
-                            @click.native.stop="showCaseSetDialog('edit', node, data)"
+                            @click.native.stop="showCaseSuiteDialog('edit', node, data)"
                           >{{ '修改当前用例集' }}
                           </el-dropdown-item>
 
@@ -135,7 +135,7 @@
                           </el-dropdown-item>
 
                           <el-dropdown-item
-                            @click.native.stop="showRunCaseSet(node, data)"
+                            @click.native.stop="showRunCaseSuite(node, data)"
                           >{{ '运行当前用例集下的用例' }}
                           </el-dropdown-item>
 
@@ -156,7 +156,7 @@
         <!-- 用例管理组件 -->
         <caseManage
           :data-type="dataType"
-          :current-set-id="currentSetId"
+          :current-set-id="currentSuiteId"
           :current-project-id="currentProjectId"
         />
       </el-col>
@@ -187,7 +187,7 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" moduleDrawerStatus === 'add' ? addCaseSet() : changCaseSet() "
+          @click=" moduleDrawerStatus === 'add' ? addCaseSuite() : changCaseSuite() "
         >
           {{ '保存' }}
         </el-button>
@@ -234,30 +234,30 @@ import {ellipsis, arrayToTree} from '@/utils/parseData'
 import {apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping} from '@/apis/apiTest/api' // 接口引用
 import {projectList as apiProjectList} from '@/apis/apiTest/project'
 import {
-  caseSetTree as apiCaseSetTree,
-  caseSetRun as apiCaseSetRun,
-  deleteCaseSet as apiDeleteCaseSet,
-  postCaseSet as apiPostCaseSet,
-  putCaseSet as apiPutCaseSet
-} from '@/apis/apiTest/caseSet'
+  caseSuiteTree as apiCaseSuiteTree,
+  caseSuiteRun as apiCaseSuiteRun,
+  deleteCaseSuite as apiDeleteCaseSuite,
+  postCaseSuite as apiPostCaseSuite,
+  putCaseSuite as apiPutCaseSuite
+} from '@/apis/apiTest/caseSuite'
 
 import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
 import {
-  caseSetTree as webUiCaseSetTree,
-  caseSetRun as webUiCaseSetRun,
-  deleteCaseSet as webUiDeleteCaseSet,
-  postCaseSet as webUiPostCaseSet,
-  putCaseSet as webUiPutCaseSet
-} from '@/apis/webUiTest/caseSet'
+  caseSuiteTree as webUiCaseSuiteTree,
+  caseSuiteRun as webUiCaseSuiteRun,
+  deleteCaseSuite as webUiDeleteCaseSuite,
+  postCaseSuite as webUiPostCaseSuite,
+  putCaseSuite as webUiPutCaseSuite
+} from '@/apis/webUiTest/caseSuite'
 
 import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
 import {
-  caseSetTree as appUiCaseSetTree,
-  caseSetRun as appUiCaseSetRun,
-  deleteCaseSet as appUiDeleteCaseSet,
-  postCaseSet as appUiPostCaseSet,
-  putCaseSet as appUiPutCaseSet
-} from '@/apis/appUiTest/caseSet'
+  caseSuiteTree as appUiCaseSuiteTree,
+  caseSuiteRun as appUiCaseSuiteRun,
+  deleteCaseSuite as appUiDeleteCaseSuite,
+  postCaseSuite as appUiPostCaseSuite,
+  putCaseSuite as appUiPutCaseSuite
+} from '@/apis/appUiTest/caseSuite'
 import {getConfigByName, getSkipIfTypeMapping} from '@/apis/config/config'
 import {extractMappingList, keyBoardCodeMappingList} from '@/apis/webUiTest/step'
 import {phoneList, serverList} from '@/apis/appUiTest/env'
@@ -284,8 +284,8 @@ export default {
       projectListData: [], // 项目列表
       currentProjectId: '', // 当前选中的项目id
       setListData: [], // 用例集列表
-      currentSetId: '', // 当前选中的用例集id，用于数据传递，获取用例列表
-      currentSetIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
+      currentSuiteId: '', // 当前选中的用例集id，用于数据传递，获取用例列表
+      currentSuiteIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
       currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
       tempDataForm: {
@@ -299,19 +299,19 @@ export default {
       queryAddr: '',
       marker: 'suite',
       moduleDrawerIsShow: false,
-      defaultCaseSet: {},
+      defaultCaseSuite: {},
       moduleDrawerStatus: '',
       dropdownStatus: false, // el-dropdown 的展开/隐藏状态
       currentLabel: '', // 当前鼠标滑入的节点名
       runType: 1,
       runEnv: 'test',
-      runSetData: undefined,
+      runSuiteData: undefined,
       projectListUrl: '',
-      caseSetTreeUrl: '',
-      caseSetRunUrl: '',
-      deleteCaseSetUrl: '',
-      postCaseSetUrl: '',
-      putCaseSetUrl: ''
+      caseSuiteTreeUrl: '',
+      caseSuiteRunUrl: '',
+      deleteCaseSuiteUrl: '',
+      postCaseSuiteUrl: '',
+      putCaseSuiteUrl: ''
     }
   },
 
@@ -324,29 +324,29 @@ export default {
   created() {
     if (this.dataType === 'api') {
       this.projectListUrl = apiProjectList
-      this.caseSetTreeUrl = apiCaseSetTree
-      this.caseSetRunUrl = apiCaseSetRun
-      this.deleteCaseSetUrl = apiDeleteCaseSet
-      this.postCaseSetUrl = apiPostCaseSet
-      this.putCaseSetUrl = apiPutCaseSet
+      this.caseSuiteTreeUrl = apiCaseSuiteTree
+      this.caseSuiteRunUrl = apiCaseSuiteRun
+      this.deleteCaseSuiteUrl = apiDeleteCaseSuite
+      this.postCaseSuiteUrl = apiPostCaseSuite
+      this.putCaseSuiteUrl = apiPutCaseSuite
     } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
-      this.caseSetTreeUrl = webUiCaseSetTree
-      this.caseSetRunUrl = webUiCaseSetRun
-      this.deleteCaseSetUrl = webUiDeleteCaseSet
-      this.postCaseSetUrl = webUiPostCaseSet
-      this.putCaseSetUrl = webUiPutCaseSet
+      this.caseSuiteTreeUrl = webUiCaseSuiteTree
+      this.caseSuiteRunUrl = webUiCaseSuiteRun
+      this.deleteCaseSuiteUrl = webUiDeleteCaseSuite
+      this.postCaseSuiteUrl = webUiPostCaseSuite
+      this.putCaseSuiteUrl = webUiPutCaseSuite
       getFindElementOption(this) // 获取定位方式
       getConfigByName({'name': 'browser_name'}).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
       })
     } else {
       this.projectListUrl = appUiProjectList
-      this.caseSetTreeUrl = appUiCaseSetTree
-      this.caseSetRunUrl = appUiCaseSetRun
-      this.deleteCaseSetUrl = appUiDeleteCaseSet
-      this.postCaseSetUrl = appUiPostCaseSet
-      this.putCaseSetUrl = appUiPutCaseSet
+      this.caseSuiteTreeUrl = appUiCaseSuiteTree
+      this.caseSuiteRunUrl = appUiCaseSuiteRun
+      this.deleteCaseSuiteUrl = appUiDeleteCaseSuite
+      this.postCaseSuiteUrl = appUiPostCaseSuite
+      this.putCaseSuiteUrl = appUiPutCaseSuite
       getFindElementOption(this) // 获取定位方式
       serverList().then(response => {
         this.$busEvents.data.runServerList = response.data.data
@@ -406,7 +406,7 @@ export default {
 
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
       if (_type === 'selectRunEnv' && _runUnit === 'set') {
-        this.runCaseSet(runDict)
+        this.runCaseSuite(runDict)
       }
     })
   },
@@ -431,20 +431,20 @@ export default {
     },
 
     // 发送用例集树数据
-    sendSetTreeIsDone(caseSetTree) {
-      this.$bus.$emit(this.$busEvents.treeIsDone, 'caseSet', JSON.parse(JSON.stringify(caseSetTree)))
+    sendSuiteTreeIsDone(caseSuiteTree) {
+      this.$bus.$emit(this.$busEvents.treeIsDone, 'caseSuite', JSON.parse(JSON.stringify(caseSuiteTree)))
     },
 
     // 获取用例集列表
-    getSetList(projectId) {
-      this.currentSetId = '' // 切换项目的时候，把选中用例集置为''
-      this.currentSetIdForCommit = '' // 切换项目的时候，把选中用例集置为''
+    getSuiteList(projectId) {
+      this.currentSuiteId = '' // 切换项目的时候，把选中用例集置为''
+      this.currentSuiteIdForCommit = '' // 切换项目的时候，把选中用例集置为''
       this.currentParent = {}
       this.currentLevelForCommit = 1 // 切换项目的时候，把选中用例集置为''
-      this.caseSetTreeUrl({'project_id': projectId}).then(response => {
+      this.caseSuiteTreeUrl({'project_id': projectId}).then(response => {
         var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
         this.setListData = arrayToTree(response_data, null)
-        this.sendSetTreeIsDone(this.setListData)
+        this.sendSuiteTreeIsDone(this.setListData)
       })
 
       // 获取所选服务的业务线id
@@ -457,25 +457,25 @@ export default {
 
     // 点击树
     clickTree(data, node, element) {
-      this.currentSetId = data.id
-      this.currentSetIdForCommit = data.id
+      this.currentSuiteId = data.id
+      this.currentSuiteIdForCommit = data.id
       this.currentLevelForCommit = data.level
       this.currentParent = data
       this.$refs.tree.store.nodesMap[data.id].expanded = !this.$refs.tree.store.nodesMap[data.id].expanded // 展开/收缩节点
     },
 
     // 添加一级用例集
-    addParentSet() {
-      this.currentSetIdForCommit = ''
+    addParentSuite() {
+      this.currentSuiteIdForCommit = ''
       this.currentLevelForCommit = 1
       this.currentParent = {}
-      this.showCaseSetDialog('add')
+      this.showCaseSuiteDialog('add')
     },
 
     // 鼠标滑入的时候，设置一个值，代表展示菜单
     mouseenter(data) {
       if (this.dropdownStatus === false) {
-        this.currentSetIdForCommit = data.id
+        this.currentSuiteIdForCommit = data.id
         this.currentParent = data
       }
       this.currentLabel = JSON.parse(JSON.stringify(data.name))
@@ -490,20 +490,20 @@ export default {
     },
 
     // 打开用例集编辑框
-    showCaseSetDialog(command, node, data) {
+    showCaseSuiteDialog(command, node, data) {
       this.moduleDrawerStatus = command
       this.tempDataForm.name = command === 'edit' ? data.name : ''
       this.moduleDrawerIsShow = true
     },
 
     // 添加用例集
-    addCaseSet() {
+    addCaseSuite() {
       this.isShowLoading = true
-      this.postCaseSetUrl({
+      this.postCaseSuiteUrl({
         name: this.tempDataForm.name,
         id: '',
         level: this.currentLevelForCommit + 1,
-        parent: this.currentSetIdForCommit || null,
+        parent: this.currentSuiteIdForCommit || null,
         project_id: this.currentProjectId
       }).then(response => {
         this.isShowLoading = false
@@ -520,15 +520,15 @@ export default {
           } else {
             this.setListData.push(response.data)
           }
-          this.sendSetTreeIsDone(this.setListData)
+          this.sendSuiteTreeIsDone(this.setListData)
         }
       })
     },
 
     // 修改用例集
-    changCaseSet() {
+    changCaseSuite() {
       this.isShowLoading = true
-      this.putCaseSetUrl({
+      this.putCaseSuiteUrl({
         name: this.tempDataForm.name,
         id: this.currentParent.id,
         level: this.currentParent.level,
@@ -540,7 +540,7 @@ export default {
           this.moduleDrawerIsShow = false
           this.currentParent.name = response.data.name
 
-          this.sendSetTreeIsDone(this.setListData)
+          this.sendSuiteTreeIsDone(this.setListData)
         }
       })
     },
@@ -558,11 +558,11 @@ export default {
 
     // 删除节点
     deleteChild(data) {
-      this.deleteCaseSetUrl({'id': data.id}).then(response => {
+      this.deleteCaseSuiteUrl({'id': data.id}).then(response => {
         if (this.showMessage(this, response)) {
           this.$refs.tree.remove(data)
 
-          this.sendSetTreeIsDone(this.setListData)
+          this.sendSuiteTreeIsDone(this.setListData)
         }
       })
     },
@@ -573,16 +573,16 @@ export default {
     },
 
     // 点击运行测试用例集
-    showRunCaseSet(node, data) {
-      this.runSetNode = node
-      this.runSetData = data
+    showRunCaseSuite(node, data) {
+      this.runSuiteNode = node
+      this.runSuiteData = data
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'set', true)
     },
 
     // 运行用例集的用例
-    runCaseSet(runConf) {
-      this.caseSetRunUrl({
-        'id': this.runSetData ? this.runSetData.id : undefined,
+    runCaseSuite(runConf) {
+      this.caseSuiteRunUrl({
+        'id': this.runSuiteData ? this.runSuiteData.id : undefined,
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,

@@ -32,31 +32,11 @@
 
           <el-popover
             v-show="selectedList.length > 0"
-            v-model="showBatchChangeStatusToRun"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定把所选用例状态改为要执行?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToRun()">取消</el-button>
-              <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 1)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              type="primary"
-              size="mini"
-              style="margin-left: 5px"
-            >批量改为要执行
-            </el-button>
-          </el-popover>
-
-          <el-popover
-            v-show="selectedList.length > 0"
             v-model="showBatchChangeStatusToNotRun"
             placement="top"
             popper-class="down-popover"
           >
-            <p>确定把所选用例状态改为不执行?</p>
+            <p>确定把所选用例状态改为未调试?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToNotRun()">取消</el-button>
               <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 0)">确定</el-button>
@@ -66,7 +46,47 @@
               type="primary"
               size="mini"
               style="margin-left: 5px"
-            >批量改为不执行
+            >批量改为未调试
+            </el-button>
+          </el-popover>
+
+          <el-popover
+            v-show="selectedList.length > 0"
+            v-model="showBatchChangeStatusToRunPass"
+            placement="top"
+            popper-class="down-popover"
+          >
+            <p>确定把所选用例状态改为已调试通过?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToRunPass()">取消</el-button>
+              <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 1)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="primary"
+              size="mini"
+              style="margin-left: 5px"
+            >批量改为已调试通过
+            </el-button>
+          </el-popover>
+
+          <el-popover
+            v-show="selectedList.length > 0"
+            v-model="showBatchChangeStatusToNotRunPass"
+            placement="top"
+            popper-class="down-popover"
+          >
+            <p>确定把所选用例状态改为调试不通过?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToNotRunPass()">取消</el-button>
+              <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 2)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="primary"
+              size="mini"
+              style="margin-left: 5px"
+            >批量改为调试不通过
             </el-button>
           </el-popover>
 
@@ -99,34 +119,56 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="55%">
+          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="50%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column align="center" min-width="15%">
+          <el-table-column
+            :show-overflow-tooltip="true"
+            prop="level"
+            align="center"
+            min-width="20%"
+          >
             <template slot="header">
-              <span>是否执行</span>
+              <span> 用例状态 </span>
               <el-tooltip
                 class="item"
                 effect="dark"
                 placement="top-start"
               >
                 <div slot="content">
-                  <div>1: 若此处设置为不运行，则运行用例集、定时任务时将不会运行此用例</div>
-                  <div>2: 请务必将用例调试通过后再设为要运行</div>
+                  <div>1: 批量/定时任务运行时，只有调试结果为 "已通过-要执行" 的才会执行</div>
+                  <div>2: 请务必将用例调试通过后再设为调试通过</div>
                 </div>
                 <span><i style="color: #409EFF" class="el-icon-question" /></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <el-switch
-                v-model="scope.row.status"
-                :inactive-value="0"
-                :active-value="1"
-                @change="changeCaseIsRun(scope.row, null)"
-              />
+              <div>
+                <div style="width: 80%; margin-left:auto; margin-right:auto">
+                  <el-select
+                    :ref="`statusSelector${scope.row.id}`"
+                    slot="prepend"
+                    v-model="scope.row.status"
+                    size="mini"
+                    placeholder="选择用例状态"
+                    filterable
+                    class="select"
+                    @change="changeCaseIsRun(scope.row)"
+                  >
+                    <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span>
+                    </el-option>
+                    <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span>
+                    </el-option>
+                    <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span>
+                    </el-option>
+                    <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span>
+                    </el-option>
+                  </el-select>
+                </div>
+              </div>
             </template>
           </el-table-column>
 
@@ -271,8 +313,9 @@ export default {
       pageSize: 20,
       selectedList: [],
       showBatchDelete: false,
-      showBatchChangeStatusToRun: false,
+      showBatchChangeStatusToRunPass: false,
       showBatchChangeStatusToNotRun: false,
+      showBatchChangeStatusToNotRunPass: false,
 
       tableLoadingIsShow: false, // 请求列表等待响应的状态
       caseTab: 'case', // tab页的显示
@@ -289,6 +332,13 @@ export default {
       oldList: [],
       newList: [],
 
+      colorDict: {
+        0: '#dcdfe6',
+        1: '#67C23A',
+        2: '#909399',
+        3: '#F56C6C'
+      },
+
       caseListUrl: '',
       caseRunUrl: '',
       deleteCaseUrl: '',
@@ -300,13 +350,25 @@ export default {
 
   watch: {
 
+    // 重新获取用例列表后，修改对应的重要等级背景色颜色
+    'case_list': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.$nextTick(function() {
+          newVal.forEach(test_case => {
+            this.changeSelectCaseColor(test_case)
+          })
+        })
+      }
+    },
+
     // 监听父组件传过来的当前选中的用例集，实时获取父组件传过来的用例集对应下的用例列表
     'currentSetId': {
       deep: true, // 深度监听
       handler(newVal, oldVal) {
         if (newVal) {
           this.getCaseList({
-            'caseSetId': newVal,
+            'caseSuiteId': newVal,
             'pageNum': this.pageNum,
             'pageSize': this.pageSize
           })
@@ -385,12 +447,16 @@ export default {
       this.selectedList = val
     },
 
-    cancelShowBatchChangeStatusToRun() {
-      this.showBatchChangeStatusToRun = false
+    cancelShowBatchChangeStatusToRunPass() {
+      this.showBatchChangeStatusToRunPass = false
     },
 
     cancelShowBatchChangeStatusToNotRun() {
       this.showBatchChangeStatusToNotRun = false
+    },
+
+    cancelShowBatchChangeStatusToNotRunPass() {
+      this.showBatchChangeStatusToNotRunPass = false
     },
 
     cancelBatchDeletePopover() {
@@ -473,13 +539,19 @@ export default {
       })
     },
 
+    // 修改选择框颜色
+    changeSelectCaseColor(row) {
+      this.$refs[`statusSelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.colorDict[row.status]
+    },
+
     // 修改用例状态
     changeCaseIsRun(row, status) {
       let selectedIdList = []
       let changeStatus = 0
       if (row === null) { // 批量修改
-        this.showBatchChangeStatusToRun = false
+        this.showBatchChangeStatusToRunPass = false
         this.showBatchChangeStatusToNotRun = false
+        this.showBatchChangeStatusToNotRunPass = false
         this.selectedList.forEach(data => {
           selectedIdList.push(data.id)
         })
@@ -489,7 +561,7 @@ export default {
         changeStatus = row.status
       }
       this.tableLoadingIsShow = true
-      this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus }).then(response => {
+      this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus.toString() }).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
         this.getCaseList()
@@ -500,7 +572,7 @@ export default {
     getCaseList(params) {
       this.tableLoadingIsShow = true
       this.caseListUrl({
-        'setId': this.currentSetId,
+        'suiteId': this.currentSetId,
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }).then(response => {

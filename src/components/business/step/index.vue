@@ -27,7 +27,7 @@
           />
         </el-tab-pane>
 
-        <!-- 接口列表 -->
+        <!-- 元素列表 -->
         <el-tab-pane v-if="dataType !== 'api'" label="元素列表" name="apiList">
           <elementListView
             ref="elementList"

@@ -334,7 +334,8 @@ export default {
   },
 
   mounted() {
-    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList // 从缓存获取响应对象数据源映射
+    // 从内存获取响应对象数据源映射
+    this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList
 
     this.initTempData(this.currentData)
     this.oldList = this.tempData.map(v => v.id)

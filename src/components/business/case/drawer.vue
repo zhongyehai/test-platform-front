@@ -62,11 +62,11 @@
             <!-- 执行次数 -->
             <el-col :span="6">
               <el-form-item label="用例归属" class="is-required" style="margin-bottom: 5px">
-                <el-select v-model="caseSetLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
+                <el-select v-model="caseSuiteLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
                     <el-tree
-                      ref="setTree"
-                      :data="caseSetTree"
+                      ref="suiteTree"
+                      :data="caseSuiteTree"
                       show-checkbox
                       node-key="id"
                       check-strictly
@@ -242,7 +242,7 @@ import {
   caseRun as apiCaseRun,
   getCase as apiGetCase
 } from '@/apis/apiTest/case'
-import { getCaseSet as apiGetCaseSet } from '@/apis/apiTest/caseSet'
+import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
 
 import {
   postCase as webUiPostCase,
@@ -251,7 +251,7 @@ import {
   caseRun as webUiCaseRun,
   getCase as webUiGetCase
 } from '@/apis/webUiTest/case'
-import { getCaseSet as webUiGetCaseSet } from '@/apis/webUiTest/caseSet'
+import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
 
 import {
   postCase as appUiPostCase,
@@ -260,7 +260,7 @@ import {
   caseRun as appUiCaseRun,
   getCase as appUiGetCase
 } from '@/apis/appUiTest/case'
-import { getCaseSet as appUiGetCaseSet } from '@/apis/appUiTest/caseSet'
+import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
 
 export default {
@@ -290,12 +290,12 @@ export default {
       isShowDebugLoading: false,
       activeName: 'caseInFo',
       caseInFoActiveName: 'editVariables',
-      caseSetTree: [],
+      caseSuiteTree: [],
       defaultProps: {
         children: 'children',
         label: 'name'
       },
-      caseSetLabel: '',
+      caseSuiteLabel: '',
       tempCase: {
         id: '',
         name: '',
@@ -316,7 +316,7 @@ export default {
         before_case: [],
         after_case: [],
         project_id: '',
-        set_id: ''
+        suite_id: ''
       },
 
       runEvent: 'runCaseEventOnDialog',
@@ -327,7 +327,7 @@ export default {
       copyCaseUrl: '',
       caseRunUrl: '',
       getCaseUrl: '',
-      getCaseSetUrl: ''
+      getCaseSuiteUrl: ''
     }
   },
 
@@ -343,7 +343,7 @@ export default {
     'currentSetId': {
       deep: true,
       handler(newVal, oldVal) {
-        this.tempCase.set_id = newVal
+        this.tempCase.suite_id = newVal
       }
     },
 
@@ -351,9 +351,9 @@ export default {
       deep: true,
       handler(newVal, oldVal) {
         if (newVal) {
-          this.getCaseSetUrl({ 'id': this.tempCase.set_id }).then(response => {
-            this.caseSetLabel = response.data.name
-            this.$refs.setTree.setCheckedKeys([this.tempCase.set_id])
+          this.getCaseSuiteUrl({ 'id': this.tempCase.suite_id }).then(response => {
+            this.caseSuiteLabel = response.data.name
+            this.$refs.suiteTree.setCheckedKeys([this.tempCase.suite_id])
           })
         }
       }
@@ -393,9 +393,9 @@ export default {
     })
 
     // 监听、接收用例集树
-    this.$bus.$on(this.$busEvents.treeIsDone, (_type, caseSetTree) => {
-      if (_type === 'caseSet') {
-        this.caseSetTree = caseSetTree
+    this.$bus.$on(this.$busEvents.treeIsDone, (_type, caseSuiteTree) => {
+      if (_type === 'caseSuite') {
+        this.caseSuiteTree = caseSuiteTree
       }
     })
 
@@ -414,21 +414,21 @@ export default {
       this.copyCaseUrl = apiCopyCase
       this.caseRunUrl = apiCaseRun
       this.getCaseUrl = apiGetCase
-      this.getCaseSetUrl = apiGetCaseSet
+      this.getCaseSuiteUrl = apiGetCaseSuite
     } else if (this.dataType === 'webUi') {
       this.postCaseUrl = webUiPostCase
       this.putCaseUrl = webUiPutCase
       this.copyCaseUrl = webUiCopyCase
       this.caseRunUrl = webUiCaseRun
       this.getCaseUrl = webUiGetCase
-      this.getCaseSetUrl = webUiGetCaseSet
+      this.getCaseSuiteUrl = webUiGetCaseSuite
     } else {
       this.postCaseUrl = appUiPostCase
       this.putCaseUrl = appUiPutCase
       this.copyCaseUrl = appUiCopyCase
       this.caseRunUrl = appUiCaseRun
       this.getCaseUrl = appUiGetCase
-      this.getCaseSetUrl = appUiGetCaseSet
+      this.getCaseSuiteUrl = appUiGetCaseSuite
     }
   },
 
@@ -461,7 +461,7 @@ export default {
       }
       this.tempCase.headers = [{ key: null, value: null, remark: null }]
       this.tempCase.project_id = this.currentProjectId || ''
-      this.tempCase.set_id = this.currentSetId || ''
+      this.tempCase.suite_id = this.currentSetId || ''
       this.drawerType = 'add'
       this.drawerIsShow = true
     },
@@ -477,7 +477,7 @@ export default {
     // 获取当前的用例数据，用于提交给后端
     getCaseDataToCommit() {
       const caseData = JSON.parse(JSON.stringify(this.tempCase))
-      caseData.set_id = this.$refs.setTree.getCheckedKeys()[0] || this.tempCase.set_id
+      caseData.suite_id = this.$refs.suiteTree.getCheckedKeys()[0] || this.tempCase.suite_id
       caseData.script_list = this.$refs.scriptView.tempScriptList
       caseData.variables = this.$refs.variablesView.tempData
       caseData.headers = this.dataType === 'api' ? this.$refs.headersView.tempData : []
@@ -487,9 +487,9 @@ export default {
 
     // 勾选树事件
     handleNodeClick(data, checked, node) {
-      if (checked && [data.id] !== this.$refs.setTree.getCheckedKeys()) {
-        this.$refs.setTree.setCheckedKeys([data.id]) // 选中
-        this.caseSetLabel = data.name
+      if (checked && [data.id] !== this.$refs.suiteTree.getCheckedKeys()) {
+        this.$refs.suiteTree.setCheckedKeys([data.id]) // 选中
+        this.caseSuiteLabel = data.name
       }
     },
 

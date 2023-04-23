@@ -36,7 +36,7 @@
             placeholder="选择用例集"
             size="mini"
             style="min-width: 100%"
-            :options="currentCaseSetList"
+            :options="currentCaseSuiteList"
             :props="{ checkStrictly: true }"
             clearable
             @change="getCaseList"
@@ -120,15 +120,15 @@
 import Pagination from '@/components/Pagination'
 
 import { projectList as apiProjectList } from '@/apis/apiTest/project'
-import { caseSetTree as apiCaseSetTree } from '@/apis/apiTest/caseSet'
+import { caseSuiteTree as apiCaseSuiteTree } from '@/apis/apiTest/caseSuite'
 import { caseList as apiCaseList, copyCaseStep as apiCopyCaseStep } from '@/apis/apiTest/case'
 
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
-import { caseSetTree as webUiCaseSetTree } from '@/apis/webUiTest/caseSet'
+import { caseSuiteTree as webUiCaseSuiteTree } from '@/apis/webUiTest/caseSuite'
 import { caseList as webUiCaseList, copyCaseStep as webUiCopyCaseStep } from '@/apis/webUiTest/case'
 
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
-import { caseSetTree as appUiCaseSetTree } from '@/apis/appUiTest/caseSet'
+import { caseSuiteTree as appUiCaseSuiteTree } from '@/apis/appUiTest/caseSuite'
 import { caseList as appUiCaseList, copyCaseStep as appUiCopyCaseStep } from '@/apis/appUiTest/case'
 
 export default {
@@ -145,7 +145,7 @@ export default {
 
       projectSelectedId: '',
       currentProjectList: [],
-      currentCaseSetList: [],
+      currentCaseSuiteList: [],
       quotePageNum: 1,
       quotePageSize: 10,
       caseList: [],
@@ -153,7 +153,7 @@ export default {
       currentSetId: '',
 
       projectListUrl: '',
-      caseSetTreeUrl: '',
+      caseSuiteTreeUrl: '',
       caseListUrl: '',
       copyCaseStepUrl: ''
     }
@@ -167,17 +167,17 @@ export default {
   created() {
     if (this.dataType === 'api') {
       this.projectListUrl = apiProjectList
-      this.caseSetTreeUrl = apiCaseSetTree
+      this.caseSuiteTreeUrl = apiCaseSuiteTree
       this.caseListUrl = apiCaseList
       this.copyCaseStepUrl = apiCopyCaseStep
     } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
-      this.caseSetTreeUrl = webUiCaseSetTree
+      this.caseSuiteTreeUrl = webUiCaseSuiteTree
       this.caseListUrl = webUiCaseList
       this.copyCaseStepUrl = webUiCopyCaseStep
     } else {
       this.projectListUrl = appUiProjectList
-      this.caseSetTreeUrl = appUiCaseSetTree
+      this.caseSuiteTreeUrl = appUiCaseSuiteTree
       this.caseListUrl = appUiCaseList
       this.copyCaseStepUrl = appUiCopyCaseStep
     }
@@ -213,20 +213,20 @@ export default {
 
     // 选中服务，获取对应的用例集
     selectedProject(projectId) {
-      this.caseSetTreeUrl({ 'project_id': projectId }).then(response => {
-        this.currentCaseSetList = this.arrayToTree(response.data, null)
+      this.caseSuiteTreeUrl({ 'project_id': projectId }).then(response => {
+        this.currentCaseSuiteList = this.arrayToTree(response.data, null)
       })
     },
 
     // 选中用例集，获取对应的用例列表
-    getCaseList(caseSetList) {
-      if (caseSetList.length > 0) {
-        this.currentSetId = caseSetList.slice(-1)[0] // 取列表中的最后一个
+    getCaseList(caseSuiteList) {
+      if (caseSuiteList.length > 0) {
+        this.currentSetId = caseSuiteList.slice(-1)[0] // 取列表中的最后一个
       }
       this.caseListUrl({
         pageNum: this.quotePageNum,
         pageSize: this.quotePageSize,
-        setId: this.currentSetId
+        suiteId: this.currentSetId
       }).then(response => {
         this.caseList = response.data.data
         this.caseTotal = response.data.total

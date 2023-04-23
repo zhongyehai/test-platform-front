@@ -124,7 +124,7 @@ export const constantRoutes = [
       {
         path: 'case',
         name: 'apiCase',
-        component: () => import('@/views/apiTest/caseSet/index'),
+        component: () => import('@/views/apiTest/caseSuite/index'),
         meta: { title: '用例管理', icon: 'el-icon-tickets' }
       },
       {
@@ -172,7 +172,7 @@ export const constantRoutes = [
       {
         path: 'case',
         name: 'WebUiCase',
-        component: () => import('@/views/webUiTest/caseSet/index'),
+        component: () => import('@/views/webUiTest/caseSuite/index'),
         meta: { title: '用例管理', icon: 'el-icon-tickets' }
       },
       {
@@ -226,7 +226,7 @@ export const constantRoutes = [
       {
         path: 'case',
         name: 'AppUiCase',
-        component: () => import('@/views/appUiTest/caseSet/index'),
+        component: () => import('@/views/appUiTest/caseSuite/index'),
         meta: { title: '用例管理', icon: 'el-icon-tickets' }
       },
       {
