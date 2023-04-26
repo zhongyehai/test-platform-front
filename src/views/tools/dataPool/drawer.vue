@@ -3,7 +3,6 @@
   <el-drawer
     :title=" drawerType === 'add' ? '新增数据' : '修改数据'"
     size="60%"
-    :wrapper-closable="false"
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
@@ -91,7 +90,7 @@
 </template>
 
 <script>
-import { dataPool, postDataPool, putDataPool } from '@/apis/assist/dataPool'
+import { postDataPool, putDataPool } from '@/apis/assist/dataPool'
 
 import waves from '@/directive/waves'
 
@@ -99,6 +98,7 @@ export default {
   name: 'Drawer',
   directives: { waves },
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'businessStatusList', 'useStatusList', 'runEnvList'
   ],
   data() {

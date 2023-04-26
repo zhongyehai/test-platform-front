@@ -112,41 +112,49 @@
       </el-tab-pane>
 
       <!-- 头部信息 -->
-      <el-tab-pane label="头部信息" name="editHeaders">
-        <el-tooltip slot="label" class="item-tabs" effect="light" placement="top">
-          <div slot="content">
-            1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br>
-            2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br>
-            3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
-            4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
-          </div>
-          <span>头部信息</span>
-        </el-tooltip>
+      <el-tab-pane name="editHeaders">
+        <template slot="label">
+          <span> 头部信息 </span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              1、可用此功能设置当前接口的固定的头部参数，比如token、cookie <br>
+              2、在此处设置的值，在运行此接口的时候，会自动加到头部参数上 <br>
+              3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
+              4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </template>
 
-        <el-form label-width="80px">
-          <el-form-item label="忽略字段" prop="pop_header_filed" size="small">
-            <el-input
-              v-model="currentStep.pop_header_filed"
-              placeholder="多个时，个用英文的,隔开(',')"
-              type="textarea"
-              autosize
-              style="width: 98%"
+        <el-tabs v-model="headersActiveName" style="margin-left: 20px;margin-right: 20px">
+          <el-tab-pane label="设置要发送的头部参数" name="setHeaders">
+            <headersView
+              ref="headersView"
+              :current-data="currentStep.headers"
+              :placeholder-key="'字段名'"
+              :placeholder-value="'字段值'"
+              :placeholder-desc="'备注'"
             />
-            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-              <div>1、若此处设置了字段，则此步骤执行时将从头部信息中去除此处设置的字段</div>
-              <div>2、多个时，个用英文的逗号隔开(',')</div>
-              <el-button slot="reference" type="text" icon="el-icon-question" />
-            </el-popover>
-          </el-form-item>
-        </el-form>
+          </el-tab-pane>
 
-        <headersView
-          ref="headersView"
-          :current-data="currentStep.headers"
-          :placeholder-key="'字段名'"
-          :placeholder-value="'字段值'"
-          :placeholder-desc="'备注'"
-        />
+          <el-tab-pane name="delHeaders">
+            <template slot="label">
+              <span> 设置要去除的头部参数 </span>
+              <el-tooltip class="item" effect="dark" placement="top-start">
+                <div slot="content">
+                  1、如果要去除在全局、用例、或者步骤执行过程中设置的头部参数，在此处设置对应的key即可 <br>
+                  2、此处设置只对此步骤有效，不会影响其他步骤
+                </div>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
+              </el-tooltip>
+            </template>
+            <oneColumnRow
+              ref="popHeaderFiledInput"
+              :current-data="currentStep.pop_header_filed"
+            />
+          </el-tab-pane>
+        </el-tabs>
+
       </el-tab-pane>
 
       <!-- url参数 -->
@@ -229,7 +237,7 @@
           <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
-              2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+              2、脚本本身不与步骤进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
             </div>
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
@@ -275,10 +283,12 @@ import { postStep, putStep } from '@/apis/apiTest/step'
 import { getApi, apiMsgBelongTo } from '@/apis/apiTest/api'
 import { assertStrIsJson } from '@/utils/validate'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
+import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
 export default {
   name: 'EditStep',
   components: {
+    oneColumnRow,
     pythonScriptIndex,
     skipIfView,
     headersView,
@@ -301,6 +311,7 @@ export default {
       direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       activeName: 'editStepInfo',
+      headersActiveName: 'setHeaders',
       currentStepCopy: '',
       currentStep: {
         'id': '',
@@ -390,13 +401,14 @@ export default {
   methods: {
 
     getStepForCommit() {
-      var json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      const json_data = this.$refs.bodyView.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
       assertStrIsJson(json_data, 'json请求体格式错误')
-      var data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
+      const data_urlencoded = this.$refs.bodyView.$refs.urlencodedEditorView.$refs.dataJsonView.tempDataJson
       assertStrIsJson(data_urlencoded, 'form-urlencoded请求体格式错误')
-      var data_driver = this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson
+      const data_driver = this.$refs.dataDriverView.$refs.dataJsonView.tempDataJson
       assertStrIsJson(data_driver, '数据驱动格式错误')
-      var skip_if = this.$refs.skipIfView.tempData
+      const skip_if = this.$refs.skipIfView.tempData
+      const pop_header_filed = this.$refs.popHeaderFiledInput.getData()
       return {
         'id': this.currentStep.id,
         'status': this.currentStep.status,
@@ -407,7 +419,7 @@ export default {
         'down_func': this.currentStep.down_func,
         'skip_if': skip_if,
         'skip_on_fail': this.currentStep.skip_on_fail,
-        'pop_header_filed': this.currentStep.pop_header_filed,
+        'pop_header_filed': pop_header_filed,
         'run_times': this.currentStep.run_times,
         'headers': this.$refs.headersView.tempData,
         'params': this.$refs.paramsView.tempData,

@@ -151,12 +151,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="最后修改人" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column label="操作" align="center" min-width="5%">
         <template slot-scope="scope">
           <el-button
@@ -191,12 +185,11 @@
 import Pagination from '@/components/Pagination'
 import dataPoolDrawer from './drawer'
 
-import { userList } from '@/apis/system/user'
 import { runEnvList } from '@/apis/config/runEnv'
-import { dataPoolList, dataPool, dataPoolBusinessStatus, dataPoolUseStatus } from '@/apis/assist/dataPool'
+import { dataPoolList, dataPoolBusinessStatus, dataPoolUseStatus } from '@/apis/assist/dataPool'
 
 export default {
-  name: 'Config',
+  name: 'DataPool',
   components: {
     Pagination,
     dataPoolDrawer
@@ -216,8 +209,7 @@ export default {
       useStatusList: [],
       runEnvList: [],
       runEnvDict: {},
-      dataPoolList: [], // 数据池列表
-      userDict: {}
+      dataPoolList: [] // 数据池列表
     }
   },
 
@@ -240,7 +232,7 @@ export default {
       })
     })
 
-    this.getUserList(this.getDataPoolList)
+    this.getDataPoolList()
 
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
       if (_type === 'dataPool') {
@@ -255,23 +247,6 @@ export default {
   },
 
   methods: {
-
-    // 获取用户列表
-    getUserList(func) {
-      userList().then(response => {
-        response.data.data.forEach(user => {
-          this.userDict[user.id] = user
-        })
-        if (func) {
-          func()
-        }
-      })
-    },
-
-    // 解析用户
-    parseUser(userId) {
-      return userId in this.userDict ? this.userDict[userId].name : '-'
-    },
 
     // 获取数据池列表
     getDataPoolList() {

@@ -191,7 +191,7 @@
           <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
-              2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+              2、脚本本身不与用例进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
             </div>
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>

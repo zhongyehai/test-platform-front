@@ -6,6 +6,9 @@ export default {
   data: {
     permissions: [], // 用户的前端权限地址
 
+    businessList: [], // 业务线列表
+    businessDict: {}, // 业务线字典
+
     dataTypeMappingList: [], // 数据类型枚举
     skipIfTypeMappingList: [], // 跳过类型枚举
 

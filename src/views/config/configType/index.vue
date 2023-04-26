@@ -90,7 +90,6 @@
               type="text"
               size="mini"
               icon="el-icon-edit"
-              :disabled="roles !== '2'"
               @click.native="showAddConfigTypeDialog(scope.row)"
             />
           </el-tooltip>
@@ -143,7 +142,7 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { configTypeList, postConfigType, putConfigType, deleteConfigType, getConfigType } from '@/apis/config/configType'
+import { configTypeList, postConfigType, putConfigType } from '@/apis/config/configType'
 import { userList } from '@/apis/system/user'
 
 export default {

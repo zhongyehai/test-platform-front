@@ -102,44 +102,64 @@
       style="width: 100%;"
       @cell-dblclick="cellDblclick"
     >
+      <el-table-column prop="num" label="序号" align="center" min-width="8%">
+        <template slot-scope="scope">
+          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" align="center" :label="`${titleType}名称`" min-width="20%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.name }} </span>
+        </template>
+      </el-table-column>
+
       <el-table-column
-        v-for="field in fieldData"
-        :key="field.fieldName"
-        :label="field.label"
-        :min-width="field.minWidth"
-        :prop="field.fieldName"
+        v-if="dataType === 'api'"
+        :show-overflow-tooltip="true"
         align="center"
-        show-overflow-tooltip
+        label="swagger"
+        min-width="35%"
       >
         <template slot-scope="scope">
-          <template v-if="field.fieldName === 'index'">
-            <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
-          </template>
-          <template v-else-if="field.fieldName === 'name'">
-            <span> {{ scope.row.name }} </span>
-          </template>
-          <template v-else-if="field.fieldName === 'swagger'">
-            <div v-if="scope.row.swagger">
-              <span>{{ scope.row.swagger }}</span>
-            </div>
-            <div v-else>
-              <el-tag type="warning">未设置</el-tag>
-            </div>
-          </template>
-          <template v-else-if="field.fieldName === 'pullStatus'">
-            <el-tag :type="pullStatusTagType[scope.row.last_pull_status]">
-              {{ pullStatusContent[scope.row.last_pull_status] }}
-            </el-tag>
-          </template>
-          <template v-else-if="field.fieldName === 'manager'">
-            <span>{{ parseUser(scope.row.manager) }}</span>
-          </template>
-          <template v-else-if="field.fieldName === 'update_user'">
-            <span>{{ parseUser(scope.row.update_user) }}</span>
-          </template>
-          <template v-else-if="field.fieldName === 'created_time'">
-            <span>{{ scope.row.created_time }}</span>
-          </template>
+          <div v-if="scope.row.swagger">
+            <span>{{ scope.row.swagger }}</span>
+          </div>
+          <div v-else>
+            <el-tag type="warning">未设置</el-tag>
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        v-if="dataType === 'api'"
+        :show-overflow-tooltip="true"
+        align="center"
+        label="拉取状态"
+        min-width="10%"
+      >
+        <template slot-scope="scope">
+          <el-tag :type="pullStatusTagType[scope.row.last_pull_status]">
+            {{ pullStatusContent[scope.row.last_pull_status] }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" align="center" label="业务线" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ $busEvents.data.businessDict[scope.row.business_id] }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" align="center" label="负责人" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ parseUser(scope.row.manager) }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" align="center" label="最后修改" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>
       </el-table-column>
 
@@ -153,7 +173,8 @@
             type="text"
             size="mini"
             @click="clickPullButton(row)"
-          >拉取</el-button>
+          >拉取
+          </el-button>
 
           <!-- 编辑服务 -->
           <el-button
@@ -189,7 +210,8 @@
               style="color: red"
               type="text"
               size="mini"
-            >删除</el-button>
+            >删除
+            </el-button>
           </el-popover>
 
         </template>
@@ -248,6 +270,7 @@ import projectDrawer from '@/components/business/project/drawer.vue'
 import pullDrawerView from '@/components/business/project/pullDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
 import { getConfigByName } from '@/apis/config/config'
+import { businessList } from '@/apis/config/business'
 import { swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType } from '@/utils/mapping'
 
 export default {
@@ -272,13 +295,6 @@ export default {
         manager: '', // 负责人
         create_user: '' // 创建人
       },
-      fieldData: [
-        { fieldName: 'index', label: '序号', minWidth: '8%' },
-        { fieldName: 'name', label: this.dataType === 'appUi' ? 'APP名' : '项目名', minWidth: '20%' },
-        { fieldName: 'created_time', label: '创建时间', minWidth: '10%' },
-        { fieldName: 'manager', label: '负责人', minWidth: '10%' },
-        { fieldName: 'update_user', label: '最后修改人', minWidth: '10%' }
-      ],
       currentProject: {}, // 当前选中的服务
       project_list: [], // 服务列表
       total: 0, // 服务数据表格总条数
@@ -289,7 +305,6 @@ export default {
       sortable: null,
       oldList: [],
       newList: [],
-
       pullStatusContent: swaggerPullStatusMappingContent,
       pullStatusTagType: swaggerPullStatusMappingTagType,
       deleteProjectUrl: '',
@@ -303,14 +318,6 @@ export default {
       this.deleteProjectUrl = apiDeleteProject
       this.projectListUrl = apiProjectList
       this.projectSortUrl = apiProjectSort
-      this.fieldData = [
-        { fieldName: 'index', label: '序号', minWidth: '8%' },
-        { fieldName: 'name', label: '服务名', minWidth: '20%' },
-        { fieldName: 'swagger', label: 'swagger地址', minWidth: '32%' },
-        { fieldName: 'pullStatus', label: '最新拉取状态', minWidth: '10%' },
-        { fieldName: 'manager', label: '负责人', minWidth: '10%' },
-        { fieldName: 'update_user', label: '最后修改人', minWidth: '15%' }
-      ]
     } else if (this.dataType === 'webUi') {
       this.deleteProjectUrl = webUiDeleteProject
       this.projectListUrl = webUiProjectList
@@ -324,6 +331,17 @@ export default {
     this.getUserList(this.getProjectList) // 先获取用户数据
   },
   mounted() {
+    // 获取业务线
+    if (this.$busEvents.data.businessList.length < 1) {
+      businessList().then(response => {
+        this.$busEvents.data.businessList = response.data.data
+        this.$busEvents.data.businessDict = {}
+        this.$busEvents.data.businessList.forEach(business => {
+          this.$busEvents.data.businessDict[business.id] = business.name
+        })
+      })
+    }
+
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
       if (['projectInfo', 'pullProjectData'].indexOf(_type) !== -1) {
         this.getProjectList()
@@ -371,7 +389,8 @@ export default {
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
-      const that = this; const data = row[column.property]
+      const that = this
+      const data = row[column.property]
       if (typeof (data) === 'string') {
         this.$copyText(data).then(
           function(e) {

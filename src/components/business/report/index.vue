@@ -309,19 +309,20 @@ export default {
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
       if (_type === 'project') {
         this.projectId = project.id
+
+        // 获取对应的运行环境
+        runEnvList({ business_id: project.business_id }).then(response => {
+          this.eventList = response.data.data
+          this.eventList.forEach(env => {
+            this.eventDict[env.code] = env.name
+          })
+        })
+
         this.query.pageNum = 1
         this.query.pageSize = 20
         this.query.total = 0
         this.getReportList()
       }
-    })
-
-    // 获取环境列表
-    runEnvList().then(response => {
-      this.eventList = response.data.data
-      response.data.data.forEach(env => {
-        this.eventDict[env.code] = env.name
-      })
     })
 
     getConfigByName({ 'name': 'run_type' }).then(response => {
@@ -403,8 +404,10 @@ export default {
       myBlob = myBlob.call ? myBlob.bind(self) : Blob
 
       // go ahead and download dataURLs right away
+      // eslint-disable-next-line prefer-const
       blob = payload instanceof myBlob
         ? payload
+        // eslint-disable-next-line new-cap
         : new myBlob([payload], { type: mimeType })
 
       function saver(url, winMode) {

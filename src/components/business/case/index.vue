@@ -32,13 +32,14 @@
 
           <el-popover
             v-show="selectedList.length > 0"
-            v-model="showBatchChangeStatusToNotRun"
+            v-model="showBatchChangeStatusToNotDebugAndNotRun"
             placement="top"
             popper-class="down-popover"
           >
-            <p>确定把所选用例状态改为未调试?</p>
+            <p>确定把所选用例状态改为未调试-不执行?</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToNotRun()">取消</el-button>
+              <el-button size="mini" type="text" @click="cancelShowBatchButton()">取消
+              </el-button>
               <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 0)">确定</el-button>
             </div>
             <el-button
@@ -46,19 +47,20 @@
               type="primary"
               size="mini"
               style="margin-left: 5px"
-            >批量改为未调试
+            >批量改为未调试-不执行
             </el-button>
           </el-popover>
 
           <el-popover
             v-show="selectedList.length > 0"
-            v-model="showBatchChangeStatusToRunPass"
+            v-model="showBatchChangeStatusToDebugPassAndRun"
             placement="top"
             popper-class="down-popover"
           >
-            <p>确定把所选用例状态改为已调试通过?</p>
+            <p>确定把所选用例状态改为已调试通过-要执行?</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToRunPass()">取消</el-button>
+              <el-button size="mini" type="text" @click="cancelShowBatchButton()">取消
+              </el-button>
               <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 1)">确定</el-button>
             </div>
             <el-button
@@ -66,19 +68,20 @@
               type="primary"
               size="mini"
               style="margin-left: 5px"
-            >批量改为已调试通过
+            >批量改为已调试通过-要执行
             </el-button>
           </el-popover>
 
           <el-popover
             v-show="selectedList.length > 0"
-            v-model="showBatchChangeStatusToNotRunPass"
+            v-model="showBatchChangeStatusToDebugPassAndNotRun"
             placement="top"
             popper-class="down-popover"
           >
-            <p>确定把所选用例状态改为调试不通过?</p>
+            <p>确定把所选用例状态改为已调试通过-不执行?</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelShowBatchChangeStatusToNotRunPass()">取消</el-button>
+              <el-button size="mini" type="text" @click="cancelShowBatchButton()">取消
+              </el-button>
               <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 2)">确定</el-button>
             </div>
             <el-button
@@ -86,7 +89,28 @@
               type="primary"
               size="mini"
               style="margin-left: 5px"
-            >批量改为调试不通过
+            >批量改为已调试通过-不执行
+            </el-button>
+          </el-popover>
+
+          <el-popover
+            v-show="selectedList.length > 0"
+            v-model="showBatchChangeStatusToNotDebugPassAndNotRun"
+            placement="top"
+            popper-class="down-popover"
+          >
+            <p>确定把所选用例状态改为调试不通过-不执行?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelShowBatchButton()">取消
+              </el-button>
+              <el-button type="primary" size="mini" @click="changeCaseIsRun(null, 3)">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="primary"
+              size="mini"
+              style="margin-left: 5px"
+            >批量改为调试不通过-不执行
             </el-button>
           </el-popover>
 
@@ -313,9 +337,10 @@ export default {
       pageSize: 20,
       selectedList: [],
       showBatchDelete: false,
-      showBatchChangeStatusToRunPass: false,
-      showBatchChangeStatusToNotRun: false,
-      showBatchChangeStatusToNotRunPass: false,
+      showBatchChangeStatusToDebugPassAndRun: false,
+      showBatchChangeStatusToNotDebugAndNotRun: false,
+      showBatchChangeStatusToDebugPassAndNotRun: false,
+      showBatchChangeStatusToNotDebugPassAndNotRun: false,
 
       tableLoadingIsShow: false, // 请求列表等待响应的状态
       caseTab: 'case', // tab页的显示
@@ -447,20 +472,12 @@ export default {
       this.selectedList = val
     },
 
-    cancelShowBatchChangeStatusToRunPass() {
-      this.showBatchChangeStatusToRunPass = false
-    },
-
-    cancelShowBatchChangeStatusToNotRun() {
-      this.showBatchChangeStatusToNotRun = false
-    },
-
-    cancelShowBatchChangeStatusToNotRunPass() {
-      this.showBatchChangeStatusToNotRunPass = false
-    },
-
-    cancelBatchDeletePopover() {
+    cancelShowBatchButton() {
       this.showBatchDelete = false
+      this.showBatchChangeStatusToNotDebugAndNotRun = false
+      this.showBatchChangeStatusToDebugPassAndNotRun = false
+      this.showBatchChangeStatusToDebugPassAndRun = false
+      this.showBatchChangeStatusToNotDebugPassAndNotRun = false
     },
 
     // 编辑用例
@@ -549,9 +566,10 @@ export default {
       let selectedIdList = []
       let changeStatus = 0
       if (row === null) { // 批量修改
-        this.showBatchChangeStatusToRunPass = false
-        this.showBatchChangeStatusToNotRun = false
-        this.showBatchChangeStatusToNotRunPass = false
+        this.showBatchChangeStatusToDebugPassAndRun = false
+        this.showBatchChangeStatusToNotDebugAndNotRun = false
+        this.showBatchChangeStatusToDebugPassAndNotRun = false
+        this.showBatchChangeStatusToNotDebugPassAndNotRun = false
         this.selectedList.forEach(data => {
           selectedIdList.push(data.id)
         })

@@ -36,23 +36,23 @@
           size="mini"
           class="filter-item"
         >
-          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id"/>
+          <el-option v-for="status in status_list" :key="status.name" :label="status.name" :value="status.id" />
         </el-select>
       </el-form-item>
 
-<!--      <el-form-item :label="'角色：'" size="mini">-->
-<!--        <el-select-->
-<!--          v-model="listQuery.role_id"-->
-<!--          :placeholder="'角色'"-->
-<!--          clearable-->
-<!--          filterable-->
-<!--          default-first-option-->
-<!--          size="mini"-->
-<!--          class="filter-item"-->
-<!--        >-->
-<!--          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id"/>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item :label="'角色：'" size="mini">-->
+      <!--        <el-select-->
+      <!--          v-model="listQuery.role_id"-->
+      <!--          :placeholder="'角色'"-->
+      <!--          clearable-->
+      <!--          filterable-->
+      <!--          default-first-option-->
+      <!--          size="mini"-->
+      <!--          class="filter-item"-->
+      <!--        >-->
+      <!--          <el-option v-for="role in role_list" :key="role.name" :label="role.name" :value="role.id"/>-->
+      <!--        </el-select>-->
+      <!--      </el-form-item>-->
 
       <el-button v-waves class="filter-item" type="primary" size="mini" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" size="mini" @click="handleCreate">添加</el-button>
@@ -165,19 +165,19 @@
 
         <!-- 用户信息 -->
         <el-form-item :label="'用户名'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.name" placeholder="2~12位"/>
+          <el-input v-model="tempUser.name" placeholder="2~12位" />
         </el-form-item>
 
         <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.account" placeholder="2~12位"/>
+          <el-input v-model="tempUser.account" placeholder="2~12位" />
         </el-form-item>
 
         <el-form-item v-if="drawerType === 'create'" :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，必填"/>
+          <el-input v-model="tempUser.password" placeholder="4~18位，必填" />
         </el-form-item>
 
         <el-form-item v-else :label="'密码'" prop="name" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改"/>
+          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改" />
         </el-form-item>
 
         <el-form-item :label="'业务线'" class="is-required" size="mini">
@@ -248,7 +248,7 @@ export default {
         detail: 1,
         name: undefined, // 用户名
         account: undefined, // 账号
-        status: undefined, // 账号状态
+        status: undefined // 账号状态
         // role_id: undefined // 角色
       },
 
@@ -263,8 +263,8 @@ export default {
       },
 
       submitButtonIsLoading: false,
+      commonBusiness: '',
       userDict: {},
-
       user_list: [], // 用户列表
       role_list: [], // 角色列表
       status_list: [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }], // 状态列表
@@ -282,16 +282,26 @@ export default {
   watch: {},
 
   created() {
-    this.getBusinessList()
     this.getAllUserList(this.getUserList)
     this.initStatus() // 初始化用户状态
     this.getRoleList() // 初始化角色列表
-    // this.getUserList()  // 初始化用户列表
     this.initTempUser() // 初始化临时数据
   },
 
   mounted() {
-
+    // 获取业务线列表
+    if (this.$busEvents.data.businessList.length < 1) {
+      businessList().then(response => {
+        this.$busEvents.data.businessList = response.data.data
+        this.$busEvents.data.businessDict = {}
+        this.$busEvents.data.businessList.forEach(business => {
+          this.$busEvents.data.businessDict[business.id] = business.name
+          if (business.code === 'common') {
+            this.commonBusiness = business.id
+          }
+        })
+      })
+    }
   },
 
   methods: {
@@ -326,7 +336,7 @@ export default {
         account: undefined,
         password: undefined,
         role_list: [],
-        business_id: []
+        business_id: [this.commonBusiness]
       }
     },
 
@@ -362,13 +372,6 @@ export default {
         create_user: undefined // 创建人
       }
       this.getUserList()
-    },
-
-    // 获取业务线列表
-    getBusinessList() {
-      businessList().then(response => {
-        this.business_list = response.data.data
-      })
     },
 
     // 获取角色列表

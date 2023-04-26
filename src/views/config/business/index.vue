@@ -107,7 +107,8 @@
               type="text"
               size="mini"
               @click.native="showAddBusinessDialog(scope.row)"
-            >修改</el-button>
+            >修改
+            </el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -142,11 +143,11 @@
           </el-popover>
         </el-form-item>
 
-        <el-form-item :label="'webhook'" v-show="tempBusiness.receive_type !== '0'" class="is-required" size="mini">
+        <el-form-item v-show="tempBusiness.receive_type !== '0'" :label="'webhook'" class="is-required" size="mini">
           <oneColumnRow
             ref="oneColumnRow"
             :current-data="tempBusiness.webhook_list"
-          ></oneColumnRow>
+          />
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
@@ -164,7 +165,16 @@
             style="width: 97%"
             size="mini"
             class="filter-item"
+            @change="handleCheckedItemChange"
           >
+            <div style="margin-left: 20px; margin-bottom: 10px">
+              <el-checkbox
+                v-model="checkAll"
+                :indeterminate="isIndeterminate"
+                @change="handleCheckAllChange"
+              >全选
+              </el-checkbox>
+            </div>
             <el-option v-for="env in run_env_list" :key="env.id" :label="`${env.group}_${env.name}`" :value="env.id" />
           </el-select>
           <el-popover
@@ -206,9 +216,9 @@
 <script>
 import Pagination from '@/components/Pagination/index.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
-import { businessList, postBusiness, putBusiness, deleteBusiness, getBusiness } from '@/apis/config/business'
+import { businessList, postBusiness, putBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
-import {runEnvList} from "@/apis/config/runEnv";
+import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Index',
@@ -235,6 +245,7 @@ export default {
       direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       run_env_list: [],
+      run_env_id_list: [],
       tempBusiness: {
         id: '',
         name: '',
@@ -245,13 +256,19 @@ export default {
         desc: ''
       },
       currentUserList: [],
-      userDict: {}
+      userDict: {},
+
+      checkAll: false,
+      isIndeterminate: true
     }
   },
 
   mounted() {
     runEnvList(this.listQuery).then(response => {
       this.run_env_list = response.data.data
+      this.run_env_list.forEach(env => {
+        this.run_env_id_list.push(env.id)
+      })
     })
 
     this.getUserList(this.getBusinessList)
@@ -259,6 +276,20 @@ export default {
   },
 
   methods: {
+
+    // 点击全选
+    handleCheckAllChange(val) {
+      this.tempBusiness.env_list = val ? this.run_env_id_list : []
+      this.isIndeterminate = false
+    },
+
+    // 当选中选项时，全选按钮的状态变化
+    handleCheckedItemChange(value) {
+      const checkedCount = value.length
+      this.checkAll = checkedCount === this.run_env_list.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.run_env_list.length
+    },
+
     // 获取用户信息，同步请求
     async getUserList(func) {
       const response = await userList()

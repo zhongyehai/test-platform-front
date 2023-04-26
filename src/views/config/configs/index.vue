@@ -130,7 +130,6 @@
               type="text"
               size="mini"
               icon="el-icon-edit"
-              :disabled="roles !== '2'"
               @click.native="editConfig(scope.row)"
             />
           </el-tooltip>
