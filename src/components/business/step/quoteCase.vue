@@ -47,39 +47,79 @@
 
     <!-- 用例列表 -->
     <el-row>
-      <el-table ref="caseTable" :data="caseList" stripe>
-        <el-table-column prop="num" label="序号" align="center" min-width="10%">
-          <template slot-scope="scope">
-            <span> {{ (quotePageNum - 1) * quotePageSize + scope.$index + 1 }} </span>
-          </template>
-        </el-table-column>
+      <el-table
+        ref="caseTable"
+        row-key="row_id"
+        :data="caseList"
+        :expand-row-keys="expands"
+        stripe
+        lazy
+        :load="getStep"
+        :tree-props="{ children: 'children', hasChildren: 'hasStep' }"
+        @expand-change="changeExpandStatus"
+      >
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="center" min-width="65%">
+        <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="left" min-width="55%">
           <template slot-scope="scope">
+            <el-tag
+              size="small"
+              :type="scope.row.suite_id ? 'danger': scope.row.quote_case ? 'warning' : 'success'"
+            >
+              {{ scope.row.suite_id ? '用例' : scope.row.quote_case ? '引用用例' : '步骤' }}
+            </el-tag>
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="25%">
+        <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="描述" min-width="10%">
+          <template slot-scope="scope">
+            <el-popover
+              v-show="scope.row.suite_id || scope.row.quote_case"
+              :ref="scope.row.id"
+              trigger="hover"
+              placement="bottom-start"
+              style="margin-right: 10px"
+              popper-class="down-popover"
+            >
+              <showCaseDesc
+                :case-desc="scope.row.desc"
+                :case-skip-if="scope.row.skip_if"
+                :case-variables="scope.row.variables"
+                :case-extracts="scope.row.output"
+              />
+              <span slot="reference"> {{ scope.row.desc || '-' }} </span>
+            </el-popover>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" align="left" min-width="10%">
           <template slot-scope="scope">
 
             <!-- 复制用例 -->
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="完全复制此用例的步骤为当前用例的步骤"
-              placement="top-start"
+            <el-popover
+              :ref="scope.row.id"
+              v-model="scope.row.copyStepPopoverIsShow"
+              placement="top"
+              style="margin-right: 10px"
+              popper-class="down-popover"
             >
+              <p>复制【当前步骤】并在当【前用用例】下生成新的步骤?</p>
+              <div style="text-align: right; margin: 0">
+                <el-button size="mini" type="text" @click="cancelCopyStepPopover(scope.row)">取消</el-button>
+                <el-button type="primary" size="mini" @click="copyCaseStepAsStep(scope.row)">确定</el-button>
+              </div>
               <el-button
+                slot="reference"
                 type="text"
                 size="mini"
-                @click.native="copyCaseStepAsStep(scope.row)"
-              >拉取
+                :loading="scope.row.copyIsLoading"
+              >复制
               </el-button>
-            </el-tooltip>
+            </el-popover>
 
-            <!-- 引用用例 -->
+            <!-- 步骤不展示引用用例按钮 -->
             <el-tooltip
+              v-show="scope.row.suite_id || scope.row.quote_case"
               class="item"
               effect="dark"
               content="引用此用例为当前用例的步骤"
@@ -92,17 +132,21 @@
               >引用
               </el-button>
             </el-tooltip>
-
-            <!-- 查看用例详情 -->
-            <el-button
-              slot="reference"
-              type="text"
-              size="mini"
-              style="margin-right: 5px"
-              @click="showCaseRemark(scope.row.id)"
-            >详情</el-button>
           </template>
         </el-table-column>
+
+        <el-table-column prop="num" label="序号" align="left" min-width="5%">
+          <template slot-scope="scope">
+            <span> {{ (quotePageNum - 1) * quotePageSize + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="id" label="数据id" align="left" min-width="5%">
+          <template slot-scope="scope">
+            <span> {{ scope.row.id }} </span>
+          </template>
+        </el-table-column>
+
       </el-table>
 
       <pagination
@@ -112,32 +156,39 @@
         :limit.sync="quotePageSize"
         @pagination="getCaseList"
       />
+
     </el-row>
   </el-form>
 </template>
 
 <script>
 import Pagination from '@/components/Pagination'
+import showCaseDesc from '@/components/business/case/showCaseDesc'
 
 import { projectList as apiProjectList } from '@/apis/apiTest/project'
-import { caseSuiteTree as apiCaseSuiteTree } from '@/apis/apiTest/caseSuite'
+import { caseSuiteList as apiCaseSuiteTree } from '@/apis/apiTest/caseSuite'
 import { caseList as apiCaseList, copyCaseStep as apiCopyCaseStep } from '@/apis/apiTest/case'
+import { stepCopy as apiStepCopy, stepList as apiStepList } from '@/apis/apiTest/step'
 
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
-import { caseSuiteTree as webUiCaseSuiteTree } from '@/apis/webUiTest/caseSuite'
+import { caseSuiteList as webUiCaseSuiteTree } from '@/apis/webUiTest/caseSuite'
 import { caseList as webUiCaseList, copyCaseStep as webUiCopyCaseStep } from '@/apis/webUiTest/case'
+import { stepCopy as webUiStepCopy, stepList as webUiStepList } from '@/apis/webUiTest/step'
 
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
-import { caseSuiteTree as appUiCaseSuiteTree } from '@/apis/appUiTest/caseSuite'
+import { caseSuiteList as appUiCaseSuiteTree } from '@/apis/appUiTest/caseSuite'
 import { caseList as appUiCaseList, copyCaseStep as appUiCopyCaseStep } from '@/apis/appUiTest/case'
+import { stepCopy as appUiStepCopy, stepList as appUiStepList } from '@/apis/appUiTest/step'
 
 export default {
   name: 'QuoteCase',
-  components: { Pagination },
+  components: {
+    showCaseDesc,
+    Pagination
+  },
   props: [
-    'dataType',
-    'tempCase',
-    'caseId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'projectId', 'caseId'
   ],
   data() {
     return {
@@ -152,10 +203,14 @@ export default {
       caseTotal: 0,
       currentSetId: '',
 
+      expands: [], // 要展开的行数据的id
+
       projectListUrl: '',
       caseSuiteTreeUrl: '',
       caseListUrl: '',
-      copyCaseStepUrl: ''
+      copyCaseStepUrl: '',
+      stepCopyUrl: '',
+      stepListUrl: ''
     }
   },
   watch: {},
@@ -170,20 +225,58 @@ export default {
       this.caseSuiteTreeUrl = apiCaseSuiteTree
       this.caseListUrl = apiCaseList
       this.copyCaseStepUrl = apiCopyCaseStep
+      this.stepListUrl = apiStepList
+      this.stepCopyUrl = apiStepCopy
     } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
       this.caseSuiteTreeUrl = webUiCaseSuiteTree
       this.caseListUrl = webUiCaseList
       this.copyCaseStepUrl = webUiCopyCaseStep
+      this.stepListUrl = webUiStepList
+      this.stepCopyUrl = webUiStepCopy
     } else {
       this.projectListUrl = appUiProjectList
       this.caseSuiteTreeUrl = appUiCaseSuiteTree
       this.caseListUrl = appUiCaseList
       this.copyCaseStepUrl = appUiCopyCaseStep
+      this.stepListUrl = appUiStepList
+      this.stepCopyUrl = appUiStepCopy
     }
   },
 
   methods: {
+
+    cancelCopyStepPopover(row) {
+      this.$set(row, 'copyStepPopoverIsShow', false)
+    },
+
+    // 第一次点击展开引用用例
+    getStep(row, treeNode, resolve) {
+      if (this.expands.indexOf(row.row_id) === -1) {
+        // 获取用例/引用用例的步骤列表
+        const request_id = row.quote_case ? row.quote_case : row.id
+        this.stepListUrl({ caseId: request_id }).then(response => {
+          this.expands.push(row.row_id)
+          const data_list = []
+          response.data.data.forEach(step => {
+            step['row_id'] = `step_${step.id}`
+            data_list.push(step)
+          })
+          resolve(data_list)
+        })
+      }
+    },
+
+    // 点击打开或者收起引用用例
+    changeExpandStatus(row, status) {
+      if (status === false) {
+        this.expands.pop(row.id)
+      } else {
+        if (this.expands.indexOf(row.id) === -1) {
+          this.expands.push(row.id)
+        }
+      }
+    },
 
     // 递归把列表转为树行结构
     arrayToTree(arr, parentId) {
@@ -213,8 +306,15 @@ export default {
 
     // 选中服务，获取对应的用例集
     selectedProject(projectId) {
-      this.caseSuiteTreeUrl({ 'project_id': projectId }).then(response => {
-        this.currentCaseSuiteList = this.arrayToTree(response.data, null)
+      // 如果是访问的当前服务的用例集，则获取基础用例集和引用用例集，否则获取引用用例集
+      const suite_type = this.projectSelectedId === this.projectId ? ['base', 'quote'] : ['quote']
+      this.caseSuiteTreeUrl({
+        'pageNum': 1,
+        'pageSize': 9999,
+        'project_id': projectId,
+        'suite_type': suite_type
+      }).then(response => {
+        this.currentCaseSuiteList = this.arrayToTree(response.data.data, null)
       })
     },
 
@@ -228,7 +328,12 @@ export default {
         pageSize: this.quotePageSize,
         suiteId: this.currentSetId
       }).then(response => {
-        this.caseList = response.data.data
+        this.caseList = []
+        this.expands = []
+        response.data.data.forEach(caseData => {
+          caseData['row_id'] = `case_${caseData.id}`
+          this.caseList.push(caseData)
+        })
         this.caseTotal = response.data.total
       })
     },
@@ -237,7 +342,6 @@ export default {
     addQuote(row) {
       // 如果有用例id，则添加步骤，否则先保存用例
       if (this.caseId) {
-        // 不能自己引用自己
         if (row.id === this.caseId) {
           this.$notify.error('不能自己引用自己')
           return
@@ -266,21 +370,28 @@ export default {
     },
 
     // 复制指定用例的步骤为当前用例的步骤
-    copyCaseStepAsStep(fromCase) {
+    copyCaseStepAsStep(from) {
       if (this.caseId) {
-        this.copyCaseStepUrl({ source: fromCase.id, to: this.caseId }).then(response => {
-          if (this.showMessage(this, response)) {
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo')
-            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess') // 重新请求用例更新变量
-          }
-        })
+        this.$set(from, 'copyStepPopoverIsShow', false)
+        this.$set(from, 'copyIsLoading', true)
+        if (from.suite_id) { // 复制用例下的步骤
+          this.copyCaseStepUrl({ source: from.id, to: this.caseId }).then(response => {
+            this.$set(from, 'copyIsLoading', false)
+            if (this.showMessage(this, response)) {
+              this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
+            }
+          })
+        } else { // 复制具体步骤
+          this.stepCopyUrl({ 'id': from.id, 'caseId': this.caseId }).then(response => {
+            this.$set(from, 'copyIsLoading', false)
+            if (this.showMessage(this, response)) {
+              this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
+            }
+          })
+        }
       } else {
         this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
       }
-    },
-
-    showCaseRemark(caseId) {
-      this.$bus.$emit(this.$busEvents.drawerIsCommit, 'showStepList', caseId)
     }
   }
 }

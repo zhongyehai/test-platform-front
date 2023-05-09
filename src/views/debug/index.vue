@@ -1,100 +1,137 @@
 <template>
-
-  <div style="margin: 20px">
-    <el-steps
-      :active="activeProcess"
-      align-center
-      finish-status="success"
-      :process-status="statusMapping[activeStatus]"
+  <div>
+    <el-table
+      :data="tableData"
+      style="width: 100%;margin-bottom: 20px;"
+      row-key="id"
+      border
+      default-expand-all
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-step title="触发执行" description="触发执行" />
-      <el-step title="解析数据" description="解析测试数据" />
-      <el-step title="执行测试" description="执行测试用例，时间会稍久，取决于用例设计" />
-      <el-step title="写入报告" description="用例执行完毕，写入测试报告" />
-    </el-steps>
+      <el-table-column
+        prop="date"
+        label="日期"
+        sortable
+        width="180"
+      />
+      <el-table-column
+        prop="name"
+        label="姓名"
+        sortable
+        width="180"
+      />
+      <el-table-column
+        prop="address"
+        label="地址"
+      />
+    </el-table>
 
+    <el-table
+      :data="tableData1"
+      style="width: 100%"
+      row-key="id"
+      border
+      lazy
+      :load="load"
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+    >
+      <el-table-column
+        prop="date"
+        label="日期"
+        width="180"
+      />
+      <el-table-column
+        prop="name"
+        label="姓名"
+        width="180"
+      />
+      <el-table-column
+        prop="address"
+        label="地址"
+      />
+    </el-table>
   </div>
-
 </template>
 <script>
-import { getReport as apiTestGetReport } from '@/apis/apiTest/report'
-import { getReport as appUiTestGetReport } from '@/apis/appUiTest/report'
-import { getReport as webUiTestGetReport } from '@/apis/webUiTest/report'
-import { runTestTimeOutMessage } from '@/utils/message'
-
 export default {
-  name: 'RunStep',
-
-  props: ['runType'],
-
   data() {
     return {
-      getReportUrl: '',
-      statusMapping: {
-        1: 'wait',
-        2: 'finish',
-        3: 'error',
-        4: 'success'
-      },
-      activeProcess: 3,
-      activeStatus: 4
+      tableData: [{
+        id: 1,
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: 2,
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        id: 3,
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄',
+        children: [{
+          id: 31,
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          id: 32,
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }]
+      }, {
+        id: 4,
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }],
+      tableData1: [{
+        id: 1,
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: 2,
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        id: 3,
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄',
+        hasChildren: true
+      }, {
+        id: 4,
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }]
     }
   },
-
-  created() {
-    // 根据运行类型初始化接口
-    if (this.runType === 'api') {
-      this.getReportUrl = apiTestGetReport
-    } else if (this.runType === 'webUi') {
-      this.getReportUrl = webUiTestGetReport
-    } else {
-      this.getReportUrl = appUiTestGetReport
-    }
-  },
-
-  mounted() {
-    // 监听 接口 Dialog 框 的提交状态，提交成功，则重新请求接口列表
-    this.$bus.$on(this.$busEvents.data.showRunProcess, (reportId) => {
-      this.getReport(reportId)
-    })
-  },
-
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.data.showRunProcess)
-  },
-
   methods: {
-
-    getReport(reportId) {
-      // 触发运行成功，每三秒查询一次，
-      // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
-      // 已出结果，则停止查询，展示测试报告
-      var that = this
-      var runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
-      var queryCount = 1
-      var timer = setInterval(function() {
-        if (queryCount <= runTimeoutCount) {
-          this.getReportUrl({ 'id': reportId }).then(response => {
-            this.activeProcess = response.data.process
-            this.activeStatus = response.data.status
-
-            if (response.data.process === 4 && response.data.status === 1) {
-              that.openReportById(reportId)
-              clearInterval(timer) // 关闭定时器
-            }
-          })
-          queryCount += 1
-        } else {
-          that.$notify(runTestTimeOutMessage(that))
-          clearInterval(timer) // 关闭定时器
-        }
-      }, 3000)
-    },
-
-    openReportById(reportId) {
-      // console.log(`task.index.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      const { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId }})
-      window.open(href, '_blank')
+    load(tree, treeNode, resolve) {
+      console.log('tree: ', tree)
+      console.log('treeNode: ', treeNode)
+      console.log('resolve: ', resolve)
+      setTimeout(() => {
+        resolve([
+          {
+            id: 31,
+            date: '2016-05-01',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1519 弄'
+          }, {
+            id: 32,
+            date: '2016-05-01',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1519 弄'
+          }
+        ])
+      }, 1000)
     }
   }
 }

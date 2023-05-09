@@ -156,9 +156,8 @@
           <el-button
             type="text"
             size="mini"
-            icon="el-icon-edit"
             @click.native="editConfig(scope.row)"
-          />
+          >修改</el-button>
         </template>
       </el-table-column>
 

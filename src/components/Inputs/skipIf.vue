@@ -28,7 +28,7 @@
             @change="selectValidateType($event, scope.row)"
           >
             <el-option
-              v-for="(item) in skipIfTypeMapping"
+              v-for="(item) in $busEvents.data.skipIfTypeMappingList"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -86,7 +86,7 @@
             @change="selectValidateType($event, scope.row)"
           >
             <el-option
-              v-for="(item) in validateTypeList"
+              v-for="(item) in $busEvents.data.apiTestAssertMappingList"
               :key="item.value"
               :label="item.value"
               :value="item.value"
@@ -110,7 +110,7 @@
                 size="mini"
               >
                 <el-option
-                  v-for="(item) in dataTypeMapping"
+                  v-for="(item) in $busEvents.data.dataTypeMappingList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -139,7 +139,7 @@
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
-              v-show="scope.$index === 0"
+              v-show="scope.$index === 0 || scope.$index === tempData.length - 1"
               type="text"
               size="mini"
               icon="el-icon-plus"
@@ -181,15 +181,15 @@ import Sortable from 'sortablejs'
 
 export default {
   name: 'SkipIf',
-  props: ['skipIfData', 'use_type'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'skipIfData', 'useType'
+  ],
 
   data() {
     return {
-      validateTypeList: [],
       tempData: [],
-      dataTypeMapping: [],
       skipIfDataSourceMapping: [],
-      skipIfTypeMapping: [],
       sortable: null,
       oldList: [],
       newList: []
@@ -205,13 +205,8 @@ export default {
   },
 
   mounted() {
-    if (this.skipIfDataSourceMapping.length === 0) {
-      this.getSkipIfDataSourceMappings()
-    }
-
-    this.skipIfTypeMapping = this.$busEvents.data.skipIfTypeMappingList
-    this.validateTypeList = this.$busEvents.data.apiTestAssertMappingList
-    this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList
+    // 判断是否跳过的数据源
+    this.skipIfDataSourceMapping = this.useType === 'step' ? this.$busEvents.data.stepSkipIfDataSourceMapping : this.$busEvents.data.caseSkipIfDataSourceMapping
 
     this.initTempData(this.skipIfData)
     this.oldList = this.tempData.map(v => v.id)
@@ -222,13 +217,6 @@ export default {
   },
 
   methods: {
-
-    // 从后端获取跳过数据源
-    getSkipIfDataSourceMappings() {
-      getSkipIfDataSourceMapping({ type: this.use_type }).then(response => {
-        this.skipIfDataSourceMapping = response.data
-      })
-    },
 
     // 根据选择的数据源显示不同的提示
     getDataSourcePlaceholder(_type) {

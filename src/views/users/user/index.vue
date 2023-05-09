@@ -183,7 +183,7 @@
         <el-form-item :label="'业务线'" class="is-required" size="mini">
           <businessView
             ref="businessView"
-            :current-business="tempUser.business_id"
+            :current-business="tempUser.business_list"
             :is-multiple="true"
             :select-width="'97%'"
           />
@@ -258,7 +258,7 @@ export default {
         name: undefined,
         account: undefined,
         role_list: [],
-        business_id: [],
+        business_list: [],
         password: undefined
       },
 
@@ -336,7 +336,7 @@ export default {
         account: undefined,
         password: undefined,
         role_list: [],
-        business_id: [this.commonBusiness]
+        business_list: [this.commonBusiness]
       }
     },
 
@@ -355,7 +355,7 @@ export default {
       this.tempUser.name = row.name
       this.tempUser.account = row.account
       this.tempUser.password = row.password
-      this.tempUser.business_id = row.business_id
+      this.tempUser.business_list = row.business_list
       userRoles({ id: row.id }).then(response => {
         this.tempUser.role_list = response.data
       })
@@ -393,7 +393,7 @@ export default {
     // 新增用户
     addUser() {
       this.submitButtonIsLoading = true
-      this.tempUser.business_id = this.$refs.businessView.business
+      this.tempUser.business_list = this.$refs.businessView.business
       postUser(this.tempUser).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
@@ -407,7 +407,7 @@ export default {
     // 修改用户
     changUser() {
       this.submitButtonIsLoading = true
-      this.tempUser.business_id = this.$refs.businessView.business
+      this.tempUser.business_list = this.$refs.businessView.business
       putUser(this.tempUser).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {

@@ -35,15 +35,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'查看详情'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip="true">
+      <el-table-column :label="'操作'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip="true">
         <template slot-scope="{row, $index}">
 
           <el-button
             size="mini"
-            icon="el-icon-view"
             type="text"
             @click="showDetail(row)"
-          />
+          >查看详情</el-button>
 
         </template>
       </el-table-column>
@@ -62,7 +61,6 @@
     <el-drawer
       :title="currentRow.name"
       size="70%"
-      :wrapper-closable="false"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >

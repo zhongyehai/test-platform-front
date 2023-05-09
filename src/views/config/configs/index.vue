@@ -120,19 +120,11 @@
 
       <el-table-column label="操作" align="center" min-width="7%">
         <template slot-scope="scope">
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="若不清楚配置的规则，请勿修改"
-            placement="right-end"
-          >
-            <el-button
-              type="text"
-              size="mini"
-              icon="el-icon-edit"
-              @click.native="editConfig(scope.row)"
-            />
-          </el-tooltip>
+          <el-button
+            type="text"
+            size="mini"
+            @click.native="editConfig(scope.row)"
+          >修改</el-button>
         </template>
       </el-table-column>
 

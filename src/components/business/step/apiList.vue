@@ -15,6 +15,7 @@
             v-show="queryAddr"
             type="primary"
             size="mini"
+            :loading="queryAddrIsLoading"
             style="margin-left: 5px"
             @click.native="getApiMsgBelongTo()"
           >查归属
@@ -23,6 +24,7 @@
             v-show="queryAddr"
             type="primary"
             size="mini"
+            :loading="queryAddrIsLoading"
             style="margin-left: 5px"
             @click.native="getApiMsgBelongToStep()"
           >查使用情况
@@ -81,9 +83,9 @@
               class="block"
               :class="`block_${scope.row.method.toLowerCase()}`"
               :style="{
-                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
-                  'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
-                }"
+                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
+                'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+              }"
             >
               <span
                 class="block-method block_method_color"
@@ -149,11 +151,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'projectId',
-    // eslint-disable-next-line vue/require-prop-types
-    'dialogIsShow',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentCaseId'
+    'projectId', 'currentCaseId'
   ],
   data() {
     return {
@@ -163,6 +161,8 @@ export default {
       currentProjectId: '',
       moduleId: '',
       caseId: '',
+
+      queryAddrIsLoading: false,
 
       apiList: {
         total: 0,
@@ -207,7 +207,9 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
+      this.queryAddrIsLoading = true
       apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
@@ -216,7 +218,9 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
+      this.queryAddrIsLoading = true
       apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
@@ -229,7 +233,7 @@ export default {
       const temp = []
       const treeArr = arr
       treeArr.forEach((item, index) => {
-        if (item.parent == parentId) {
+        if (item.parent === parentId) {
           if (this.arrayToTree(treeArr, treeArr[index].id).length > 0) {
             // 递归调用此函数
             treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id)

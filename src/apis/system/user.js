@@ -56,4 +56,3 @@ export function putUser(data) {
 export function deleteUser(data) {
   return Func('delete', data)
 }
-

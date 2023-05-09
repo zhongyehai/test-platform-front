@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
 
-    <el-form label-width="120px" :inline="true">
+    <el-form label-width="80px" :inline="true">
 
       <el-form-item :label="'业务线：'" size="mini">
         <el-input
@@ -57,6 +57,14 @@
         添加业务线
       </el-button>
 
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="primary"
+        size="mini"
+        @click.native="showBusinessToUserDrawer()"
+      >绑定管理</el-button>
+
     </el-form>
 
     <el-table
@@ -97,19 +105,12 @@
 
       <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="修改"
-            placement="top-start"
-          >
-            <el-button
-              type="text"
-              size="mini"
-              @click.native="showAddBusinessDialog(scope.row)"
-            >修改
-            </el-button>
-          </el-tooltip>
+          <el-button
+            type="text"
+            size="mini"
+            @click.native="showAddBusinessDialog(scope.row)"
+          >修改
+          </el-button>
         </template>
       </el-table-column>
 
@@ -203,6 +204,8 @@
       </div>
     </el-drawer>
 
+    <businessToUser />
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -216,6 +219,7 @@
 <script>
 import Pagination from '@/components/Pagination/index.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
+import businessToUser from './businessToUser.vue'
 import { businessList, postBusiness, putBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
 import { runEnvList } from '@/apis/config/runEnv'
@@ -224,6 +228,7 @@ export default {
   name: 'Index',
   components: {
     Pagination,
+    businessToUser,
     oneColumnRow
   },
   data() {
@@ -288,6 +293,15 @@ export default {
       const checkedCount = value.length
       this.checkAll = checkedCount === this.run_env_list.length
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.run_env_list.length
+    },
+
+    showBusinessToUserDrawer() {
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'businessToUser',
+        JSON.parse(JSON.stringify(this.list)),
+        JSON.parse(JSON.stringify(this.currentUserList))
+      )
     },
 
     // 获取用户信息，同步请求

@@ -69,10 +69,9 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            icon="el-icon-download"
             :loading="scope.row.downloadLoadingIsShow"
             @click.native="downloadFile(scope.row)"
-          />
+          >下载</el-button>
 
           <!-- 删除文件 -->
           <el-popover
@@ -91,9 +90,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            />
+            >删除</el-button>
           </el-popover>
         </template>
       </el-table-column>

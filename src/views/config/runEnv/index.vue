@@ -57,10 +57,18 @@
         style="margin-left: 10px"
         type="primary"
         size="mini"
-        @click="showAddRunEnvDialog()"
+        @click="showAddRunEnvDrawer()"
       >
         添加环境
       </el-button>
+
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="primary"
+        size="mini"
+        @click.native="showRunEnvToBusinessDrawer()"
+      >绑定管理</el-button>
 
     </el-form>
 
@@ -105,19 +113,11 @@
 
       <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="修改"
-            placement="top-start"
-          >
-            <el-button
-              type="text"
-              size="mini"
-              icon="el-icon-edit"
-              @click.native="showAddRunEnvDialog(scope.row)"
-            />
-          </el-tooltip>
+          <el-button
+            type="text"
+            size="mini"
+            @click.native="showAddRunEnvDrawer(scope.row)"
+          >修改</el-button>
         </template>
       </el-table-column>
 
@@ -173,7 +173,7 @@
         </el-form-item>
 
         <el-form-item :label="'备注'" size="mini">
-          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini"/>
+          <el-input v-model="tempRunEnv.desc" type="textarea" autosize size="mini" />
         </el-form-item>
 
       </el-form>
@@ -191,6 +191,8 @@
       </div>
     </el-drawer>
 
+    <runEnvToBusiness />
+
     <pagination
       v-show="run_env_total>0"
       :total="run_env_total"
@@ -204,12 +206,14 @@
 <script>
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
+import runEnvToBusiness from './runEnvToBusiness.vue'
 import { runEnvList, postRunEnv, putRunEnv, runEnvSort, runEnvGroupList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Index',
   components: {
-    Pagination
+    Pagination,
+    runEnvToBusiness
   },
   data() {
     return {
@@ -258,7 +262,11 @@ export default {
 
   methods: {
 
-    showAddRunEnvDialog(row) {
+    showRunEnvToBusinessDrawer(row) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'runEnvToBusiness', JSON.parse(JSON.stringify(this.run_env_list)))
+    },
+
+    showAddRunEnvDrawer(row) {
       if (row) {
         this.tempRunEnv = JSON.parse(JSON.stringify(row))
         this.drawerType = 'edit'

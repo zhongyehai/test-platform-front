@@ -97,7 +97,7 @@
                 <oneColumnRow
                   ref="webhookListInput"
                   :current-data="tempTask.webhook_list"
-                ></oneColumnRow>
+                />
               </el-form-item>
             </div>
 
@@ -126,7 +126,7 @@
                 <oneColumnRow
                   ref="emailToInput"
                   :current-data="tempTask.email_to"
-                ></oneColumnRow>
+                />
               </el-form-item>
             </div>
           </div>
@@ -582,8 +582,13 @@ export default {
 
     // 获取服务id对应的用例集列表
     getCaseSuiteByProjectId(project_id) {
-      this.caseSuiteListUrl({ 'projectId': project_id }).then(response => {
-        const response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data;
+      this.caseSuiteListUrl({
+        'pageNum': 1,
+        'pageSize': 9999,
+        'project_id': project_id,
+        'suite_type': ['api', 'process']
+      }).then(response => {
+        const response_data = JSON.stringify(response.data.data) === '{}' ? [] : response.data.data
         this.tempCaseSuiteList = arrayToTree(response_data, null)
 
         // 默认获取第一个用例集的用例

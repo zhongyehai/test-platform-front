@@ -31,7 +31,7 @@
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button
-            v-show="scope.$index === 0"
+            v-show="scope.$index === 0 || scope.$index === tempData.length - 1"
             type="text"
             size="mini"
             icon="el-icon-plus"
@@ -67,7 +67,7 @@
 import Sortable from 'sortablejs'
 
 export default {
-  name: 'oneColumnRow',
+  name: 'OneColumnRow',
   props: [
     'currentData',
     'placeholderKey',
@@ -113,7 +113,7 @@ export default {
     },
 
     initTempData(data) {
-      if (data && data.length > 0) {  // 有数据
+      if (data && data.length > 0) { // 有数据
         this.tempData = []
         this.currentData.forEach(data => {
           this.tempData.push({
@@ -121,7 +121,6 @@ export default {
             key: data
           })
         })
-
       } else {
         this.addRow()
       }
@@ -143,10 +142,10 @@ export default {
     },
 
     // 获取数据
-    getData(){
+    getData() {
       const dataList = []
       this.tempData.forEach(data => {
-        if (data.key){
+        if (data.key) {
           dataList.push(data.key)
         }
       })

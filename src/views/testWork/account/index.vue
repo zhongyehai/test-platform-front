@@ -87,9 +87,8 @@
             type="text"
             size="mini"
             style="margin-right: 10px"
-            icon="el-icon-edit"
             @click="showDialog(scope.row)"
-          />
+          >修改</el-button>
 
           <!-- 删除账号 -->
           <el-popover
@@ -108,9 +107,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.deleteButtonIsLoading"
-            />
+            >删除</el-button>
           </el-popover>
 
         </template>

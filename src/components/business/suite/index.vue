@@ -13,7 +13,7 @@
           default-first-option
           @change="getSuiteList"
         >
-          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id"/>
+          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
 
         <!--        <el-button-->
@@ -39,6 +39,7 @@
           v-show="queryAddr"
           type="primary"
           size="mini"
+          :loading="queryAddrIsLoading"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongTo()"
         >查归属
@@ -47,6 +48,7 @@
           v-show="queryAddr"
           type="primary"
           size="mini"
+          :loading="queryAddrIsLoading"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongToStep()"
         >查使用情况
@@ -77,7 +79,7 @@
 
             <div class="custom-tree-container">
               <div class="block">
-                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini"/>
+                <el-input v-model="filterText" placeholder="输入关键字进行过滤" size="mini" />
                 <el-tree
                   ref="tree"
                   class="project-tree"
@@ -177,8 +179,26 @@
         label-width="100px"
         style="min-width: 400px;margin-left: 20px;margin-right: 20px"
       >
+        <el-form-item :label="'用例集类型'" class="filter-item is-required" prop="name" size="mini">
+          <el-select
+            v-model="tempDataForm.suite_type"
+            default-first-option
+            size="mini"
+            :disabled="isDisabled()"
+            style="width: 100%"
+            placeholder="请选择用例集类型"
+            class="filter-item"
+          >
+            <el-option
+              v-for="suiteType in suiteTypeList"
+              :key="suiteType.key"
+              :label="suiteType.value"
+              :value="suiteType.key"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="'用例集名称'" class="filter-item is-required" prop="name" size="mini">
-          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复"/>
+          <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复" />
         </el-form-item>
       </el-form>
       <div class="demo-drawer__footer">
@@ -198,12 +218,12 @@
       :data-type="dataType"
       :project-business-id="projectBusinessId"
     />
-
+    <!--    :use-from="'caseIndex'"-->
     <runProcess
       :data-type="dataType"
     />
 
-    <ApiEditDrawer/>
+    <ApiEditDrawer />
 
     <showApiFromDrawer
       v-if="dataType === 'api'"
@@ -228,39 +248,42 @@ import ApiEditDrawer from '@/views/apiTest/api/drawer.vue'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
-import {getFindElementOption} from '@/utils/getConfig'
-import {ellipsis, arrayToTree} from '@/utils/parseData'
+import { getFindElementOption } from '@/utils/getConfig'
+import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import {apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping} from '@/apis/apiTest/api' // 接口引用
-import {projectList as apiProjectList} from '@/apis/apiTest/project'
+import { apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping } from '@/apis/apiTest/api' // 接口引用
+import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import {
-  caseSuiteTree as apiCaseSuiteTree,
+  getCaseSuite as apiGetCaseSuite,
+  caseSuiteList as apiCaseSuiteTree,
   caseSuiteRun as apiCaseSuiteRun,
   deleteCaseSuite as apiDeleteCaseSuite,
   postCaseSuite as apiPostCaseSuite,
   putCaseSuite as apiPutCaseSuite
 } from '@/apis/apiTest/caseSuite'
 
-import {projectList as webUiProjectList} from '@/apis/webUiTest/project'
+import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 import {
-  caseSuiteTree as webUiCaseSuiteTree,
+  getCaseSuite as webUiGetCaseSuite,
+  caseSuiteList as webUiCaseSuiteTree,
   caseSuiteRun as webUiCaseSuiteRun,
   deleteCaseSuite as webUiDeleteCaseSuite,
   postCaseSuite as webUiPostCaseSuite,
   putCaseSuite as webUiPutCaseSuite
 } from '@/apis/webUiTest/caseSuite'
 
-import {projectList as appUiProjectList} from '@/apis/appUiTest/project'
+import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import {
-  caseSuiteTree as appUiCaseSuiteTree,
+  getCaseSuite as appUiGetCaseSuite,
+  caseSuiteList as appUiCaseSuiteTree,
   caseSuiteRun as appUiCaseSuiteRun,
   deleteCaseSuite as appUiDeleteCaseSuite,
   postCaseSuite as appUiPostCaseSuite,
   putCaseSuite as appUiPutCaseSuite
 } from '@/apis/appUiTest/caseSuite'
-import {getConfigByName, getSkipIfTypeMapping} from '@/apis/config/config'
-import {extractMappingList, keyBoardCodeMappingList} from '@/apis/webUiTest/step'
-import {phoneList, serverList} from '@/apis/appUiTest/env'
+import { getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping } from '@/apis/config/config'
+import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
+import { phoneList, serverList } from '@/apis/appUiTest/env'
 
 export default {
   name: 'Index',
@@ -272,7 +295,8 @@ export default {
     showApiUseDrawer,
     ApiEditDrawer
   },
-  directives: {waves},
+  directives: { waves },
+  // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
   data() {
     return {
@@ -283,18 +307,14 @@ export default {
       filterText: '', // 查询关键字
       projectListData: [], // 项目列表
       currentProjectId: '', // 当前选中的项目id
+      suiteTypeList: [], // 用例集类型列表
       setListData: [], // 用例集列表
       currentSuiteId: '', // 当前选中的用例集id，用于数据传递，获取用例列表
       currentSuiteIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
       currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
-      tempDataForm: {
-        name: '',
-        id: '',
-        level: '',
-        parent: '',
-        project_id: ''
-      },
+      tempDataForm: {},
+      queryAddrIsLoading: false,
       projectBusinessId: '',
       queryAddr: '',
       marker: 'suite',
@@ -308,6 +328,7 @@ export default {
       runSuiteData: undefined,
       projectListUrl: '',
       caseSuiteTreeUrl: '',
+      getCaseSuiteUrl: '',
       caseSuiteRunUrl: '',
       deleteCaseSuiteUrl: '',
       postCaseSuiteUrl: '',
@@ -323,6 +344,7 @@ export default {
 
   created() {
     if (this.dataType === 'api') {
+      this.getCaseSuiteUrl = apiGetCaseSuite
       this.projectListUrl = apiProjectList
       this.caseSuiteTreeUrl = apiCaseSuiteTree
       this.caseSuiteRunUrl = apiCaseSuiteRun
@@ -330,6 +352,7 @@ export default {
       this.postCaseSuiteUrl = apiPostCaseSuite
       this.putCaseSuiteUrl = apiPutCaseSuite
     } else if (this.dataType === 'webUi') {
+      this.getCaseSuiteUrl = webUiGetCaseSuite
       this.projectListUrl = webUiProjectList
       this.caseSuiteTreeUrl = webUiCaseSuiteTree
       this.caseSuiteRunUrl = webUiCaseSuiteRun
@@ -337,10 +360,11 @@ export default {
       this.postCaseSuiteUrl = webUiPostCaseSuite
       this.putCaseSuiteUrl = webUiPutCaseSuite
       getFindElementOption(this) // 获取定位方式
-      getConfigByName({'name': 'browser_name'}).then(response => {
+      getConfigByName({ 'name': 'browser_name' }).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
       })
     } else {
+      this.getCaseSuiteUrl = appUiGetCaseSuite
       this.projectListUrl = appUiProjectList
       this.caseSuiteTreeUrl = appUiCaseSuiteTree
       this.caseSuiteRunUrl = appUiCaseSuiteRun
@@ -360,14 +384,34 @@ export default {
   },
 
   mounted() {
+    // 获取用例集类型
+    getConfigByName({ 'name': 'suite_type' }).then(response => {
+      this.suiteTypeList = response.data
+    })
+
     // 从后端获取数据类型映射
-    getConfigByName({'name': 'data_type_mapping'}).then(response => {
+    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
       this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+    })
+
+    // 从后端获取跳过方式映射
+    getSkipIfTypeMapping().then(response => {
+      this.$busEvents.data.skipIfTypeMappingList = response.data
+    })
+
+    // 从后端获取跳过条件映射
+    getSkipIfDataSourceMapping({ type: 'case' }).then(response => {
+      this.$busEvents.data.caseSkipIfDataSourceMapping = response.data
+    })
+
+    // 从后端获取跳过条件映射
+    getSkipIfDataSourceMapping({ type: 'step' }).then(response => {
+      this.$busEvents.data.stepSkipIfDataSourceMapping = response.data
     })
 
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {
-      getConfigByName({'name': 'app_key_code'}).then(response => {
+      getConfigByName({ 'name': 'app_key_code' }).then(response => {
         this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
       })
     }
@@ -384,7 +428,7 @@ export default {
 
     // 从后端获取响应对象数据源映射
     if (this.dataType === 'api') {
-      getConfigByName({'name': 'response_data_source_mapping'}).then(response => {
+      getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
         this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
       })
 
@@ -398,11 +442,6 @@ export default {
         this.$busEvents.data.uiTestExtractMappingList = response.data
       })
     }
-
-    // 从后端获取跳过方式映射
-    getSkipIfTypeMapping().then(response => {
-      this.$busEvents.data.skipIfTypeMappingList = response.data
-    })
 
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
       if (_type === 'selectRunEnv' && _runUnit === 'set') {
@@ -418,6 +457,26 @@ export default {
 
   methods: {
 
+    // 判断用例集类型是否可编辑
+    isDisabled() {
+      // 管理员不限制
+      if (localStorage.getItem('permissions').indexOf('admin') !== -1) {
+        return false
+      }
+      return this.currentLevelForCommit !== 1 || this.moduleDrawerStatus !== 'add'
+    },
+
+    initNewSuite() {
+      this.tempDataForm = {
+        name: '',
+        id: '',
+        level: this.currentLevelForCommit + 1,
+        suite_type: '',
+        parent: this.currentSuiteIdForCommit || null,
+        project_id: this.currentProjectId
+      }
+    },
+
     // el-dropdown 的展开/隐藏状态
     changeDropdownStatus(status) {
       this.dropdownStatus = status
@@ -432,7 +491,12 @@ export default {
 
     // 发送用例集树数据
     sendSuiteTreeIsDone(caseSuiteTree) {
-      this.$bus.$emit(this.$busEvents.treeIsDone, 'caseSuite', JSON.parse(JSON.stringify(caseSuiteTree)))
+      this.$bus.$emit(
+        this.$busEvents.treeIsDone,
+        'caseSuite',
+        JSON.parse(JSON.stringify(caseSuiteTree)),
+        'caseIndex'
+      )
     },
 
     // 获取用例集列表
@@ -441,15 +505,15 @@ export default {
       this.currentSuiteIdForCommit = '' // 切换项目的时候，把选中用例集置为''
       this.currentParent = {}
       this.currentLevelForCommit = 1 // 切换项目的时候，把选中用例集置为''
-      this.caseSuiteTreeUrl({'project_id': projectId}).then(response => {
-        var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
+      this.caseSuiteTreeUrl({ 'project_id': projectId }).then(response => {
+        var response_data = JSON.stringify(response.data.data) === '{}' ? [] : response.data.data
         this.setListData = arrayToTree(response_data, null)
         this.sendSuiteTreeIsDone(this.setListData)
       })
 
       // 获取所选服务的业务线id
-      this.projectListData.forEach(project =>{
-        if (project.id === projectId){
+      this.projectListData.forEach(project => {
+        if (project.id === projectId) {
           this.projectBusinessId = project.business_id
         }
       })
@@ -492,20 +556,20 @@ export default {
     // 打开用例集编辑框
     showCaseSuiteDialog(command, node, data) {
       this.moduleDrawerStatus = command
-      this.tempDataForm.name = command === 'edit' ? data.name : ''
+      if (command === 'edit') {
+        this.getCaseSuiteUrl({ id: data.id }).then(response => {
+          this.tempDataForm = response.data
+        })
+      } else {
+        this.initNewSuite()
+      }
       this.moduleDrawerIsShow = true
     },
 
     // 添加用例集
     addCaseSuite() {
       this.isShowLoading = true
-      this.postCaseSuiteUrl({
-        name: this.tempDataForm.name,
-        id: '',
-        level: this.currentLevelForCommit + 1,
-        parent: this.currentSuiteIdForCommit || null,
-        project_id: this.currentProjectId
-      }).then(response => {
+      this.postCaseSuiteUrl(this.tempDataForm).then(response => {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
           this.moduleDrawerIsShow = false
@@ -528,13 +592,7 @@ export default {
     // 修改用例集
     changCaseSuite() {
       this.isShowLoading = true
-      this.putCaseSuiteUrl({
-        name: this.tempDataForm.name,
-        id: this.currentParent.id,
-        level: this.currentParent.level,
-        parent: this.currentParent.parent,
-        project_id: this.currentParent.project_id
-      }).then(response => {
+      this.putCaseSuiteUrl(this.tempDataForm).then(response => {
         this.isShowLoading = false
         if (this.showMessage(this, response)) {
           this.moduleDrawerIsShow = false
@@ -558,7 +616,7 @@ export default {
 
     // 删除节点
     deleteChild(data) {
-      this.deleteCaseSuiteUrl({'id': data.id}).then(response => {
+      this.deleteCaseSuiteUrl({ 'id': data.id }).then(response => {
         if (this.showMessage(this, response)) {
           this.$refs.tree.remove(data)
 
@@ -569,7 +627,13 @@ export default {
 
     // 添加用例
     addCase(node, data) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'add')
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'caseInfo',
+        'add',
+        null,
+        'caseIndex'
+      )
     },
 
     // 点击运行测试用例集
@@ -609,7 +673,9 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
-      apiMsgBelongTo({addr: this.queryAddr}).then(response => {
+      this.queryAddrIsLoading = true
+      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
@@ -618,7 +684,9 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
-      apiMsgBelongToStep({addr: this.queryAddr}).then(response => {
+      this.queryAddrIsLoading = true
+      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }

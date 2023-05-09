@@ -62,19 +62,17 @@
             slot="reference"
             type="text"
             size="mini"
-            icon="el-icon-video-play"
             :loading="scope.row.isShowRunLoading"
             @click="runServer(scope.row)"
-          />
+          >访问</el-button>
 
           <!-- 修改服务器 -->
           <el-button
             type="text"
             size="mini"
-            icon="el-icon-edit"
             style="margin-right: 10px"
             @click.native="showDrawer(scope.row)"
-          />
+          >修改</el-button>
 
           <!-- 复制服务器 -->
           <el-popover
@@ -93,9 +91,8 @@
               slot="reference"
               type="text"
               size="mini"
-              icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
-            />
+            >复制</el-button>
           </el-popover>
 
           <!-- 删除服务器 -->
@@ -115,9 +112,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            />
+            >删除</el-button>
           </el-popover>
 
         </template>
@@ -208,7 +204,6 @@
 
 <script>
 import Sortable from 'sortablejs'
-import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 
 import {
@@ -225,7 +220,7 @@ import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappi
 
 export default {
   name: 'Index',
-  components: { Pagination, projectTreeView },
+  components: { Pagination },
   data() {
     return {
       tableLoadingIsShow: false,

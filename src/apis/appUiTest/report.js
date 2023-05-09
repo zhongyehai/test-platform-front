@@ -18,8 +18,8 @@ export function getReport(params) {
 }
 
 // 报告列表
-export function reportList(params) {
-  return request({ url: reportDir + '/list', method: 'get', data: null, params: params })
+export function reportList(data) {
+  return request({ url: reportDir + '/list', method: 'post', data: data })
 }
 
 // 下载报告

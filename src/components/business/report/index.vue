@@ -24,10 +24,10 @@
 
               <el-form-item label="环境" size="mini">
                 <el-select
-                  v-model="query.env"
+                  v-model="query.env_list"
                   placeholder="运行环境"
                   size="mini"
-                  filterable
+                  multiple
                   clearable
                   default-first-option
                 >
@@ -99,8 +99,11 @@
                 placement="top"
                 popper-class="down-popover"
               >
-                <p>确定删除所选中的测试报告?</p>
-                <p style="color: red">关联了失败记录的测试报告不会被删除</p>
+                确定删除所选中的测试报告?
+                <div style="color: red">
+                  1、关联了问题记录的测试报告不会被删除 <br>
+                  2、触发方式为【定时任务】或者【流水线】的，只有管理员能删除
+                </div>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelBatchDeletePopover()">取消</el-button>
                   <el-button type="primary" size="mini" @click="delReport">确定</el-button>
@@ -202,8 +205,11 @@
                     placement="top"
                     popper-class="down-popover"
                   >
-                    <p>确定删除【{{ scope.row.name }}】?</p>
-                    <p style="color: red">关联了失败记录的测试报告不会被删除</p>
+                    确定删除【{{ scope.row.name }}】?
+                    <div style="color: red">
+                      1、关联了问题记录的测试报告不会被删除 <br>
+                      2、触发方式为【定时任务】或者【流水线】的，只有管理员能删除
+                    </div>
                     <div style="text-align: right; margin: 0">
                       <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
                       <el-button type="primary" size="mini" @click="delReport(scope.row)">确定</el-button>
@@ -222,8 +228,8 @@
             </el-table>
 
             <pagination
-              v-show="query.total>0"
-              :total="query.total"
+              v-show="queryTotal>0"
+              :total="queryTotal"
               :page.sync="query.pageNum"
               :limit.sync="query.pageSize"
               @pagination="getReportList"
@@ -271,7 +277,10 @@ import {
 export default {
   name: 'Index',
   components: { Pagination, projectTreeView },
-  props: ['dataType'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType'
+  ],
   data() {
     return {
       reportTab: 'reportTab',
@@ -281,12 +290,12 @@ export default {
       query: {
         pageNum: 0,
         pageSize: 20,
-        total: 0,
         projectName: undefined,
         createUser: undefined,
-        env: undefined,
+        env_list: [],
         run_type: undefined
       },
+      queryTotal: 0,
       userList: [],
       eventDict: {},
       eventList: {},
@@ -320,7 +329,7 @@ export default {
 
         this.query.pageNum = 1
         this.query.pageSize = 20
-        this.query.total = 0
+        this.queryTotal = 0
         this.getReportList()
       }
     })
@@ -368,7 +377,7 @@ export default {
       this.query.projectId = this.projectId
       this.reportListUrl(this.query).then(response => {
         this.reportDataList = response.data.data
-        this.query.total = response.data.total
+        this.queryTotal = response.data.total
       })
     },
 

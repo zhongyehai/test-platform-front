@@ -9,8 +9,11 @@ export default {
     businessList: [], // 业务线列表
     businessDict: {}, // 业务线字典
 
-    dataTypeMappingList: [], // 数据类型枚举
     skipIfTypeMappingList: [], // 跳过类型枚举
+    caseSkipIfDataSourceMapping: [], // 跳过数据源枚举 - 用例
+    stepSkipIfDataSourceMapping: [], // 跳过数据源枚举 - 步骤
+
+    dataTypeMappingList: [], // 数据类型枚举
 
     responseDataSourceMappingList: [], // 接口响应数据源枚举
 

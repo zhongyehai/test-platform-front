@@ -32,11 +32,6 @@ export function caseSuiteList(params) {
   return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
-// 获取用例集树
-export function caseSuiteTree(params) {
-  return request({ url: currentBaseDir + '/tree', method: 'get', params: params })
-}
-
 // 运行用例集下的用例
 export function caseSuiteRun(data) {
   return request({ url: currentBaseDir + '/run', method: 'post', data: data })

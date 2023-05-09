@@ -423,6 +423,11 @@ export default {
           // 获取元素信息
           this.getElementUrl({ id: step.element_id }).then(response => {
             this.currentElement = response.data
+
+            // 获取当前步骤对应元素所在页面的所有元素
+            this.elementListUrl({ pageId: this.currentElement.page_id }).then(response => {
+              this.tempElementList = response.data.data
+            })
           })
           this.currentStep = step
           this.currentStepCopy = JSON.parse(JSON.stringify(step)) // 深拷贝
@@ -432,11 +437,6 @@ export default {
         // 获取元素归属
         this.elementFromUrl({ id: this.currentStep.element_id }).then(response => {
           this.$set(this.currentElement, 'elementFrom', response.message)
-        })
-
-        // 获取当前步骤对应元素所在页面的所有元素
-        this.elementListUrl({ pageId: step.page_id }).then(response => {
-          this.tempElementList = response.data.data
         })
       }
     })

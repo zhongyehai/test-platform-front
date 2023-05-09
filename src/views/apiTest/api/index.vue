@@ -150,6 +150,7 @@
                 </div>
                 <el-tag
                   v-if="scope.row.quote_count"
+                  :loading="queryApiMsgBelongToStepIsLoading"
                   @click="getApiMsgBelongToStep(scope.row)"
                 >
                   {{ scope.row.quote_count }}
@@ -301,6 +302,8 @@ export default {
         'P2': '#67C23A'
       },
 
+      queryApiMsgBelongToStepIsLoading: false,
+
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -365,7 +368,9 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep(row) {
+      this.queryApiMsgBelongToStepIsLoading = true
       apiMsgBelongToStep({ id: row.id }).then(response => {
+        this.queryApiMsgBelongToStepIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }

@@ -76,7 +76,7 @@
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button
-            v-show="scope.$index === 0"
+            v-show="scope.$index === 0 || scope.$index === tempData.length - 1"
             type="text"
             size="mini"
             icon="el-icon-plus"

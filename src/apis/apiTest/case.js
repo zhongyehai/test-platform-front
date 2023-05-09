@@ -76,3 +76,8 @@ export function caseSort(data) {
 export function caseFrom(params) {
   return request({ url: currentBaseDir + '/from', method: 'get', params: params })
 }
+
+// 获取用例所属的服务
+export function caseProject(params) {
+  return request({ url: currentBaseDir + '/project', method: 'get', params: params })
+}

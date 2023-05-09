@@ -15,26 +15,12 @@
           </span>
         </label>
       </div>
-      <div style="margin-top: 10px">
-        <el-checkbox
-          v-model="checkAll"
-          :indeterminate="isIndeterminate"
-          @change="handleCheckAllChange"
-        >全选
-        </el-checkbox>
-        <div style="margin: 15px 0;" />
-        <el-checkbox-group v-model="runEnv" @change="handleCheckedItemChange">
-          <div v-for="(group, index) in envGroupList" :key="index">
-            <div style="margin: 15px 0;" />
-            <el-checkbox disabled>{{ group }}</el-checkbox>
-            <br>
-            <el-checkbox v-for="(env) in envGroupDataList[group]" :key="env.code" :label="env.code">{{
-              env.name
-            }}
-            </el-checkbox>
-          </div>
-        </el-checkbox-group>
-      </div>
+      <runEnvCheckbox
+        ref="runEnvCheckbox"
+        :env-list="runEnvDataSource"
+        :get-item="'code'"
+      />
+
     </div>
 
     <!-- 选择运行浏览器 -->
@@ -171,22 +157,22 @@
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
 import { getRunModel } from '@/apis/config/config'
-import { runEnvGroupList, runEnvList } from '@/apis/config/runEnv'
+import { runEnvList } from '@/apis/config/runEnv'
 import { getRunTimeout } from '@/utils/getConfig'
+import runEnvCheckbox from '@/components/Selector/runEnvCheckbox.vue'
 
 export default {
   name: 'SelectRunEnv',
+  components: { runEnvCheckbox },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType',
-    // eslint-disable-next-line vue/require-prop-types
-    'projectBusinessId'
+    'dataType', 'projectBusinessId'
   ],
   data() {
     return {
       dialogIsShow: false,
       runModeData: {},
-      runEnv: [],
+
       runBrowser: undefined,
       runServer: undefined,
       runPhone: undefined,
@@ -194,47 +180,29 @@ export default {
       runUnit: 'api',
       runType: '0',
       showSelectRunModel: false,
-
-      checkAll: false,
-      isIndeterminate: true,
-      runEnvDataSource: [],
-      envCodeList: [], // ['envCode1', 'envCode2']
-      envGroupList: [], // ['qa', 'dev']
-      envGroupDataList: {
-        // dev: [{'envCode': 'envName'}],
-        // test: [{'envCode': 'envName'}]
-      },
-
+      runEnvDataSource: [], // 运行环境list
       statusContentMapping: appiumServerRequestStatusMappingContent,
       statusTagTypeMapping: appiumServerRequestStatusMappingTagType
     }
   },
 
   mounted() {
-    // 获取环境分组
-    runEnvGroupList().then(res => {
-      this.envGroupList = res.data
-      res.data.forEach(group => {
-        this.envGroupDataList[group] = []
-      })
-    })
-
     getRunTimeout(this) // 初始化等待用例运行超时时间
 
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, runUnit, showSelectRunModel, business_id) => {
       if (_type === 'selectRunEnv') {
         this.runUnit = runUnit
         this.showSelectRunModel = showSelectRunModel
         if (this.dataType === 'api') {
           this.initRunMode()
-          this.initEnvList()
+          this.initEnvList(business_id)
         } else if (this.dataType === 'appUi') {
           this.getRunAppEnv()
           this.noReset = false
         } else {
           this.initRunMode()
           this.initBrowserName()
-          this.initEnvList()
+          this.initEnvList(business_id)
         }
         this.dialogIsShow = true
       }
@@ -248,48 +216,19 @@ export default {
 
   methods: {
 
-    // 获取环境配置
-    initEnvList() {
-      // 初始化运行环境
-      runEnvList({ business_id: this.projectBusinessId }).then(response => {
+    // 初始化运行环境
+    initEnvList(business_id) {
+      runEnvList({
+        business_id: this.projectBusinessId ? this.projectBusinessId : business_id
+      }).then(response => {
         this.runEnvDataSource = response.data.data
-        this.envCodeList = []
-        this.initEnvGroupDataList()
-        this.runEnvDataSource.forEach(env => {
-          this.envCodeList.push(env.code)
-          this.envGroupDataList[env.group].push(env)
-        })
-        this.runEnv = []
-        // if (this.runEnvDataSource && this.runEnvDataSource.length > 0) {
-        //   this.runEnv = [this.runEnvDataSource[0].code]
-        // }
       })
-    },
-
-    initEnvGroupDataList() {
-      this.envGroupDataList = {}
-      this.envGroupList.forEach(group => {
-        this.envGroupDataList[group] = []
-      })
-    },
-
-    // 点全选
-    handleCheckAllChange(val) {
-      this.runEnv = val ? this.envCodeList : []
-      this.isIndeterminate = false
-    },
-
-    // 当选中选项时，全选按钮的状态变化
-    handleCheckedItemChange(value) {
-      const checkedCount = value.length
-      this.checkAll = checkedCount === this.envCodeList.length
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.envCodeList.length
     },
 
     // 点确定
     runData() {
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'selectRunEnv', this.runUnit, {
-        runEnv: this.runEnv,
+        runEnv: this.$refs.runEnvCheckbox.selectedEnvDataList,
         browser: this.runBrowser,
         runServer: this.runServer,
         runPhone: this.runPhone,

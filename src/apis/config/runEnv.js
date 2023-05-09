@@ -41,3 +41,8 @@ export function runEnvList(params) {
 export function runEnvSort(data) {
   return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }
+
+// 批量修改环境与业务线的绑定关系
+export function runEnvToBusiness(data) {
+  return request({ url: currentBaseDir + '/toBusiness', method: 'put', data: data })
+}

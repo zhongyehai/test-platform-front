@@ -120,8 +120,6 @@
 </template>
 
 <script>
-import projectSelectorView from '@/components/Selector/project'
-import moduleSelectorView from '@/components/Selector/module'
 import Pagination from '@/components/Pagination'
 
 import { moduleList as appUiModuleList } from '@/apis/appUiTest/module'
@@ -137,14 +135,11 @@ import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 export default {
   name: 'ElementList',
   components: {
-    Pagination,
-    projectSelectorView,
-    moduleSelectorView
+    Pagination
   },
   props: [
-    'dataType',
-    'dialogIsShow',
-    'currentCaseId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'currentCaseId'
   ],
   data() {
     return {

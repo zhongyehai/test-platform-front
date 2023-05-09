@@ -41,10 +41,9 @@
           <el-button
             type="text"
             size="mini"
-            icon="el-icon-edit"
             style="margin-right: 10px"
             @click.native="showDrawer(scope.row)"
-          />
+          >修改</el-button>
 
           <!-- 复制手机 -->
           <el-popover
@@ -63,9 +62,8 @@
               slot="reference"
               type="text"
               size="mini"
-              icon="el-icon-document-copy"
               :loading="scope.row.copyButtonIsLoading"
-            />
+            >复制</el-button>
           </el-popover>
 
           <!-- 删除手机 -->
@@ -85,9 +83,8 @@
               style="color: red"
               type="text"
               size="mini"
-              icon="el-icon-delete"
               :loading="scope.row.deleteLoadingIsShow"
-            />
+            >删除</el-button>
           </el-popover>
 
         </template>
@@ -158,15 +155,14 @@
 
 <script>
 import Sortable from 'sortablejs'
-import projectTreeView from '@/components/uiTest/projectTree'
 import Pagination from '@/components/Pagination'
 
-import { phoneList, postPhone, putPhone, getServer, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/env'
+import { phoneList, postPhone, putPhone, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/env'
 import { getConfigByName } from '@/apis/config/config'
 
 export default {
   name: 'Index',
-  components: { Pagination, projectTreeView },
+  components: { Pagination },
   data() {
     return {
       tableLoadingIsShow: false,

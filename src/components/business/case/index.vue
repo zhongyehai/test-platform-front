@@ -143,18 +143,33 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="50%">
+          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="40%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column
-            :show-overflow-tooltip="true"
-            prop="level"
-            align="center"
-            min-width="20%"
-          >
+          <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="用例描述" min-width="10%">
+            <template slot-scope="scope">
+              <el-popover
+                :ref="scope.row.id"
+                trigger="hover"
+                placement="bottom-start"
+                style="margin-right: 10px"
+                popper-class="down-popover"
+              >
+                <showCaseDesc
+                  :case-desc="scope.row.desc"
+                  :case-skip-if="scope.row.skip_if"
+                  :case-variables="scope.row.variables"
+                  :case-extracts="scope.row.output"
+                />
+                <span slot="reference"> {{ scope.row.desc || '-' }} </span>
+              </el-popover>
+            </template>
+          </el-table-column>
+
+          <el-table-column :show-overflow-tooltip="true" prop="level" align="center" min-width="20%">
             <template slot="header">
               <span> 用例状态 </span>
               <el-tooltip
@@ -286,6 +301,7 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import caseDrawer from '@/components/business/case/drawer'
+import showCaseDesc from '@/components/business/case/showCaseDesc'
 
 import {
   caseList as apiCaseList,
@@ -317,17 +333,14 @@ export default {
   name: 'Index',
   components: {
     Pagination,
-    caseDrawer
+    caseDrawer,
+    showCaseDesc
   },
 
   // 接收父组件传参的key
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentProjectId',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentSetId'
+    'dataType', 'currentProjectId', 'currentSetId'
   ],
   data() {
     return {
@@ -424,10 +437,6 @@ export default {
         this.runCase(runDict)
       }
     })
-
-    // this.$bus.$on(this.callBackEvent, (runDict) => {
-    //   this.runCase(runDict)
-    // })
   },
 
   created() {
@@ -483,7 +492,12 @@ export default {
     // 编辑用例
     editCase(row) {
       this.tempCase = row
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'edit', JSON.parse(JSON.stringify(this.tempCase)))
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'caseInfo',
+        'edit',
+        JSON.parse(JSON.stringify(this.tempCase))
+      )
     },
 
     // 删除用例
@@ -512,7 +526,13 @@ export default {
       this.tempCase = caseData
       this.tempCase.num = ''
       this.tableLoadingIsShow = true
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'caseInfo', 'copy', JSON.parse(JSON.stringify(this.tempCase)))
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'caseInfo',
+        'copy',
+        JSON.parse(JSON.stringify(this.tempCase)),
+        'caseIndex'
+      )
       this.tableLoadingIsShow = false
       this.$set(caseData, 'copyPopoverIsShow', false)
     },

@@ -1,28 +1,31 @@
 <template>
 
   <!-- 步骤管理组件 -->
-  <el-row>
+  <div>
 
     <!-- 步骤列表 -->
-    <el-col :span="10">
-      <stepListView
-        ref="stepListView"
-        :data-type="dataType"
-        :case-id="caseId"
-      />
-    </el-col>
+    <stepListView
+      ref="stepListView"
+      :data-type="dataType"
+      :project-id="projectId"
+      :case-id="caseId"
+    />
 
     <!-- 添加步骤/引用用例 -->
-    <el-col :span="14">
-
-      <el-tabs v-model="activeName">
+    <el-drawer
+      title="新增步骤"
+      size="85%"
+      :append-to-body="true"
+      :visible.sync="drawerIsShow"
+      :direction="direction"
+    >
+      <el-tabs v-model="activeName" style="margin-left: 20px">
 
         <!-- 接口列表 -->
         <el-tab-pane v-if="dataType === 'api'" label="接口列表" name="apiList">
           <apiListView
             ref="apiListView"
             :project-id="projectId"
-            :dialog-is-show="dialogIsShow"
             :current-case-id="caseId"
           />
         </el-tab-pane>
@@ -33,7 +36,6 @@
             ref="elementList"
             :data-type="dataType"
             :project-id="projectId"
-            :dialog-is-show="dialogIsShow"
             :current-case-id="caseId"
           />
         </el-tab-pane>
@@ -43,20 +45,20 @@
           <quoteCaseView
             ref="quoteCase"
             :data-type="dataType"
-            :temp-case="tempCase"
+            :project-id="projectId"
             :case-id="caseId"
           />
         </el-tab-pane>
 
       </el-tabs>
-
-    </el-col>
+    </el-drawer>
 
     <!-- api步骤编辑 -->
     <editApiStepView
       v-if="dataType === 'api'"
       ref="editStepView"
       :case-id="caseId"
+      :data-type="dataType"
     />
 
     <!-- ui步骤编辑 -->
@@ -66,7 +68,7 @@
       :data-type="dataType"
       :case-id="caseId"
     />
-  </el-row>
+  </div>
 
 </template>
 
@@ -94,16 +96,13 @@ export default {
     quoteCaseView
   },
   props: [
-    'dataType',
-    'projectId',
-    'caseId',
-    'tempCase'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'projectId', 'caseId'
   ],
   data() {
     return {
       direction: 'rtl', // 抽屉打开方式
-      dialogStatus: '',
-      dialogIsShow: false,
+      drawerIsShow: false,
       activeName: 'apiList',
       postStepUrl: ''
     }
@@ -120,6 +119,13 @@ export default {
   },
 
   mounted() {
+    // 打开添加步骤抽屉
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, caseId) => {
+      if (_type === 'showAddStepDrawer') {
+        this.drawerIsShow = true
+      }
+    })
+
     // 引用用例
     this.$bus.$on(this.$busEvents.quoteCaseToStep, (testCase, status) => {
       if (testCase) {
@@ -135,6 +141,7 @@ export default {
 
   // 组件销毁前，关闭bus监听事件
   beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
     this.$bus.$off(this.$busEvents.quoteCaseToStep)
   },
 

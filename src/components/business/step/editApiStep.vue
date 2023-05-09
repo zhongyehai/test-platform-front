@@ -107,7 +107,7 @@
         <skipIfView
           ref="skipIfView"
           :skip-if-data="currentStep.skip_if"
-          :use_type="'step'"
+          :use-type="'step'"
         />
       </el-tab-pane>
 
@@ -300,9 +300,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'datatype',
-    // eslint-disable-next-line vue/require-prop-types
-    'caseId'
+    'datatype', 'caseId'
   ],
   data() {
     return {

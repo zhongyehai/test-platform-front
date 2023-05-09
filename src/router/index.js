@@ -5,7 +5,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-import { can_not_get_page } from '@/utils/auth'
 
 /*
 路由参数说明：
@@ -350,7 +349,7 @@ export const constantRoutes = [
         name: 'Hit',
         component: () => import('@/views/assist/hits'),
         meta: { title: '自动化问题记录', icon: 'el-icon-circle-close' }
-      },
+      }
       // {
       //   path: 'diffRecord',
       //   name: 'DiffRecord',
@@ -473,31 +472,31 @@ export const constantRoutes = [
   },
 
   // 操作手册
-  {
-    path: '/help',
-    component: Layout,
-    redirect: '/help/gitee',
-    name: 'Help',
-    meta: { title: '帮助', icon: 'el-icon-document' },
-    children: [
-      {
-        hidden: true,
-        path: 'https://gitee.com/Xiang-Qian-Zou/api-test-api/blob/master/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
-        meta: { title: '操作手册：gitee', icon: 'el-icon-document' }
-      },
-      {
-        hidden: true,
-        path: 'https://github.com/zhongyehai/api-test-api/blob/main/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
-        meta: { title: '操作手册：GitHub', icon: 'el-icon-document' }
-      },
-      // {
-      //   path: 'debug',
-      //   name: 'Debug',
-      //   component: () => import('@/views/debug/index'),
-      //   meta: { title: '调试页面' }
-      // }
-    ]
-  },
+  // {
+  //   path: '/help',
+  //   component: Layout,
+  //   redirect: '/help/gitee',
+  //   name: 'Help',
+  //   meta: { title: '帮助', icon: 'el-icon-document' },
+  //   children: [
+  //     {
+  //       hidden: true,
+  //       path: 'https://gitee.com/Xiang-Qian-Zou/api-test-api/blob/master/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
+  //       meta: { title: '操作手册：gitee', icon: 'el-icon-document' }
+  //     },
+  //     {
+  //       hidden: true,
+  //       path: 'https://github.com/zhongyehai/api-test-api/blob/main/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md',
+  //       meta: { title: '操作手册：GitHub', icon: 'el-icon-document' }
+  //     },
+  //     {
+  //       path: 'debug',
+  //       name: 'Debug',
+  //       component: () => import('@/views/debug/index'),
+  //       meta: { title: '调试页面' }
+  //     }
+  //   ]
+  // },
 
   // 用 * 匹配404 必须放到最后面，意味着用以上的映射表都没有匹配到用户输入的路由，则跳转到404
   { path: '*', redirect: '/404', hidden: true }

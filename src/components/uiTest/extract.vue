@@ -193,12 +193,11 @@
       ref="dataTable"
       :data="tempData"
       stripe
-      :show-header="false"
       size="mini"
       row-key="id"
     >
 
-      <el-table-column label="id" header-align="center" min-width="4%">
+      <el-table-column label="序号" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
           <el-input v-show="false" v-model="scope.row.id" />
@@ -273,7 +272,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加" header-align="center" min-width="6%">
+      <el-table-column label="操作" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
@@ -319,11 +318,8 @@ import Sortable from 'sortablejs'
 export default {
   name: 'Extract',
   props: [
-    'currentData',
-    'tempElementList',
-    'placeholderKey',
-    'placeholderValue',
-    'placeholderDesc'
+    // eslint-disable-next-line vue/require-prop-types
+    'currentData', 'tempElementList', 'placeholderKey', 'placeholderValue', 'placeholderDesc'
   ],
   data() {
     return {

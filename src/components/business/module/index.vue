@@ -30,6 +30,7 @@
           v-show="queryAddr"
           type="primary"
           size="mini"
+          :loading="queryAddrIsLoading"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongTo()"
         >查归属
@@ -38,6 +39,7 @@
           v-show="queryAddr"
           type="primary"
           size="mini"
+          :loading="queryAddrIsLoading"
           style="margin-left: 10px"
           @click.native="getApiMsgBelongToStep()"
         >查使用情况
@@ -51,7 +53,7 @@
       <!-- 第一列服务树 -->
       <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="projectTab" class="table_padding table_project">
-<!--          <el-tab-pane :label="projectTab" :name="projectTab">-->
+          <!--          <el-tab-pane :label="projectTab" :name="projectTab">-->
           <el-tab-pane :name="projectTab">
 
             <template slot="label">
@@ -329,6 +331,7 @@ export default {
         project_id: '',
         controller: ''
       },
+      queryAddrIsLoading: false,
       moduleDrawerIsShow: false,
       moduleDrawerStatus: '',
       defaultModule: {},
@@ -413,7 +416,9 @@ export default {
 
     // 获取接口归属
     getApiMsgBelongTo() {
+      this.queryAddrIsLoading = true
       apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
         }
@@ -422,7 +427,9 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep() {
+      this.queryAddrIsLoading = true
       apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+        this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }
@@ -454,8 +461,8 @@ export default {
       })
 
       // 获取所选服务的业务线id
-      this.projectListData.forEach(project =>{
-        if (project.id === projectId){
+      this.projectListData.forEach(project => {
+        if (project.id === projectId) {
           this.projectBusinessId = project.business_id
         }
       })

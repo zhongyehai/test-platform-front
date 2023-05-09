@@ -152,7 +152,6 @@
 
     <selectRunEnv
       :data-type="dataType"
-      :project-business-id="projectBusinessId"
     />
 
     <runProcess
@@ -329,7 +328,7 @@ export default {
     // 点击运行任务
     clickRunTask(task) {
       this.currentTask = task
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'taskIndex', true)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'taskIndex', true, this.projectBusinessId)
     },
 
     // 运行任务

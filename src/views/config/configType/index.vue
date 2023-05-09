@@ -80,19 +80,11 @@
 
       <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="修改"
-            placement="top-start"
-          >
-            <el-button
-              type="text"
-              size="mini"
-              icon="el-icon-edit"
-              @click.native="showAddConfigTypeDialog(scope.row)"
-            />
-          </el-tooltip>
+          <el-button
+            type="text"
+            size="mini"
+            @click.native="showAddConfigTypeDialog(scope.row)"
+          >修改</el-button>
         </template>
       </el-table-column>
 

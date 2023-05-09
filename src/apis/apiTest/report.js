@@ -1,10 +1,10 @@
 import request from '@/utils/request' // 加载请求配置文件
 import { baseDirApiTest } from '@/apis/base'
 
-const currentBaseDir = baseDirApiTest + '/report'
+const reportDir = baseDirApiTest + '/report'
 
 function Func(method, data = null, params = null) {
-  return request({ url: currentBaseDir, method: method, data: data, params: params })
+  return request({ url: reportDir, method: method, data: data, params: params })
 }
 
 // 删除报告
@@ -18,26 +18,26 @@ export function getReport(params) {
 }
 
 // 报告列表
-export function reportList(params) {
-  return request({ url: currentBaseDir + '/list', method: 'get', data: null, params: params })
+export function reportList(data) {
+  return request({ url: reportDir + '/list', method: 'post', data: data })
 }
 
 // 下载报告
 export function downloadReport(params) {
-  return request({ url: currentBaseDir + '/download', method: 'get', data: null, params: params })
+  return request({ url: reportDir + '/download', method: 'get', data: null, params: params })
 }
 
 // 报告是否生成
 export function reportIsDone(params) {
-  return request({ url: currentBaseDir + '/status', method: 'get', data: null, params: params })
+  return request({ url: reportDir + '/status', method: 'get', data: null, params: params })
 }
 
 // 获取运行批次中要展示的报告id
 export function reportShowId(params) {
-  return request({ url: currentBaseDir + '/showId', method: 'get', data: null, params: params })
+  return request({ url: reportDir + '/showId', method: 'get', data: null, params: params })
 }
 
 // 报告详情
 export function reportDetail(params) {
-  return request({ url: currentBaseDir + '/detail', method: 'get', data: null, params: params })
+  return request({ url: reportDir + '/detail', method: 'get', data: null, params: params })
 }

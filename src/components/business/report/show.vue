@@ -129,7 +129,7 @@
         <!-- 第三行，用例和详情 -->
         <el-row>
           <!-- 用例、步骤列表 -->
-          <el-col :span="6">
+          <el-col :span="8">
             <el-scrollbar>
               <div :style="{height:caseScrollbarHeight}">
                 <el-collapse accordion>
@@ -146,10 +146,29 @@
                         :content="case_data.records ? `${case_data.records.length}个步骤` : ''"
                         placement="top-start"
                       >
-                        <div
-                          style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                          :style="case_data.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
-                        > {{ case_data.name }}
+                        <div>
+                          <el-row>
+                            <el-col :span="case_data.case_id ? 19 : 24">
+                              <div
+                                style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
+                                :style="case_data.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
+                              > {{ case_data.name }}
+                              </div>
+                            </el-col>
+                            <el-col :span="case_data.case_id ? 5 : 0">
+                              <el-button
+                                v-if="case_data.case_id"
+                                style="
+                                margin-left: 20px;
+                                float:right;
+                                text-align:right"
+                                size="mini"
+                                type="text"
+                                @click.stop.prevent="showCaseInfo(case_data.case_id)"
+                              >打开用例
+                              </el-button>
+                            </el-col>
+                          </el-row>
                         </div>
                       </el-tooltip>
                     </template>
@@ -168,7 +187,7 @@
                           @click="handleNodeClick(case_index, step_index)"
                         >
                           <div
-                            :style="getStepColor(step_data)"
+                            :style="getStepColor(step_data.status)"
                           >
                             <span class="test-name">{{ step_data.name }}</span>
                             <span class="test-time">{{ step_data.meta_datas.stat.response_time_ms }} ms</span>
@@ -180,7 +199,7 @@
                             >
                               <el-button
                                 v-if="step_data.meta_datas.case_id"
-                                :style="getStepColor(step_data)"
+                                :style="getStepColor(step_data.status)"
                                 size="mini"
                                 type="text"
                                 class="test-status"
@@ -202,7 +221,7 @@
                                 size="mini"
                                 type="text"
                                 class="test-status"
-                                :style="getStepColor(step_data)"
+                                :style="getStepColor(step_data.status)"
                               >复制数据
                               </el-button>
                               <el-button
@@ -217,7 +236,7 @@
                                 size="mini"
                                 type="text"
                                 class="test-status"
-                                :style="getStepColor(step_data)"
+                                :style="getStepColor(step_data.status)"
                               >复制数据
                               </el-button>
                             </el-tooltip>
@@ -238,7 +257,7 @@
           </el-col>
 
           <!-- 详情页 -->
-          <el-col :span="18">
+          <el-col :span="16">
             <el-scrollbar>
               <div :style="{height:caseScrollbarHeight}">
                 <div
@@ -648,7 +667,20 @@
       />
 
       <!-- 打开用例 -->
-      <showCaseDetail
+      <caseDrawer
+        :data-type="dataType"
+        :current-project-id="caseProjectId"
+        :current-set-id="caseSuiteId"
+      />
+
+      <!-- 选择运行环境 -->
+      <selectRunEnv
+        :data-type="dataType"
+        :project-business-id="projectBusinessId"
+      />
+
+      <!-- 测试执行进度 -->
+      <runProcess
         :data-type="dataType"
       />
 
@@ -672,23 +704,29 @@
 import JsonViewer from 'vue-json-viewer'
 import vkbeautify from 'vkbeautify' // xml格式化组件
 import hitDrawer from '@/views/assist/hits/drawer'
-import showCaseDetail from '@/components/business/case/showCaseDetail.vue'
+import pythonScriptIndex from '@/views/assist/script/index'
+import caseDrawer from '@/components/business/case/drawer'
 
 import { runEnvList } from '@/apis/config/runEnv'
 import { deleteReport as deleteApiReport, reportDetail as apiReportDetail } from '@/apis/apiTest/report'
 import { deleteReport as deleteWebUiReport, reportDetail as webUiReportDetail } from '@/apis/webUiTest/report'
 import { deleteReport as deleteAppUiReport, reportDetail as appUiReportDetail } from '@/apis/appUiTest/report'
+import { caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
+import { caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
+import { caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
 
 import { reportStepResultMapping } from '@/utils/mapping'
-import pythonScriptIndex from '@/views/assist/script/index.vue'
+import selectRunEnv from '@/components/selectRunEnv.vue'
+import runProcess from '@/components/runProcess.vue'
 
 export default {
   name: 'ReportShow',
   components: {
+    runProcess, selectRunEnv,
+    caseDrawer,
     pythonScriptIndex,
     JsonViewer,
-    hitDrawer,
-    showCaseDetail
+    hitDrawer
   },
   // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
@@ -700,6 +738,12 @@ export default {
       runTestTypeList: [],
       envList: [],
       runEnvDict: {},
+
+      // 选中打开用例
+      caseProjectId: '',
+      caseSuiteId: '',
+      projectBusinessId: '',
+
       msg: { copyText: 'copy', copiedText: 'copied' },
       defaultShowResponseInFo: ['6', '7', '23'], // 默认展开报告详情的项
       showCaseResultType: 'all',
@@ -818,7 +862,8 @@ export default {
 
       resultMapping: reportStepResultMapping,
       reportDetailUrl: '',
-      deleteReportUrl: ''
+      deleteReportUrl: '',
+      getCaseProjectUrl: ''
     }
   },
 
@@ -826,13 +871,16 @@ export default {
     if (this.dataType === 'api') {
       this.reportDetailUrl = apiReportDetail
       this.deleteReportUrl = deleteApiReport
+      this.getCaseProjectUrl = apiGetCaseProject
       this.defaultShowResponseInFo = ['12', '17', '21', '23']
     } else if (this.dataType === 'webUi') {
       this.reportDetailUrl = webUiReportDetail
       this.deleteReportUrl = deleteWebUiReport
+      this.getCaseProjectUrl = webUiGetCaseProject
     } else {
       this.reportDetailUrl = appUiReportDetail
       this.deleteReportUrl = deleteAppUiReport
+      this.getCaseProjectUrl = appUiGetCaseProject
     }
 
     // 获取环境列表
@@ -855,15 +903,27 @@ export default {
       })
     },
 
-    getStepColor(step_data) {
-      return step_data.status === 'success' ? 'color:#19D4AE'
-        : step_data.status === 'failure' ? 'color:#FA6E86'
-          : step_data.status === 'skipped' ? 'color:#60C0DD' : 'color:#E87C25'
+    getStepColor(status) {
+      return status === 'success' ? 'color:#19D4AE'
+        : status === true ? 'color:#19D4AE'
+          : status === 'failure' ? 'color:#FA6E86'
+            : status === false ? 'color:#FA6E86'
+              : status === 'skipped' ? 'color:#60C0DD' : 'color:#E87C25'
     },
 
     // 打开用例信息
     showCaseInfo(caseId) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'showCaseInfo', caseId)
+      this.getCaseProjectUrl({ id: caseId }).then(response => {
+        this.projectBusinessId = response.data.project.business_id
+        this.caseProjectId = response.data.project.id
+        this.caseSuiteId = response.data.suite.id
+        this.$bus.$emit(
+          this.$busEvents.drawerIsShow,
+          'caseInfo',
+          'edit',
+          JSON.parse(JSON.stringify(response.data.case))
+        )
+      })
     },
 
     // 记录问题
