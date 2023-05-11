@@ -3,30 +3,35 @@
     ref="dataTable"
     :data="tempData"
     stripe
-    :show-header="false"
     size="mini"
     row-key="id"
   >
 
-    <el-table-column label="id" header-align="center" min-width="4%">
+    <el-table-column label="序号" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
       </template>
     </el-table-column>
 
-    <el-table-column label="Key" header-align="center" min-width="30%">
+    <el-table-column header-align="center" min-width="30%">
+      <template slot="header">
+        <span><span style="color: red">*</span>变量key</span>
+      </template>
       <template slot-scope="scope">
         <el-input v-model="scope.row.key" size="mini" type="textarea" :rows="1" :placeholder="placeholderKey" />
       </template>
     </el-table-column>
 
-    <el-table-column label="Value" header-align="center" min-width="30%">
+    <el-table-column label="变量值" header-align="center" min-width="30%">
       <template slot-scope="scope">
         <el-input v-model="scope.row.value" size="mini" type="textarea" :rows="1" :placeholder="placeholderValue" />
       </template>
     </el-table-column>
 
     <el-table-column label="数据类型" header-align="center" min-width="10%">
+      <template slot="header">
+        <span><span style="color: red">*</span>数据类型</span>
+      </template>
       <template slot-scope="scope">
         <el-select
           v-model="scope.row.data_type"
@@ -47,12 +52,15 @@
     </el-table-column>
 
     <el-table-column label="备注" header-align="center" min-width="20%">
+      <template slot="header">
+        <span><span style="color: red">*</span>备注</span>
+      </template>
       <template slot-scope="scope">
         <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc" />
       </template>
     </el-table-column>
 
-    <el-table-column label="添加/删除" header-align="center" min-width="6%">
+    <el-table-column label="操作" header-align="center" min-width="6%">
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button

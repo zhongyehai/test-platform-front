@@ -114,7 +114,7 @@ export default {
     } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
       getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
       })
     } else {
       this.projectListUrl = appUiProjectList

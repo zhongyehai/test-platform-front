@@ -5,7 +5,7 @@
     <el-collapse accordion>
       <el-collapse-item>
         <template slot="title">
-          <div style="color:#409eff"> 点击查看示例</div>
+          <div style="color:red"> 点击查看示例</div>
         </template>
 
         <div style="margin-left: 20px">
@@ -193,24 +193,29 @@
       ref="dataTable"
       :data="tempData"
       stripe
-      :show-header="false"
       size="mini"
       row-key="id"
     >
 
-      <el-table-column label="id" header-align="center" min-width="4%">
+      <el-table-column label="序号" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
         </template>
       </el-table-column>
 
-      <el-table-column label="Key" header-align="center" min-width="20%">
+      <el-table-column header-align="center" min-width="20%">
+        <template slot="header">
+          <span><span style="color: red">*</span>变量key</span>
+        </template>
         <template slot-scope="scope">
           <el-input v-model="scope.row.key" size="mini" type="textarea" :rows="1" :placeholder="placeholderKey" />
         </template>
       </el-table-column>
 
-      <el-table-column label="数据源" header-align="center" min-width="20%">
+      <el-table-column header-align="center" min-width="20%">
+        <template slot="header">
+          <span><span style="color: red">*</span>数据源</span>
+        </template>
         <template slot-scope="scope">
           <el-row>
             <el-select
@@ -233,7 +238,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Value" header-align="center" min-width="20%">
+      <el-table-column label="提取表达式" header-align="center" min-width="20%">
         <template slot-scope="scope">
           <el-input
             v-model="scope.row.value"
@@ -245,25 +250,39 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="更新到头部" min-width="10%">
+      <el-table-column header-align="center" min-width="10%">
+        <template slot="header">
+          <span>是否更新到头部</span>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            placement="top-start"
+          >
+            <div slot="content">
+              <div>作用：在特殊场景中，直接把提取到的值设置到后续操作中的头部参数中</div>
+              <div>1、若打开此开关，则会将此处提取到的值，以当前设置的key更新到后续步骤的头部信息中</div>
+              <div>2、若在其他地方已预设头部信息包含当前的key，对于头部信息中的这个key，则会以将此处提取到的值为准</div>
+              <div>注：提取后的数据会以key、value的形式存在于自定义变量池中，不管是否选择更新到头部，都可使用</div>
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </template>
+
         <template slot-scope="scope">
           <el-switch v-model="scope.row.update_to_header" />
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>1、若打开此开关，则会将此处提取到的值，以当前设置的key更新到后续步骤的头部信息中</div>
-            <div>2、若在其他地方已预设头部信息包含当前的key，对于头部信息中的这个key，则会以将此处提取到的值为准</div>
-            <div>注：提取后的数据会以key、value的形式存在于自定义变量池中，不管是否选择更新到头部，都可使用</div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
         </template>
       </el-table-column>
 
       <el-table-column label="备注" header-align="center" min-width="20%">
+        <template slot="header">
+          <span><span style="color: red">*</span>备注</span>
+        </template>
         <template slot-scope="scope">
           <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc" />
         </template>
       </el-table-column>
 
-      <el-table-column label="添加/删除" header-align="center" min-width="6%">
+      <el-table-column label="操作" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button
@@ -308,10 +327,8 @@ import Sortable from 'sortablejs'
 export default {
   name: 'Extract',
   props: [
-    'currentData',
-    'placeholderKey',
-    'placeholderValue',
-    'placeholderDesc'
+    // eslint-disable-next-line vue/require-prop-types
+    'currentData', 'placeholderKey', 'placeholderValue', 'placeholderDesc'
   ],
   data() {
     return {

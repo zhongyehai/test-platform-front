@@ -137,19 +137,19 @@
         >
           <el-table-column type="selection" min-width="2%" />
 
-          <el-table-column prop="num" label="序号" align="center" min-width="8%">
+          <el-table-column prop="num" label="序号" align="left" min-width="8%">
             <template slot-scope="scope">
               <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="40%">
+          <el-table-column :show-overflow-tooltip="true" prop="name" align="left" label="用例名称" min-width="40%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="用例描述" min-width="10%">
+          <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="用例描述" min-width="10%">
             <template slot-scope="scope">
               <el-popover
                 :ref="scope.row.id"
@@ -169,7 +169,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="level" align="center" min-width="20%">
+          <el-table-column :show-overflow-tooltip="true" prop="level" align="left" min-width="20%">
             <template slot="header">
               <span> 用例状态 </span>
               <el-tooltip
@@ -185,33 +185,29 @@
               </el-tooltip>
             </template>
             <template slot-scope="scope">
-              <div>
-                <div style="width: 80%; margin-left:auto; margin-right:auto">
-                  <el-select
-                    :ref="`statusSelector${scope.row.id}`"
-                    slot="prepend"
-                    v-model="scope.row.status"
-                    size="mini"
-                    placeholder="选择用例状态"
-                    filterable
-                    class="select"
-                    @change="changeCaseIsRun(scope.row)"
-                  >
-                    <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span>
-                    </el-option>
-                    <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span>
-                    </el-option>
-                    <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span>
-                    </el-option>
-                    <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span>
-                    </el-option>
-                  </el-select>
-                </div>
-              </div>
+              <el-select
+                :ref="`statusSelector${scope.row.id}`"
+                slot="prepend"
+                v-model="scope.row.status"
+                size="mini"
+                placeholder="选择用例状态"
+                filterable
+                class="select"
+                @change="changeCaseIsRun(scope.row)"
+              >
+                <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span>
+                </el-option>
+                <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span>
+                </el-option>
+                <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span>
+                </el-option>
+                <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span>
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" align="center" min-width="20%">
+          <el-table-column label="操作" align="left" min-width="20%">
             <template slot-scope="scope">
 
               <!-- 运行用例 -->

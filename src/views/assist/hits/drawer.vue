@@ -236,7 +236,7 @@ export default {
         // 获取测试类型列表
         if (!this.runTestType || this.runTestType.length < 1) {
           getConfigByName({ name: 'test_type' }).then(response => {
-            this.runTestType = JSON.parse(response.data.value)
+            this.runTestType = JSON.parse(response.data)
           })
         }
 

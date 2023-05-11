@@ -5,7 +5,7 @@ import { assertMappingList, extractMappingList } from '@/apis/webUiTest/step'
 export function getRunTimeout(_this) {
   let runTimeout = 0
   getConfigByName({ 'name': 'run_time_out' }).then(response => {
-    _this.$busEvents.runTimeout = response.data.value
+    _this.$busEvents.runTimeout = response.data
     runTimeout = response.data.value
   })
   return runTimeout
@@ -15,7 +15,7 @@ export function getRunTimeout(_this) {
 export function getFindElementOption(_this) {
   let findElementOption = []
   getConfigByName({ 'name': 'find_element_option' }).then(response => {
-    findElementOption = JSON.parse(response.data.value)
+    findElementOption = JSON.parse(response.data)
     _this.$busEvents.data.findElementOptionList = findElementOption
     // 列表解析为字典
     const optionDict = []

@@ -24,7 +24,10 @@ export default {
   components: {
     editor: require('vue2-ace-editor')
   },
-  props: ['dataJson'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'dataJson'
+  ],
   data() {
     return {
       tableHeight: 500,

@@ -113,7 +113,7 @@ export default {
   methods: {
     // 获取业务线
     getBusinessDataList() {
-      businessList({ getAll: true, pageNum: 1, pageSize: 999 }).then(response => {
+      businessList({ getAll: true, pageNum: 1, pageSize: 9999 }).then(response => {
         this.businessDataList = response.data.data
       })
     },

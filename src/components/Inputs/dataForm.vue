@@ -4,23 +4,28 @@
     ref="dataTable"
     :data="tempData"
     stripe
-    :show-header="false"
     size="mini"
     row-key="id"
   >
-    <el-table-column label="id" header-align="center" min-width="4%">
+    <el-table-column label="序号" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
       </template>
     </el-table-column>
 
-    <el-table-column label="Key" header-align="center" min-width="20%">
+    <el-table-column header-align="center" min-width="20%">
+      <template slot="header">
+        <span><span style="color: red">*</span>字段key</span>
+      </template>
       <template slot-scope="scope">
         <el-input v-model="scope.row.key" size="mini" type="textarea" autosize placeholder="key" />
       </template>
     </el-table-column>
 
-    <el-table-column label="type" header-align="center" min-width="20%">
+    <el-table-column header-align="center" min-width="20%">
+      <template slot="header">
+        <span><span style="color: red">*</span>数据类型</span>
+      </template>
       <template slot-scope="scope">
         <el-select v-model="scope.row.data_type" size="mini" placeholder="选择数据类型" style="width: 100%">
           <el-option v-for="item in formDataTypes" :key="item.value" :label="item.label" :value="item.value" />
@@ -28,7 +33,10 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="Value" header-align="center" min-width="30%">
+    <el-table-column header-align="center" min-width="30%">
+      <template slot="header">
+        <span><span style="color: red">*</span>字段值</span>
+      </template>
       <template slot-scope="scope">
         <!-- 文件 -->
         <div v-if="scope.row.data_type === 'file'">
@@ -66,7 +74,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="备注" header-align="center" min-width="20%">
+    <el-table-column label="字段说明" header-align="center" min-width="20%">
       <template slot-scope="scope">
         <el-input v-model="scope.row.remark" size="mini" type="textarea" autosize placeholder="备注" />
       </template>

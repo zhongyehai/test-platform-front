@@ -61,7 +61,7 @@ import waves from '@/directive/waves'
 import runEnvCheckbox from '@/components/Selector/runEnvCheckbox.vue'
 import businessCheckbox from '@/components/Selector/baseCheckbox.vue'
 
-import { runEnvToBusiness } from '@/apis/config/runEnv'
+import { runEnvList, runEnvToBusiness } from '@/apis/config/runEnv'
 import { businessList } from '@/apis/config/business'
 
 export default {
@@ -96,6 +96,7 @@ export default {
       if (_type === 'runEnvToBusiness') {
         this.runEnvList = run_env_list
 
+        this.getRunEnvList()
         this.getBusinessDataList()
         this.drawerIsShow = true
       }
@@ -109,8 +110,15 @@ export default {
 
   methods: {
     // 获取业务线
+    getRunEnvList() {
+      runEnvList({ getAll: true, pageNum: 1, pageSize: 9999 }).then(response => {
+        this.runEnvList = response.data.data
+      })
+    },
+
+    // 获取业务线
     getBusinessDataList() {
-      businessList({ getAll: true, pageNum: 1, pageSize: 999 }).then(response => {
+      businessList({ getAll: true, pageNum: 1, pageSize: 9999 }).then(response => {
         this.businessDataList = response.data.data
       })
     },

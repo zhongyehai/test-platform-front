@@ -111,13 +111,13 @@ export default {
   mounted() {
     // 获取生成用户信息可选项映射关系
     getConfigByName({ 'name': 'make_user_info_mapping' }).then(response => {
-      this.allOptionsMapping = JSON.parse(response.data.value)
+      this.allOptionsMapping = JSON.parse(response.data)
       this.allOptionKeys = Object.keys(this.allOptionsMapping)
     })
 
     // 获取语言映射关系
     getConfigByName({ 'name': 'make_user_language_mapping' }).then(response => {
-      this.languageDict = JSON.parse(response.data.value)
+      this.languageDict = JSON.parse(response.data)
       this.language = Object.keys(this.languageDict)[0]
     })
   },

@@ -74,7 +74,7 @@
 
     <!-- 用例入参 -->
     <el-tab-pane label="用例入参" name="caseVariables">
-      <el-table :data="caseVariables" stripe style="width: 100%">
+      <el-table :data="caseVariables" :height="tableHeight" stripe style="width: 100%">
         <el-table-column prop="num" label="序号" size="mini" width="50">
           <template slot-scope="scope">
             <span> {{ scope.$index + 1 }} </span>
@@ -116,50 +116,50 @@
 
     <!-- 用例出参 -->
     <el-tab-pane label="用例出参" name="caseExtracts">
-      <el-table :data="caseExtracts" stripe style="width: 100%">
+      <el-table :data="caseExtracts" :height="tableHeight" stripe style="width: 100%">
         <el-table-column prop="num" label="序号" size="mini" width="50">
           <template slot-scope="scope">
             <span> {{ scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="key" label="key" size="mini" width="180">
+        <el-table-column prop="key" label="key" size="mini" width="300">
           <template slot-scope="scope">
             <span> {{ scope.row.key }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column v-show="dataType === 'api'" prop="data_source" label="数据源" size="mini" width="180">
-          <template slot-scope="scope">
-            <el-select v-model="scope.row.data_source" style="width: 100%" size="mini" disabled>
-              <el-option
-                v-for="(item) in $busEvents.data.responseDataSourceMappingList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column v-show="dataType === 'api'" prop="data_source" label="数据源" size="mini" width="180">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <el-select v-model="scope.row.data_source" style="width: 100%" size="mini" disabled>-->
+        <!--              <el-option-->
+        <!--                v-for="(item) in $busEvents.data.responseDataSourceMappingList"-->
+        <!--                :key="item.value"-->
+        <!--                :label="item.label"-->
+        <!--                :value="item.value"-->
+        <!--              />-->
+        <!--            </el-select>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
 
-        <el-table-column v-show="dataType === 'api'" prop="value" label="提取表达式" size="mini" width="350">
-          <template slot-scope="scope">
-            <span> {{ scope.row.value }} </span>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column v-show="dataType === 'api'" prop="value" label="提取表达式" size="mini" width="350">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <span> {{ scope.row.value }} </span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
 
-        <el-table-column v-show="dataType !== 'api'" prop="extract_type" label="提取方式" size="mini" width="180">
-          <template slot-scope="scope">
-            <el-select v-model="scope.row.extract_type" style="width: 100%" size="mini" disabled>
-              <el-option
-                v-for="(item) in $busEvents.data.uiTestExtractMappingList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column v-show="dataType !== 'api'" prop="extract_type" label="提取方式" size="mini" width="180">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <el-select v-model="scope.row.extract_type" style="width: 100%" size="mini" disabled>-->
+        <!--              <el-option-->
+        <!--                v-for="(item) in $busEvents.data.uiTestExtractMappingList"-->
+        <!--                :key="item.value"-->
+        <!--                :label="item.label"-->
+        <!--                :value="item.value"-->
+        <!--              />-->
+        <!--            </el-select>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
 
         <el-table-column prop="remark" label="备注" size="mini" width="450">
           <template slot-scope="scope">
@@ -184,8 +184,13 @@ export default {
 
   data() {
     return {
-      activeName: 'caseInfo'
+      activeName: 'caseInfo',
+      tableHeight: '500'
     }
+  },
+
+  mounted() {
+    this.tableHeight = window.innerHeight * 0.90
   }
 }
 </script>

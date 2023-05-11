@@ -89,6 +89,10 @@
             <el-radio v-model="tempTask.receive_type" label="ding_ding">钉钉群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="we_chat">企业微信群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="email">邮件</el-radio>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、钉钉群为关键词模式，关键词为“测试”、“报告”、“统计”</div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
           </el-form-item>
 
           <div v-show="tempTask.is_send !== '1'">
@@ -187,26 +191,28 @@
         </el-tab-pane>
 
         <el-tab-pane label="配置任务用例" name="case">
-          <!-- 使用示例 -->
-          <el-collapse accordion>
-            <el-collapse-item>
-              <template slot="title">
-                <div style="color:#409eff"> 点击查看说明</div>
-              </template>
-              <div style="margin-left: 20px">
-                1、若没有选择用例集和用例，则默认运行当前服务下的所有用例集下的所有用例<br>
-                2、若要选择用例集下的所有用例，则勾选对应的用例集即可，无需再选择用例<br>
-                3、若要选择用例，则点击对应的用例集获取用例列表，再在用例列表中勾选要选择的用例<br>
-                4、若要既选择了用例集，又选择了用例，则会运行选中用例集下的所有用例+选择的用例<br>
-                5、仅用例状态为要运行的用例可选中、会执行
-              </div>
-            </el-collapse-item>
-          </el-collapse>
 
           <el-row>
             <el-col style="width: 25%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
               <el-tabs v-model="caseSuiteTab">
-                <el-tab-pane label="用例集列表" name="caseSuiteTab">
+                <el-tab-pane name="caseSuiteTab">
+                  <template slot="label">
+                    <span> 用例集列表 </span>
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      placement="top-start"
+                    >
+                      <div slot="content">
+                        1、仅可选择类型为<span style="color: red">接口</span>和<span style="color: red">流程</span>的用例集<br>
+                        2、若没有选择用例集和用例，则默认运行当前服务下的所有类型为<span style="color: red">接口</span>和<span style="color: red">流程</span>用例集下的所有<span style="color: red">状态为要执行</span>的用例<br>
+                        3、若要选择用例集下的<span style="color: red">所有用例</span>，则勾选对应的用例集即可，无需再选择用例<br>
+                        4、若要选择<span style="color: red">指定用例</span>，则点击对应的用例集获取用例列表，再在用例列表中勾选要选择的用例<br>
+                        5、若要既选择了用例集，又选择了用例，则会运行选中用<span style="color: red">例集下的所有状态为要执行的用例 + 选择的用例</span><br>
+                      </div>
+                      <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    </el-tooltip>
+                  </template>
                   <el-tree
                     ref="suiteTree"
                     class="suiteTree"
@@ -226,7 +232,24 @@
 
             <el-col :span="18">
               <el-tabs v-model="caseTab" style="margin-left: 5px">
-                <el-tab-pane label="用例列表" name="caseTab">
+                <el-tab-pane name="caseTab">
+                  <template slot="label">
+                    <span> 用例列表 </span>
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      placement="top-start"
+                    >
+                      <div slot="content">
+                        1、若没有选择用例集和用例，则默认运行当前服务下的所有类型为<span style="color: red">接口</span>和<span style="color: red">流程</span>用例集下的所有<span style="color: red">状态为要执行</span>的用例<br>
+                        2、若要选择用例集下的<span style="color: red">所有用例</span>，则勾选对应的用例集即可，无需再选择用例<br>
+                        3、若要选择<span style="color: red">指定用例</span>，则点击对应的用例集获取用例列表，再在用例列表中勾选要选择的用例<br>
+                        4、若要既选择了用例集，又选择了用例，则会运行选中用<span style="color: red">例集下的所有状态为要执行的用例 + 选择的用例</span><br>
+                        5、仅用例状态为<span style="color: red">要运行</span>的用例可选中、会执行
+                      </div>
+                      <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    </el-tooltip>
+                  </template>
                   <el-table
                     ref="multipleTable"
                     :data="currentCaseList"
@@ -255,14 +278,14 @@
                       min-width="25%"
                     >
                       <template slot="header">
-                        <span> 调试结果 </span>
+                        <span> 用例状态 </span>
                         <el-tooltip
                           class="item"
                           effect="dark"
                           placement="top-start"
                         >
                           <div slot="content">
-                            <div>1: 批量运行时，只有调试结果为通过的才会执行</div>
+                            <div>1: 批量/定时任务运行时，只有调试结果为 "已通过-要执行" 的才会执行</div>
                             <div>2: 请务必将用例调试通过后再设为调试通过</div>
                           </div>
                           <span><i style="color: #409EFF" class="el-icon-question" /></span>

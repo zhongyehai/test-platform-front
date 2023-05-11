@@ -107,7 +107,7 @@ export default {
   mounted() {
     // 请求测试平台名字
     getConfigByName({ name: 'platform_name' }).then(response => {
-      this.platformName = response.data.value
+      this.platformName = response.data
       document.title = this.platformName
       localStorage.setItem('platformName', this.platformName)
     })

@@ -262,7 +262,7 @@ export default {
 
     getRunType() {
       getConfigByName({ name: 'test_type' }).then(response => {
-        this.runTestTypeList = JSON.parse(response.data.value)
+        this.runTestTypeList = JSON.parse(response.data)
         this.runTestTypeList.forEach(rType => {
           this.runTestTypeDict[rType['key']] = rType['label']
         })

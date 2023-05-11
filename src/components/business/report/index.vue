@@ -335,7 +335,7 @@ export default {
     })
 
     getConfigByName({ 'name': 'run_type' }).then(response => {
-      this.runTypeDict = JSON.parse(response.data.value)
+      this.runTypeDict = JSON.parse(response.data)
     })
   },
 

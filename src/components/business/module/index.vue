@@ -376,7 +376,7 @@ export default {
       this.postModuleUrl = webUiPostModule
       this.putModuleUrl = webUiPutModule
       getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
       })
     } else {
       this.projectListUrl = appUiProjectList
@@ -398,12 +398,12 @@ export default {
   mounted() {
     // 从后端获取数据类型映射
     getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
     })
 
     // 从后端获取响应对象数据源映射
     getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
-      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
     })
 
     // 从后端获取断言数方式映射

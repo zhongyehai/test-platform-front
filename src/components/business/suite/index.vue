@@ -168,7 +168,7 @@
     <!-- 新增/修改用例集表单 -->
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增用例集' : '修改用例集'"
-      size="40%"
+      size="50%"
       :visible.sync="moduleDrawerIsShow"
       :direction="direction"
     >
@@ -185,7 +185,7 @@
             default-first-option
             size="mini"
             :disabled="isDisabled()"
-            style="width: 100%"
+            style="width: 97%"
             placeholder="请选择用例集类型"
             class="filter-item"
           >
@@ -196,7 +196,23 @@
               :value="suiteType.key"
             />
           </el-select>
+          <el-popover
+            class="el_popover_class"
+            placement="top-start"
+            trigger="hover"
+          >
+            <div>
+              <div>1、基础用例集: 用于创建某一个步骤或者某一个节点，<span style="color: red">只能被当前服务下的用例引用</span></div>
+              <div>2、引用用例集: 用于创建某一个节点、流程节点的用例集，<span style="color: red">只能被创建其他用例的时候引用</span></div>
+              <div>3、单接口用例集: 用于创建测试单接口的用例集，<span style="color: red">只能被任务使用</span></div>
+              <div>4、流程用例集: 用于创建测试流程的用例集，<span style="color: red">只能被任务使用</span></div>
+              <div>5、造数据用例集: 用于创建快速造数据的用例集，提升手工测试效率，不能被其他用例引用，<span style="color: red">可在造数工具菜单使用</span></div>
+              <div>6、<span style="color: red">管理员</span>可修改用例集类型</div>
+            </div>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
+          </el-popover>
         </el-form-item>
+
         <el-form-item :label="'用例集名称'" class="filter-item is-required" prop="name" size="mini">
           <el-input v-model="tempDataForm.name" placeholder="同一节点下，用例集名称不可重复" />
         </el-form-item>
@@ -361,7 +377,7 @@ export default {
       this.putCaseSuiteUrl = webUiPutCaseSuite
       getFindElementOption(this) // 获取定位方式
       getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data.value)
+        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
       })
     } else {
       this.getCaseSuiteUrl = appUiGetCaseSuite
@@ -385,13 +401,13 @@ export default {
 
   mounted() {
     // 获取用例集类型
-    getConfigByName({ 'name': 'suite_type' }).then(response => {
-      this.suiteTypeList = response.data
+    getConfigByName({ 'name': this.dataType === 'api' ? 'api_suite_list' : 'ui_suite_list' }).then(response => {
+      this.suiteTypeList = JSON.parse(response.data)
     })
 
     // 从后端获取数据类型映射
     getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
     })
 
     // 从后端获取跳过方式映射
@@ -412,14 +428,14 @@ export default {
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {
       getConfigByName({ 'name': 'app_key_code' }).then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
       })
     }
 
     // 从后端获取PC键盘code类型映射
     if (this.dataType === 'webUi') {
       // getConfigByName({'name': 'app_key_code'}).then(response => {
-      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data.value)
+      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
       // })
       keyBoardCodeMappingList().then(response => {
         this.$busEvents.data.keyboardKeyCodeList = response.data
@@ -429,7 +445,7 @@ export default {
     // 从后端获取响应对象数据源映射
     if (this.dataType === 'api') {
       getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
-        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data.value)
+        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
       })
 
       // 从后端获取断言数方式映射
@@ -466,12 +482,12 @@ export default {
       return this.currentLevelForCommit !== 1 || this.moduleDrawerStatus !== 'add'
     },
 
-    initNewSuite() {
+    initNewSuite(data) {
       this.tempDataForm = {
         name: '',
         id: '',
         level: this.currentLevelForCommit + 1,
-        suite_type: '',
+        suite_type: data ? data.suite_type : '',
         parent: this.currentSuiteIdForCommit || null,
         project_id: this.currentProjectId
       }
@@ -555,13 +571,15 @@ export default {
 
     // 打开用例集编辑框
     showCaseSuiteDialog(command, node, data) {
+      console.log('node: ', node)
+      console.log('data: ', data)
       this.moduleDrawerStatus = command
       if (command === 'edit') {
         this.getCaseSuiteUrl({ id: data.id }).then(response => {
           this.tempDataForm = response.data
         })
       } else {
-        this.initNewSuite()
+        this.initNewSuite(data)
       }
       this.moduleDrawerIsShow = true
     },

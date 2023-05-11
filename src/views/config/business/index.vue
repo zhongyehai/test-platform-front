@@ -139,7 +139,8 @@
           <el-radio v-model="tempBusiness.receive_type" label="ding_ding">钉钉</el-radio>
           <el-radio v-model="tempBusiness.receive_type" label="we_chat">企业微信</el-radio>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
+            <div>1、设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
+            <div>2、钉钉群为关键词模式，关键词为“测试”、“报告”、“统计”</div>
             <el-button slot="reference" type="text" icon="el-icon-question" />
           </el-popover>
         </el-form-item>
@@ -269,7 +270,7 @@ export default {
   },
 
   mounted() {
-    runEnvList(this.listQuery).then(response => {
+    runEnvList({ pageNum: 1, pageSize: 9999 }).then(response => {
       this.run_env_list = response.data.data
       this.run_env_list.forEach(env => {
         this.run_env_id_list.push(env.id)

@@ -350,7 +350,7 @@ export default {
 
     // 从后端获取数据类型映射
     getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data.value)
+      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
     })
   },
 

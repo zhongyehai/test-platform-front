@@ -266,7 +266,7 @@ import {
   stepCopy as apiStepCopy,
   stepList as apiStepList
 } from '@/apis/apiTest/step'
-import { caseFrom as apiCaseFrom, getCase as apiGetCase, pullStep as apiPullStep } from '@/apis/apiTest/case'
+import { caseFrom as apiCaseFrom, getCase as apiGetCase } from '@/apis/apiTest/case'
 
 import {
   deleteStep as webUiDeleteStep,
@@ -275,7 +275,7 @@ import {
   stepCopy as webUiStepCopy,
   stepList as webUiStepList
 } from '@/apis/webUiTest/step'
-import { caseFrom as webUiCaseFrom, getCase as webUiGetCase, pullStep as webUiPullStep } from '@/apis/webUiTest/case'
+import { caseFrom as webUiCaseFrom, getCase as webUiGetCase } from '@/apis/webUiTest/case'
 
 import {
   deleteStep as appUiDeleteStep,
@@ -284,7 +284,7 @@ import {
   stepCopy as appUiStepCopy,
   stepList as appUiStepList
 } from '@/apis/appUiTest/step'
-import { caseFrom as appUiCaseFrom, getCase as appUiGetCase, pullStep as appUiPullStep } from '@/apis/appUiTest/case'
+import { caseFrom as appUiCaseFrom, getCase as appUiGetCase } from '@/apis/appUiTest/case'
 import showCaseDesc from '@/components/business/case/showCaseDesc.vue'
 
 export default {
@@ -339,8 +339,7 @@ export default {
       stepCopyUrl: '',
       stepListUrl: '',
       caseFromUrl: '',
-      getCaseUrl: '',
-      pullStepUrl: ''
+      getCaseUrl: ''
     }
   },
   watch: {
@@ -381,7 +380,6 @@ export default {
       this.stepListUrl = apiStepList
       this.caseFromUrl = apiCaseFrom
       this.getCaseUrl = apiGetCase
-      this.pullStepUrl = apiPullStep
     } else if (this.dataType === 'webUi') {
       this.deleteStepUrl = webUiDeleteStep
       this.putStepIsRunUrl = webUiPutStepIsRun
@@ -390,7 +388,6 @@ export default {
       this.stepListUrl = webUiStepList
       this.caseFromUrl = webUiCaseFrom
       this.getCaseUrl = webUiGetCase
-      this.pullStepUrl = webUiPullStep
     } else {
       this.deleteStepUrl = appUiDeleteStep
       this.putStepIsRunUrl = appUiPutStepIsRun
@@ -399,7 +396,6 @@ export default {
       this.stepListUrl = appUiStepList
       this.caseFromUrl = appUiCaseFrom
       this.getCaseUrl = appUiGetCase
-      this.pullStepUrl = appUiPullStep
     }
 
     this.tableHeight = window.innerHeight * 0.80

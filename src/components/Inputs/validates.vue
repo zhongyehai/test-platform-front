@@ -4,7 +4,7 @@
     <el-collapse accordion>
       <el-collapse-item>
         <template slot="title">
-          <div style="color:#409eff"> 点击查看示例</div>
+          <div style="color:red"> 点击查看示例</div>
         </template>
 
         <div style="margin-left: 20px">
@@ -121,17 +121,19 @@
       ref="dataTable"
       :data="tempData"
       stripe
-      :show-header="false"
       size="mini"
       row-key="id"
     >
-      <el-table-column label="id" header-align="center" min-width="4%">
+      <el-table-column label="序号" header-align="center" min-width="4%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
         </template>
       </el-table-column>
 
-      <el-table-column label="数据源" header-align="center" min-width="30%">
+      <el-table-column header-align="center" min-width="30%">
+        <template slot="header">
+          <span><span style="color: red">*</span>数据源</span>
+        </template>
         <template slot-scope="scope">
           <el-row>
             <el-row>
@@ -165,7 +167,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="validate_type" header-align="center" min-width="30%">
+      <el-table-column header-align="center" min-width="30%">
+        <template slot="header">
+          <span><span style="color: red">*</span>断言类型</span>
+        </template>
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.validate_type"
@@ -187,7 +192,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column property="value" label="Value" header-align="center" min-width="30%">
+      <el-table-column header-align="center" min-width="30%">
+        <template slot="header">
+          <span><span style="color: red">*</span>预期结果</span>
+        </template>
         <template slot-scope="scope">
           <el-row>
             <el-row>
@@ -227,7 +235,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="添加一行" header-align="center" min-width="6%">
+      <el-table-column label="操作" header-align="center" min-width="6%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button

@@ -5,7 +5,7 @@
     <el-collapse accordion>
       <el-collapse-item>
         <template slot="title">
-          <div style="color:#409eff"> 点击查看示例</div>
+          <div style="color:red"> 点击查看示例</div>
         </template>
 
         <div style="margin-left: 20px">
@@ -204,13 +204,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Key" header-align="center" min-width="23%">
+      <el-table-column header-align="center" min-width="23%">
+        <template slot="header">
+          <span><span style="color: red">*</span>变量key</span>
+        </template>
         <template slot-scope="scope">
           <el-input v-model="scope.row.key" size="mini" type="textarea" :rows="1" :placeholder="placeholderKey" />
         </template>
       </el-table-column>
 
-      <el-table-column label="提取方式" header-align="center" min-width="23%">
+      <el-table-column header-align="center" min-width="23%">
+        <template slot="header">
+          <span><span style="color: red">*</span>提取方式</span>
+        </template>
         <template slot-scope="scope">
           <el-row>
             <el-select
@@ -233,7 +239,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Value" header-align="center" min-width="23%">
+      <el-table-column label="选择元素" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <!-- 选择自定义函数，则输入自定义函数 -->
           <el-input
@@ -266,7 +272,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="备注" header-align="center" min-width="21%">
+      <el-table-column header-align="center" min-width="21%">
+        <template slot="header">
+          <span><span style="color: red">*</span>备注</span>
+        </template>
         <template slot-scope="scope">
           <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc" />
         </template>

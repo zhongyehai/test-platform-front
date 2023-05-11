@@ -3,18 +3,20 @@
     ref="dataTable"
     :data="tempData"
     stripe
-    :show-header="false"
     size="mini"
     row-key="id"
   >
 
-    <el-table-column label="id" header-align="center" min-width="4%">
+    <el-table-column label="序号" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
       </template>
     </el-table-column>
 
-    <el-table-column label="Key" header-align="center" min-width="35%">
+    <el-table-column header-align="center" min-width="35%">
+      <template slot="header">
+        <span><span style="color: red">*</span>字段key</span>
+      </template>
       <template slot-scope="scope">
         <el-input
           v-model="scope.row.key"
@@ -27,7 +29,10 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="Value" header-align="center" min-width="35%">
+    <el-table-column header-align="center" min-width="35%">
+      <template slot="header">
+        <span><span style="color: red">*</span>字段value</span>
+      </template>
       <template slot-scope="scope">
         <el-input
           v-model="scope.row.value"
@@ -40,13 +45,16 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="备注" header-align="center" min-width="20%">
+    <el-table-column header-align="center" min-width="20%">
+      <template slot="header">
+        <span><span style="color: red">*</span>字段说明</span>
+      </template>
       <template slot-scope="scope">
         <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc" />
       </template>
     </el-table-column>
 
-    <el-table-column label="添加" header-align="center" min-width="6%">
+    <el-table-column label="操作" header-align="center" min-width="6%">
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button

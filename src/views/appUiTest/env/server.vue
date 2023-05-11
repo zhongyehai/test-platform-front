@@ -262,7 +262,7 @@ export default {
     })
 
     getConfigByName({ 'name': 'server_os_mapping' }).then(response => {
-      this.serverOsMapping = JSON.parse(response.data.value)
+      this.serverOsMapping = JSON.parse(response.data)
     })
 
     this.getServerList()

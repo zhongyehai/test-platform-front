@@ -35,12 +35,23 @@
             filterable
             placeholder="选择用例集"
             size="mini"
-            style="min-width: 100%"
+            style="width: 97%"
             :options="currentCaseSuiteList"
             :props="{ checkStrictly: true }"
             clearable
             @change="getCaseList"
           />
+          <el-popover
+            class="el_popover_class"
+            placement="top-start"
+            trigger="hover"
+          >
+            <div>
+              <div>1、若选择的服务是当前服务，可引用类型为<span style="color: red">基础用例集</span>和<span style="color: red">引用用例集</span>的用例集</div>
+              <div>2、若选择的服务不是当前服务，只可引用类型为<span style="color: red">引用用例集</span>的用例集</div>
+            </div>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
+          </el-popover>
         </el-form-item>
       </el-col>
     </el-row>
@@ -355,7 +366,7 @@ export default {
         new_api['case_id'] = this.caseId
         new_api['status'] = 1
         new_api['run_times'] = 1
-        new_api['name'] = `引用【${name}/${row.name}】`
+        new_api['name'] = `${name}/${row.name}`
         new_api['headers'] = [{ 'key': null, 'remark': null, 'value': null }]
         new_api['params'] = [{ 'key': null, 'value': null }]
         new_api['data_form'] = [{ 'data_type': null, 'key': null, 'remark': null, 'value': null }]

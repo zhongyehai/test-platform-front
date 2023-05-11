@@ -200,7 +200,7 @@ export default {
     })
 
     getConfigByName({ 'name': 'phone_os_mapping' }).then(response => {
-      this.phoneOsMapping = JSON.parse(response.data.value)
+      this.phoneOsMapping = JSON.parse(response.data)
     })
 
     this.gePhoneList()
