@@ -86,12 +86,12 @@ export default {
 
   mounted() {
     // 监听运行申请的提交状态，提交成功，则获取对应的测试报告
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, run_id) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, batch_id) => {
       if (_type === 'process') {
         this.activeProcess = 1
         this.activeStatus = 1
         this.processIsShow = true
-        this.getReport(run_id)
+        this.getReport(batch_id)
       }
     })
   },
@@ -102,14 +102,14 @@ export default {
 
   methods: {
 
-    getShowReportId(run_id) {
+    getShowReportId(batch_id) {
       const that = this
-      this.reportShowIdUrl({ run_id: run_id }).then(response => (
+      this.reportShowIdUrl({ batch_id: batch_id }).then(response => (
         that.openReportById(response.data)
       ))
     },
 
-    getReport(run_id) {
+    getReport(batch_id) {
       // 触发运行成功，每三秒查询一次，
       // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
       // 已出结果，则停止查询，展示测试报告
@@ -120,7 +120,7 @@ export default {
       const timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
           that.reportIsDoneUrl({
-            run_id: run_id,
+            batch_id: batch_id,
             process: that.activeProcess,
             status: that.activeStatus
           }).then(response => {
@@ -128,7 +128,7 @@ export default {
             that.activeStatus = response.data.status
             if (that.activeProcess === 3 && that.activeStatus === 2) {
               that.processIsShow = false // 关闭进度框
-              that.getShowReportId(run_id)
+              that.getShowReportId(batch_id)
               clearInterval(timer) // 关闭定时器
             }
           })
@@ -143,7 +143,11 @@ export default {
 
     openReportById(reportId) {
       // console.log(`task.index.openReportById.reportId: ${JSON.stringify(reportId)}`)
-      const { href } = this.$router.resolve({ path: 'reportShow', query: { id: reportId }})
+      // 如果是造数据的页面触发的，则跳转到接口测试报告页面，否则根据测试类型跳报告
+      const { href } = this.$router.resolve({
+        path: window.location.href.indexOf('Test') !== -1 ? 'reportShow' : '/apiTest/reportShow',
+        query: { id: reportId }
+      })
       window.open(href, '_blank')
     }
   }

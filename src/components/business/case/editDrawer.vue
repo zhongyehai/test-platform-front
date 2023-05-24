@@ -1,13 +1,13 @@
 <template>
   <el-drawer
-    :title=" drawerType === 'update' ? '修改用例' : '新增用例'"
+    title="修改用例"
     size="95%"
     :append-to-body="true"
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
 
-    <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px" :before-leave="changeTab">
+    <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
 
       <!-- 用例信息组件 -->
       <el-tab-pane label="用例信息" name="caseInFo">
@@ -61,7 +61,7 @@
 
             <!-- 执行次数 -->
             <el-col :span="6">
-              <el-form-item label="用例归属" class="is-required" style="margin-bottom: 5px">
+              <el-form-item label="用例集" class="is-required" style="margin-bottom: 5px">
                 <el-select v-model="caseSuiteLabel" placeholder="请选择用例集" size="mini" style="width: 100%">
                   <el-option :value="[]" style="height: auto">
                     <el-tree
@@ -140,7 +140,7 @@
 
             <el-tab-pane v-if="dataType === 'api'">
               <template slot="label">
-                <span> 头部信息 </span>
+                <span> 头部参数 </span>
                 <el-tooltip
                   class="item"
                   effect="dark"
@@ -221,15 +221,28 @@
         style="float: left"
         :loading="isShowDebugLoading"
         @click="clickRunDebug()"
-      >运行
+      >调试
       </el-button>
+      <el-tooltip
+        style="float: left"
+        class="item"
+        effect="dark"
+        placement="top-start"
+      >
+        <div slot="content">
+          <div>1: 会用设置的参数运行用例</div>
+          <div>2: 不会自动保存跳过条件、自定义变量、头部信息设置的参数</div>
+          <div>3: 若调试完毕后要保存参数设置，请手动点击保存按钮</div>
+        </div>
+        <span><i style="color: #409EFF" class="el-icon-question" /></span>
+      </el-tooltip>
 
       <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
       <el-button
         size="mini"
         type="primary"
         :loading="submitLoadingIsShow"
-        @click="drawerType === 'add' ? addCase() : changCase() "
+        @click="changCase()"
       >
         {{ '保存' }}
       </el-button>
@@ -247,7 +260,6 @@ import variablesView from '@/components/Inputs/variables'
 import stepView from '@/components/business/step/index.vue'
 
 import {
-  postCase as apiPostCase,
   putCase as apiPutCase,
   copyCase as apiCopyCase,
   caseRun as apiCaseRun,
@@ -256,7 +268,6 @@ import {
 import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
 
 import {
-  postCase as webUiPostCase,
   putCase as webUiPutCase,
   copyCase as webUiCopyCase,
   caseRun as webUiCaseRun,
@@ -265,7 +276,6 @@ import {
 import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
 
 import {
-  postCase as appUiPostCase,
   putCase as appUiPutCase,
   copyCase as appUiCopyCase,
   caseRun as appUiCaseRun,
@@ -273,6 +283,9 @@ import {
 } from '@/apis/appUiTest/case'
 import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
+import { getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping } from '@/apis/config/config'
+import { getAssertMapping } from '@/apis/apiTest/api'
+import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
 
 export default {
   name: 'CaseDrawer',
@@ -329,7 +342,6 @@ export default {
       runEvent: 'runCaseEventOnDialog',
       callBackEvent: 'runCaseOnDialog',
 
-      postCaseUrl: '',
       putCaseUrl: '',
       copyCaseUrl: '',
       caseRunUrl: '',
@@ -371,10 +383,7 @@ export default {
     // 监听 case抽屉 的状态
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, currentCase) => {
       if (_type === 'caseInfo') {
-        if (command === 'add') {
-          this.initNewTempCase()
-          this.activeName = 'caseInFo'
-        } else if (command === 'edit') {
+        if (command === 'edit') {
           this.initUpdateTempCase(currentCase)
           this.activeName = 'stepInFo'
         } else if (command === 'copy') { // 复制用例
@@ -414,25 +423,94 @@ export default {
         this.debugCase(runDict)
       }
     })
+
+    // 从后端获取数据类型映射
+    if (this.$busEvents.data.dataTypeMappingList.length === 0) {
+      getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
+        this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
+      })
+    }
+
+    // 从后端获取跳过方式映射
+    if (this.$busEvents.data.skipIfTypeMappingList.length === 0) {
+      getSkipIfTypeMapping().then(response => {
+        this.$busEvents.data.skipIfTypeMappingList = response.data
+      })
+    }
+
+    // 从后端获取跳过条件映射
+    if (this.$busEvents.data.caseSkipIfDataSourceMapping.length === 0) {
+      getSkipIfDataSourceMapping({ type: 'case' }).then(response => {
+        this.$busEvents.data.caseSkipIfDataSourceMapping = response.data
+      })
+    }
+
+    // 从后端获取跳过条件映射
+    if (this.$busEvents.data.stepSkipIfDataSourceMapping.length === 0) {
+      getSkipIfDataSourceMapping({ type: 'step' }).then(response => {
+        this.$busEvents.data.stepSkipIfDataSourceMapping = response.data
+      })
+    }
+
+    // 从后端获取app键盘code类型映射
+    if (this.dataType === 'appUi') {
+      if (this.$busEvents.data.keyboardKeyCodeList.length === 0) {
+        getConfigByName({ 'name': 'app_key_code' }).then(response => {
+          this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
+        })
+      }
+    }
+
+    // 从后端获取响应对象数据源映射
+    if (this.dataType === 'api') {
+      if (this.$busEvents.data.responseDataSourceMappingList.length === 0) {
+        getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
+          this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
+        })
+      }
+    }
+
+    // 从后端获取断言数方式映射
+    if (this.$busEvents.data.apiTestAssertMappingList.length === 0) {
+      getAssertMapping().then(response => {
+        this.$busEvents.data.apiTestAssertMappingList = response.data
+      })
+    }
+
+    // 从后端获取PC键盘code类型映射
+    if (this.dataType === 'webUi') {
+      // getConfigByName({'name': 'app_key_code'}).then(response => {
+      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
+      // })
+      if (this.$busEvents.data.keyboardKeyCodeList.length === 0) {
+        keyBoardCodeMappingList().then(response => {
+          this.$busEvents.data.keyboardKeyCodeList = response.data
+        })
+      }
+    } else {
+      // 从后端获取UI测试数据提取方式映射
+      if (this.$busEvents.data.uiTestExtractMappingList.length === 0) {
+        extractMappingList().then(response => {
+          this.$busEvents.data.uiTestExtractMappingList = response.data
+        })
+      }
+    }
   },
 
   created() {
     if (this.dataType === 'api') {
-      this.postCaseUrl = apiPostCase
       this.putCaseUrl = apiPutCase
       this.copyCaseUrl = apiCopyCase
       this.caseRunUrl = apiCaseRun
       this.getCaseUrl = apiGetCase
       this.getCaseSuiteUrl = apiGetCaseSuite
     } else if (this.dataType === 'webUi') {
-      this.postCaseUrl = webUiPostCase
       this.putCaseUrl = webUiPutCase
       this.copyCaseUrl = webUiCopyCase
       this.caseRunUrl = webUiCaseRun
       this.getCaseUrl = webUiGetCase
       this.getCaseSuiteUrl = webUiGetCaseSuite
     } else {
-      this.postCaseUrl = appUiPostCase
       this.putCaseUrl = appUiPutCase
       this.copyCaseUrl = appUiCopyCase
       this.caseRunUrl = appUiCaseRun
@@ -455,35 +533,9 @@ export default {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'showAddStepDrawer')
     },
 
-    // 初始化新增用例模板
-    initNewTempCase() {
-      this.tempCase.id = ''
-      this.tempCase.name = ''
-      this.tempCase.desc = ''
-      this.tempCase.run_times = ''
-      this.tempCase.script_list = []
-      this.tempCase.before_case = []
-      this.tempCase.after_case = []
-      this.tempCase.variables = [{ key: null, value: null, remark: null, data_type: '' }]
-      this.tempCase.skip_if = {
-        skip_type: null,
-        data_source: null,
-        check_value: null,
-        comparator: null,
-        data_type: null,
-        expect: null
-      }
-      this.tempCase.headers = [{ key: null, value: null, remark: null }]
-      this.tempCase.project_id = this.currentProjectId || ''
-      this.tempCase.suite_id = this.currentSetId || ''
-      this.drawerType = 'add'
-      this.drawerIsShow = true
-    },
-
     // 初始化修改用例模板
     initUpdateTempCase(currentCase) {
       this.tempCase = currentCase
-      // this.getStepList()
       this.drawerType = 'update'
       this.drawerIsShow = true
     },
@@ -507,52 +559,6 @@ export default {
       }
     },
 
-    // 保存用例
-    changeTab(activeName, oldActiveName) {
-      return new Promise((resolve, reject) => {
-        if (oldActiveName && oldActiveName === 'caseInFo') {
-          this.submitLoadingIsShow = true
-          if (this.tempCase.id) { // 修改
-            this.putCaseUrl(this.getCaseDataToCommit()).then(response => {
-              this.submitLoadingIsShow = false
-              if (this.showMessage(this, response)) {
-                this.sendDrawerIsCommit()
-                return resolve()
-              } else {
-                this.activeName = 'caseInFo'
-              }
-            })
-          } else { // 新增
-            this.postCaseUrl(this.getCaseDataToCommit()).then(response => {
-              this.submitLoadingIsShow = false
-              if (this.showMessage(this, response)) {
-                this.drawerType = 'update'
-                this.tempCase.id = response.data.id
-                this.sendDrawerIsCommit()
-                return resolve()
-              } else {
-                this.activeName = 'caseInFo'
-              }
-            })
-          }
-        }
-        return resolve()
-      })
-    },
-
-    // 新增用例
-    addCase() {
-      this.submitLoadingIsShow = true
-      this.postCaseUrl(this.getCaseDataToCommit()).then(response => {
-        this.submitLoadingIsShow = false
-        if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
-          this.tempCase.id = response.data.id
-          this.sendDrawerIsCommit()
-        }
-      })
-    },
-
     // 修改用例
     changCase() {
       this.submitLoadingIsShow = true
@@ -567,30 +573,24 @@ export default {
 
     // 点击调试按钮
     clickRunDebug() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'caseDrawer', false)
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'selectRunEnv',
+        'caseDrawer',
+        false,
+        null,
+        {
+          variables: JSON.parse(JSON.stringify(this.tempCase.variables)),
+          headers: this.tempCase.headers ? JSON.parse(JSON.stringify(this.tempCase.headers)) : undefined,
+          skip_if: JSON.parse(JSON.stringify(this.tempCase.skip_if)),
+          run_times: this.tempCase.run_times
+        }
+      )
     },
 
-    // 保存并调试
+    // 触发调试
     debugCase(runConf) {
-      this.submitLoadingIsShow = true
-      if (this.tempCase.id) {
-        this.putCaseUrl(this.getCaseDataToCommit()).then(response => {
-          this.submitLoadingIsShow = false
-          if (this.showMessage(this, response)) {
-            this.sendDrawerIsCommit()
-            this.runCase(this.tempCase.id, runConf)
-          }
-        })
-      } else {
-        this.postCaseUrl(this.getCaseDataToCommit()).then(response => {
-          this.submitLoadingIsShow = false
-          if (this.showMessage(this, response)) {
-            this.tempCase.id = response.data.id
-            this.sendDrawerIsCommit()
-            this.runCase(this.tempCase.id, runConf)
-          }
-        })
-      }
+      this.runCase(this.tempCase.id, runConf)
     },
 
     sendDrawerIsCommit() {
@@ -608,12 +608,13 @@ export default {
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
         no_reset: runConf.noReset,
+        temp_variables: runConf.temp_variables,
         'trigger_type': 'page'
       }).then(response => {
         // console.log('case.index.methods.runCase.response: ', JSON.stringify(response))
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
         }
       })
     }

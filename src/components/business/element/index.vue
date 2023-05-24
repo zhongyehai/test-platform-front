@@ -137,6 +137,13 @@
       :current-module-id="currentModuleId"
       :current-page-id="pageId"
     />
+
+    <addElementDrawer
+      :data-type="dataType"
+      :current-project-id="currentProjectId"
+      :current-module-id="currentModuleId"
+      :current-page-id="pageId"
+    />
   </div>
 </template>
 
@@ -144,7 +151,8 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
-import elementDrawer from '@/components/business/element/drawer'
+import elementDrawer from '@/components/business/element/editElementDrawer.vue'
+import addElementDrawer from '@/components/business/element/addElementDrawer.vue'
 
 import {
   elementList as webUiElementList,
@@ -161,15 +169,14 @@ export default {
   name: 'Index',
   components: {
     Pagination,
-    elementDrawer
+    elementDrawer,
+    addElementDrawer
   },
 
   // 接收父组件传参的key
   props: [
-    'dataType',
-    'currentProjectId',
-    'currentModuleId',
-    'currentPageId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
   ],
   data() {
     return {

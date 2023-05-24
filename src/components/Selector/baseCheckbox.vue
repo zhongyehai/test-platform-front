@@ -52,7 +52,7 @@ export default {
   },
 
   mounted() {
-    console.log('this.dataList: ', this.dataList)
+    // console.log('this.dataList: ', this.dataList)
     this.initData()
   },
 

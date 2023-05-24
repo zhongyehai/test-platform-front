@@ -82,7 +82,6 @@ import editUiStepView from './editUiStep.vue'
 import quoteCaseView from './quoteCase'
 
 import { postStep as apiPostStep } from '@/apis/apiTest/step'
-import { postStep as webUiPostStep } from '@/apis/webUiTest/step'
 import { postStep as appUiPostStep } from '@/apis/appUiTest/step'
 
 export default {

@@ -7,6 +7,7 @@
     row-key="id"
   >
 
+    {{ canEdite }}
     <el-table-column label="序号" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
@@ -22,6 +23,7 @@
           v-model="scope.row.key"
           size="mini"
           type="textarea"
+          :disabled="canEdite === false"
           :rows="1"
           :placeholder="placeholderKey"
           @change="changeData"
@@ -50,11 +52,18 @@
         <span><span style="color: red">*</span>字段说明</span>
       </template>
       <template slot-scope="scope">
-        <el-input v-model="scope.row.remark" size="mini" type="textarea" :rows="1" :placeholder="placeholderDesc" />
+        <el-input
+          v-model="scope.row.remark"
+          :disabled="canEdite === false"
+          size="mini"
+          type="textarea"
+          :rows="1"
+          :placeholder="placeholderDesc"
+        />
       </template>
     </el-table-column>
 
-    <el-table-column label="操作" header-align="center" min-width="6%">
+    <el-table-column v-if="canEdite !== false" label="操作" header-align="center" min-width="6%">
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button
@@ -96,11 +105,8 @@ import Sortable from 'sortablejs'
 export default {
   name: 'ChangeRow',
   props: [
-    'currentData',
-    'placeholderKey',
-    'placeholderValue',
-    'placeholderDesc',
-    'busEventName'
+    // eslint-disable-next-line vue/require-prop-types
+    'currentData', 'placeholderKey', 'placeholderValue', 'placeholderDesc', 'busEventName', 'canEdite'
   ],
   data() {
     return {

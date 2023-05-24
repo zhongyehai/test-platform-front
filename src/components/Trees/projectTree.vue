@@ -55,7 +55,7 @@ import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 import { dataTypeTitleMappingContent } from '@/utils/mapping'
-import { phoneList, serverList } from '@/apis/appUiTest/env'
+import { phoneList, serverList } from '@/apis/appUiTest/device'
 import { getConfigByName } from '@/apis/config/config'
 
 export default {

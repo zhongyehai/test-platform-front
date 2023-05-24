@@ -1,0 +1,251 @@
+<template>
+  <div>
+
+    <!-- 新增/修改页面表单 -->
+    <el-drawer
+      title="新增元素"
+      size="85%"
+      :append-to-body="true"
+      :visible.sync="drawerIsShow"
+      :direction="direction"
+    >
+      <div style="margin-left: 20px; margin-right: 20px">
+
+        <!--        <el-form label-width="80px">-->
+        <!--          <el-form-item label="所属模块" class="is-required" style="margin-bottom: 5px">-->
+        <!--            <el-select v-model="moduleLabel" placeholder="请选择模块" size="mini" style="width: 100%">-->
+        <!--              <el-option :value="[]" style="height: auto">-->
+        <!--                <el-tree-->
+        <!--                  ref="moduleTree"-->
+        <!--                  :data="moduleTree"-->
+        <!--                  show-checkbox-->
+        <!--                  node-key="id"-->
+        <!--                  check-strictly-->
+        <!--                  highlight-current-->
+        <!--                  :props="defaultProps"-->
+        <!--                  @check-change="handleNodeClick"-->
+        <!--                />-->
+        <!--              </el-option>-->
+        <!--            </el-select>-->
+        <!--          </el-form-item>-->
+        <!--        </el-form>-->
+
+        <el-table
+          ref="dataTable"
+          :data="tempData"
+          stripe
+          size="mini"
+          row-key="id"
+        >
+
+          <el-table-column label="序号" header-align="center" min-width="4%">
+            <template slot-scope="scope">
+              <div>{{ scope.$index + 1 }}</div>
+            </template>
+          </el-table-column>
+
+          <el-table-column header-align="center" min-width="20%">
+            <template slot="header">
+              <span><span style="color: red">*</span>元素名</span>
+            </template>
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.name" size="mini" type="textarea" :rows="1" />
+            </template>
+          </el-table-column>
+
+          <el-table-column header-align="center" min-width="20%">
+            <template slot="header">
+              <span><span style="color: red">*</span>定位方式</span>
+            </template>
+            <template slot-scope="scope">
+              <el-select
+                v-model="scope.row.by"
+                filterable
+                default-first-option
+                clearable
+                size="mini"
+                style="width:100%"
+                placeholder="请选择定位方式"
+              >
+                <el-option
+                  v-for="option in $busEvents.data.findElementOptionList"
+                  :key="option.label"
+                  :label="option.label"
+                  :value="option.value"
+                />
+              </el-select>
+            </template>
+          </el-table-column>
+
+          <el-table-column header-align="center" min-width="30%">
+            <template slot="header">
+              <span><span style="color: red">*</span>元素表达式</span>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>如果定位方式为坐标，请填写坐标：(x, y)</div>
+                <div>如坐标x为538, y为1816，则填写: (538, 1816)</div>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
+              </el-popover>
+            </template>
+            <template slot-scope="scope">
+              <el-input
+                v-model="scope.row.element"
+                size="mini"
+                type="textarea"
+                :rows="1"
+                :placeholder="scope.row.by === 'coordinate' ? '请填写坐标：(x, y)，如(538, 1816)' : '元素表达式'"
+              />
+            </template>
+          </el-table-column>
+
+          <el-table-column header-align="center" min-width="20%">
+            <template slot="header">
+              <span>元素描述</span>
+            </template>
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.desc" size="mini" type="textarea" :rows="1" />
+            </template>
+          </el-table-column>
+
+          <el-table-column label="操作" header-align="center" min-width="6%">
+            <template slot-scope="scope">
+              <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
+                <el-button
+                  v-show="scope.$index === 0 || scope.$index === tempData.length - 1"
+                  type="text"
+                  size="mini"
+                  icon="el-icon-plus"
+                  @click.native="addRow(true)"
+                />
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
+                <el-button
+                  v-show="isShowDelButton(scope.$index)"
+                  type="text"
+                  size="mini"
+                  icon="el-icon-minus"
+                  style="color: red"
+                  @click.native="delRow(scope.$index)"
+                />
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+                <el-button
+                  v-show="tempData.length === 1"
+                  type="text"
+                  size="mini"
+                  icon="el-icon-circle-close"
+                  style="color: red"
+                  @click.native="clearData()"
+                />
+              </el-tooltip>
+            </template>
+          </el-table-column>
+
+        </el-table>
+
+      </div>
+
+      <div class="demo-drawer__footer">
+
+        <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          :loading="isShowSubmitLoading"
+          @click="addElement() "
+        >
+          {{ '保存元素' }}
+        </el-button>
+
+      </div>
+    </el-drawer>
+
+  </div>
+
+</template>
+
+<script>
+
+import { postElement as appPostElement } from '@/apis/appUiTest/element'
+import { postElement as webUiPostElement } from '@/apis/webUiTest/element'
+
+export default {
+  name: 'Drawer',
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
+  ],
+  data() {
+    return {
+      drawerIsShow: false, // 抽屉是否打开
+      direction: 'rtl', // 抽屉打开方式
+
+      isShowSubmitLoading: false,
+      tempData: [{ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 }],
+      postElementUrl: ''
+    }
+  },
+
+  created() {
+    if (this.dataType === 'webUi') {
+      this.postElementUrl = webUiPostElement
+    } else {
+      this.postElementUrl = appPostElement
+    }
+  },
+
+  mounted() {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, page_id) => {
+      if (_type === 'elementInfo') {
+        if (status === 'add') { // 新增
+          this.drawerType = 'add'
+          this.tempData = [{ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 }]
+          this.drawerIsShow = true
+        }
+      }
+    })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsShow)
+  },
+
+  methods: {
+
+    addRow() {
+      this.tempData.push({ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 })
+    },
+
+    // 是否显示删除按钮
+    isShowDelButton(index) {
+      return !(this.tempData.length === 1 && index === 0)
+    },
+
+    // 删除一行
+    delRow(index) {
+      this.tempData.splice(index, 1)
+    },
+
+    // 提交添加页面
+    addElement() {
+      this.isShowSubmitLoading = true
+      this.postElementUrl({
+        project_id: this.currentProjectId,
+        module_id: this.currentModuleId,
+        page_id: this.currentPageId,
+        element_list: this.tempData
+      }).then(response => {
+        this.isShowSubmitLoading = false
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsCommit, 'elementInfo')
+          this.drawerIsShow = false
+        }
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

@@ -1,7 +1,9 @@
 import request from '@/utils/request' // 加载请求配置文件
-import { baseDirWebUiTest } from '@/apis/base'
+import { baseDirApiTest, baseDirWebUiTest } from '@/apis/base'
 
 const currentBaseDir = baseDirWebUiTest + '/caseSuite'
+
+export const uploadAddr = baseDirApiTest + '/caseSuite/upload'
 
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })
@@ -35,4 +37,9 @@ export function caseSuiteList(params) {
 // 运行用例集下的用例
 export function caseSuiteRun(data) {
   return request({ url: currentBaseDir + '/run', method: 'post', data: data })
+}
+
+// 导入用例集
+export function caseSuiteUpload(data) {
+  return request({ url: currentBaseDir + '/upload', method: 'post', data: data })
 }

@@ -15,15 +15,6 @@
         >
           <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
-
-        <!--        <el-button-->
-        <!--          v-show="currentProjectId"-->
-        <!--          type="primary"-->
-        <!--          size="mini"-->
-        <!--          style="margin-left: 10px"-->
-        <!--          @click.native="addParentSuite()"-->
-        <!--        >添加一级用例集-->
-        <!--        </el-button>-->
       </el-form-item>
 
       <el-form-item v-if="dataType === 'api'" label="查接口" size="mini">
@@ -73,6 +64,17 @@
                   style="margin-left: 50px"
                   @click="addParentSuite()"
                 >添加
+                </el-button>
+              </el-popover>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>{{ `为当前${titleType}导入用例集` }}</div>
+                <el-button
+                  v-show="currentProjectId"
+                  slot="reference"
+                  type="text"
+                  style="margin-left: 50px"
+                  @click="showUploadDrawer()"
+                >导入
                 </el-button>
               </el-popover>
             </template>
@@ -165,6 +167,47 @@
 
     </el-row>
 
+    <!-- 导入用例集 -->
+    <el-drawer
+      :title="'上传用例集文件'"
+      size="55%"
+      :visible.sync="uploadFileDrawerIsShow"
+      :direction="direction"
+    >
+      <div style="margin-left: 20px;margin-right: 20px">
+        <div style="margin-bottom: 20px">
+          1、必须<span style="color: red;">按照模板填写内容</span><br>
+          2、必须使用<span style="color: red;">XMind8</span>版本 <a href="https://xmind.cn/download/xmind8/" target="_blank" style="color: #3a8ee6">去下载</a><br>
+          3、导入后，<span style="color: red;">默认类型为流程用例集</span>，若要修改为其他类型，<span style="color: red;">只需修改一级用例集即可</span>，子用例集会跟随修改
+        </div>
+        <!-- 示例图片 -->
+        <el-image :src="uploadCaseImage" />
+        <el-row>
+          <el-col :span="12">
+            <el-upload
+              class="upload-demo"
+              :action="uploadAddrUrl"
+              :show-file-list="false"
+              :on-success="uploadFile"
+            >
+              <el-button size="mini" type="primary">选择文件</el-button>
+            </el-upload>
+          </el-col>
+
+          <el-col :span="12">
+            <el-button size="mini" type="primary" style="float: right" @click="downloadTemplate">下载模板</el-button>
+          </el-col>
+        </el-row>
+        <div v-if="uploadFailTotal > 0">
+          <span>共失败 {{ uploadFailTotal }}条</span>
+          {{ uploadFailList }}
+        </div>
+      </div>
+      <div class="demo-drawer__footer">
+        <el-button size="small" @click="uploadFileDrawerIsShow = false">关闭</el-button>
+      </div>
+    </el-drawer>
+
     <!-- 新增/修改用例集表单 -->
     <el-drawer
       :title="moduleDrawerStatus === 'add' ? '新增用例集' : '修改用例集'"
@@ -172,6 +215,14 @@
       :visible.sync="moduleDrawerIsShow"
       :direction="direction"
     >
+      <div style="margin: 0 20px 20px 20px">
+        <div>1、基础用例集: 用于创建某一个步骤或者某一个节点，<span style="color: red">只能被当前服务下的用例引用</span></div>
+        <div>2、引用用例集: 用于创建某一个节点、流程节点的用例集，<span style="color: red">只能被创建其他用例的时候引用</span></div>
+        <div>3、单接口用例集: 用于创建测试单接口的用例集，<span style="color: red">只能被任务使用</span></div>
+        <div>4、流程用例集: 用于创建测试流程的用例集，<span style="color: red">只能被任务使用</span></div>
+        <div>5、造数据用例集: 用于创建快速造数据的用例集，提升手工测试效率，不能被其他用例引用，<span style="color: red">可在造数工具菜单使用</span></div>
+        <div>6、修改<span style="color: red">一级用例集</span>的类型，<span style="color: red">子用例集</span>的类型会跟随修改</div>
+      </div>
       <el-form
         ref="dataForm"
         :model="tempDataForm"
@@ -184,8 +235,8 @@
             v-model="tempDataForm.suite_type"
             default-first-option
             size="mini"
-            :disabled="isDisabled()"
-            style="width: 97%"
+            :disabled="tempDataForm.parent !== null"
+            style="width: 100%"
             placeholder="请选择用例集类型"
             class="filter-item"
           >
@@ -196,21 +247,21 @@
               :value="suiteType.key"
             />
           </el-select>
-          <el-popover
-            class="el_popover_class"
-            placement="top-start"
-            trigger="hover"
-          >
-            <div>
-              <div>1、基础用例集: 用于创建某一个步骤或者某一个节点，<span style="color: red">只能被当前服务下的用例引用</span></div>
-              <div>2、引用用例集: 用于创建某一个节点、流程节点的用例集，<span style="color: red">只能被创建其他用例的时候引用</span></div>
-              <div>3、单接口用例集: 用于创建测试单接口的用例集，<span style="color: red">只能被任务使用</span></div>
-              <div>4、流程用例集: 用于创建测试流程的用例集，<span style="color: red">只能被任务使用</span></div>
-              <div>5、造数据用例集: 用于创建快速造数据的用例集，提升手工测试效率，不能被其他用例引用，<span style="color: red">可在造数工具菜单使用</span></div>
-              <div>6、<span style="color: red">管理员</span>可修改用例集类型</div>
-            </div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
+          <!--          <el-popover-->
+          <!--            class="el_popover_class"-->
+          <!--            placement="top-start"-->
+          <!--            trigger="hover"-->
+          <!--          >-->
+          <!--            <div>-->
+          <!--              <div>1、基础用例集: 用于创建某一个步骤或者某一个节点，<span style="color: red">只能被当前服务下的用例引用</span></div>-->
+          <!--              <div>2、引用用例集: 用于创建某一个节点、流程节点的用例集，<span style="color: red">只能被创建其他用例的时候引用</span></div>-->
+          <!--              <div>3、单接口用例集: 用于创建测试单接口的用例集，<span style="color: red">只能被任务使用</span></div>-->
+          <!--              <div>4、流程用例集: 用于创建测试流程的用例集，<span style="color: red">只能被任务使用</span></div>-->
+          <!--              <div>5、造数据用例集: 用于创建快速造数据的用例集，提升手工测试效率，不能被其他用例引用，<span style="color: red">可在造数工具菜单使用</span></div>-->
+          <!--              <div>6、<span style="color: red">管理员</span>可修改用例集类型</div>-->
+          <!--            </div>-->
+          <!--            <el-button slot="reference" type="text" icon="el-icon-question" />-->
+          <!--          </el-popover>-->
         </el-form-item>
 
         <el-form-item :label="'用例集名称'" class="filter-item is-required" prop="name" size="mini">
@@ -234,7 +285,7 @@
       :data-type="dataType"
       :project-business-id="projectBusinessId"
     />
-    <!--    :use-from="'caseIndex'"-->
+
     <runProcess
       :data-type="dataType"
     />
@@ -264,10 +315,15 @@ import ApiEditDrawer from '@/views/apiTest/api/drawer.vue'
 import showApiFromDrawer from '@/components/business/api/apiFromDrawer.vue'
 import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
+import { Loading } from 'element-ui'
+
 import { getFindElementOption } from '@/utils/getConfig'
 import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import { apiMsgBelongTo, apiMsgBelongToStep, getAssertMapping } from '@/apis/apiTest/api' // 接口引用
+import {
+  apiMsgBelongTo,
+  apiMsgBelongToStep
+} from '@/apis/apiTest/api' // 接口引用
 import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import {
   getCaseSuite as apiGetCaseSuite,
@@ -275,7 +331,9 @@ import {
   caseSuiteRun as apiCaseSuiteRun,
   deleteCaseSuite as apiDeleteCaseSuite,
   postCaseSuite as apiPostCaseSuite,
-  putCaseSuite as apiPutCaseSuite
+  putCaseSuite as apiPutCaseSuite,
+  uploadAddr as apiUploadAddr,
+  caseSuiteUpload as apiCaseSuiteUpload, downloadSuiteTemplate
 } from '@/apis/apiTest/caseSuite'
 
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
@@ -285,7 +343,9 @@ import {
   caseSuiteRun as webUiCaseSuiteRun,
   deleteCaseSuite as webUiDeleteCaseSuite,
   postCaseSuite as webUiPostCaseSuite,
-  putCaseSuite as webUiPutCaseSuite
+  putCaseSuite as webUiPutCaseSuite,
+  uploadAddr as webUiUploadAddr,
+  caseSuiteUpload as webUiCaseSuiteUpload
 } from '@/apis/webUiTest/caseSuite'
 
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
@@ -295,11 +355,12 @@ import {
   caseSuiteRun as appUiCaseSuiteRun,
   deleteCaseSuite as appUiDeleteCaseSuite,
   postCaseSuite as appUiPostCaseSuite,
-  putCaseSuite as appUiPutCaseSuite
+  putCaseSuite as appUiPutCaseSuite,
+  uploadAddr as appUiUploadAddr,
+  caseSuiteUpload as appUiCaseSuiteUpload
 } from '@/apis/appUiTest/caseSuite'
-import { getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping } from '@/apis/config/config'
-import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
-import { phoneList, serverList } from '@/apis/appUiTest/env'
+import { getConfigByName } from '@/apis/config/config'
+import { phoneList, serverList } from '@/apis/appUiTest/device'
 
 export default {
   name: 'Index',
@@ -327,7 +388,6 @@ export default {
       setListData: [], // 用例集列表
       currentSuiteId: '', // 当前选中的用例集id，用于数据传递，获取用例列表
       currentSuiteIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
-      currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
       tempDataForm: {},
       queryAddrIsLoading: false,
@@ -335,6 +395,9 @@ export default {
       queryAddr: '',
       marker: 'suite',
       moduleDrawerIsShow: false,
+      uploadFileDrawerIsShow: false,
+      uploadFailList: [],
+      uploadFailTotal: 0,
       defaultCaseSuite: {},
       moduleDrawerStatus: '',
       dropdownStatus: false, // el-dropdown 的展开/隐藏状态
@@ -342,7 +405,10 @@ export default {
       runType: 1,
       runEnv: 'test',
       runSuiteData: undefined,
+      uploadCaseImage: require('../../../assets/uploadCase.png'),
       projectListUrl: '',
+      uploadAddrUrl: '',
+      caseSuiteUploadUrl: '',
       caseSuiteTreeUrl: '',
       getCaseSuiteUrl: '',
       caseSuiteRunUrl: '',
@@ -367,6 +433,8 @@ export default {
       this.deleteCaseSuiteUrl = apiDeleteCaseSuite
       this.postCaseSuiteUrl = apiPostCaseSuite
       this.putCaseSuiteUrl = apiPutCaseSuite
+      this.uploadAddrUrl = apiUploadAddr
+      this.caseSuiteUploadUrl = apiCaseSuiteUpload
     } else if (this.dataType === 'webUi') {
       this.getCaseSuiteUrl = webUiGetCaseSuite
       this.projectListUrl = webUiProjectList
@@ -375,6 +443,8 @@ export default {
       this.deleteCaseSuiteUrl = webUiDeleteCaseSuite
       this.postCaseSuiteUrl = webUiPostCaseSuite
       this.putCaseSuiteUrl = webUiPutCaseSuite
+      this.uploadAddrUrl = webUiUploadAddr
+      this.caseSuiteUploadUrl = webUiCaseSuiteUpload
       getFindElementOption(this) // 获取定位方式
       getConfigByName({ 'name': 'browser_name' }).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
@@ -387,6 +457,8 @@ export default {
       this.deleteCaseSuiteUrl = appUiDeleteCaseSuite
       this.postCaseSuiteUrl = appUiPostCaseSuite
       this.putCaseSuiteUrl = appUiPutCaseSuite
+      this.uploadAddrUrl = appUiUploadAddr
+      this.caseSuiteUploadUrl = appUiCaseSuiteUpload
       getFindElementOption(this) // 获取定位方式
       serverList().then(response => {
         this.$busEvents.data.runServerList = response.data.data
@@ -405,60 +477,6 @@ export default {
       this.suiteTypeList = JSON.parse(response.data)
     })
 
-    // 从后端获取数据类型映射
-    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
-    })
-
-    // 从后端获取跳过方式映射
-    getSkipIfTypeMapping().then(response => {
-      this.$busEvents.data.skipIfTypeMappingList = response.data
-    })
-
-    // 从后端获取跳过条件映射
-    getSkipIfDataSourceMapping({ type: 'case' }).then(response => {
-      this.$busEvents.data.caseSkipIfDataSourceMapping = response.data
-    })
-
-    // 从后端获取跳过条件映射
-    getSkipIfDataSourceMapping({ type: 'step' }).then(response => {
-      this.$busEvents.data.stepSkipIfDataSourceMapping = response.data
-    })
-
-    // 从后端获取app键盘code类型映射
-    if (this.dataType === 'appUi') {
-      getConfigByName({ 'name': 'app_key_code' }).then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
-      })
-    }
-
-    // 从后端获取PC键盘code类型映射
-    if (this.dataType === 'webUi') {
-      // getConfigByName({'name': 'app_key_code'}).then(response => {
-      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
-      // })
-      keyBoardCodeMappingList().then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = response.data
-      })
-    }
-
-    // 从后端获取响应对象数据源映射
-    if (this.dataType === 'api') {
-      getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
-        this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
-      })
-
-      // 从后端获取断言数方式映射
-      getAssertMapping().then(response => {
-        this.$busEvents.data.apiTestAssertMappingList = response.data
-      })
-    } else {
-      // 从后端获取UI测试数据提取方式映射
-      extractMappingList().then(response => {
-        this.$busEvents.data.uiTestExtractMappingList = response.data
-      })
-    }
-
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
       if (_type === 'selectRunEnv' && _runUnit === 'set') {
         this.runCaseSuite(runDict)
@@ -473,20 +491,46 @@ export default {
 
   methods: {
 
-    // 判断用例集类型是否可编辑
-    isDisabled() {
-      // 管理员不限制
-      if (localStorage.getItem('permissions').indexOf('admin') !== -1) {
-        return false
+    // 导入文件
+    uploadFile(response, file) {
+      const form = new FormData()
+      form.append('project_id', this.currentProjectId)
+      form.append('file', file.raw)
+
+      const loadingInstance = Loading.service({
+        text: '文件上传、解析、写库需要些时间，请耐心等待',
+        background: 'rgba(0, 0, 0, 0.8)'
+      })
+
+      this.caseSuiteUploadUrl(form).then((response) => {
+        loadingInstance.close()
+
+        if (this.showMessage(this, response)) {
+          this.getSuiteList(this.currentProjectId)
+        } else {
+          this.uploadFailList = response.data.suite.fail.data
+          this.uploadFailTotal = response.data.suite.fail.total
+        }
       }
-      return this.currentLevelForCommit !== 1 || this.moduleDrawerStatus !== 'add'
+      )
+    },
+
+    // 下载导入模板
+    downloadTemplate() {
+      downloadSuiteTemplate().then(response => {
+        const blob = new Blob([response], { type: 'application/vnd.xmind.workbook' })
+        // 保存文件到本地
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
+        a.download = '用例集导入模板.xmind'
+        a.click()
+      })
     },
 
     initNewSuite(data) {
       this.tempDataForm = {
         name: '',
         id: '',
-        level: this.currentLevelForCommit + 1,
         suite_type: data ? data.suite_type : '',
         parent: this.currentSuiteIdForCommit || null,
         project_id: this.currentProjectId
@@ -520,7 +564,6 @@ export default {
       this.currentSuiteId = '' // 切换项目的时候，把选中用例集置为''
       this.currentSuiteIdForCommit = '' // 切换项目的时候，把选中用例集置为''
       this.currentParent = {}
-      this.currentLevelForCommit = 1 // 切换项目的时候，把选中用例集置为''
       this.caseSuiteTreeUrl({ 'project_id': projectId }).then(response => {
         var response_data = JSON.stringify(response.data.data) === '{}' ? [] : response.data.data
         this.setListData = arrayToTree(response_data, null)
@@ -539,7 +582,6 @@ export default {
     clickTree(data, node, element) {
       this.currentSuiteId = data.id
       this.currentSuiteIdForCommit = data.id
-      this.currentLevelForCommit = data.level
       this.currentParent = data
       this.$refs.tree.store.nodesMap[data.id].expanded = !this.$refs.tree.store.nodesMap[data.id].expanded // 展开/收缩节点
     },
@@ -547,9 +589,13 @@ export default {
     // 添加一级用例集
     addParentSuite() {
       this.currentSuiteIdForCommit = ''
-      this.currentLevelForCommit = 1
       this.currentParent = {}
       this.showCaseSuiteDialog('add')
+    },
+
+    // 打开文件上传
+    showUploadDrawer() {
+      this.uploadFileDrawerIsShow = true
     },
 
     // 鼠标滑入的时候，设置一个值，代表展示菜单
@@ -571,8 +617,6 @@ export default {
 
     // 打开用例集编辑框
     showCaseSuiteDialog(command, node, data) {
-      console.log('node: ', node)
-      console.log('data: ', data)
       this.moduleDrawerStatus = command
       if (command === 'edit') {
         this.getCaseSuiteUrl({ id: data.id }).then(response => {
@@ -674,7 +718,7 @@ export default {
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
         }
       })
     },

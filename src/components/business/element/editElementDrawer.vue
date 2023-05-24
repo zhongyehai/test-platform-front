@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-drawer
-      :title="drawerType === 'edit' ? '修改元素' : '新增元素'"
+      title="修改元素"
       size="70%"
       :append-to-body="true"
       :wrapper-closable="false"
@@ -84,7 +84,7 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click="drawerType === 'edit' ? changElement() : addElement() "
+          @click="changElement()"
         >保存
         </el-button>
       </div>
@@ -94,17 +94,15 @@
 </template>
 
 <script>
-import { postElement as appPostElement, putElement as appPutElement } from '@/apis/appUiTest/element'
-import { postElement as webUiPostElement, putElement as webUiPutElement } from '@/apis/webUiTest/element'
+import { putElement as appPutElement } from '@/apis/appUiTest/element'
+import { putElement as webUiPutElement } from '@/apis/webUiTest/element'
 
 export default {
   name: 'Drawer',
   components: {},
   props: [
-    'dataType',
-    'currentProjectId',
-    'currentModuleId',
-    'currentPageId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
   ],
   data() {
     return {
@@ -123,12 +121,9 @@ export default {
       },
       submitButtonIsLoading: false,
       submitButtonIsShow: true,
-      pageId: '',
       isSendForPage: false, // 标记是否发送给页面管理，更新页面地址
 
       element_label: '',
-
-      postElementUrl: '',
       putElementUrl: ''
     }
   },
@@ -147,47 +142,26 @@ export default {
 
   created() {
     if (this.dataType === 'webUi') {
-      this.postElementUrl = webUiPostElement
       this.putElementUrl = webUiPutElement
     } else {
-      this.postElementUrl = appPostElement
       this.putElementUrl = appPutElement
     }
-
-    this.pageId = this.currentPageId
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, element) => {
       if (_type === 'elementInfo') {
-        if (status === 'add') { // 新增
-          this.drawerType = 'add'
-          this.initTempElement()
-        } else if (status === 'edit') { // 修改
+        if (status === 'edit') { // 修改
           this.drawerType = 'edit'
-          this.updateTempElement(data)
+          this.updateTempElement(element)
         } else if (status === 'copy') { // 复制
           this.drawerType = 'add'
-          this.updateTempElement(data)
+          this.updateTempElement(element)
         }
 
         if (this.tempElement.by === null) {
           this.tempElement.by = this.$busEvents.data.findElementOptionList[0].value
         }
-
-        this.drawerIsShow = true
-      }
-    })
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, pageId) => {
-      if (_type === 'pageInfo') {
-        this.pageId = pageId
-      }
-    })
-
-    this.$bus.$on(this.$busEvents.drawerIsOpen, (_type, pageId) => {
-      if (_type === 'pageInfo') {
-        this.pageId = pageId
       }
     })
   },
@@ -201,22 +175,6 @@ export default {
 
   methods: {
 
-    // 初始化临时元素数据 (新增)
-    initTempElement() {
-      this.tempElement = {
-        id: null,
-        name: null,
-        by: null,
-        element: null,
-        desc: null,
-        wait_time_out: 5,
-        page_id: this.pageId,
-        module_id: this.currentModuleId,
-        project_id: this.currentProjectId
-      }
-      this.submitButtonIsShow = true
-    },
-
     // 初始化临时元素数据 (修改)
     updateTempElement(row) {
       this.tempElement.id = row.id
@@ -229,6 +187,7 @@ export default {
       this.tempElement.module_id = row.module_id
       this.tempElement.project_id = row.project_id
       this.submitButtonIsShow = true
+      this.drawerIsShow = true
     },
 
     // 获取数据提交给后端
@@ -244,18 +203,6 @@ export default {
         module_id: this.tempElement.module_id,
         project_id: this.tempElement.project_id
       }
-    },
-
-    // 新增元素
-    addElement() {
-      this.submitButtonIsLoading = true
-      this.postElementUrl(this.getProjectForCommit()).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.tempElement.id = response.data.id
-          this.sendIsCommitStatus()
-        }
-      })
     },
 
     // 修改元素

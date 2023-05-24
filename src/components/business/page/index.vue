@@ -170,7 +170,13 @@
 
     </el-tabs>
 
-    <pageDrawer
+    <editPageDrawer
+      :data-type="dataType"
+      :current-project-id="currentProjectId"
+      :current-module-id="currentModuleId"
+    />
+
+    <addPageDrawer
       :data-type="dataType"
       :current-project-id="currentProjectId"
       :current-module-id="currentModuleId"
@@ -183,7 +189,8 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
-import pageDrawer from '@/components/business/page/drawer'
+import editPageDrawer from '@/components/business/page/editPageDrawer.vue'
+import addPageDrawer from '@/components/business/page/addPageDrawer.vue'
 
 import { getFindElementOption } from '@/utils/getConfig'
 
@@ -209,7 +216,8 @@ export default {
   name: 'Index',
   components: {
     Pagination,
-    pageDrawer
+    editPageDrawer,
+    addPageDrawer
   },
 
   // 接收父组件传参的key

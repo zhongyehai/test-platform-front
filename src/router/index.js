@@ -205,10 +205,10 @@ export const constantRoutes = [
     meta: { title: 'appUI自动化', icon: 'el-icon-mobile' },
     children: [
       {
-        path: 'env',
-        name: 'AppUiEnv',
-        component: () => import('@/views/appUiTest/env/index'),
-        meta: { title: '运行环境', icon: 'el-icon-monitor' }
+        path: 'device',
+        name: 'AppUiDevice',
+        component: () => import('@/views/appUiTest/device/index'),
+        meta: { title: '设备管理', icon: 'el-icon-monitor' }
       },
       {
         path: 'project',
@@ -288,7 +288,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/tools/dataPool',
     name: 'Tools',
-    meta: { title: '造数小工具', icon: 'el-icon-s-tools' },
+    meta: { title: '造数工具', icon: 'el-icon-s-tools' },
     alwaysShow: true,
     children: [
       // {
@@ -297,6 +297,12 @@ export const constantRoutes = [
       //   component: () => import('@/views/tools/examination'),
       //   meta: { title: '征信考试', icon: 'form' }
       // },
+      {
+        path: 'makeData',
+        name: 'MakeData',
+        component: () => import('@/views/tools/makeBusinessData'),
+        meta: { title: '造数据', icon: 'el-icon-coin' }
+      },
       {
         path: 'dataPool',
         name: 'DataPool',
@@ -380,12 +386,12 @@ export const constantRoutes = [
       //   component: () => import('@/views/testWork/weekly'),
       //   meta: { title: '周报', icon: 'el-icon-s-check' }
       // },
-      // {
-      //   path: 'kym',
-      //   name: 'KYM',
-      //   component: () => import('@/views/testWork/kym'),
-      //   meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
-      // },
+      {
+        path: 'kym',
+        name: 'KYM',
+        component: () => import('@/views/testWork/kym'),
+        meta: { title: 'KYM分析', icon: 'el-icon-edit-outline' }
+      },
       {
         path: 'makeTestCase',
         name: 'MakeTestCase',
@@ -395,8 +401,8 @@ export const constantRoutes = [
       {
         path: 'account',
         name: 'Account',
-        component: () => import('@/views/testWork/account'),
-        meta: { title: '测试账号', icon: 'el-icon-s-check' }
+        component: () => import('@/views/testWork/env'),
+        meta: { title: '地址和账号管理', icon: 'el-icon-s-check' }
       }
     ]
   },
@@ -461,6 +467,12 @@ export const constantRoutes = [
         name: 'User',
         component: () => import('@/views/users/user/index'),
         meta: { title: '用户管理', icon: 'el-icon-user-solid' }
+      },
+      {
+        path: 'job',
+        name: 'Job',
+        component: () => import('@/views/system/job/index'),
+        meta: { title: '定时任务', icon: 'el-icon-date' }
       },
       {
         path: 'errorRecord',

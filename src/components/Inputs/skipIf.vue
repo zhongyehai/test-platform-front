@@ -8,7 +8,7 @@
       size="mini"
       row-key="id"
     >
-      <el-table-column label="序号" header-align="center" min-width="4%">
+      <el-table-column label="序号" header-align="center" min-width="8%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
         </template>
@@ -39,7 +39,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column header-align="center" min-width="25%">
+      <el-table-column header-align="center" min-width="20%">
         <template slot="header">
           <span><span style="color: red">*</span>数据源</span>
         </template>
@@ -146,7 +146,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" header-align="center" min-width="6%">
+      <el-table-column label="操作" header-align="center" min-width="7%">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
             <el-button

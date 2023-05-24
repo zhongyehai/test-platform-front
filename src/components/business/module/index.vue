@@ -296,7 +296,7 @@ import {
   postModule as appUiPostModule,
   putModule as appUiPutModule
 } from '@/apis/appUiTest/module'
-import { phoneList, serverList } from '@/apis/appUiTest/env'
+import { phoneList, serverList } from '@/apis/appUiTest/device'
 
 export default {
   name: 'Index',
@@ -321,12 +321,10 @@ export default {
       projectListData: [], // 项目列表
       moduleListData: [], // 模块列表
       currentModuleIdForCommit: '', // 当前选中的模块id，用于提交新增、修改
-      currentLevelForCommit: 1, // 当前选中的模块id，用于提交新增、修改
       currentParent: {}, // 当前选中的模块，用于提交新增、修改
       tempDataForm: {
         name: '',
         id: '',
-        level: '',
         parent: '',
         project_id: '',
         controller: ''
@@ -452,7 +450,6 @@ export default {
     getModuleList(projectId) {
       this.currentModuleIdForCommit = '' // 切换项目的时候，把选中模块置为''
       this.currentParent = {}
-      this.currentLevelForCommit = 1 // 切换项目的时候，把选中模块置为''
       this.moduleTreeUrl({ 'project_id': projectId }).then(response => {
         var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data
         this.moduleListData = arrayToTree(response_data, null)
@@ -471,7 +468,6 @@ export default {
     // 点击树
     clickTree(data, node, element) {
       this.currentModuleIdForCommit = data.id
-      this.currentLevelForCommit = data.level
       this.currentParent = data
       this.$refs.tree.store.nodesMap[data.id].expanded = !this.$refs.tree.store.nodesMap[data.id].expanded // 展开/收缩节点
       this.$bus.$emit(this.$busEvents.treeIsChoice, 'module', data.id, this.tempDataForm.project_id)
@@ -480,7 +476,6 @@ export default {
     // 添加一级模块
     addParentModule() {
       this.currentModuleIdForCommit = ''
-      this.currentLevelForCommit = 1
       this.currentParent = {}
       this.showModuleDialog('add')
     },
@@ -518,7 +513,6 @@ export default {
       this.postModuleUrl({
         name: this.tempDataForm.name,
         id: '',
-        level: this.currentLevelForCommit + 1,
         parent: this.currentModuleIdForCommit || null,
         project_id: this.tempDataForm.project_id
       }).then(response => {
@@ -547,7 +541,6 @@ export default {
       this.putModuleUrl({
         name: this.tempDataForm.name,
         id: this.currentParent.id,
-        level: this.currentParent.level,
         parent: this.currentParent.parent,
         project_id: this.currentParent.project_id
       }).then(response => {

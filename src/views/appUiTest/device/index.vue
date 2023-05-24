@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import serverView from '@/views/appUiTest/env/server'
-import phoneView from '@/views/appUiTest/env/phone'
+import serverView from '@/views/appUiTest/device/server'
+import phoneView from '@/views/appUiTest/device/phone'
 
 export default {
   name: 'Index',

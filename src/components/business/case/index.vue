@@ -284,7 +284,12 @@
 
     </el-tabs>
 
-    <caseDrawer
+    <add-case-drawer
+      :data-type="dataType"
+      :current-set-id="currentSetId"
+    />
+
+    <editCaseDrawer
       :data-type="dataType"
       :current-project-id="currentProjectId"
       :current-set-id="currentSetId"
@@ -296,7 +301,8 @@
 <script>
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
-import caseDrawer from '@/components/business/case/drawer'
+import editCaseDrawer from '@/components/business/case/editDrawer'
+import addCaseDrawer from '@/components/business/case/addCaseDrawer'
 import showCaseDesc from '@/components/business/case/showCaseDesc'
 
 import {
@@ -329,7 +335,8 @@ export default {
   name: 'Index',
   components: {
     Pagination,
-    caseDrawer,
+    addCaseDrawer,
+    editCaseDrawer,
     showCaseDesc
   },
 
@@ -543,7 +550,14 @@ export default {
 
     // 点击运行用例
     clickRunCase(row) {
+      let tempRunArgs = null
       if (row.id) {
+        tempRunArgs = {
+          variables: JSON.parse(JSON.stringify(row.variables)),
+          headers: row.headers ? JSON.parse(JSON.stringify(row.headers)) : undefined,
+          skip_if: JSON.parse(JSON.stringify(row.skip_if)),
+          run_times: row.run_times
+        }
         this.runCaseId = [row.id]
       } else {
         this.runCaseId = []
@@ -551,7 +565,14 @@ export default {
           this.runCaseId.push(data.id)
         })
       }
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'caseIndex', false)
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'selectRunEnv',
+        'caseIndex',
+        false,
+        null,
+        tempRunArgs
+      )
     },
 
     // 运行用例
@@ -564,10 +585,11 @@ export default {
         server_id: runConf.runServer,
         phone_id: runConf.runPhone,
         no_reset: runConf.noReset,
+        temp_variables: runConf.temp_variables,
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
         }
       })
     },

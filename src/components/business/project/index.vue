@@ -139,9 +139,17 @@
         min-width="10%"
       >
         <template slot-scope="scope">
-          <el-tag :type="pullStatusTagType[scope.row.last_pull_status]">
-            {{ pullStatusContent[scope.row.last_pull_status] }}
-          </el-tag>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              <div>{{ scope.row.last_pull_status !== 1 ? '点击查看详情' : '' }}</div>
+            </div>
+            <el-tag
+              :type="pullStatusTagType[scope.row.last_pull_status]"
+              @click="getSwaggerPullLog(scope.row)"
+            >
+              {{ pullStatusContent[scope.row.last_pull_status] }}
+            </el-tag>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -242,6 +250,9 @@
     <projectEnvDrawer
       :data-type="dataType"
     />
+
+    <!-- swagger拉取记录 -->
+    <showSwaggerPullLog />
   </div>
 </template>
 
@@ -269,6 +280,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import projectDrawer from '@/components/business/project/drawer.vue'
 import pullDrawerView from '@/components/business/project/pullDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
+import showSwaggerPullLog from '@/components/business/project/showSwaggerPullLog.vue'
 import { getConfigByName } from '@/apis/config/config'
 import { businessList } from '@/apis/config/business'
 import { swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType } from '@/utils/mapping'
@@ -279,7 +291,8 @@ export default {
     Pagination,
     projectDrawer,
     pullDrawerView,
-    projectEnvDrawer
+    projectEnvDrawer,
+    showSwaggerPullLog
   },
   directives: { waves },
   // eslint-disable-next-line vue/require-prop-types
@@ -375,6 +388,13 @@ export default {
     // 解析用户
     parseUser(userId) {
       return this.userDict[userId].name
+    },
+
+    // 获取服务的拉取日志
+    getSwaggerPullLog(project) {
+      if (project.last_pull_status !== 1) {
+        this.$bus.$emit(this.$busEvents.drawerIsShow, 'showSwaggerPullLog', project, this.userDict)
+      }
     },
 
     // 编辑按钮

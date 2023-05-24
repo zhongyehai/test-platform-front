@@ -16,43 +16,14 @@ exports.install = function(Vue) {
   Vue.prototype.showMessage = function(_this, response) {
     // 根据响应信息的状态码，以不同状态的弹框提示message
     if (response.status >= 500) {
-      _this.$notify.error(response.message)
+      _this.$message({ showClose: true, message: response.message, type: 'error' })
       return false
     } else if (response.status >= 400) {
-      _this.$notify.warning(response.message)
+      _this.$message({ showClose: true, message: response.message, type: 'warning' })
       return false
     } else {
-      _this.$notify.success(response.message)
+      _this.$message({ showClose: true, message: response.message, type: 'success' })
       return true
     }
-  }
-
-  // 显示接口业务响应状态为2xx的信息
-  Vue.prototype.showSuccess = function(_this, response) {
-    if (response.status < 300) {
-      _this.$notify.success(response.message)
-      return true
-    }
-  }
-
-  // 显示接口业务响应状态为4xx的信息
-  Vue.prototype.showFail = function(_this, response) {
-    if (response.status >= 400 < 500) {
-      _this.$notify.warning(response.message)
-      return true
-    }
-  }
-
-  // 显示接口业务响应状态为5xx的信息
-  Vue.prototype.showErrorResponse = function(_this, response) {
-    if (response.status >= 400 < 500) {
-      _this.$notify.error(response.message)
-      return true
-    }
-  }
-
-  // 显示接口业务响应状态为5xx的信息
-  Vue.prototype.showError = function(_this, message) {
-    _this.$notify.error(message)
   }
 }

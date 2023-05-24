@@ -351,7 +351,7 @@ export default {
   },
 
   mounted() {
-    // 从内存获取响应对象数据源映射
+    // 从获取响应对象数据源映射
     this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList
 
     this.initTempData(this.currentData)

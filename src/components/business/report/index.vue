@@ -184,7 +184,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="操作" align="center" min-width="10%">
+              <el-table-column label="操作" align="center" min-width="12%">
                 <template slot-scope="scope">
 
                   <!--查看报告-->
@@ -192,9 +192,18 @@
                     v-show="scope.row.process === 3 && scope.row.status === 2"
                     type="text"
                     size="mini"
-                    style="margin-right: 10px"
                     @click.native="openReportById(scope.row.id)"
                   >查看
+                  </el-button>
+
+                  <!--重跑-->
+                  <el-button
+                    v-show="scope.row.process === 3 && scope.row.status === 2 || isAdmin"
+                    type="text"
+                    size="mini"
+                    style="margin-right: 10px"
+                    @click.native="reRun(scope.row)"
+                  >重跑
                   </el-button>
 
                   <!-- 删除报告 -->
@@ -240,6 +249,14 @@
       </el-col>
     </el-row>
 
+    <selectRunEnv
+      :data-type="dataType"
+    />
+
+    <runProcess
+      :data-type="dataType"
+    />
+
   </div>
 </template>
 
@@ -248,16 +265,31 @@
 import projectTreeView from '@/components/Trees/projectTree.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
+import { getProject as apiGetProject } from '@/apis/apiTest/project'
+import { getCase as apiGetCase, caseRun as apiCaseRun } from '@/apis/apiTest/case'
+import { runApi as apiRun } from '@/apis/apiTest/api'
+import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
+import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import {
   reportList as apiReportList,
   deleteReport as apiDeleteReport,
   downloadReport as apiDownloadReport
 } from '@/apis/apiTest/report'
+
+import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
+import { getCase as webUiGetCase, caseRun as webUiCaseRun } from '@/apis/webUiTest/case'
+import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 import {
   reportList as webUiReportList,
   deleteReport as webUiDeleteReport,
   downloadReport as webUiDownloadReport
 } from '@/apis/webUiTest/report'
+
+import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
+import { getCase as appUiGetCase, caseRun as appUiCaseRun } from '@/apis/appUiTest/case'
+import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 import {
   reportList as appUiReportList,
   deleteReport as appUiDeleteReport,
@@ -273,10 +305,12 @@ import {
   reportStatusMappingTagType,
   reportTriggerTypeMappingContent
 } from '@/utils/mapping'
+import selectRunEnv from '@/components/selectRunEnv.vue'
+import runProcess from '@/components/runProcess.vue'
 
 export default {
   name: 'Index',
-  components: { Pagination, projectTreeView },
+  components: { runProcess, selectRunEnv, Pagination, projectTreeView },
   props: [
     // eslint-disable-next-line vue/require-prop-types
     'dataType'
@@ -295,6 +329,7 @@ export default {
         env_list: [],
         run_type: undefined
       },
+      isAdmin: localStorage.getItem('permissions').indexOf('admin') !== -1,
       queryTotal: 0,
       userList: [],
       eventDict: {},
@@ -305,7 +340,14 @@ export default {
       reportTriggerType: reportTriggerTypeMappingContent,
       selectedList: [],
       showBatchDelete: false,
+      reRunReport: {},
 
+      apiRunUrl: '',
+      caseRunUrl: '',
+      taskRunUrl: '',
+      caseSuiteRunUrl: '',
+      getProjectUrl: '',
+      getCaseUrl: '',
       reportListUrl: '',
       deleteReportUrl: '',
       downloadReportUrl: ''
@@ -334,6 +376,13 @@ export default {
       }
     })
 
+    // 用例提交成功，请求用例列表
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'selectRunEnv' && _runUnit === 'reportIndex') {
+        this.runCase(runDict)
+      }
+    })
+
     getConfigByName({ 'name': 'run_type' }).then(response => {
       this.runTypeDict = JSON.parse(response.data)
     })
@@ -341,14 +390,30 @@ export default {
 
   created() {
     if (this.dataType === 'api') {
+      this.apiRunUrl = apiRun
+      this.caseRunUrl = apiCaseRun
+      this.taskRunUrl = apiRunTask
+      this.caseSuiteRunUrl = apiRunCaseSuite
+      this.getCaseUrl = apiGetCase
+      this.getProjectUrl = apiGetProject
       this.reportListUrl = apiReportList
       this.deleteReportUrl = apiDeleteReport
       this.downloadReportUrl = apiDownloadReport
     } else if (this.dataType === 'webUi') {
+      this.taskRunUrl = webUiRunTask
+      this.caseSuiteRunUrl = webUiRunCaseSuite
+      this.caseRunUrl = webUiCaseRun
+      this.getCaseUrl = webUiGetCase
+      this.getProjectUrl = webUiGetProject
       this.reportListUrl = webUiReportList
       this.deleteReportUrl = webUiDeleteReport
       this.downloadReportUrl = webUiDownloadReport
     } else {
+      this.taskRunUrl = appUiRunTask
+      this.caseSuiteRunUrl = appUiRunCaseSuite
+      this.caseRunUrl = appUiCaseRun
+      this.getCaseUrl = appUiGetCase
+      this.getProjectUrl = appUiGetProject
       this.reportListUrl = appUiReportList
       this.deleteReportUrl = appUiDeleteReport
       this.downloadReportUrl = appUiDownloadReport
@@ -358,6 +423,7 @@ export default {
   // 页面销毁前，关闭bus监听服务选中事件
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.treeIsChoice)
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
   methods: {
 
@@ -388,6 +454,85 @@ export default {
       window.open(href, '_blank')
     },
 
+    // 重跑
+    reRun(report) {
+      this.reRunReport = report
+      // 获取报告对应的服务的业务线id
+      let project = null
+
+      // 获取服务
+      this.getProjectUrl({ id: report.project_id }).then(response => {
+        project = response.data
+
+        const run_type = this.reRunReport.run_type
+        if (run_type === 'case') {
+          const temp_variables = this.reRunReport.temp_variables
+          if (temp_variables) { // 本身就有临时参数
+            this.sendReRun(project.business_id, temp_variables)
+          } else { // 没有就获取用例的数据
+            const run_id = this.reRunReport.run_id
+            if (run_id.length === 1) {
+              this.getCaseUrl({ id: run_id[0] }).then(response => {
+                const case_data = response.data
+                this.sendReRun(project.business_id, {
+                  skip_if: case_data.skip_if,
+                  variables: case_data.variables,
+                  run_times: case_data.run_times,
+                  headers: case_data.headers
+                })
+              })
+            } else {
+              this.sendReRun(project.business_id, null)
+            }
+          }
+        } else {
+          this.sendReRun(project.business_id, null)
+        }
+      })
+    },
+
+    sendReRun(business_id, temp_run_args) {
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'selectRunEnv',
+        'reportIndex',
+        ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1,
+        business_id,
+        temp_run_args
+      )
+    },
+
+    getRunUrl() {
+      const run_type = this.reRunReport.run_type
+      return run_type === 'task' ? this.taskRunUrl
+        : run_type === 'suite' ? this.caseSuiteRunUrl
+          : run_type === 'case' ? this.caseRunUrl
+            : this.apiRunUrl
+    },
+
+    // 运行用例
+    runCase(runConf) {
+      const runUrl = this.getRunUrl()
+
+      runUrl({
+        apis: this.reRunReport.run_type === 'api' ? this.reRunReport.run_id : undefined,
+        caseId: this.reRunReport.run_type === 'case' ? this.reRunReport.run_id : undefined,
+        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.run_id : undefined,
+        env_list: runConf.runEnv,
+        is_async: runConf.runType,
+        browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
+        temp_variables: runConf.temp_variables,
+        'trigger_type': 'page'
+      }).then(response => {
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
+        }
+      })
+    },
+
     // // 下载测试报告按钮
     // this.downloadReportUrl(reportId) {
     //   downloadReport({'id': reportId}).then((response) => {
@@ -397,70 +542,70 @@ export default {
     // },
 
     // 把数据转为html
-    renderHtml(data, strFileName, strMimeType) {
-      const self = window // this script is only for browsers anyway...
-      const defaultMime = 'application/octet-stream' // this default mime also triggers iframe downloads
-      const mimeType = strMimeType || defaultMime
-      const payload = data
-      const anchor = document.createElement('a')
-      const toString = function(a) {
-        return String(a)
-      }
-      let myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString)
-      const fileName = strFileName || 'download'
-      let blob
-      let reader
-      myBlob = myBlob.call ? myBlob.bind(self) : Blob
-
-      // go ahead and download dataURLs right away
-      // eslint-disable-next-line prefer-const
-      blob = payload instanceof myBlob
-        ? payload
-        // eslint-disable-next-line new-cap
-        : new myBlob([payload], { type: mimeType })
-
-      function saver(url, winMode) {
-        if ('download' in anchor) { // html5 A[download]
-          anchor.href = url
-          anchor.setAttribute('download', fileName)
-          anchor.className = 'download-js-link'
-          anchor.innerHTML = 'downloading...'
-          anchor.style.display = 'none'
-          document.body.appendChild(anchor)
-          setTimeout(function() {
-            anchor.click()
-            document.body.removeChild(anchor)
-            if (winMode === true) {
-              setTimeout(function() {
-                self.URL.revokeObjectURL(anchor.href)
-              }, 250)
-            }
-          }, 66)
-          return true
-        }
-      }// end saver
-
-      if (self.URL) { // simple fast and modern way using Blob and URL:
-        saver(self.URL.createObjectURL(blob), true)
-      } else {
-        // handle non-Blob()+non-URL browsers:
-        if (typeof blob === 'string' || blob.constructor === toString) {
-          try {
-            return saver('data:' + mimeType + ';base64,' + self.btoa(blob))
-          } catch (y) {
-            return saver('data:' + mimeType + ',' + encodeURIComponent(blob))
-          }
-        }
-
-        // Blob but not URL support:
-        reader = new FileReader()
-        reader.onload = function() {
-          saver(this.result)
-        }
-        reader.readAsDataURL(blob)
-      }
-      return true
-    },
+    // renderHtml(data, strFileName, strMimeType) {
+    //   const self = window // this script is only for browsers anyway...
+    //   const defaultMime = 'application/octet-stream' // this default mime also triggers iframe downloads
+    //   const mimeType = strMimeType || defaultMime
+    //   const payload = data
+    //   const anchor = document.createElement('a')
+    //   const toString = function(a) {
+    //     return String(a)
+    //   }
+    //   let myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString)
+    //   const fileName = strFileName || 'download'
+    //   let blob
+    //   let reader
+    //   myBlob = myBlob.call ? myBlob.bind(self) : Blob
+    //
+    //   // go ahead and download dataURLs right away
+    //   // eslint-disable-next-line prefer-const
+    //   blob = payload instanceof myBlob
+    //     ? payload
+    //     // eslint-disable-next-line new-cap
+    //     : new myBlob([payload], { type: mimeType })
+    //
+    //   function saver(url, winMode) {
+    //     if ('download' in anchor) { // html5 A[download]
+    //       anchor.href = url
+    //       anchor.setAttribute('download', fileName)
+    //       anchor.className = 'download-js-link'
+    //       anchor.innerHTML = 'downloading...'
+    //       anchor.style.display = 'none'
+    //       document.body.appendChild(anchor)
+    //       setTimeout(function() {
+    //         anchor.click()
+    //         document.body.removeChild(anchor)
+    //         if (winMode === true) {
+    //           setTimeout(function() {
+    //             self.URL.revokeObjectURL(anchor.href)
+    //           }, 250)
+    //         }
+    //       }, 66)
+    //       return true
+    //     }
+    //   }// end saver
+    //
+    //   if (self.URL) { // simple fast and modern way using Blob and URL:
+    //     saver(self.URL.createObjectURL(blob), true)
+    //   } else {
+    //     // handle non-Blob()+non-URL browsers:
+    //     if (typeof blob === 'string' || blob.constructor === toString) {
+    //       try {
+    //         return saver('data:' + mimeType + ';base64,' + self.btoa(blob))
+    //       } catch (y) {
+    //         return saver('data:' + mimeType + ',' + encodeURIComponent(blob))
+    //       }
+    //     }
+    //
+    //     // Blob but not URL support:
+    //     reader = new FileReader()
+    //     reader.onload = function() {
+    //       saver(this.result)
+    //     }
+    //     reader.readAsDataURL(blob)
+    //   }
+    //   return true
+    // },
 
     cancelDeletePopover(report) {
       this.$set(report, 'deletePopoverIsShow', false)

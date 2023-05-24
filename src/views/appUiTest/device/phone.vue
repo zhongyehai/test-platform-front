@@ -16,21 +16,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="手机名称" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" align="center" label="手机名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="os" align="center" label="手机系统类型" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" align="center" label="手机系统类型" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="ip" align="center" label="手机系统版本" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" align="center" label="手机系统版本" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.os_version }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :show-overflow-tooltip="true" align="center" label="设备id" min-width="25%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.device_id }} </span>
         </template>
       </el-table-column>
 
@@ -128,6 +134,10 @@
           <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本" />
         </el-form-item>
 
+        <el-form-item label="设备id" class="is-required" size="mini">
+          <el-input v-model="tempData.device_id" size="mini" placeholder="设备id" />
+        </el-form-item>
+
       </el-form>
 
       <div class="demo-drawer__footer">
@@ -157,7 +167,7 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
-import { phoneList, postPhone, putPhone, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/env'
+import { phoneList, postPhone, putPhone, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/device'
 import { getConfigByName } from '@/apis/config/config'
 
 export default {
@@ -181,6 +191,7 @@ export default {
         num: '',
         name: '',
         os: '',
+        device_id: '',
         os_version: ''
       },
 
@@ -250,6 +261,7 @@ export default {
         this.tempData.num = ''
         this.tempData.name = ''
         this.tempData.os = ''
+        this.tempData.device_id = ''
         this.tempData.os_version = ''
       }
     },

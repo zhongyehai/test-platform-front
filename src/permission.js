@@ -5,12 +5,12 @@
 
 import router from './router'
 import store from './store'
-import {Message} from 'element-ui'
+import { Message } from 'element-ui'
 import NProgress from 'nprogress' // 顶部页面加载进度条
 import 'nprogress/nprogress.css' // progress bar style
 import getPageTitle from '@/utils/get-page-title'
 
-NProgress.configure({showSpinner: false}) // showSpinner: false 隐藏显示加载中的转圈
+NProgress.configure({ showSpinner: false }) // showSpinner: false 隐藏显示加载中的转圈
 
 // 白名单列表，不需要权限就可访问的路由
 const whiteList = [
@@ -23,10 +23,13 @@ const whiteList = [
   '/tools/examination',
   '/tools/makeUserInfo',
 
-  '/uiTest/uiReportShow'
+  '/testManage/account',
+
+  '/webUiTest/reportShow',
+  '/appUiTest/reportShow'
 ]
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   // 显示顶部页面加载进度条
   NProgress.start()
 

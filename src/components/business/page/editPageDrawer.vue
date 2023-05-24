@@ -3,7 +3,7 @@
 
     <!-- 新增/修改页面表单 -->
     <el-drawer
-      :title=" tempPage.id ? '修改页面' : '新增页面'"
+      title="修改页面"
       size="80%"
       :visible.sync="drawerIsShow"
       :direction="direction"
@@ -14,7 +14,6 @@
         v-model="showTab"
         class="table_padding table_api"
         style="margin-left: 20px;margin-right: 20px"
-        :before-leave="beforeLeave"
       >
 
         <!--页面管理 -->
@@ -77,7 +76,7 @@
           type="primary"
           size="mini"
           :loading="isShowSubmitLoading"
-          @click=" tempPage.id ? changPage() : addPage() "
+          @click="changPage()"
         >
           {{ '保存页面' }}
         </el-button>
@@ -93,11 +92,11 @@
 import elementManage from '@/components/business/element/index.vue'
 
 import { getModule as appUiGetModule } from '@/apis/appUiTest/module'
-import { postPage as appUiPostPage, putPage as appUiPutPage, copyPage as appUiCopyPage } from '@/apis/appUiTest/page'
+import { putPage as appUiPutPage, copyPage as appUiCopyPage } from '@/apis/appUiTest/page'
 import { elementList as appUiElementList } from '@/apis/appUiTest/element'
 
 import { getModule as webUiGetModule } from '@/apis/webUiTest/module'
-import { postPage as webUiPostPage, putPage as webUiPutPage, copyPage as webUiCopyPage } from '@/apis/webUiTest/page'
+import { putPage as webUiPutPage, copyPage as webUiCopyPage } from '@/apis/webUiTest/page'
 import { elementList as webUiElementList } from '@/apis/webUiTest/element'
 
 export default {
@@ -106,9 +105,8 @@ export default {
     elementManage
   },
   props: [
-    'dataType',
-    'currentProjectId',
-    'currentModuleId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'currentProjectId', 'currentModuleId'
   ],
   data() {
     return {
@@ -133,7 +131,6 @@ export default {
       },
 
       getModuleUrl: '',
-      postPageUrl: '',
       putPageUrl: '',
       copyPageUrl: '',
       elementListUrl: ''
@@ -174,13 +171,11 @@ export default {
   created() {
     if (this.dataType === 'webUi') {
       this.getModuleUrl = webUiGetModule
-      this.postPageUrl = webUiPostPage
       this.putPageUrl = webUiPutPage
       this.copyPageUrl = webUiCopyPage
       this.elementListUrl = webUiElementList
     } else {
       this.getModuleUrl = appUiGetModule
-      this.postPageUrl = appUiPostPage
       this.putPageUrl = appUiPutPage
       this.copyPageUrl = appUiCopyPage
       this.elementListUrl = appUiElementList
@@ -199,10 +194,7 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, page) => {
       if (_type === 'pageInfo') {
         this.showTab = 'pageInfo'
-        if (command === 'add') {
-          this.tempPage.id = ''
-          this.initNewTempPage() // 新增
-        } else if (command === 'edit') {
+        if (command === 'edit') {
           this.initUpdateTempPage(page) // 修改
           this.$bus.$emit(this.$busEvents.drawerIsOpen, 'pageInfo', page.id)
         } else if (command === 'copy') {
@@ -235,17 +227,6 @@ export default {
       }
     },
 
-    // 提交添加页面
-    addPage() {
-      this.isShowSubmitLoading = true
-      this.postPageUrl(this.getTempPage()).then(response => {
-        this.isShowSubmitLoading = false
-        if (this.showMessage(this, response)) {
-          this.drawerIsCommit()
-        }
-      })
-    },
-
     // 提交修改页面
     changPage() {
       this.isShowSubmitLoading = true
@@ -262,16 +243,6 @@ export default {
       this.$bus.$emit(this.$busEvents.drawerIsCommit, 'pageInfo')
     },
 
-    // 点击新增页面时，初始化 dialog 数据
-    initNewTempPage() {
-      this.tempPage.id = ''
-      this.tempPage.name = ''
-      this.tempPage.desc = ''
-      this.tempPage.module_id = this.currentModuleId ? this.currentModuleId : ''
-      this.tempPage.project_id = this.currentProjectId || ''
-      this.drawerIsShow = true
-    },
-
     // 点击修改页面时，初始化 dialog 数据
     initUpdateTempPage(page) {
       this.tempPage = page
@@ -286,25 +257,6 @@ export default {
         desc: this.tempPage.desc,
         module_id: this.$refs.moduleTree.getCheckedKeys()[0],
         project_id: this.tempPage.project_id
-      }
-    },
-
-    /* 点击切换tab
-    * activeName：要去的标签页
-    * oldActiveName：当前的标签页
-    * */
-    beforeLeave(activeName, oldActiveName) {
-      if (!this.tempPage.id && oldActiveName === 'pageInfo') {
-        this.isShowSubmitLoading = true
-        this.postPageUrl(this.getTempPage()).then(response => {
-          this.isShowSubmitLoading = false
-          if (this.showMessage(this, response)) {
-            this.tempPage = response.data
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'pageInfo', this.tempPage.id)
-          } else {
-            this.showTab = oldActiveName
-          }
-        })
       }
     },
 

@@ -3,7 +3,7 @@
     <div class="reportShow" style="line-height: 36px;">
 
       <!-- 有测试报告数据 -->
-      <div v-show="reportData.details.length > 0">
+      <div v-if="reportData.details.length > 0">
 
         <!-- 第一行，头部信息 -->
         <div class="grid-content" style="background-color: #f5f5f5 !important;">
@@ -61,7 +61,7 @@
               v-if="!reportData.success"
               type="primary"
               size="mini"
-              style="margin-right: 10px"
+              style="margin-right: 5px"
               @click.native="showHitDrawer('add')"
             >记录问题</el-button>
 
@@ -69,9 +69,17 @@
             <el-button
               type="primary"
               size="mini"
-              style="margin-right: 10px"
+              style="margin-right: 5px"
               @click="showPythonScriptManage = true"
             >Python脚本</el-button>
+
+            <!-- Python脚本 -->
+            <el-button
+              type="primary"
+              size="mini"
+              style="margin-right: 10px"
+              @click="reRun()"
+            >重跑</el-button>
 
             <!-- 删除报告 -->
             <el-popover
@@ -148,25 +156,23 @@
                       >
                         <div>
                           <el-row>
-                            <el-col :span="case_data.case_id ? 19 : 24">
+                            <el-col :span="case_data.case_id ? 20 : 24">
                               <div
                                 style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
                                 :style="case_data.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
                               > {{ case_data.name }}
                               </div>
                             </el-col>
-                            <el-col :span="case_data.case_id ? 5 : 0">
-                              <el-button
-                                v-if="case_data.case_id"
-                                style="
-                                margin-left: 20px;
-                                float:right;
-                                text-align:right"
-                                size="mini"
-                                type="text"
-                                @click.stop.prevent="showCaseInfo(case_data.case_id)"
-                              >打开用例
-                              </el-button>
+                            <el-col :span="case_data.case_id ? 4 : 0">
+                              <div style="text-align: center">
+                                <el-button
+                                  v-if="case_data.case_id"
+                                  size="mini"
+                                  type="text"
+                                  @click.stop.prevent="showCaseInfo(case_data.case_id)"
+                                >打开用例
+                                </el-button>
+                              </div>
                             </el-col>
                           </el-row>
                         </div>
@@ -705,15 +711,27 @@ import JsonViewer from 'vue-json-viewer'
 import vkbeautify from 'vkbeautify' // xml格式化组件
 import hitDrawer from '@/views/assist/hits/drawer'
 import pythonScriptIndex from '@/views/assist/script/index'
-import caseDrawer from '@/components/business/case/drawer'
+import caseDrawer from '@/components/business/case/editDrawer.vue'
 
 import { runEnvList } from '@/apis/config/runEnv'
-import { deleteReport as deleteApiReport, reportDetail as apiReportDetail } from '@/apis/apiTest/report'
-import { deleteReport as deleteWebUiReport, reportDetail as webUiReportDetail } from '@/apis/webUiTest/report'
-import { deleteReport as deleteAppUiReport, reportDetail as appUiReportDetail } from '@/apis/appUiTest/report'
-import { caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
-import { caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
-import { caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
+import { deleteReport as deleteApiReport, reportDetail as apiReportDetail, getReport as apiGetReport } from '@/apis/apiTest/report'
+import { getProject as apiGetProject } from '@/apis/apiTest/project'
+import { runApi as apiRun } from '@/apis/apiTest/api'
+import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
+import { runTask as apiRunTask } from '@/apis/apiTest/task'
+import { getCase as apiGetCase, caseRun as apiCaseRun, caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
+
+import { deleteReport as deleteWebUiReport, reportDetail as webUiReportDetail, getReport as webUiGetReport } from '@/apis/webUiTest/report'
+import { getCase as webUiGetCase, caseRun as webUiCaseRun, caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
+import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
+import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
+
+import { deleteReport as deleteAppUiReport, reportDetail as appUiReportDetail, getReport as appUiGetReport } from '@/apis/appUiTest/report'
+import { getCase as appUiGetCase, caseRun as appUiCaseRun, caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
+import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
+import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 
 import { reportStepResultMapping } from '@/utils/mapping'
 import selectRunEnv from '@/components/selectRunEnv.vue'
@@ -730,6 +748,7 @@ export default {
   },
   // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
+
   data() {
     return {
       direction: 'rtl', // 抽屉打开方式
@@ -861,23 +880,63 @@ export default {
       },
 
       resultMapping: reportStepResultMapping,
+      reRunReport: '',
+      apiRunUrl: '',
+      caseRunUrl: '',
+      taskRunUrl: '',
+      caseSuiteRunUrl: '',
+      getProjectUrl: '',
+      getReportUrl: '',
+      getCaseUrl: '',
       reportDetailUrl: '',
       deleteReportUrl: '',
       getCaseProjectUrl: ''
     }
   },
 
+  mounted() {
+    // 用例提交成功，请求用例列表
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
+      if (_type === 'selectRunEnv' && _runUnit === 'reportShow') {
+        this.runCase(runDict)
+      }
+    })
+  },
+
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
+  },
+
   created() {
     if (this.dataType === 'api') {
+      this.apiRunUrl = apiRun
+      this.caseRunUrl = apiCaseRun
+      this.taskRunUrl = apiRunTask
+      this.caseSuiteRunUrl = apiRunCaseSuite
+      this.getCaseUrl = apiGetCase
+      this.getReportUrl = apiGetReport
+      this.getProjectUrl = apiGetProject
       this.reportDetailUrl = apiReportDetail
       this.deleteReportUrl = deleteApiReport
       this.getCaseProjectUrl = apiGetCaseProject
       this.defaultShowResponseInFo = ['12', '17', '21', '23']
     } else if (this.dataType === 'webUi') {
+      this.taskRunUrl = webUiRunTask
+      this.caseSuiteRunUrl = webUiRunCaseSuite
+      this.caseRunUrl = webUiCaseRun
+      this.getCaseUrl = webUiGetCase
+      this.getReportUrl = webUiGetReport
+      this.getProjectUrl = webUiGetProject
       this.reportDetailUrl = webUiReportDetail
       this.deleteReportUrl = deleteWebUiReport
       this.getCaseProjectUrl = webUiGetCaseProject
     } else {
+      this.taskRunUrl = appUiRunTask
+      this.caseSuiteRunUrl = appUiRunCaseSuite
+      this.caseRunUrl = appUiCaseRun
+      this.getCaseUrl = appUiGetCase
+      this.getReportUrl = appUiGetReport
+      this.getProjectUrl = appUiGetProject
       this.reportDetailUrl = appUiReportDetail
       this.deleteReportUrl = deleteAppUiReport
       this.getCaseProjectUrl = appUiGetCaseProject
@@ -1021,6 +1080,89 @@ export default {
     // 控制是否显示统计图
     isShowPic() {
       this.picStatus = !this.picStatus
+    },
+
+    // 触发重跑
+    reRun() {
+      // 获取报告
+      this.getReportUrl({ 'id': this.$route.query.id }).then(response => {
+        this.reRunReport = response.data
+
+        // 获取报告对应的服务的业务线id
+        let project = null
+
+        // 获取服务
+        this.getProjectUrl({ id: this.reRunReport.project_id }).then(response => {
+          project = response.data
+
+          const run_type = this.reRunReport.run_type
+          if (run_type === 'case') {
+            const temp_variables = this.reRunReport.temp_variables
+            if (temp_variables) { // 本身就有临时参数
+              this.sendReRun(project.business_id, temp_variables)
+            } else { // 没有就获取用例的数据
+              const run_id = this.reRunReport.run_id
+              if (run_id.length === 1) {
+                this.getCaseUrl({ id: run_id[0] }).then(response => {
+                  const case_data = response.data
+                  this.sendReRun(project.business_id, {
+                    skip_if: case_data.skip_if,
+                    variables: case_data.variables,
+                    run_times: case_data.run_times,
+                    headers: case_data.headers
+                  })
+                })
+              } else {
+                this.sendReRun(project.business_id, null)
+              }
+            }
+          } else {
+            this.sendReRun(project.business_id, null)
+          }
+        })
+      })
+    },
+
+    sendReRun(business_id, temp_run_args) {
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'selectRunEnv',
+        'reportShow',
+        ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1,
+        business_id,
+        temp_run_args
+      )
+    },
+
+    getRunUrl() {
+      const run_type = this.reRunReport.run_type
+      return run_type === 'task' ? this.taskRunUrl
+        : run_type === 'suite' ? this.caseSuiteRunUrl
+          : run_type === 'case' ? this.caseRunUrl
+            : this.apiRunUrl
+    },
+
+    // 运行用例
+    runCase(runConf) {
+      const runUrl = this.getRunUrl()
+
+      runUrl({
+        apis: this.reRunReport.run_type === 'api' ? this.reRunReport.run_id : undefined,
+        caseId: this.reRunReport.run_type === 'case' ? this.reRunReport.run_id : undefined,
+        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.run_id : undefined,
+        env_list: runConf.runEnv,
+        is_async: runConf.runType,
+        browser: runConf.browser,
+        server_id: runConf.runServer,
+        phone_id: runConf.runPhone,
+        no_reset: runConf.noReset,
+        temp_variables: runConf.temp_variables,
+        'trigger_type': 'page'
+      }).then(response => {
+        if (this.showMessage(this, response)) {
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
+        }
+      })
     }
   }
 }

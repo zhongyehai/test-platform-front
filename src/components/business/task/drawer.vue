@@ -258,25 +258,11 @@
                     @select="selectRow"
                     @select-all="selectAll"
                   >
-                    <el-table-column
-                      type="selection"
-                      :selectable="isDisable"
-                      min-width="10%"
-                    />
+                    <el-table-column type="selection" :selectable="isDisable" min-width="10%" />
 
-                    <el-table-column
-                      prop="name"
-                      label="用例名"
-                      min-width="65%"
-                      show-overflow-tooltip
-                    />
+                    <el-table-column prop="name" label="用例名" min-width="65%" show-overflow-tooltip />
 
-                    <el-table-column
-                      :show-overflow-tooltip="true"
-                      prop="level"
-                      align="center"
-                      min-width="25%"
-                    >
+                    <el-table-column prop="level" align="center" min-width="25%">
                       <template slot="header">
                         <span> 用例状态 </span>
                         <el-tooltip
@@ -758,7 +744,7 @@ export default {
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.run_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
         }
       })
     },

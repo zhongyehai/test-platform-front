@@ -337,7 +337,8 @@ export default {
       this.caseListUrl({
         pageNum: this.quotePageNum,
         pageSize: this.quotePageSize,
-        suiteId: this.currentSetId
+        suiteId: this.currentSetId,
+        getHasStep: true
       }).then(response => {
         this.caseList = []
         this.expands = []
@@ -352,56 +353,50 @@ export default {
     // 引用用例
     addQuote(row) {
       // 如果有用例id，则添加步骤，否则先保存用例
-      if (this.caseId) {
-        if (row.id === this.caseId) {
-          this.$notify.error('不能自己引用自己')
-          return
-        }
-
-        var new_api = JSON.parse(JSON.stringify(row))
-        // 服务名 + 用例集... + 用例名
-        var name = this.$refs.projectSelector.selected.label + '/' + this.$refs['caseSelector'].getCheckedNodes()[0].pathLabels.join('/')
-        new_api['quote_case'] = new_api['id']
-        new_api['id'] = ''
-        new_api['case_id'] = this.caseId
-        new_api['status'] = 1
-        new_api['run_times'] = 1
-        new_api['name'] = `${name}/${row.name}`
-        new_api['headers'] = [{ 'key': null, 'remark': null, 'value': null }]
-        new_api['params'] = [{ 'key': null, 'value': null }]
-        new_api['data_form'] = [{ 'data_type': null, 'key': null, 'remark': null, 'value': null }]
-        new_api['data_json'] = {}
-        new_api['extracts'] = [{ 'key': '', 'remark': null, 'value': '' }]
-        new_api['validates'] = [{ 'key': '', 'remark': null, 'validate_type': '', 'value': '' }]
-        new_api['data_driver'] = []
-        this.$bus.$emit(this.$busEvents.quoteCaseToStep, new_api, null)
-      } else {
-        this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
+      if (row.id === this.caseId) {
+        this.$notify.error('不能自己引用自己')
+        return
       }
+
+      var new_api = JSON.parse(JSON.stringify(row))
+      // 服务名 + 用例集... + 用例名
+      var name = this.$refs.projectSelector.selected.label + '/' + this.$refs['caseSelector'].getCheckedNodes()[0].pathLabels.join('/')
+      new_api['quote_case'] = new_api['id']
+      new_api['id'] = ''
+      new_api['case_id'] = this.caseId
+      new_api['status'] = 1
+      new_api['run_times'] = 1
+      new_api['name'] = `${name}/${row.name}`
+      new_api['headers'] = [{ 'key': null, 'remark': null, 'value': null }]
+      new_api['params'] = [{ 'key': null, 'value': null }]
+      new_api['data_form'] = [{ 'data_type': null, 'key': null, 'remark': null, 'value': null }]
+      new_api['data_json'] = {}
+      new_api['extracts'] = [{ 'key': '', 'remark': null, 'value': '' }]
+      new_api['validates'] = [{ 'key': '', 'remark': null, 'validate_type': '', 'value': '' }]
+      new_api['data_driver'] = []
+      this.$bus.$emit(this.$busEvents.quoteCaseToStep, new_api, null)
     },
 
     // 复制指定用例的步骤为当前用例的步骤
     copyCaseStepAsStep(from) {
-      if (this.caseId) {
-        this.$set(from, 'copyStepPopoverIsShow', false)
-        this.$set(from, 'copyIsLoading', true)
-        if (from.suite_id) { // 复制用例下的步骤
-          this.copyCaseStepUrl({ source: from.id, to: this.caseId }).then(response => {
-            this.$set(from, 'copyIsLoading', false)
-            if (this.showMessage(this, response)) {
-              this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
-            }
-          })
-        } else { // 复制具体步骤
-          this.stepCopyUrl({ 'id': from.id, 'caseId': this.caseId }).then(response => {
-            this.$set(from, 'copyIsLoading', false)
-            if (this.showMessage(this, response)) {
-              this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
-            }
-          })
-        }
-      } else {
-        this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepTrigger')
+      this.$set(from, 'copyStepPopoverIsShow', false)
+      this.$set(from, 'copyIsLoading', true)
+      if (from.suite_id) { // 复制用例下的步骤
+        this.copyCaseStepUrl({ source: from.id, to: this.caseId }).then(response => {
+          this.$set(from, 'copyIsLoading', false)
+          if (this.showMessage(this, response)) {
+            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
+            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'pullStep') // 复制完成，重新获取用例的变量
+          }
+        })
+      } else { // 复制具体步骤
+        this.stepCopyUrl({ 'id': from.id, 'caseId': this.caseId }).then(response => {
+          this.$set(from, 'copyIsLoading', false)
+          if (this.showMessage(this, response)) {
+            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
+            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'pullStep') // 复制完成，重新获取用例的变量
+          }
+        })
       }
     }
   }

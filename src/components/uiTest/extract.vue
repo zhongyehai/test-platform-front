@@ -323,6 +323,7 @@
 <script>
 
 import Sortable from 'sortablejs'
+import { extractMappingList } from '@/apis/webUiTest/step'
 
 export default {
   name: 'Extract',
@@ -359,6 +360,10 @@ export default {
   },
 
   mounted() {
+    extractMappingList().then(response => {
+      this.$busEvents.data.uiTestExtractMappingList = response.data
+    })
+
     this.initExtract(this.currentData)
 
     this.oldList = this.tempData.map(v => v.id)

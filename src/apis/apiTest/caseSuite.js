@@ -3,6 +3,13 @@ import { baseDirApiTest } from '@/apis/base'
 
 const currentBaseDir = baseDirApiTest + '/caseSuite'
 
+export const uploadAddr = baseDirApiTest + '/caseSuite/upload'
+
+// 下载导入用例集模板
+export function downloadSuiteTemplate() {
+  return request({ url: currentBaseDir + '/template/download', method: 'get', responseType: 'blob' })
+}
+
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })
 }
@@ -35,4 +42,9 @@ export function caseSuiteList(data) {
 // 运行用例集下的用例
 export function caseSuiteRun(data) {
   return request({ url: currentBaseDir + '/run', method: 'post', data: data })
+}
+
+// 导入用例集
+export function caseSuiteUpload(data) {
+  return request({ url: currentBaseDir + '/upload', method: 'post', data: data })
 }

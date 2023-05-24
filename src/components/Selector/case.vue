@@ -19,10 +19,8 @@ import { caseList } from '@/apis/apiTest/case'
 export default {
   name: 'CaseSelector',
   props: [
-    'module_id',
-    'caseIds',
-    'busOnEventName',
-    'busEmitEventName'
+    // eslint-disable-next-line vue/require-prop-types
+    'moduleId', 'caseIds', 'busOnEventName', 'busEmitEventName'
   ],
   data() {
     return {
@@ -42,7 +40,7 @@ export default {
       }
     },
 
-    'module_id': {
+    'moduleId': {
       handler(newVal, oldVal) {
         this.tempModuleId = newVal
         this.tempCase = [] // 模块变了，则把选中的用例清空掉
@@ -75,7 +73,7 @@ export default {
   },
 
   created() {
-    this.tempModuleId = this.module_id
+    this.tempModuleId = this.moduleId
     this.tempCase = this.caseIds
 
     if (this.tempModuleId) {

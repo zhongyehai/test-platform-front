@@ -5,3 +5,8 @@ import { baseDirAssist } from '@/apis/base'
 export function swaggerPull(data) {
   return request({ url: baseDirAssist + '/swagger/pull', method: 'post', data: data })
 }
+
+// 获取swagger拉取记录
+export function swaggerPullList(params) {
+  return request({ url: baseDirAssist + '/swagger/pull/list', method: 'get', params: params })
+}

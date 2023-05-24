@@ -42,6 +42,11 @@ export function caseList(params) {
   return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
+// 获取用例list
+export function assertCaseList(params) {
+  return request({ url: currentBaseDir + '/assert/list', method: 'get', params: params })
+}
+
 // 根据用例id获取用例名
 export function caseName(params) {
   return request({ url: currentBaseDir + '/name', method: 'get', params: params })

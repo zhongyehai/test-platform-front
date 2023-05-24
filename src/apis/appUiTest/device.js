@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 import { baseDirAppUiTest } from '@/apis/base'
 
-const serverBaseDir = baseDirAppUiTest + '/env/server'
-const phoneBaseDir = baseDirAppUiTest + '/env/phone'
+const serverBaseDir = baseDirAppUiTest + '/device/server'
+const phoneBaseDir = baseDirAppUiTest + '/device/phone'
 
 function serverFunc(method, data = null, params = null) {
   return request({ url: serverBaseDir, method: method, data: data, params: params })

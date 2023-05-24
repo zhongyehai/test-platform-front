@@ -214,7 +214,7 @@ import {
   deleteServer,
   sortServer,
   copyServer
-} from '@/apis/appUiTest/env'
+} from '@/apis/appUiTest/device'
 import { getConfigByName } from '@/apis/config/config'
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 

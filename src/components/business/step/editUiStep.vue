@@ -312,7 +312,6 @@
 
 <script>
 import skipIfView from '@/components/Inputs/skipIf'
-import jsonEditorView from '@/components/jsonView'
 import extractsView from '@/components/uiTest/extract'
 import validatesView from '@/components/uiTest/validates'
 import uploadFileView from '@/components/file/uploadFile'
@@ -342,7 +341,6 @@ import { postStep as webUiPostStep, putStep as webUiPutStep } from '@/apis/webUi
 export default {
   name: 'EditStep',
   components: {
-    jsonEditorView,
     extractsView,
     validatesView,
     uploadFileView,
