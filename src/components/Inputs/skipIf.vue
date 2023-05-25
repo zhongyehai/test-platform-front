@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <!-- 跳过条件 -->
     <el-table
       ref="dataTable"
@@ -54,6 +55,7 @@
                 clearable
                 default-first-option
                 size="mini"
+                @change="getDataSource(scope.row.data_source)"
               >
                 <el-option
                   v-for="(item) in skipIfDataSourceMapping"
@@ -66,7 +68,7 @@
             <el-row>
               <el-input
                 v-model="scope.row.check_value"
-                :disabled="scope.row.data_source === 'run_env'"
+                :disabled="['run_device', 'run_server', 'run_env'].indexOf(scope.row.data_source) !== -1"
                 type="textarea"
                 size="mini"
                 :rows="1"
@@ -108,7 +110,9 @@
           <span><span style="color: red">*</span>预期值</span>
         </template>
         <template slot-scope="scope">
-          <el-row>
+
+          <!-- 预期值为常量 -->
+          <el-row v-show="['run_device', 'run_server', 'run_env'].indexOf(scope.row.data_source) === -1">
             <el-row>
               <el-select
                 v-model="scope.row.data_type"
@@ -142,6 +146,46 @@
                 "
               />
             </el-row>
+          </el-row>
+
+          <!-- 预期值为运行环境、原先服务器、运行设备 -->
+          <el-row v-show="['run_device', 'run_server', 'run_env'].indexOf(scope.row.data_source) !== -1">
+            <el-select
+              v-show="scope.row.data_source === 'run_server'"
+              v-model="scope.row.expect"
+              placeholder="选择服务器"
+              style="width: 100%"
+              filterable
+              clearable
+              default-first-option
+              size="mini"
+            >
+              <el-option v-for="(s) in $busEvents.data.runServerList" :key="s.id" :label="s.name" :value="s.id" />
+            </el-select>
+            <el-select
+              v-show="scope.row.data_source === 'run_device'"
+              v-model="scope.row.expect"
+              placeholder="选择设备"
+              style="width: 100%"
+              filterable
+              clearable
+              default-first-option
+              size="mini"
+            >
+              <el-option v-for="(p) in $busEvents.data.runPhoneList" :key="p.id" :label="p.name" :value="p.id" />
+            </el-select>
+            <el-select
+              v-show="scope.row.data_source === 'run_env'"
+              v-model="scope.row.expect"
+              placeholder="选择环境"
+              style="width: 100%"
+              filterable
+              clearable
+              default-first-option
+              size="mini"
+            >
+              <el-option v-for="(env) in runEnvList" :key="env.code" :label="env.name" :value="env.code" />
+            </el-select>
           </el-row>
         </template>
       </el-table-column>
@@ -187,23 +231,33 @@
 
 <script>
 
-import { getSkipIfDataSourceMapping } from '@/apis/config/config'
 import Sortable from 'sortablejs'
+import { phoneList, serverList } from '@/apis/appUiTest/device'
+import { getProject as apiGetProject } from '@/apis/apiTest/project'
+import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
+import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
+import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'SkipIf',
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'skipIfData', 'useType'
+    'dataType', 'skipIfData', 'useType', 'projectId', 'envList' // 如果传了envList，就不再用projectId去获取
   ],
 
   data() {
     return {
-      tempData: [],
-      skipIfDataSourceMapping: [],
       sortable: null,
       oldList: [],
-      newList: []
+      newList: [],
+
+      tempData: [],
+      skipIfDataSourceMapping: [],
+      serverList: [],
+      phoneList: [],
+      runEnvList: [],
+
+      getProjectUrl: ''
     }
   },
 
@@ -212,7 +266,20 @@ export default {
       handler(newVal, oldVal) {
         this.initTempData(newVal)
       }
+    },
+
+    'projectId': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.getProjectRunEnv()
+        }
+      }
     }
+  },
+
+  created() {
+    this.initData()
   },
 
   mounted() {
@@ -228,6 +295,49 @@ export default {
   },
 
   methods: {
+
+    initData() {
+      if (this.dataType === 'api') {
+        this.getProjectUrl = apiGetProject
+        this.getProjectRunEnv()
+      } else if (this.dataType === 'webUi') {
+        this.getProjectUrl = webUiGetProject
+        this.getProjectRunEnv()
+      } else {
+        this.getProjectUrl = appUiGetProject
+        this.getRunDeviceList()
+        this.getRunServerList()
+      }
+    },
+
+    // 获取服务对应的运行环境
+    getProjectRunEnv() {
+      if (!this.envList) {
+        this.getProjectUrl({ id: this.projectId }).then(response => { // 获取服务
+          const project = response.data
+
+          runEnvList({ business_id: project.business_id }).then(response => { // 获取服务的业务线对应的运行环境
+            this.runEnvList = response.data.data
+          })
+        })
+      }
+    },
+
+    getRunServerList() {
+      if (this.$busEvents.data.runServerList < 1) {
+        serverList({ pageNum: 1, pageSize: 9999 }).then(response => {
+          this.$busEvents.data.runServerList = response.data.data
+        })
+      }
+    },
+
+    getRunDeviceList() {
+      if (this.$busEvents.data.runPhoneList.length < 1) {
+        phoneList({ pageNum: 1, pageSize: 9999 }).then(response => {
+          this.$busEvents.data.runPhoneList = response.data.data
+        })
+      }
+    },
 
     // 根据选择的数据源显示不同的提示
     getDataSourcePlaceholder(_type) {
@@ -252,6 +362,17 @@ export default {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'False')
         return true
+      }
+    },
+
+    // 根据选择的数据源，获取对应的预期值列表
+    getDataSource(data_source) {
+      if (this.dataType === 'appUi' && data_source === 'run_server') {
+        this.getRunServerList()
+      } else if (this.dataType === 'appUi' && data_source === 'run_device') {
+        this.getRunDeviceList()
+      } else if (this.dataType !== 'appUi' && data_source === 'run_env') {
+        this.getProjectRunEnv()
       }
     },
 

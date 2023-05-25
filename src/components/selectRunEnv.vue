@@ -194,7 +194,10 @@
             </template>
             <skipIfView
               ref="skipIfView"
+              :data-typed="dataType"
               :skip-if-data="runArgs.skip_if"
+              :env-list="runEnvDataSource"
+              :project-id="''"
               :use-type="'case'"
             />
           </el-tab-pane>

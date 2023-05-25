@@ -163,6 +163,7 @@
                   :case-skip-if="scope.row.skip_if"
                   :case-variables="scope.row.variables"
                   :case-extracts="scope.row.output"
+                  :project-id="currentProjectId"
                 />
                 <span slot="reference"> {{ scope.row.desc || '-' }} </span>
               </el-popover>

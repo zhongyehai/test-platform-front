@@ -95,18 +95,16 @@
             <el-tab-pane name="editSkipIf">
               <template slot="label">
                 <span> 跳过条件 </span>
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  placement="top-start"
-                >
+                <el-tooltip class="item" effect="dark" placement="top-start">
                   <div slot="content"> 任意一行设置的表达式成立，都会执行跳过操作，使用方法与断言一致，详见断言示例</div>
                   <span><i style="color: #409EFF" class="el-icon-question" /></span>
                 </el-tooltip>
               </template>
               <skipIfView
                 ref="skipIfView"
+                :data-type="dataType"
                 :skip-if-data="tempCase.skip_if"
+                :project-id="currentProjectId"
                 :use-type="'case'"
               />
             </el-tab-pane>
@@ -114,11 +112,7 @@
             <el-tab-pane name="editVariables">
               <template slot="label">
                 <span> 自定义变量 </span>
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  placement="top-start"
-                >
+                <el-tooltip class="item" effect="dark" placement="top-start">
                   <div slot="content">
                     1、可用此功能设置一些预设值，比如token、账号信息 <br>
                     2、在此处设置的值，对于此用例下的测试步骤均可直接引用 <br>
@@ -141,11 +135,7 @@
             <el-tab-pane v-if="dataType === 'api'">
               <template slot="label">
                 <span> 头部参数 </span>
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  placement="top-start"
-                >
+                <el-tooltip class="item" effect="dark" placement="top-start">
                   <div slot="content">
                     1、可用此功能设置当前用例的固定的头部参数，比如token、cookie <br>
                     2、在此处设置的值，在运行此用例下的测试步骤的时候，会自动加到对应的步骤的头部参数上 <br>
@@ -438,19 +428,15 @@ export default {
       })
     }
 
-    // 从后端获取跳过条件映射
-    if (this.$busEvents.data.caseSkipIfDataSourceMapping.length === 0) {
-      getSkipIfDataSourceMapping({ type: 'case' }).then(response => {
-        this.$busEvents.data.caseSkipIfDataSourceMapping = response.data
-      })
-    }
+    // 从后端获取跳过条件映射，用例
+    getSkipIfDataSourceMapping({ test_type: this.dataType, type: 'case' }).then(response => {
+      this.$busEvents.data.caseSkipIfDataSourceMapping = response.data
+    })
 
-    // 从后端获取跳过条件映射
-    if (this.$busEvents.data.stepSkipIfDataSourceMapping.length === 0) {
-      getSkipIfDataSourceMapping({ type: 'step' }).then(response => {
-        this.$busEvents.data.stepSkipIfDataSourceMapping = response.data
-      })
-    }
+    // 从后端获取跳过条件映射，步骤
+    getSkipIfDataSourceMapping({ test_type: this.dataType, type: 'step' }).then(response => {
+      this.$busEvents.data.stepSkipIfDataSourceMapping = response.data
+    })
 
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {

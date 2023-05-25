@@ -179,8 +179,11 @@
         <el-tab-pane label="跳过条件" name="editSkipIf">
           <skipIfView
             ref="skipIfView"
+            :data-type="dataType"
             :skip-if-data="currentStep.skip_if"
-            :use_type="'step'"
+            :case-id="caseId"
+            :project-id="projectId"
+            :use-type="'step'"
           />
         </el-tab-pane>
 
@@ -347,8 +350,8 @@ export default {
     skipIfView
   },
   props: [
-    'dataType',
-    'caseId'
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'caseId', 'projectId'
   ],
   data() {
     return {

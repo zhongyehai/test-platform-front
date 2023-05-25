@@ -57,8 +57,9 @@
     <editApiStepView
       v-if="dataType === 'api'"
       ref="editStepView"
-      :case-id="caseId"
       :data-type="dataType"
+      :case-id="caseId"
+      :project-id="projectId"
     />
 
     <!-- ui步骤编辑 -->
@@ -67,6 +68,7 @@
       ref="editStepView"
       :data-type="dataType"
       :case-id="caseId"
+      :project-id="projectId"
     />
   </div>
 
@@ -83,6 +85,7 @@ import quoteCaseView from './quoteCase'
 
 import { postStep as apiPostStep } from '@/apis/apiTest/step'
 import { postStep as appUiPostStep } from '@/apis/appUiTest/step'
+import { postStep as webUiPostStep } from '@/apis/webUiTest/step'
 
 export default {
   name: 'Index',
