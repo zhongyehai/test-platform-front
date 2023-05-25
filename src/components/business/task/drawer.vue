@@ -271,7 +271,7 @@
                           placement="top-start"
                         >
                           <div slot="content">
-                            <div>1: 批量/定时任务运行时，只有调试结果为 "已通过-要执行" 的才会执行</div>
+                            <div>1: 批量/定时任务运行时，只有调试结果为 "调试通过-要执行" 的才会执行</div>
                             <div>2: 请务必将用例调试通过后再设为调试通过</div>
                           </div>
                           <span><i style="color: #409EFF" class="el-icon-question" /></span>
@@ -292,9 +292,9 @@
                               @change="changeCaseIsRun(scope.row)"
                             >
                               <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span></el-option>
-                              <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span></el-option>
-                              <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span></el-option>
-                              <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span></el-option>
+                              <el-option label="调试通过-要执行" :value="1"><span style="color: #67C23A">调试通过-要执行</span></el-option>
+                              <el-option label="调试通过-不执行" :value="2"><span style="color: #909399">调试通过-不执行</span></el-option>
+                              <el-option label="调试不通过-不执行" :value="3"><span style="color: #F56C6C">调试不通过-不执行</span></el-option>
                             </el-select>
                           </div>
                         </div>

@@ -5,11 +5,11 @@
 
       <!-- 服务选择 -->
       <el-col :span="11">
-        <el-form-item label="服务">
+        <el-form-item :label="titleType">
           <el-select
             ref="projectSelector"
             v-model="projectSelectedId"
-            placeholder="选择服务"
+            :placeholder="`选择${titleType}`"
             size="mini"
             filterable
             default-first-option
@@ -203,6 +203,7 @@ export default {
   ],
   data() {
     return {
+      titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       selectedOptions: [],
 
       projectSelectedId: '',

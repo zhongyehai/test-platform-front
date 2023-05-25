@@ -7,11 +7,11 @@
 
         <!-- 项目选择 -->
         <el-col :span="8">
-          <el-form-item label="项目" style="margin-bottom: 5px">
+          <el-form-item :label="titleType" style="margin-bottom: 5px">
             <el-select
               ref="projectSelectorView"
               v-model="projectId"
-              placeholder="请选择项目"
+              :placeholder="`请选择${titleType}`"
               size="mini"
               style="min-width: 100%"
               filterable
@@ -143,6 +143,7 @@ export default {
   ],
   data() {
     return {
+      titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       selectedOptions: [],
 
       tempModuleList: [],

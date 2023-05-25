@@ -13,7 +13,7 @@
       :data="caseList"
       stripe
     >
-      <el-table-column prop="num" align="center" label="序号" min-width="10%">
+      <el-table-column prop="num" align="center" label="序号" min-width="8%">
         <template slot-scope="scope">
           <span> {{ scope.$index + 1 }} </span>
         </template>
@@ -35,7 +35,7 @@
         :show-overflow-tooltip="true"
         prop="level"
         align="center"
-        min-width="15%"
+        min-width="17%"
       >
         <template slot="header">
           <span> 调试结果 </span>
@@ -65,9 +65,9 @@
                 @change="changeCaseIsRun(scope.row)"
               >
                 <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span></el-option>
-                <el-option label="已通过-要执行" :value="1"><span style="color: #67C23A">已通过-要执行</span></el-option>
-                <el-option label="已通过-不执行" :value="2"><span style="color: #909399">已通过-不执行</span></el-option>
-                <el-option label="不通过-不执行" :value="3"><span style="color: #F56C6C">不通过-不执行</span></el-option>
+                <el-option label="调试通过-要执行" :value="1"><span style="color: #67C23A">调试通过-要执行</span></el-option>
+                <el-option label="调试通过-不执行" :value="2"><span style="color: #909399">调试通过-不执行</span></el-option>
+                <el-option label="调试不通过-不执行" :value="3"><span style="color: #F56C6C">调试不通过-不执行</span></el-option>
               </el-select>
             </div>
           </div>
