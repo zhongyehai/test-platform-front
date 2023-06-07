@@ -51,3 +51,13 @@ export function getSkipIfTypeMapping() {
 export function getSkipIfDataSourceMapping(params) {
   return request({ url: currentBaseDir + '/skipIfDataSource', method: 'get', params: params })
 }
+
+// 获取数据提取数据源
+export function getExtractsMapping(params) {
+  return request({ url: currentBaseDir + '/extractsMapping', method: 'get', params: params })
+}
+
+// 获取定位方式数据源
+export function getGetFindElementBy(params) {
+  return request({ url: currentBaseDir + '/findElementBy', method: 'get', params: params })
+}

@@ -30,8 +30,8 @@ export function deleteCaseSuite(data) {
 }
 
 // 获取用例集list
-export function caseSuiteList(params) {
-  return request({ url: currentBaseDir + '/list', method: 'get', params: params })
+export function caseSuiteList(data) {
+  return request({ url: currentBaseDir + '/list', method: 'post', data: data })
 }
 
 // 运行用例集下的用例

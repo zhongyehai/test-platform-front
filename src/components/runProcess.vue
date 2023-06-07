@@ -58,6 +58,7 @@ export default {
   data() {
     return {
       processIsShow: false,
+      timer: undefined,
       statusMapping: {
         1: 'finish',
         2: 'success',
@@ -68,6 +69,22 @@ export default {
       activeStatus: 1,
       reportIsDoneUrl: '',
       reportShowIdUrl: ''
+    }
+  },
+
+  watch: {
+    // 如果手动关闭弹窗，就关闭定时器
+    'processIsShow': {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal === false) {
+          try {
+            clearInterval(this.timer) // 关闭定时器
+          } catch (e) {
+            console.log('查询定时器已关闭')
+          }
+        }
+      }
     }
   },
 
@@ -117,7 +134,7 @@ export default {
       const that = this
       const runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
       let queryCount = 1
-      const timer = setInterval(function() {
+      that.timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
           that.reportIsDoneUrl({
             batch_id: batch_id,
@@ -129,14 +146,14 @@ export default {
             if (that.activeProcess === 3 && that.activeStatus === 2) {
               that.processIsShow = false // 关闭进度框
               that.getShowReportId(batch_id)
-              clearInterval(timer) // 关闭定时器
+              clearInterval(that.timer) // 关闭定时器
             }
           })
           queryCount += 1
         } else {
           that.$notify(runTestTimeOutMessage(that))
           this.processIsShow = false // 关闭进度框
-          clearInterval(timer) // 关闭定时器
+          clearInterval(that.timer) // 关闭定时器
         }
       }, 3000)
     },

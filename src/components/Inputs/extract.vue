@@ -14,7 +14,7 @@
             2、若在此处设置的key与服务/用例设置的公共变量的一致，则会使用此处提取到的值
           </div>
           <div style="margin-left: 20px; margin-bottom: 5px">
-            示例数据： {"status": 200, "list": [{"id": 1},{"id": 2}]}
+            示例数据： {"status": 200, "data_list": [{"id": 1},{"id": 2}]}
           </div>
           <div style="margin-left: 20px">
 
@@ -43,10 +43,26 @@
                 <el-input size="mini" disabled :placeholder="'extract_name_2'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'响应头部信息'" style="width: 90%" />
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
                 <el-input size="mini" disabled :placeholder="'status'" style="width: 95%" />
+              </el-col>
+            </el-row>
+
+            <!-- 提取json中的data_list -->
+            <el-row style="margin-top: 5px">
+              <el-col :span="5">
+                <div>提取json中的data_list</div>
+              </el-col>
+              <el-col :span="5">
+                <el-input size="mini" disabled :placeholder="'extract_name_2'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input size="mini" disabled :placeholder="'data_list'" style="width: 95%" />
               </el-col>
             </el-row>
 
@@ -62,7 +78,7 @@
                 <el-input size="mini" disabled :placeholder="'响应cookies'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'list.0.id'" style="width: 95%" />
+                <el-input size="mini" disabled :placeholder="'data_list.0.id'" style="width: 95%" />
               </el-col>
             </el-row>
 
@@ -78,7 +94,7 @@
                 <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'list.1.id'" style="width: 95%" />
+                <el-input size="mini" disabled :placeholder="'data_list.1.id'" style="width: 95%" />
               </el-col>
             </el-row>
 
@@ -94,7 +110,7 @@
                 <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'list.-1.id'" style="width: 95%" />
+                <el-input size="mini" disabled :placeholder="'data_list.-1.id'" style="width: 95%" />
               </el-col>
             </el-row>
 
@@ -110,7 +126,7 @@
                 <el-input size="mini" disabled :placeholder="'响应体'" style="width: 90%" />
               </el-col>
               <el-col :span="7">
-                <el-input size="mini" disabled :placeholder="'list.-2.id'" style="width: 95%" />
+                <el-input size="mini" disabled :placeholder="'data_list.-2.id'" style="width: 95%" />
               </el-col>
             </el-row>
 
@@ -181,7 +197,69 @@
                   style="width: 95%"
                 />
               </el-col>
-              <span style="margin-top: 5px"><span style="color: red">注</span>：自定义函数提取值，不支持传常量，只支持自定义变量或者提取表达式</span>
+            </el-row>
+
+            <!-- 常量 -->
+            <el-row style="margin-top: 5px">
+              <el-col :span="5">
+                <div>常量</div>
+              </el-col>
+              <el-col :span="5">
+                <el-input size="mini" disabled :placeholder="'extract_name_11'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input size="mini" disabled :placeholder="'常量'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input
+                  size="mini"
+                  disabled
+                  :placeholder="'123'"
+                  style="width: 95%"
+                />
+              </el-col>
+            </el-row>
+
+            <!-- 自定义变量二次提取 -->
+            <el-row style="margin-top: 5px">
+              <el-col :span="5">
+                <div>自定义变量二次提取</div>
+              </el-col>
+              <el-col :span="5">
+                <el-input size="mini" disabled :placeholder="'extract_name_12'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input size="mini" disabled :placeholder="'自定义变量'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input
+                  size="mini"
+                  disabled
+                  :placeholder="'$extract_name_2.1.id'"
+                  style="width: 95%"
+                />
+              </el-col>
+            </el-row>
+
+            <!-- 自定义变量二次提取 -->
+            <el-row style="margin-top: 5px">
+              <el-col :span="5">
+                <div>自定义变量二次赋值</div>
+              </el-col>
+              <el-col :span="5">
+                <el-input size="mini" disabled :placeholder="'extract_name_12'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input size="mini" disabled :placeholder="'自定义变量'" style="width: 90%" />
+              </el-col>
+              <el-col :span="7">
+                <el-input
+                  size="mini"
+                  disabled
+                  :placeholder="'$extract_name_2'"
+                  style="width: 95%"
+                />
+              </el-col>
             </el-row>
 
           </div>

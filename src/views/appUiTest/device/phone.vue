@@ -34,7 +34,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="设备id" min-width="25%">
+      <el-table-column :show-overflow-tooltip="true" align="center" min-width="25%">
+        <template slot="header">
+          <span> 设备id </span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              <div>使用adb devices查看</div>
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </template>
         <template slot-scope="scope">
           <span> {{ scope.row.device_id }} </span>
         </template>
@@ -134,8 +143,14 @@
           <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本" />
         </el-form-item>
 
-        <el-form-item label="设备id" class="is-required" size="mini">
-          <el-input v-model="tempData.device_id" size="mini" placeholder="设备id" />
+        <el-form-item label="设备id" size="mini">
+          <el-input v-model="tempData.device_id" size="mini" style="width: 98%" placeholder="设备id" />
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              <div>使用 adb devices 命令查看</div>
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
         </el-form-item>
 
       </el-form>

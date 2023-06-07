@@ -85,17 +85,14 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="操作" align="left" min-width="8%">
+              <el-table-column label="操作" align="left" min-width="10%">
                 <template slot-scope="scope">
 
                   <!-- 运行用例 -->
-                  <el-button
-                    slot="reference"
-                    type="text"
-                    size="mini"
-                    @click="clickRunCase(scope.row)"
-                  >运行
-                  </el-button>
+                  <el-button slot="reference" type="text" size="mini" @click="clickRunCase(scope.row)">运行 </el-button>
+
+                  <!--修改用例-->
+                  <el-button type="text" size="mini" @click="editCase(scope.row)">修改 </el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -112,6 +109,12 @@
       :data-type="'api'"
     />
 
+    <editCaseDrawer
+      :data-type="'api'"
+      :current-project-id="projectActiveId"
+      :current-set-id="tempSuiteId"
+    />
+
   </div>
 </template>
 
@@ -125,9 +128,11 @@ import showCaseDesc from '@/components/business/case/showCaseDesc.vue'
 import { businessList } from '@/apis/config/business'
 import { projectList } from '@/apis/apiTest/project'
 import { assertCaseList, caseRun } from '@/apis/apiTest/case'
+import editCaseDrawer from '@/components/business/case/editDrawer.vue'
 export default {
   name: 'MakeBusinessData',
   components: {
+    editCaseDrawer,
     showCaseDesc,
     selectRunEnv,
     runProcess
@@ -141,6 +146,7 @@ export default {
       businessId: '',
       businessActiveId: '',
       projectActiveId: '',
+      tempSuiteId: '',
       project_list: [],
       case_list: []
     }
@@ -193,6 +199,18 @@ export default {
           this.case_list = response.data.data
         })
       }
+    },
+
+    // 编辑用例
+    editCase(row) {
+      this.tempCase = row
+      this.tempSuiteId = row.suite_id
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'caseInfo',
+        'edit',
+        JSON.parse(JSON.stringify(this.tempCase))
+      )
     },
 
     clickRunCase(row) {

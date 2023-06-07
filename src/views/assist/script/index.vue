@@ -3,6 +3,20 @@
 
     <el-form label-width="100px" :inline="true">
 
+      <el-form-item :label="'脚本类型：'" size="mini">
+        <el-select
+          v-model="listQuery.script_type"
+          :placeholder="'选择脚本类型'"
+          filterable
+          default-first-option
+          clearable
+          size="mini"
+          class="filter-item"
+        >
+          <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key" />
+        </el-select>
+      </el-form-item>
+
       <el-form-item :label="'脚本文件名：'" size="mini">
         <el-input
           v-model="listQuery.file_name"
@@ -18,20 +32,6 @@
         <el-select
           v-model="listQuery.create_user"
           :placeholder="'选择创建人'"
-          filterable
-          default-first-option
-          clearable
-          size="mini"
-          class="filter-item"
-        >
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item :label="'最近修改人：'" size="mini">
-        <el-select
-          v-model="listQuery.update_user"
-          :placeholder="'选择负责人'"
           filterable
           default-first-option
           clearable
@@ -75,13 +75,19 @@
         </template>
       </el-table-column>
 
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="脚本类型" min-width="10%">
+        <template slot-scope="scope">
+          <span>{{ scriptTypeDict[scope.row.script_type] }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="脚本文件名" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="30%">
+      <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="15%">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>
@@ -106,7 +112,6 @@
           <el-button
             type="text"
             size="mini"
-            style="margin-right: 10px"
             @click="sendEditEmit('update', scope.row)"
           >修改
           </el-button>
@@ -115,28 +120,10 @@
           <el-button
             type="text"
             size="mini"
-            style="margin-right: 10px"
+            style="margin-right: 5px"
             @click="sendEditEmit('add', scope.row)"
           >复制
           </el-button>
-<!--          <el-popover-->
-<!--            :ref="scope.row.name"-->
-<!--            v-model="scope.row.copyPopoverIsShow"-->
-<!--            placement="top"-->
-<!--            popper-class="down-popover"-->
-<!--          >-->
-<!--            <p>确定复制【{{ scope.row.name }}】并生成一条新的数据?</p>-->
-<!--            <div style="text-align: right; margin: 0">-->
-<!--              <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>-->
-<!--              <el-button type="primary" size="mini" @click="copyFile(scope.row)">确定</el-button>-->
-<!--            </div>-->
-<!--            <el-button-->
-<!--              slot="reference"-->
-<!--              type="text"-->
-<!--              size="mini"-->
-<!--              style="margin-right: 10px"-->
-<!--            >复制</el-button>-->
-<!--          </el-popover>-->
 
           <!-- 删除文件 -->
           <el-popover
@@ -172,7 +159,9 @@
       @pagination="getScriptList"
     />
 
-    <ScriptDrawer />
+    <ScriptDrawer
+      :script-type-dict="scriptTypeDict"
+    />
 
   </div>
 </template>
@@ -194,11 +183,16 @@ export default {
   data() {
     return {
       listQuery: {
-        file_name: '',
-        create_user: '',
-        update_user: '',
+        script_type: undefined,
+        file_name: undefined,
+        create_user: undefined,
+        update_user: undefined,
         pageNum: 1,
         pageSize: 20
+      },
+
+      scriptTypeDict: {
+        test: '执行测试', encryption: '加密脚本', decryption: '解密脚本'
       },
 
       // 拖拽排序参数

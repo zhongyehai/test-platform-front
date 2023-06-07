@@ -11,7 +11,7 @@
     <el-tabs v-model="showTabName">
       <el-tab-pane label="选择环境" name="selectRunEnv">
         <!-- 选择运行环境 -->
-        <div v-if="dataType !== 'appUi'">
+        <div>
           <div>
             <label>选择环境：</label>
           </div>
@@ -326,15 +326,15 @@ export default {
         // 设置执行环境
         if (this.dataType === 'api') {
           this.initRunMode()
-          this.initEnvList(business_id)
         } else if (this.dataType === 'appUi') {
           this.getRunAppEnv()
           this.noReset = false
         } else {
           this.initRunMode()
           this.initBrowserName()
-          this.initEnvList(business_id)
         }
+
+        this.initEnvList(business_id)
 
         // 判断是否展示重新指定运行参数
         if (args) {
@@ -394,7 +394,7 @@ export default {
           'selectRunEnv',
           this.runUnit,
           {
-            runEnv: this.dataType !== 'appUi' ? this.$refs.runEnvCheckbox.selectedEnvDataList : undefined,
+            runEnv: this.$refs.runEnvCheckbox.selectedEnvDataList,
             browser: this.runBrowser,
             runServer: this.runServer,
             runPhone: this.runPhone,

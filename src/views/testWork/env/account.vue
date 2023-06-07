@@ -3,6 +3,7 @@
     title="账号管理"
     size="75%"
     append-to-body
+    :wrapper-closable="false"
     :visible.sync="accountManageDrawerIsShow"
     :direction="direction"
   >
@@ -164,6 +165,7 @@
       title="新增账号"
       size="80%"
       append-to-body
+      :wrapper-closable="false"
       :visible.sync="addAccountDrawerIsShow"
       :direction="direction"
     >

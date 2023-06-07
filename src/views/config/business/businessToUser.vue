@@ -2,7 +2,7 @@
 
   <!-- 新增/修改配置表单 -->
   <el-drawer
-    title="批量管理【运行环境】与【业务线】的绑定关系"
+    title="批量管理【业务线】与【用户】的绑定关系"
     size="70%"
     :visible.sync="drawerIsShow"
     :direction="direction"

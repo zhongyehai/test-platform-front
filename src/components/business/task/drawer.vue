@@ -15,11 +15,22 @@
 
           <!-- 选择运行环境 -->
           <el-form-item v-if="dataType !== 'appUi'" label="运行环境" class="is-required">
-            <environmentSelectorView
-              ref="environmentSelectorView"
-              :env="tempTask.env_list"
-              :is-multiple="true"
-            />
+            <el-select
+              v-model="tempTask.env_list"
+              multiple
+              filterable
+              default-first-option
+              placeholder="请选择运行环境"
+              style="width: 98%"
+              size="mini"
+            >
+              <el-option
+                v-for="(env) in envList"
+                :key="env.code"
+                :label="env.name"
+                :value="env.code"
+              />
+            </el-select>
             <el-popover class="el_popover_class" placement="top-start" trigger="hover">
               <div>
                 触发此定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名
@@ -260,9 +271,30 @@
                   >
                     <el-table-column type="selection" :selectable="isDisable" min-width="10%" />
 
-                    <el-table-column prop="name" label="用例名" min-width="65%" show-overflow-tooltip />
+                    <el-table-column :show-overflow-tooltip="true" label="用例名" prop="name" min-width="50%" />
 
-                    <el-table-column prop="level" align="center" min-width="25%">
+                    <el-table-column :show-overflow-tooltip="true" label="用例描述" min-width="15%">
+                      <template slot-scope="scope">
+                        <el-popover
+                          :ref="scope.row.id"
+                          trigger="hover"
+                          placement="bottom-start"
+                          style="margin-right: 10px"
+                          popper-class="down-popover"
+                        >
+                          <showCaseDesc
+                            :case-desc="scope.row.desc"
+                            :case-skip-if="scope.row.skip_if"
+                            :case-variables="scope.row.variables"
+                            :case-extracts="scope.row.output"
+                            :project-id="''"
+                          />
+                          <span slot="reference"> {{ scope.row.desc || '-' }} </span>
+                        </el-popover>
+                      </template>
+                    </el-table-column>
+
+                    <el-table-column align="center" min-width="25%">
                       <template slot="header">
                         <span> 用例状态 </span>
                         <el-tooltip
@@ -336,7 +368,6 @@
 </template>
 
 <script>
-import environmentSelectorView from '@/components/Selector/environment.vue'
 import emailServerSelector from '@/components/Selector/email.vue'
 import jsonEditorView from '@/components/jsonView.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
@@ -359,11 +390,13 @@ import {
   appiumServerRequestStatusMappingContent,
   appiumServerRequestStatusMappingTagType
 } from '@/utils/mapping'
+import showCaseDesc from '@/components/business/case/showCaseDesc.vue'
+import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Drawer',
   components: {
-    environmentSelectorView,
+    showCaseDesc,
     emailServerSelector,
     jsonEditorView,
     oneColumnRow
@@ -406,7 +439,8 @@ export default {
 
       tempCaseSuiteList: [], // 当前选中服务下的用例集列表
       currentCaseList: [], // 当前选中模块下的用例列表
-
+      envList: [],
+      projectBusinessId: '',
       currentTreeDataId: '',
       runModeData: {},
       callBackPlaceholder: [
@@ -466,6 +500,7 @@ export default {
           this.currentCaseList = []
         }
         this.projectSelectedId = project.id // 当前选中的服务
+        this.projectBusinessId = project.business_id // 当前选中的服务
       }
     })
 
@@ -492,6 +527,7 @@ export default {
 
         // 获取当前服务对应的用例集列表
         this.getCaseSuiteByProjectId(this.projectSelectedId)
+        this.getRunEnvList()
       }
     })
 
@@ -533,6 +569,13 @@ export default {
     this.$bus.$off(this.$busEvents.drawerIsShow)
   },
   methods: {
+
+    // 获取环境列表
+    getRunEnvList() {
+      runEnvList({ business_id: this.projectBusinessId }).then(response => {
+        this.envList = response.data.data
+      })
+    },
 
     // 用例列表的选中框是否禁用
     isDisable(row) {
@@ -609,7 +652,7 @@ export default {
 
     // 获取当前模块下的用例列表
     getCaseList(suiteId) {
-      this.caseListUrl({ suiteId: suiteId }).then(response => {
+      this.caseListUrl({ suiteId: suiteId, status: 1 }).then(response => {
         this.currentCaseList = response.data.data
         this.defaultClick() // 获取完用例列表过后 ，执行默认选中事件
       })
@@ -647,11 +690,18 @@ export default {
 
     // 获取当前数据，用于提交
     getTaskToCommit() {
+      let call_back = {}
+      try {
+        call_back = JSON.parse(this.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson)
+      } catch (e) {
+        this.$message({ showClose: true, message: '回调流水线json格式错误', type: 'warning' })
+        return
+      }
       return {
         id: this.tempTask.id,
         num: this.tempTask.num,
         name: this.tempTask.name,
-        env_list: this.dataType !== 'appUi' ? this.$refs.environmentSelectorView.current_env : [],
+        env_list: this.tempTask.env_list,
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
         is_send: this.tempTask.is_send,
@@ -663,7 +713,7 @@ export default {
         email_to: this.$refs.emailToInput.getData(),
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
-        call_back: JSON.parse(this.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson),
+        call_back: call_back,
         project_id: this.tempTask.project_id,
         suite_ids: this.$refs.suiteTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids

@@ -11,24 +11,51 @@
     <el-form
       ref="dataForm"
       label-position="center"
-      label-width="100px"
-      style="min-width: 400px;margin-left: 20px;margin-right: 20px"
+      label-width="80px"
+      style="margin-left: 20px;margin-right: 20px"
     >
-
-      <!-- 脚本文件名 -->
-      <el-form-item :label="'脚本文件名'" prop="name" class="is-required" size="mini" style="margin-bottom: 0">
-        <el-input
-          v-model="tempScript.name"
-          size="mini"
-          placeholder="支持大小写字母和下划线"
-          :disabled="tempScript.id !== ''"
-        />
-      </el-form-item>
-
-      <!-- 备注 -->
-      <el-form-item :label="'备注'" prop="desc" style="margin-bottom: 8px">
-        <el-input v-model="tempScript.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'" />
-      </el-form-item>
+      <el-row>
+        <el-col :span="8">
+          <!-- 脚本类型 -->
+          <el-form-item :label="'脚本类型'" prop="name" class="is-required" size="mini">
+            <el-select
+              v-model="tempScript.script_type"
+              :placeholder="'选择脚本类型'"
+              filterable
+              default-first-option
+              clearable
+              style="width: 90%"
+              size="mini"
+              class="filter-item"
+            >
+              <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key" />
+            </el-select>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、输入运行表达式，调试自定义函数</div>
+              <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
+              <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <!-- 脚本文件名 -->
+          <el-form-item :label="'脚本名'" prop="name" class="is-required" size="mini">
+            <el-input
+              v-model="tempScript.name"
+              size="mini"
+              placeholder="支持大小写字母和下划线"
+              :disabled="tempScript.id !== ''"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <!-- 备注 -->
+          <el-form-item :label="'备注'" prop="desc" size="mini">
+            <el-input v-model="tempScript.desc" size="mini" type="textarea" :rows="1" :placeholder="'函数的描述、备注'" />
+          </el-form-item>
+        </el-col>
+      </el-row>
 
       <el-form-item label="调试函数" size="mini">
         <el-input
@@ -36,7 +63,7 @@
           placeholder="输入格式：${func(abc,123)}"
           type="textarea"
           :rows="1"
-          style="width: 89%"
+          style="width: 90%"
         />
         <el-button
           type="primary"
@@ -53,29 +80,9 @@
           <el-button slot="reference" type="text" icon="el-icon-question" />
         </el-popover>
       </el-form-item>
-
     </el-form>
 
-    <el-collapse accordion style="margin-left: 20px">
-      <el-collapse-item>
-        <template slot="title">
-          <div style="color:#409eff"> 点击查看说明</div>
-        </template>
-        <div style="margin-left: 20px">
-          1、支持python3语法 <br>
-          2、若使用了未安装的第三方库，则需联系管理员安装对应的库 <br>
-          3、在执行自定义函数的时候，系统会强制在第一行加入一个参数：env <br>
-          4、系统插入的env参数为运行时选择的环境，默认测试环境（test），其余为开发环境（dev）、uat环境（uat）、生产环境（production）
-          <br>
-          5、若自定义函数需要根据运行选中的环境进行调整，则可以使用此参数判断，然后给对应的变量赋值，如：SQL文件为操作数据库，则可以根据这个字段判断，根据不同环境给数据库信息赋值<br>
-          <span
-            style="color: red"
-          >注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试</span>
-        </div>
-      </el-collapse-item>
-    </el-collapse>
-
-    <el-container style="margin-left: 20px">
+    <el-container style="margin-left: 20px;margin-right: 20px">
       <editor
         v-model="tempScript.script_data"
         :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
@@ -191,6 +198,10 @@ import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Drawer',
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'scriptTypeDict', 'useFrom'
+  ],
   components: {
     editor: require('vue2-ace-editor')
   },
@@ -204,7 +215,8 @@ export default {
         id: '',
         name: '',
         desc: '',
-        script_data: ''
+        script_data: '',
+        script_type: ''
       },
       runEnv: '',
       runEnvList: [],
@@ -243,19 +255,26 @@ export default {
       if (_type === 'scriptInfo') {
         if (status === 'add') {
           this.tempScript.id = ''
-          this.tempScript.script_data = ''
           this.tempScript.name = data ? data.name : ''
           this.tempScript.desc = data ? data.desc : ''
+          this.tempScript.script_type = data ? data.script_type : 'test'
           if (data) {
             getScript({ id: data.id }).then(res => {
               this.tempScript.script_data = res.script_data
             })
           }
-          this.tempScript.script_data = data ? data.script_data : ''
+          this.tempScript.script_data = data ? data.script_data : '\n# 1、支持python3.9及以下语法 \n' +
+            '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
+            '# 3、在执行自定义函数的时候，系统会强制在第一行加入一个参数：env \n' +
+            '# 4、系统插入的env参数为运行时选择的环境对应的code，详见配置管理-运行环境，默认为debug \n' +
+            '# 5、若自定义函数需要根据运行选中的环境进行调整，则可以使用此参数判断，然后给对应的变量赋值\n' +
+            '#   如：当前文件为操作数据库，则可以根据这个env判断，连哪个库，操作哪些表 \n' +
+            '# 注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试 \n'
         } else if (status === 'update') {
           this.tempScript.id = data.id
           this.tempScript.name = data.name
           this.tempScript.desc = data.desc
+          this.tempScript.script_type = data.script_type
           getScript({ id: data.id }).then(res => {
             this.tempScript.script_data = res.script_data
           })

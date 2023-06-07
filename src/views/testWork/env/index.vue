@@ -199,6 +199,7 @@
     <el-drawer
       title="新增环境"
       size="70%"
+      :wrapper-closable="false"
       :visible.sync="addDrawerIsShow"
       :direction="direction"
     >

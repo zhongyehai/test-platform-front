@@ -42,7 +42,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'备注'" prop="desc" align="center" min-width="25%" size="mini">
+      <el-table-column show-overflow-tooltip :label="'备注'" prop="desc" align="center" min-width="25%" size="mini">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>

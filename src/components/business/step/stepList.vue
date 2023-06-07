@@ -94,9 +94,9 @@
       @expand-change="changeExpandStatus"
     >
 
-      <el-table-column type="selection" min-width="1%" />
+      <el-table-column type="selection" min-width="2%" />
 
-      <el-table-column align="left" label="步骤名称" min-width="42%">
+      <el-table-column align="left" label="步骤名称" min-width="48%">
         <template slot-scope="scope">
           <el-tag
             size="small"
@@ -108,7 +108,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="dataType !== 'api'" align="left" label="执行事件" min-width="10%">
+      <el-table-column v-if="dataType !== 'api'" align="left" label="执行事件" min-width="15%">
         <template slot-scope="scope">
           <span>{{ parseExecuteType(scope.row.execute_type) }}</span>
         </template>
@@ -237,7 +237,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="num" label="序号" min-width="3%">
+      <el-table-column prop="num" label="序号" min-width="5%">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
@@ -572,8 +572,9 @@ export default {
         // 拖动数据是展开状态的，不允许拖拽排序
         // 拖动和要替换的步骤，有一个是非当前用例的步骤，不允许拖拽排序
         onMove: function(evt, originalEvent) {
-          const from_id = parseInt(evt.dragged.children[6].innerText)
-          const to_id = parseInt(evt.related.children[6].innerText)
+          const index = that.dataType === 'api' ? 6 : 7 // UI自动化比接口自动化多一列
+          const from_id = parseInt(evt.dragged.children[index].innerText)
+          const to_id = parseInt(evt.related.children[index].innerText)
 
           if (that.expands.indexOf(from_id) !== -1) {
             // Message.error('数据是展开状态的，不允许拖拽排序')
@@ -593,8 +594,6 @@ export default {
 
         // 发送排序请求
         onEnd: evt => {
-          console.log('onEnd.evt: ', evt)
-
           // 非当前用例的步骤，不发送排序请求
           if (that.sendSortRequest) {
             const targetRow = this.stepList.splice(evt.oldIndex, 1)[0]

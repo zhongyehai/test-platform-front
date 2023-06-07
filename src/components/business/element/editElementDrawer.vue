@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-drawer
-      title="修改元素"
+      :title="tempElement.id ? '修改元素' : '新增元素'"
       size="70%"
       :append-to-body="true"
       :wrapper-closable="false"
@@ -44,7 +44,9 @@
               <el-input
                 v-model="tempElement.element"
                 size="mini"
-                :placeholder="tempElement.by === 'coordinate' ? '请填写坐标：(x, y)，如(538, 1816)' : '元素表达式'"
+                type="textarea"
+                :rows="1"
+                :placeholder="tempElement.by === 'coordinate' ? '如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' : '元素表达式'"
                 :style="{'width': tempElement.by === 'coordinate' ? '98%' : '100%'}"
               />
               <el-popover
@@ -53,8 +55,8 @@
                 placement="top-start"
                 trigger="hover"
               >
-                <div>请填写坐标：(x, y)</div>
-                <div>如坐标x为538, y为1816，则填写: (538, 1816)</div>
+                <div>请填写定位工具上bounds字段的值：(x, y)</div>
+                <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
                 <el-button slot="reference" type="text" icon="el-icon-question" />
               </el-popover>
             </el-form-item>
@@ -84,7 +86,7 @@
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
-          @click="changElement()"
+          @click="tempElement.id ? changElement() : addElement()"
         >保存
         </el-button>
       </div>
@@ -94,8 +96,8 @@
 </template>
 
 <script>
-import { putElement as appPutElement } from '@/apis/appUiTest/element'
-import { putElement as webUiPutElement } from '@/apis/webUiTest/element'
+import { postElement as appPostElement, putElement as appPutElement } from '@/apis/appUiTest/element'
+import { postElement as webUiPostElement, putElement as webUiPutElement } from '@/apis/webUiTest/element'
 
 export default {
   name: 'Drawer',
@@ -108,7 +110,6 @@ export default {
     return {
       drawerIsShow: false, // 抽屉的显示状态
       direction: 'rtl', // 抽屉打开方式
-      drawerType: '',
 
       // 临时数据，添加、修改
       tempElement: {
@@ -124,6 +125,7 @@ export default {
       isSendForPage: false, // 标记是否发送给页面管理，更新页面地址
 
       element_label: '',
+      postElementUrl: '',
       putElementUrl: ''
     }
   },
@@ -143,8 +145,10 @@ export default {
   created() {
     if (this.dataType === 'webUi') {
       this.putElementUrl = webUiPutElement
+      this.postElementUrl = webUiPostElement
     } else {
       this.putElementUrl = appPutElement
+      this.postElementUrl = appPostElement
     }
   },
 
@@ -152,10 +156,10 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, element) => {
       if (_type === 'elementInfo') {
         if (status === 'edit') { // 修改
-          this.drawerType = 'edit'
+          this.tempElement.id = element.id
           this.updateTempElement(element)
         } else if (status === 'copy') { // 复制
-          this.drawerType = 'add'
+          this.tempElement.id = ''
           this.updateTempElement(element)
         }
 
@@ -177,7 +181,6 @@ export default {
 
     // 初始化临时元素数据 (修改)
     updateTempElement(row) {
-      this.tempElement.id = row.id
       this.tempElement.name = row.name
       this.tempElement.by = row.by
       this.tempElement.element = row.element
@@ -203,6 +206,22 @@ export default {
         module_id: this.tempElement.module_id,
         project_id: this.tempElement.project_id
       }
+    },
+
+    // 新增元素
+    addElement() {
+      this.submitButtonIsLoading = true
+      this.postElementUrl({
+        page_id: this.tempElement.page_id,
+        module_id: this.tempElement.module_id,
+        project_id: this.tempElement.project_id,
+        element_list: [this.tempElement]
+      }).then(response => {
+        this.submitButtonIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.sendIsCommitStatus()
+        }
+      })
     },
 
     // 修改元素

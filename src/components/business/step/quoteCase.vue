@@ -362,7 +362,7 @@ export default {
       var new_api = JSON.parse(JSON.stringify(row))
       // 服务名 + 用例集... + 用例名
       var name = this.$refs.projectSelector.selected.label + '/' + this.$refs['caseSelector'].getCheckedNodes()[0].pathLabels.join('/')
-      new_api['quote_case'] = new_api['id']
+      new_api['quote_case'] = new_api['quote_case'] ? new_api['quote_case'] : new_api['id'] // 有可能是引用用例下的引用
       new_api['id'] = ''
       new_api['case_id'] = this.caseId
       new_api['status'] = 1

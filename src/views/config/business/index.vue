@@ -367,7 +367,7 @@ export default {
       })
     },
 
-    // 获取配置类型列表
+    // 获取业务线列表
     getBusinessList() {
       this.listLoading = true
       businessList(this.listQuery).then(response => {

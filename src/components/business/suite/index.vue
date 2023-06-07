@@ -61,7 +61,7 @@
                   v-show="currentProjectId"
                   slot="reference"
                   type="text"
-                  style="margin-left: 50px"
+                  style="margin-left: 30px"
                   @click="addParentSuite()"
                 >添加
                 </el-button>
@@ -72,7 +72,7 @@
                   v-show="currentProjectId"
                   slot="reference"
                   type="text"
-                  style="margin-left: 50px"
+                  style="margin-left: 30px"
                   @click="showUploadDrawer()"
                 >导入
                 </el-button>

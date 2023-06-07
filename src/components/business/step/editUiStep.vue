@@ -409,7 +409,7 @@ export default {
           this.currentStep.wait_time_out = step.wait_time_out
           this.currentStep.up_func = ''
           this.currentStep.down_func = ''
-          this.currentStep.execute_type = this.$busEvents.data.executeTypeList[2].value
+          this.currentStep.execute_type = this.$busEvents.data.executeTypeList[1].value
           this.currentStep.send_keys = ''
           this.currentStep.run_times = 1
           this.currentStep.skip_on_fail = 1

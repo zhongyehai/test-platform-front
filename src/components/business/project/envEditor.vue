@@ -8,7 +8,7 @@
     <div class="demo-drawer__content">
 
       <el-row>
-        <el-col :span="dataType !== 'appUi' ? 3 : 0">
+        <el-col :span="3">
           <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">
             <!--          <el-tabs v-model="activeName" :tab-position="tabPosition">-->
             <el-tab-pane
@@ -20,7 +20,7 @@
           </el-tabs>
         </el-col>
 
-        <el-col :span="dataType !== 'appUi' ? 21 : 24">
+        <el-col :span="21">
           <div>
             <el-form v-show="dataType !== 'appUi'" label-width="120px">
               <el-form-item :label="'环境域名'" class="is-required" size="mini">

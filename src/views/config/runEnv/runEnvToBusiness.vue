@@ -9,7 +9,13 @@
   >
 
     <div style="margin-left: 20px">
-
+      <span>
+        <span style="color: red">注：</span>
+        所有运行环境都需要赋给
+        <span style="color: red">【中台业务线】</span>
+        和
+        <span style="color: red">【公共业务线】</span>
+      </span>
       <div style="margin-top: 20px">
         <span>选择环境: </span>
         <runEnvCheckbox

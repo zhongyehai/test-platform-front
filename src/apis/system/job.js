@@ -18,8 +18,13 @@ export function jobList(data) {
 }
 
 // 执行任务
-export function jobRun(params) {
-  return request({ url: baseDir + '/run', method: 'post', params: params })
+export function jobRun(data) {
+  return request({ url: baseDir + '/run', method: 'post', data: data })
+}
+
+// 执行任务记录
+export function jobRunLog(params) {
+  return request({ url: baseDir + '/log', method: 'get', params: params })
 }
 
 // 获取任务信息

@@ -63,7 +63,11 @@
               size="mini"
               class="is-required"
             >
-              <el-input v-model="tempProject.app_package" />
+              <el-input v-model="tempProject.app_package" style="width: 98%" />
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>查看命令：adb shell dumpsys window | findstr mCurrentFocus </div>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
+              </el-popover>
             </el-form-item>
 
             <el-form-item
@@ -73,7 +77,11 @@
               size="mini"
               class="is-required"
             >
-              <el-input v-model="tempProject.app_activity" />
+              <el-input v-model="tempProject.app_activity" style="width: 98%" />
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>查看命令：adb shell dumpsys window | findstr mCurrentFocus </div>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
+              </el-popover>
             </el-form-item>
 
             <!-- 脚本文件 -->

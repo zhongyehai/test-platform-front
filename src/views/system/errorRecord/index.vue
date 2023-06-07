@@ -23,6 +23,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column :label="'触发人'" prop="url" align="center" min-width="10%" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <span> {{ userDict[scope.row.create_user] }} </span>
+        </template>
+      </el-table-column>
+
       <el-table-column :label="'请求方法'" prop="url" align="center" min-width="10%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span> {{ scope.row.method }} </span>
@@ -35,7 +41,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="40%" :show-overflow-tooltip="true">
+      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="30%" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <span>{{ scope.row.detail }}</span>
         </template>

@@ -134,6 +134,7 @@
           row-key="id"
           stripe
           @selection-change="clickSelectAll"
+          @cell-dblclick="cellDblclick"
         >
           <el-table-column type="selection" min-width="2%" />
 
@@ -212,22 +213,10 @@
             <template slot-scope="scope">
 
               <!-- 运行用例 -->
-              <el-button
-                slot="reference"
-                type="text"
-                size="mini"
-                @click="clickRunCase(scope.row)"
-              >运行
-              </el-button>
+              <el-button slot="reference" type="text" size="mini" @click="clickRunCase(scope.row)">运行</el-button>
 
               <!--修改用例-->
-              <el-button
-                type="text"
-                size="mini"
-                style="margin-right: 8px"
-                @click="editCase(scope.row)"
-              >修改
-              </el-button>
+              <el-button type="text" size="mini" style="margin-right: 8px" @click="editCase(scope.row)">修改</el-button>
 
               <!-- 复制用例 -->
               <el-popover
@@ -242,12 +231,7 @@
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
                   <el-button type="primary" size="mini" @click="copyCase(scope.row)">确定</el-button>
                 </div>
-                <el-button
-                  slot="reference"
-                  type="text"
-                  size="mini"
-                >复制
-                </el-button>
+                <el-button slot="reference" type="text" size="mini">复制 </el-button>
               </el-popover>
 
               <!-- 删除用例 -->
@@ -262,13 +246,7 @@
                   <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
                   <el-button type="primary" size="mini" @click="delCase(scope.row)">确定</el-button>
                 </div>
-                <el-button
-                  slot="reference"
-                  style="color: red"
-                  type="text"
-                  size="mini"
-                >删除
-                </el-button>
+                <el-button slot="reference" style="color: red" type="text" size="mini">删除 </el-button>
               </el-popover>
             </template>
           </el-table-column>
@@ -483,6 +461,17 @@ export default {
     // 全选
     clickSelectAll(val) {
       this.selectedList = val
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row.name
+      this.$copyText(data).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
     },
 
     cancelShowBatchButton() {

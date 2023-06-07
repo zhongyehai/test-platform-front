@@ -51,7 +51,7 @@
     <el-row>
 
       <!-- 第一列服务树 -->
-      <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+      <el-col style="width: 20%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="projectTab" class="table_padding table_project">
           <!--          <el-tab-pane :label="projectTab" :name="projectTab">-->
           <el-tab-pane :name="projectTab">
@@ -64,9 +64,20 @@
                   v-show="tempDataForm.project_id"
                   slot="reference"
                   type="text"
-                  style="margin-left: 50px"
+                  style="margin-left: 30px"
                   @click="addParentModule()"
                 >添加</el-button>
+              </el-popover>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>{{ `为当前${titleType}导入模块、页面、元素` }}</div>
+                <el-button
+                  v-if="dataType !== 'api'"
+                  v-show="tempDataForm.project_id"
+                  slot="reference"
+                  type="text"
+                  style="margin-left: 30px"
+                  @click="addParentModule()"
+                >导入</el-button>
               </el-popover>
             </template>
 
@@ -150,7 +161,7 @@
       </el-col>
 
       <!-- 第二列，接口列表 -->
-      <el-col style="width: 84%; margin-left: 5px">
+      <el-col style="width: 79%; margin-left: 5px">
         <!-- 接口管理组件 -->
         <apiManage
           v-if="dataType === 'api'"
@@ -263,7 +274,7 @@ import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByName, getExtractsMapping } from '@/apis/config/config'
 import {
   apiMsgBelongTo,
   apiMsgBelongToStep,
@@ -400,8 +411,8 @@ export default {
     })
 
     // 从后端获取响应对象数据源映射
-    getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
-      this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
+    getExtractsMapping().then(response => {
+      this.$busEvents.data.responseDataSourceMappingList = response.data
     })
 
     // 从后端获取断言数方式映射

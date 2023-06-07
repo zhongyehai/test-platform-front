@@ -273,7 +273,12 @@ import {
 } from '@/apis/appUiTest/case'
 import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
-import { getConfigByName, getSkipIfDataSourceMapping, getSkipIfTypeMapping } from '@/apis/config/config'
+import {
+  getConfigByName,
+  getExtractsMapping,
+  getSkipIfDataSourceMapping,
+  getSkipIfTypeMapping
+} from '@/apis/config/config'
 import { getAssertMapping } from '@/apis/apiTest/api'
 import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
 
@@ -450,8 +455,8 @@ export default {
     // 从后端获取响应对象数据源映射
     if (this.dataType === 'api') {
       if (this.$busEvents.data.responseDataSourceMappingList.length === 0) {
-        getConfigByName({ 'name': 'response_data_source_mapping' }).then(response => {
-          this.$busEvents.data.responseDataSourceMappingList = JSON.parse(response.data)
+        getExtractsMapping().then(response => {
+          this.$busEvents.data.responseDataSourceMappingList = response.data
         })
       }
     }

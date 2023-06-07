@@ -5,6 +5,7 @@
     <el-drawer
       title="新增元素"
       size="85%"
+      :wrapper-closable="false"
       :append-to-body="true"
       :visible.sync="drawerIsShow"
       :direction="direction"
@@ -81,8 +82,8 @@
             <template slot="header">
               <span><span style="color: red">*</span>元素表达式</span>
               <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                <div>如果定位方式为坐标，请填写坐标：(x, y)</div>
-                <div>如坐标x为538, y为1816，则填写: (538, 1816)</div>
+                <div>请填写定位工具上bounds字段的值：(x, y)</div>
+                <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
                 <el-button slot="reference" type="text" icon="el-icon-question" />
               </el-popover>
             </template>
@@ -92,7 +93,7 @@
                 size="mini"
                 type="textarea"
                 :rows="1"
-                :placeholder="scope.row.by === 'coordinate' ? '请填写坐标：(x, y)，如(538, 1816)' : '元素表达式'"
+                :placeholder="scope.row.by === 'coordinate' ? '如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' : '元素表达式'"
               />
             </template>
           </el-table-column>
@@ -180,7 +181,15 @@ export default {
       direction: 'rtl', // 抽屉打开方式
 
       isShowSubmitLoading: false,
-      tempData: [{ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 }],
+      wait_time_out: this.dataType === 'appUi' ? 3 : 5,
+      tempData: [{
+        id: `${Date.now()}`,
+        name: null,
+        by: null,
+        element: null,
+        desc: null,
+        wait_time_out: this.wait_time_out
+      }],
       postElementUrl: ''
     }
   },
@@ -198,7 +207,14 @@ export default {
       if (_type === 'elementInfo') {
         if (status === 'add') { // 新增
           this.drawerType = 'add'
-          this.tempData = [{ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 }]
+          this.tempData = [{
+            id: `${Date.now()}`,
+            name: null,
+            by: null,
+            element: null,
+            desc: null,
+            wait_time_out: this.wait_time_out
+          }]
           this.drawerIsShow = true
         }
       }
@@ -213,7 +229,14 @@ export default {
   methods: {
 
     addRow() {
-      this.tempData.push({ id: `${Date.now()}`, name: null, by: null, element: null, desc: null, wait_time_out: 5 })
+      this.tempData.push({
+        id: `${Date.now()}`,
+        name: null,
+        by: null,
+        element: null,
+        desc: null,
+        wait_time_out: this.wait_time_out
+      })
     },
 
     // 是否显示删除按钮

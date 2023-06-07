@@ -1,4 +1,4 @@
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByName, getGetFindElementBy } from '@/apis/config/config'
 import { assertMappingList, extractMappingList } from '@/apis/webUiTest/step'
 
 // 获取配置的运行等待超时时间
@@ -14,8 +14,8 @@ export function getRunTimeout(_this) {
 // 获取ui自动化元素定位方式
 export function getFindElementOption(_this) {
   let findElementOption = []
-  getConfigByName({ 'name': 'find_element_option' }).then(response => {
-    findElementOption = JSON.parse(response.data)
+  getGetFindElementBy({ 'test_type': _this.dataType }).then(response => {
+    findElementOption = response.data
     _this.$busEvents.data.findElementOptionList = findElementOption
     // 列表解析为字典
     const optionDict = []

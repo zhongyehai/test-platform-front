@@ -149,86 +149,23 @@
       @pagination="getUserList"
     />
 
-    <!-- 新增/修改表单 -->
-    <el-drawer
-      :title=" drawerType === 'create' ? '新增用户' : '修改用户'"
-      size="60%"
-      :visible.sync="drawerIsShow"
-      :direction="direction"
-    >
-      <el-form
-        ref="dataForm"
-        :model="tempUser"
-        label-width="100px"
-        style="min-width: 400px;margin-left: 20px;margin-right: 20px"
-      >
+    <addUserDrawer
+      :role-list="roleList"
+    />
 
-        <!-- 用户信息 -->
-        <el-form-item :label="'用户名'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.name" placeholder="2~12位" />
-        </el-form-item>
-
-        <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.account" placeholder="2~12位" />
-        </el-form-item>
-
-        <el-form-item v-if="drawerType === 'create'" :label="'密码'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，必填" />
-        </el-form-item>
-
-        <el-form-item v-else :label="'密码'" prop="name" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~18位，若填写，则会修改为此密码，若不填写，则不修改" />
-        </el-form-item>
-
-        <el-form-item :label="'业务线'" class="is-required" size="mini">
-          <businessView
-            ref="businessView"
-            :current-business="tempUser.business_list"
-            :is-multiple="true"
-            :select-width="'97%'"
-          />
-        </el-form-item>
-
-        <el-form-item :label="'角色'" class="is-required" size="mini">
-          <el-select
-            v-model="tempUser.role_list"
-            placeholder="请选择角色"
-            multiple
-            filterable
-            style="width:100%"
-          >
-            <el-option
-              v-for="role in role_list"
-              :key="role.name"
-              :label="role.name"
-              :value="role.id"
-            />
-          </el-select>
-        </el-form-item>
-
-      </el-form>
-      <div class="demo-drawer__footer">
-        <el-button size="mini" @click="drawerIsShow = false">取消</el-button>
-        <el-button
-          size="mini"
-          type="primary"
-          :loading="submitButtonIsLoading"
-          @click="drawerType==='create' ? addUser() : changUser()"
-        >保存
-        </el-button>
-      </div>
-
-    </el-drawer>
-
+    <editUserDrawer
+      :role-list="roleList"
+    />
   </div>
 </template>
 
 <script>
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import businessView from '@/components/Selector/business'
+import addUserDrawer from '@/views/users/user/addUserDrawer.vue'
+import editUserDrawer from '@/views/users/user/editUserDrawer.vue'
 
-import { userList, deleteUser, postUser, putUser, getUser, userStatus, userRoles } from '@/apis/system/user'
+import { userList, deleteUser, userStatus } from '@/apis/system/user'
 import { roleList } from '@/apis/system/role'
 import { businessList } from '@/apis/config/business'
 
@@ -236,7 +173,8 @@ export default {
   name: 'Index',
   components: {
     Pagination,
-    businessView
+    addUserDrawer,
+    editUserDrawer
   },
   directives: { waves },
   data() {
@@ -251,22 +189,11 @@ export default {
         status: undefined // 账号状态
         // role_id: undefined // 角色
       },
-
-      // 临时数据，添加、修改
-      tempUser: {
-        id: undefined,
-        name: undefined,
-        account: undefined,
-        role_list: [],
-        business_list: [],
-        password: undefined
-      },
-
       submitButtonIsLoading: false,
       commonBusiness: '',
       userDict: {},
       user_list: [], // 用户列表
-      role_list: [], // 角色列表
+      roleList: [], // 角色列表
       status_list: [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }], // 状态列表
       business_list: [], // 业务线列表
       tableKey: 0, // 服务数据表格起始
@@ -277,15 +204,11 @@ export default {
       listLoading: true // 请求加载状态
     }
   },
-  computed: {},
-
-  watch: {},
 
   created() {
     this.getAllUserList(this.getUserList)
     this.initStatus() // 初始化用户状态
     this.getRoleList() // 初始化角色列表
-    this.initTempUser() // 初始化临时数据
   },
 
   mounted() {
@@ -302,6 +225,16 @@ export default {
         })
       })
     }
+
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
+      if (_type === 'userInfo') {
+        this.getUserList()
+      }
+    })
+  },
+
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
@@ -328,38 +261,14 @@ export default {
       this.status_list = [{ 'id': 1, name: '启用' }, { 'id': 2, name: '冻结' }]
     },
 
-    // 初始化临时服务数据
-    initTempUser() {
-      this.tempUser = {
-        id: undefined,
-        name: undefined,
-        account: undefined,
-        password: undefined,
-        role_list: [],
-        business_list: [this.commonBusiness]
-      }
-    },
-
     // 初始化临时模板数据，点击新增按钮触发
     handleCreate() {
-      this.initTempUser()
-      this.drawerType = 'create' // dialog框标识为创建
-      this.drawerIsShow = true
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'userInfo', 'add')
     },
 
     //  初始化临时模板数据，点击修改按钮触发
     handleUpdate(row) {
-      this.drawerType = 'edit' // dialog框标识为编辑
-
-      this.tempUser.id = row.id
-      this.tempUser.name = row.name
-      this.tempUser.account = row.account
-      this.tempUser.password = row.password
-      this.tempUser.business_list = row.business_list
-      userRoles({ id: row.id }).then(response => {
-        this.tempUser.role_list = response.data
-      })
-      this.drawerIsShow = true
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'userInfo', 'edit', JSON.parse(JSON.stringify(row)))
     },
 
     // 初始化查询数据
@@ -377,7 +286,7 @@ export default {
     // 获取角色列表
     getRoleList() {
       roleList().then(response => {
-        this.role_list = response.data.data
+        this.roleList = response.data.data
       })
     },
 
@@ -387,34 +296,6 @@ export default {
         this.user_list = response.data.data
         this.total = response.data.total
         this.listLoading = false
-      })
-    },
-
-    // 新增用户
-    addUser() {
-      this.submitButtonIsLoading = true
-      this.tempUser.business_list = this.$refs.businessView.business
-      postUser(this.tempUser).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
-          this.initTempUser() // 初始化临时数据模板
-          this.getUserList() // 重新从后台获取服务列表
-        }
-      })
-    },
-
-    // 修改用户
-    changUser() {
-      this.submitButtonIsLoading = true
-      this.tempUser.business_list = this.$refs.businessView.business
-      putUser(this.tempUser).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
-          this.initTempUser() // 初始化临时数据模板
-          this.getUserList() // 重新从后台获取服务列表
-        }
       })
     },
 

@@ -2,6 +2,7 @@
   <el-drawer
     title="新增用例"
     size="95%"
+    :wrapper-closable="false"
     :append-to-body="true"
     :visible.sync="drawerIsShow"
     :direction="direction"

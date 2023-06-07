@@ -10,7 +10,7 @@
       row-key="id"
       stripe
     >
-      <el-table-column prop="num" label="序号" min-width="10%">
+      <el-table-column prop="num" label="序号" min-width="6%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" align="center" min-width="12%">
         <template slot="header">
           <span>定位方式</span>
           <el-tooltip
@@ -41,22 +41,18 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="元素表达式" min-width="20%">
+      <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="元素表达式" min-width="42%">
         <template slot-scope="scope">
           <span> {{ scope.row.element }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" min-width="15%">
+      <el-table-column :show-overflow-tooltip="true" align="center" min-width="10%">
         <template slot="header">
           <span>等待时间(秒)</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
+          <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
-              <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待</div>
+              <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待(秒)</div>
             </div>
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
@@ -66,7 +62,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="20%">
+      <el-table-column align="center" label="操作" min-width="15%">
         <template slot-scope="scope">
 
           <!--修改元素-->

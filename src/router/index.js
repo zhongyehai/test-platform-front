@@ -472,7 +472,7 @@ export const constantRoutes = [
         path: 'job',
         name: 'Job',
         component: () => import('@/views/system/job/index'),
-        meta: { title: '定时任务', icon: 'el-icon-date' }
+        meta: { title: '系统定时任务', icon: 'el-icon-date' }
       },
       {
         path: 'errorRecord',
