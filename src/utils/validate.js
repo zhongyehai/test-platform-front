@@ -1,4 +1,4 @@
-import { Notification } from 'element-ui'
+import { Message } from 'element-ui'
 
 /**
  * Created by PanJiaChen on 16/11/18.
@@ -25,9 +25,9 @@ export function validUsername(str) {
 // 校验字符串是否为json
 export function assertStrIsJson(strData, message) {
   try {
-    JSON.parse(strData)
+    return JSON.parse(strData)
   } catch (e) {
-    Notification.error(message)
+    Message.error(message)
     throw e
   }
 }

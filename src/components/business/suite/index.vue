@@ -445,7 +445,7 @@ export default {
       this.putCaseSuiteUrl = webUiPutCaseSuite
       this.uploadAddrUrl = webUiUploadAddr
       this.caseSuiteUploadUrl = webUiCaseSuiteUpload
-      getFindElementOption(this) // 获取定位方式
+      getFindElementOption(this, this.dataType) // 获取定位方式
       getConfigByName({ 'name': 'browser_name' }).then(response => {
         this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
       })
@@ -459,7 +459,7 @@ export default {
       this.putCaseSuiteUrl = appUiPutCaseSuite
       this.uploadAddrUrl = appUiUploadAddr
       this.caseSuiteUploadUrl = appUiCaseSuiteUpload
-      getFindElementOption(this) // 获取定位方式
+      getFindElementOption(this, this.dataType) // 获取定位方式
       serverList().then(response => {
         this.$busEvents.data.runServerList = response.data.data
       })

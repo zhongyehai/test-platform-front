@@ -12,9 +12,9 @@ export function getRunTimeout(_this) {
 }
 
 // 获取ui自动化元素定位方式
-export function getFindElementOption(_this) {
+export function getFindElementOption(_this, dataType) {
   let findElementOption = []
-  getGetFindElementBy({ 'test_type': _this.dataType }).then(response => {
+  getGetFindElementBy({ 'test_type': dataType }).then(response => {
     findElementOption = response.data
     _this.$busEvents.data.findElementOptionList = findElementOption
     // 列表解析为字典
@@ -59,18 +59,9 @@ export function getExtractMappingList(_this) {
   return tempList
 }
 
-// 获取ui自动化数据提取类型
-export function getAssertMappingList(_this) {
-  let tempList = []
+// 获取ui自动化断言方法
+export function getUiAssertMappingList(_this) {
   assertMappingList().then(response => {
-    tempList = response.data
-    _this.$busEvents.data.assertMappingList = tempList
-    // 列表解析为字典
-    const tempDict = []
-    tempList.forEach(option => {
-      tempDict[option.value] = option.label
-    })
-    _this.$busEvents.data.assertMappingDict = tempDict
+    _this.$busEvents.data.assertMappingList = response.data
   })
-  return tempList
 }

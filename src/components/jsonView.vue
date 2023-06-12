@@ -20,7 +20,10 @@ import dataJsonView from '@/components/Inputs/dataJson'
 export default {
   name: 'JsonEditorView',
   components: { dataJsonView },
-  props: ['dataJson'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'dataJson'
+  ],
   data() {
     return {
       tempDataJson: ''

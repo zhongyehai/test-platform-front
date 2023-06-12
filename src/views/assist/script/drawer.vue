@@ -159,7 +159,7 @@
 
             <div>执行结果：</div>
             <pre class="el-collapse-item-content" style="overflow: auto">{{
-                debugResultDetail.result || '没有返回值或返回值为null'
+                debugResultDetail.result || debugResultDetail
             }}</pre>
             <br>
             <br>

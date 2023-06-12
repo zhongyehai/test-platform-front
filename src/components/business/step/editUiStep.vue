@@ -214,8 +214,8 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="定位元素" prop="element" size="small">
-              <el-input v-model="currentElement.element" />
+            <el-form-item label="元素表达式" prop="element" class="is-required" size="small">
+              <el-input v-model="currentElement.element" type="textarea" :rows="1" />
             </el-form-item>
 
           </el-form>
@@ -237,8 +237,8 @@
         <el-tab-pane label="断言" name="editAssert">
           <validatesView
             ref="validatesView"
-            :temp-element-list="tempElementList"
-            :step-drawer-status="drawerIsShow"
+            :data-type="'page'"
+            :element-list="tempElementList"
             :validates="currentStep.validates"
           />
         </el-tab-pane>
@@ -316,8 +316,8 @@
 <script>
 import skipIfView from '@/components/Inputs/skipIf'
 import extractsView from '@/components/uiTest/extract'
-import validatesView from '@/components/uiTest/validates'
 import uploadFileView from '@/components/file/uploadFile'
+import validatesView from '@/components/Inputs/validates'
 
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
 import { getPage as appUiGetPage } from '@/apis/appUiTest/page'

@@ -34,7 +34,7 @@ export function putStepIsRun(data) {
 
 // 获取步骤执行类型list
 export function executeList() {
-  return request({ url: stepDir + '/execute', method: 'get' })
+  return request({ url: stepDir + '/executeMapping', method: 'get' })
 }
 
 // 数据提取动作映射

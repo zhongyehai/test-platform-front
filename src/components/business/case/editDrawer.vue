@@ -15,29 +15,13 @@
         <el-form size="mini" label-width="100px">
 
           <el-row>
-            <el-col :span="18">
+            <el-col :span="12">
               <el-form-item label="用例名称" class="is-required">
                 <el-input v-model="tempCase.name" />
               </el-form-item>
             </el-col>
 
-            <el-col :span="6">
-              <el-form-item label="执行次数" class="is-required">
-                <el-input-number
-                  v-model="tempCase.run_times"
-                  :min="1"
-                  :max="1000"
-                  controls-position="right"
-                />
-              </el-form-item>
-
-            </el-col>
-          </el-row>
-
-          <el-row>
-
-            <!-- 脚本文件选择 -->
-            <el-col :span="18">
+            <el-col :span="8">
               <el-form-item label="脚本文件">
                 <scriptView
                   ref="scriptView"
@@ -56,6 +40,27 @@
                   </div>
                   <el-button slot="reference" type="text" icon="el-icon-question" />
                 </el-popover>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="4">
+              <el-form-item label="执行次数" class="is-required">
+                <el-input-number
+                  v-model="tempCase.run_times"
+                  :min="1"
+                  :max="1000"
+                  controls-position="right"
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+
+            <!-- 脚本文件选择 -->
+            <el-col :span="18">
+              <el-form-item label="用例来源">
+                <el-input v-model="caseFromStr" disabled />
               </el-form-item>
             </el-col>
 
@@ -228,14 +233,10 @@
       </el-tooltip>
 
       <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
-      <el-button
-        size="mini"
-        type="primary"
-        :loading="submitLoadingIsShow"
-        @click="changCase()"
-      >
-        {{ '保存' }}
-      </el-button>
+
+      <el-button size="mini" type="primary" :loading="submitLoadingIsShow" @click="changCase()"> {{ '保存并继续填写' }} </el-button>
+
+      <el-button size="mini" type="primary" :loading="submitLoadingIsShow" @click="changCase(true)"> {{ '保存并关闭抽屉' }} </el-button>
     </div>
 
   </el-drawer>
@@ -253,7 +254,8 @@ import {
   putCase as apiPutCase,
   copyCase as apiCopyCase,
   caseRun as apiCaseRun,
-  getCase as apiGetCase
+  getCase as apiGetCase,
+  caseFrom as apiCaseFrom
 } from '@/apis/apiTest/case'
 import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
 
@@ -261,7 +263,8 @@ import {
   putCase as webUiPutCase,
   copyCase as webUiCopyCase,
   caseRun as webUiCaseRun,
-  getCase as webUiGetCase
+  getCase as webUiGetCase,
+  caseFrom as webUiCaseFrom
 } from '@/apis/webUiTest/case'
 import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
 
@@ -269,7 +272,8 @@ import {
   putCase as appUiPutCase,
   copyCase as appUiCopyCase,
   caseRun as appUiCaseRun,
-  getCase as appUiGetCase
+  getCase as appUiGetCase,
+  caseFrom as appUiCaseFrom
 } from '@/apis/appUiTest/case'
 import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
@@ -281,6 +285,7 @@ import {
 } from '@/apis/config/config'
 import { getAssertMapping } from '@/apis/apiTest/api'
 import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
+import { getUiAssertMappingList } from '@/utils/getConfig'
 
 export default {
   name: 'CaseDrawer',
@@ -336,11 +341,13 @@ export default {
 
       runEvent: 'runCaseEventOnDialog',
       callBackEvent: 'runCaseOnDialog',
+      caseFromStr: '', // 用例来源
 
       putCaseUrl: '',
       copyCaseUrl: '',
       caseRunUrl: '',
       getCaseUrl: '',
+      getCaseFromUrl: '',
       getCaseSuiteUrl: ''
     }
   },
@@ -379,12 +386,14 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, currentCase) => {
       if (_type === 'caseInfo') {
         if (command === 'edit') {
+          this.getCaseFrom(currentCase.id)
           this.initUpdateTempCase(currentCase)
           this.activeName = 'stepInFo'
         } else if (command === 'copy') { // 复制用例
           this.copyCaseUrl({ id: currentCase.id }).then(response => {
             if (this.showMessage(this, response)) {
               this.tempCase = response.data.case
+              this.getCaseFrom(this.tempCase.id)
               this.drawerType = 'copy'
               this.drawerIsShow = true
               this.sendDrawerIsCommit()
@@ -426,6 +435,12 @@ export default {
       })
     }
 
+    if (this.dataType !== 'api') {
+      if (this.$busEvents.data.assertMappingList.length === 0) {
+        getUiAssertMappingList(this)
+      }
+    }
+
     // 从后端获取跳过方式映射
     if (this.$busEvents.data.skipIfTypeMappingList.length === 0) {
       getSkipIfTypeMapping().then(response => {
@@ -453,12 +468,10 @@ export default {
     }
 
     // 从后端获取响应对象数据源映射
-    if (this.dataType === 'api') {
-      if (this.$busEvents.data.responseDataSourceMappingList.length === 0) {
-        getExtractsMapping().then(response => {
-          this.$busEvents.data.responseDataSourceMappingList = response.data
-        })
-      }
+    if (this.$busEvents.data.responseDataSourceMappingList.length === 0) {
+      getExtractsMapping().then(response => {
+        this.$busEvents.data.responseDataSourceMappingList = response.data
+      })
     }
 
     // 从后端获取断言数方式映射
@@ -494,18 +507,21 @@ export default {
       this.copyCaseUrl = apiCopyCase
       this.caseRunUrl = apiCaseRun
       this.getCaseUrl = apiGetCase
+      this.getCaseFromUrl = apiCaseFrom
       this.getCaseSuiteUrl = apiGetCaseSuite
     } else if (this.dataType === 'webUi') {
       this.putCaseUrl = webUiPutCase
       this.copyCaseUrl = webUiCopyCase
       this.caseRunUrl = webUiCaseRun
       this.getCaseUrl = webUiGetCase
+      this.getCaseFromUrl = webUiCaseFrom
       this.getCaseSuiteUrl = webUiGetCaseSuite
     } else {
       this.putCaseUrl = appUiPutCase
       this.copyCaseUrl = appUiCopyCase
       this.caseRunUrl = appUiCaseRun
       this.getCaseUrl = appUiGetCase
+      this.getCaseFromUrl = appUiCaseFrom
       this.getCaseSuiteUrl = appUiGetCaseSuite
     }
   },
@@ -518,6 +534,12 @@ export default {
   },
 
   methods: {
+
+    getCaseFrom(caseId) {
+      this.getCaseFromUrl({ id: caseId }).then(response => {
+        this.caseFromStr = response.data
+      })
+    },
 
     // 打开添加步骤抽屉
     showAddStepDrawer() {
@@ -551,12 +573,14 @@ export default {
     },
 
     // 修改用例
-    changCase() {
+    changCase(isClose) {
       this.submitLoadingIsShow = true
       this.putCaseUrl(this.getCaseDataToCommit()).then(response => {
         this.submitLoadingIsShow = false
         if (this.showMessage(this, response)) {
-          this.drawerIsShow = false
+          if (isClose) {
+            this.drawerIsShow = false
+          }
           this.sendDrawerIsCommit()
         }
       })

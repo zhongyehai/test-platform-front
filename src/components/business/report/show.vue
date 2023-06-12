@@ -271,48 +271,81 @@
                 >
                   <el-collapse v-model="defaultShowResponseInFo">
 
+                    <el-collapse-item v-show="attachment" name="0">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ '备注信息：' }}</div>
+                      </template>
+                      <pre class="el-collapse-item-content" style="overflow: auto">{{ attachment }}</pre>
+                    </el-collapse-item>
+
+                    <el-collapse-item v-show="meta_datas.data[0].validation_results" name="01">
+                      <template slot="title">
+                        <div class="el-collapse-item-title"> {{ '断言详情：' }}</div>
+                      </template>
+                      <div>
+                        <el-table
+                          :data="meta_datas.data[0].validation_results"
+                          stripe
+                          style="width: 100%"
+                          @cell-dblclick="cellDblclick"
+                        >
+                          <el-table-column prop="check_value" label="实际结果" align="center" min-width="30%">
+                            <template slot-scope="scope">
+                              <span> {{ scope.row.check_value }} </span>
+                            </template>
+                          </el-table-column>
+
+                          <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
+                            <template slot-scope="scope">
+                              <span> {{ scope.row.comparator }} </span>
+                            </template>
+                          </el-table-column>
+
+                          <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
+                            <template slot-scope="scope">
+                              <span> {{ scope.row.expect }} </span>
+                            </template>
+                          </el-table-column>
+
+                          <el-table-column prop="check_result" label="断言结果" align="center" min-width="15%">
+                            <template slot-scope="scope">
+                              <el-tag :type="scope.row.check_result === 'pass' ? 'success' : 'danger'">
+                                {{ scope.row.check_result === 'pass' ? '断言通过' : '断言不通过' }}
+                              </el-tag>
+                            </template>
+                          </el-table-column>
+                        </el-table>
+                      </div>
+                    </el-collapse-item>
+
+                    <!-- UI自动化执行信息 -->
                     <el-collapse-item v-if="dataType !== 'api'" name="1">
                       <template slot="title">
-                        <div class="el-collapse-item-title"> 执行方式: {{
-                          meta_datas.data[0].test_action.execute_name
-                        }}
-                        </div>
+                        <div class="el-collapse-item-title"> 执行信息</div>
                       </template>
-                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.execute_name }}</div>
-                    </el-collapse-item>
+                      <div>
+                        <el-descriptions class="margin-top" :column="2" border>
+                          <el-descriptions-item>
+                            <template slot="label"> 执行方式 </template>
+                            {{ meta_datas.data[0].test_action.execute_name }}
+                          </el-descriptions-item>
 
-                    <el-collapse-item v-if="dataType !== 'api'" name="2">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '执行方式映射的方法：' }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.action }}</div>
-                    </el-collapse-item>
+                          <el-descriptions-item>
+                            <template slot="label"> 输入内容 </template>
+                            {{ meta_datas.data[0].test_action.text }}
+                          </el-descriptions-item>
 
-                    <el-collapse-item v-if="dataType !== 'api'" name="3">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">元素定位方式: {{
-                          meta_datas.data[0].test_action.by_type
-                        }}
-                        </div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.by_type }}</div>
-                    </el-collapse-item>
+                          <el-descriptions-item>
+                            <template slot="label"> 元素定位方式 </template>
+                            {{ meta_datas.data[0].test_action.by_type }}
+                          </el-descriptions-item>
 
-                    <el-collapse-item v-if="dataType !== 'api'" name="4">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">定位元素表达式 {{
-                          meta_datas.data[0].test_action.element
-                        }}
-                        </div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.element }}</div>
-                    </el-collapse-item>
-
-                    <el-collapse-item v-if="dataType !== 'api' && meta_datas.data[0].test_action.text" name="5">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">输入内容: {{ meta_datas.data[0].test_action.text }}</div>
-                      </template>
-                      <div class="el-collapse-item-content">{{ meta_datas.data[0].test_action.text }}</div>
+                          <el-descriptions-item>
+                            <template slot="label"> 元素定位表达式 </template>
+                            {{ meta_datas.data[0].test_action.element }}
+                          </el-descriptions-item>
+                        </el-descriptions>
+                      </div>
                     </el-collapse-item>
 
                     <el-collapse-item v-if="dataType !== 'api'" v-show="meta_datas.data[0].before" name="6">
@@ -646,13 +679,6 @@
 
                     </el-collapse-item>
 
-                    <el-collapse-item v-show="attachment" name="23">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
-                      </template>
-                      <pre class="el-collapse-item-content" style="overflow: auto">{{ attachment }}</pre>
-                    </el-collapse-item>
-
                   </el-collapse>
                 </div>
               </div>
@@ -764,7 +790,7 @@ export default {
       projectBusinessId: '',
 
       msg: { copyText: 'copy', copiedText: 'copied' },
-      defaultShowResponseInFo: ['6', '7', '23'], // 默认展开报告详情的项
+      defaultShowResponseInFo: ['0', '1', '6', '7'], // 默认展开报告详情的项
       showCaseResultType: 'all',
       showCaseResultTypeList: [
         { label: '展示全部用例', value: 'all' },
@@ -919,7 +945,7 @@ export default {
       this.reportDetailUrl = apiReportDetail
       this.deleteReportUrl = deleteApiReport
       this.getCaseProjectUrl = apiGetCaseProject
-      this.defaultShowResponseInFo = ['12', '17', '21', '23']
+      this.defaultShowResponseInFo = ['0', '12', '17', '21']
     } else if (this.dataType === 'webUi') {
       this.taskRunUrl = webUiRunTask
       this.caseSuiteRunUrl = webUiRunCaseSuite
@@ -1043,6 +1069,17 @@ export default {
       } catch (err) {
         return jsonObj
       }
+    },
+
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      const copy_data = typeof (data) === 'string' ? data : JSON.stringify(data)
+      this.$copyText(copy_data).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
     },
 
     handleNodeClick(i1, i2) {

@@ -197,6 +197,8 @@
       <el-tab-pane label="断言" name="editAssert">
         <validatesView
           ref="validatesView"
+          :data-type="'api'"
+          :element-list="[]"
           :validates="currentStep.validates"
         />
       </el-tab-pane>

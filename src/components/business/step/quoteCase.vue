@@ -339,6 +339,7 @@ export default {
         pageNum: this.quotePageNum,
         pageSize: this.quotePageSize,
         suiteId: this.currentSetId,
+        status: 1,
         getHasStep: true
       }).then(response => {
         this.caseList = []

@@ -174,6 +174,8 @@
       <el-tab-pane label="断言" name="validates">
         <validatesView
           ref="validatesView"
+          :data-type="'api'"
+          :element-list="[]"
           :validates="tempApi.validates"
         />
       </el-tab-pane>

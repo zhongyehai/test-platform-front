@@ -392,6 +392,7 @@ import {
 } from '@/utils/mapping'
 import showCaseDesc from '@/components/business/case/showCaseDesc.vue'
 import { runEnvList } from '@/apis/config/runEnv'
+import { assertStrIsJson } from '@/utils/validate'
 
 export default {
   name: 'Drawer',
@@ -690,13 +691,9 @@ export default {
 
     // 获取当前数据，用于提交
     getTaskToCommit() {
-      let call_back = {}
-      try {
-        call_back = JSON.parse(this.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson)
-      } catch (e) {
-        this.$message({ showClose: true, message: '回调流水线json格式错误', type: 'warning' })
-        return
-      }
+      const call_back = this.$refs.jsonEditorView.$refs.dataJsonView.tempDataJson
+      const call_back_data = assertStrIsJson(call_back, '回调流水线格式错误')
+
       return {
         id: this.tempTask.id,
         num: this.tempTask.num,
@@ -713,7 +710,7 @@ export default {
         email_to: this.$refs.emailToInput.getData(),
         email_from: this.tempTask.email_from,
         email_pwd: this.tempTask.email_pwd,
-        call_back: call_back,
+        call_back: call_back_data,
         project_id: this.tempTask.project_id,
         suite_ids: this.$refs.suiteTree.getCheckedKeys(),
         case_ids: this.tempTask.case_ids

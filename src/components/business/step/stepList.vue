@@ -140,12 +140,8 @@
 
       <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" min-width="10%">
         <template slot="header">
-          <span>用例详情</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
+          <span>详情</span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               <div>引用用例的详情</div>
             </div>

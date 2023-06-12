@@ -25,7 +25,6 @@ export default {
     uiTestExtractMappingDict: {}, // ui自动化数据提取方法映射
 
     assertMappingList: [], // ui自动化断言方法映射
-    assertMappingDict: {}, // ui自动化断言方法映射
 
     findElementOptionList: [], // ui自动化的定位方式
     findElementOptionDict: {}, // ui自动化的定位方式

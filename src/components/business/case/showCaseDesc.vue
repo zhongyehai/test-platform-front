@@ -1,6 +1,6 @@
 <template>
   <el-tabs v-model="activeName">
-    <el-tab-pane label="用例信息" name="caseInfo">
+    <el-tab-pane label="用例信息" name="showCaseInfo">
       <label>用例描述：</label>
       <div style="margin-bottom: 20px">{{ caseDesc }}</div>
 
@@ -74,7 +74,7 @@
     </el-tab-pane>
 
     <!-- 用例入参 -->
-    <el-tab-pane label="用例入参" name="caseVariables">
+    <el-tab-pane label="用例入参" name="showCaseVariables">
       <showCaseVariables
         :data-type="dataType"
         :case-variables="caseVariables"
@@ -83,7 +83,7 @@
     </el-tab-pane>
 
     <!-- 用例出参 -->
-    <el-tab-pane label="用例出参" name="caseExtracts">
+    <el-tab-pane label="用例出参" name="showCaseExtracts">
       <el-table :data="caseExtracts" :height="tableHeight" stripe style="width: 100%">
         <el-table-column :show-overflow-tooltip="true" prop="num" label="序号" size="mini" width="50">
           <template slot-scope="scope">
@@ -123,7 +123,7 @@ export default {
   ],
   data() {
     return {
-      activeName: 'caseInfo',
+      activeName: 'showCaseInfo',
       tableHeight: '500'
     }
   },

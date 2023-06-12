@@ -130,6 +130,29 @@
         </template>
       </el-table-column>
 
+      <el-table-column header-align="center" min-width="10%">
+        <template slot="header">
+          <span><span style="color: red">*</span>断言类型</span>
+        </template>
+        <template slot-scope="scope">
+          <el-select
+            v-model="scope.row.validate_type"
+            :disabled="dataType === 'api'"
+            placeholder="断言类型"
+            style="width: 100%"
+            size="mini"
+            @change="selectValidateType($event, scope.row)"
+          >
+            <el-option
+              v-for="(item) in validateTypeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </template>
+      </el-table-column>
+
       <el-table-column header-align="center" min-width="30%">
         <template slot="header">
           <span><span style="color: red">*</span>数据源</span>
@@ -139,28 +162,40 @@
             <el-row>
               <el-select
                 v-model="scope.row.data_source"
-                placeholder="选择数据源"
+                :placeholder="scope.row.validate_type === 'data' ? '选择数据源' : '选择元素'"
                 style="width: 100%"
                 filterable
                 clearable
                 default-first-option
                 size="mini"
               >
-                <el-option
-                  v-for="(item) in responseDataSourceMapping"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
+                <div v-show="scope.row.validate_type === 'data'">
+                  <el-option
+                    v-for="(item) in responseDataSourceMapping"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </div>
+                <div v-show="scope.row.validate_type === 'page'">
+                  <el-option
+                    v-for="(item) in elementList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </div>
+
               </el-select>
             </el-row>
             <el-row>
               <el-input
                 v-model="scope.row.key"
+                :disabled="scope.row.validate_type === 'page'"
                 type="textarea"
                 size="mini"
                 :rows="1"
-                :placeholder="getDataSourcePlaceholder(scope.row.data_source)"
+                :placeholder="getDataSourcePlaceholder(scope.row)"
               />
             </el-row>
           </el-row>
@@ -169,21 +204,38 @@
 
       <el-table-column header-align="center" min-width="30%">
         <template slot="header">
-          <span><span style="color: red">*</span>断言类型</span>
+          <span><span style="color: red">*</span>断言方法</span>
         </template>
         <template slot-scope="scope">
           <el-select
-            v-model="scope.row.validate_type"
-            placeholder="断言类型"
+            v-if="scope.row.validate_type === 'data'"
+            v-model="scope.row.validate_method"
+            placeholder="选择断言方法"
             style="width: 100%"
             filterable
             clearable
-            default-first-option
             size="mini"
-            @change="selectValidateType($event, scope.row)"
+            @change="selectValidateMethod($event, scope.row)"
           >
             <el-option
-              v-for="(item) in validateTypeList"
+              v-for="(item) in validateDataMethodList"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value"
+            />
+          </el-select>
+          <el-select
+            v-if="scope.row.validate_type !== 'data'"
+            v-model="scope.row.validate_method"
+            placeholder="选择断言方法"
+            style="width: 100%"
+            filterable
+            clearable
+            size="mini"
+            @change="selectValidateMethod($event, scope.row)"
+          >
+            <el-option
+              v-for="(item) in validateUiMethodList"
               :key="item.value"
               :label="item.value"
               :value="item.value"
@@ -202,7 +254,7 @@
               <el-select
                 v-model="scope.row.data_type"
                 placeholder="选择预期结果数据类型"
-                :disabled="scope.row.validate_type === '值为真' || scope.row.validate_type === '值为假'"
+                :disabled="assertAll.indexOf(scope.row.validate_method) !== -1"
                 style="width: 100%"
                 filterable
                 clearable
@@ -222,10 +274,11 @@
                 v-model="scope.row.value"
                 size="mini"
                 type="textarea"
-                :disabled="scope.row.validate_type === '值为真' || scope.row.validate_type === '值为假'"
-                :rows="1"
+                :disabled="assertOne.indexOf(scope.row.validate_method) !== -1"
+                autosize
                 :placeholder="
-                  scope.row.validate_type === '契约校验' ?
+                  assertBatch.indexOf(scope.row.validate_method) !== -1 ? `请填写具体字段，如: ['key1', 'key2']` :
+                  scope.row.validate_method === '契约校验' ?
                     '详见：https://pypi.org/project/pactverify/，注：契约校验标识符改用@':
                     '预期结果'
                 "
@@ -281,15 +334,36 @@ import Sortable from 'sortablejs'
 
 export default {
   name: 'Validates',
-  props: ['validates'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'validates', 'dataType', 'elementList'
+  ],
 
   data() {
     return {
       tempData: [],
 
-      validateTypeList: [],
+      validateTypeList: [{ 'label': '数据', 'value': 'data' }, { 'label': '页面', 'value': 'page' }],
+      validateDataMethodList: [],
+      validateUiMethodList: [],
       dataTypeMapping: [],
       responseDataSourceMapping: [],
+
+      assertOne: ['值为真', '值为假', '值为null', '值不为null', '值为true', '值不为true', '值为false', '值不为false'],
+      assertBatch: [
+        '批量判断字段值均为真', '批量判断字段值均为假',
+        '批量判断字段值均为true', '批量判断字段值均不为true',
+        '批量判断字段值均为false', '批量判断字段值均不为false',
+        '批量判断字段值均为null', '批量判断字段值均不为null'
+      ],
+      assertAll: [
+        '值为真', '值为假', '值为null', '值不为null', '值为true', '值不为true', '值为false', '值不为false',
+        '批量判断字段值均为真', '批量判断字段值均为假',
+        '批量判断字段值均为true', '批量判断字段值均不为true',
+        '批量判断字段值均为false', '批量判断字段值均不为false',
+        '批量判断字段值均为null', '批量判断字段值均不为null'
+      ],
+
       sortable: null,
       oldList: [],
       newList: []
@@ -305,7 +379,8 @@ export default {
   },
 
   mounted() {
-    this.validateTypeList = this.$busEvents.data.apiTestAssertMappingList // 从缓存获取断言类型映射
+    this.validateDataMethodList = this.$busEvents.data.apiTestAssertMappingList // 从缓存获取断言方法
+    this.validateUiMethodList = this.$busEvents.data.assertMappingList // 从缓存获取断言方法
     this.dataTypeMapping = this.$busEvents.data.dataTypeMappingList // 从缓存获取数据类型映射
     this.responseDataSourceMapping = this.$busEvents.data.responseDataSourceMappingList // 从缓存获取响应对象数据源映射
 
@@ -319,25 +394,66 @@ export default {
 
   methods: {
     // 根据选择的数据源显示不同的提示
-    getDataSourcePlaceholder(_type) {
-      if (!_type) {
-        return '实际结果提取表达式'
-      } else if (_type === 'regexp') {
-        return '请填写正确的正则表达式'
-      } else {
-        return 'jsonpath表达式，若要提取整个对象，则不填写'
+    getDataSourcePlaceholder(row) {
+      if (row.validate_type === 'data') {
+        if (!row.data_source) {
+          return '实际结果提取表达式'
+        } else if (row.data_source === 'regexp') {
+          return '请填写正确的正则表达式'
+        } else if (row.data_source === 'func') {
+          return '请填写正确的自定义函数表达式'
+        } else if (row.data_source === 'variable') {
+          return '请填写正确的自定义变量表达式'
+        } else {
+          return 'jsonpath表达式，若要提取整个对象，则不填写'
+        }
       }
     },
 
     // 选中断言类型事件
     selectValidateType(data, row) {
-      if (data === '值为真') {
+      if (this.dataType === 'page') {
+        if (data.validate_type === 'api') {
+          this.$set(row, 'data_source', this.responseDataSourceMapping[0].value)
+          this.$set(row, 'key', '')
+        } else {
+          this.$set(row, 'data_source', '')
+          this.$set(row, 'key', '')
+        }
+        this.$set(row, 'validate_method', '')
+      }
+    },
+
+    // 选中断言方法事件
+    selectValidateMethod(data, row) {
+      if (['值为真', '值为true'].indexOf(data) !== -1) {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'True')
         return true
-      } else if (data === '值为假') {
+      } else if (['值为假', '值为false'].indexOf(data) !== -1) {
         this.$set(row, 'data_type', 'str')
         this.$set(row, 'value', 'False')
+        return true
+      } else if (data === '值为null') {
+        this.$set(row, 'data_type', 'str')
+        this.$set(row, 'value', 'null')
+        return true
+      } else if (data === '值不为null') {
+        this.$set(row, 'data_type', 'str')
+        this.$set(row, 'value', 'not null')
+        return true
+      } else if (data === '值不为true') {
+        this.$set(row, 'data_type', 'str')
+        this.$set(row, 'value', 'not true')
+        return true
+      } else if (data === '值不为false') {
+        this.$set(row, 'data_type', 'str')
+        this.$set(row, 'value', 'not false')
+        return true
+      } else if (data.indexOf('批量') !== -1) {
+        this.$set(row, 'data_type', 'list')
+        this.$set(row, 'value', '["kei1", "key2"]')
+        this.$set(row, 'value', '["kei1", "key2"]')
         return true
       }
     },
@@ -352,18 +468,20 @@ export default {
       if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
-          data_source: this.responseDataSourceMapping[0].value,
+          validate_type: this.dataType === 'api' ? 'data' : 'page',
+          data_source: this.dataType === 'api' ? this.responseDataSourceMapping[0].value : this.elementList[0].value,
           key: null,
-          validate_type: this.validateTypeList[0].value,
+          validate_method: this.dataType === 'api' ? this.validateDataMethodList[0].value : this.validateUiMethodList[0].value,
           data_type: this.dataTypeMapping[0].value,
           value: null
         })
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
+          validate_type: null,
           data_source: null,
           key: null,
-          validate_type: null,
+          validate_method: null,
           data_type: null,
           value: null
         }]
@@ -377,9 +495,10 @@ export default {
 
     // 清除数据
     clearData() {
+      this.tempData[0].validate_type = 'data'
       this.tempData[0].data_source = null
       this.tempData[0].key = null
-      this.tempData[0].validate_type = null
+      this.tempData[0].validate_method = null
       this.tempData[0].data_type = null
       this.tempData[0].value = null
     },

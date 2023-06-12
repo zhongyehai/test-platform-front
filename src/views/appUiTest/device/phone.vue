@@ -153,6 +153,13 @@
           </el-tooltip>
         </el-form-item>
 
+        <el-form-item label="扩展字段" size="mini">
+          <extendsEditorView
+            ref="extendsEditorView"
+            :data-json="tempData.extends"
+          />
+        </el-form-item>
+
       </el-form>
 
       <div class="demo-drawer__footer">
@@ -182,12 +189,14 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
-import { phoneList, postPhone, putPhone, deletePhone, sortPhone, copyPhone } from '@/apis/appUiTest/device'
+import { copyPhone, deletePhone, phoneList, postPhone, putPhone, sortPhone } from '@/apis/appUiTest/device'
 import { getConfigByName } from '@/apis/config/config'
+import extendsEditorView from '@/components/jsonView.vue'
+import { assertStrIsJson } from '@/utils/validate'
 
 export default {
   name: 'Index',
-  components: { Pagination },
+  components: { extendsEditorView, Pagination },
   data() {
     return {
       tableLoadingIsShow: false,
@@ -207,9 +216,11 @@ export default {
         name: '',
         os: '',
         device_id: '',
-        os_version: ''
+        os_version: '',
+        extends: {}
       },
 
+      device_extends: {},
       direction: 'rtl', // 抽屉打开方式
       submitButtonIsLoading: false,
       drawerIsShow: false,
@@ -228,6 +239,12 @@ export default {
     getConfigByName({ 'name': 'phone_os_mapping' }).then(response => {
       this.phoneOsMapping = JSON.parse(response.data)
     })
+
+    if (Object.keys(this.device_extends).length < 1) {
+      getConfigByName({ 'name': 'device_extends' }).then(response => {
+        this.device_extends = JSON.parse(response.data)
+      })
+    }
 
     this.gePhoneList()
   },
@@ -277,13 +294,19 @@ export default {
         this.tempData.name = ''
         this.tempData.os = ''
         this.tempData.device_id = ''
+        this.tempData.extends = this.device_extends
         this.tempData.os_version = ''
       }
     },
 
     // 新增服务
     addServer() {
-      postPhone(this.tempData).then(response => {
+      const row = JSON.parse(JSON.stringify(this.tempData))
+      const json_data = this.$refs.extendsEditorView.$refs.dataJsonView.tempDataJson
+      row['extends'] = assertStrIsJson(json_data, '扩展字段格式错误')
+      this.submitButtonIsLoading = true
+      postPhone(row).then(response => {
+        this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
           this.gePhoneList()
@@ -293,7 +316,12 @@ export default {
 
     // 编辑服务
     changeServer() {
-      putPhone(this.tempData).then(response => {
+      const row = JSON.parse(JSON.stringify(this.tempData))
+      const json_data = this.$refs.extendsEditorView.$refs.dataJsonView.tempDataJson
+      row['extends'] = assertStrIsJson(json_data, '扩展字段格式错误')
+      this.submitButtonIsLoading = true
+      putPhone(row).then(response => {
+        this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
           this.gePhoneList()

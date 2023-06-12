@@ -150,7 +150,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="用例描述" min-width="10%">
+          <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="详情" min-width="10%">
             <template slot-scope="scope">
               <el-popover
                 :ref="scope.row.id"

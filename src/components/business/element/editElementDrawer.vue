@@ -36,27 +36,31 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item
-              label="元素表达式"
-              prop="element"
-              class="is-required"
-            >
+            <el-form-item label="元素表达式" prop="element" class="is-required">
               <el-input
                 v-model="tempElement.element"
                 size="mini"
                 type="textarea"
                 :rows="1"
-                :placeholder="tempElement.by === 'coordinate' ? '如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' : '元素表达式'"
-                :style="{'width': tempElement.by === 'coordinate' ? '98%' : '100%'}"
+                :placeholder="
+                  tempElement.by === 'bounds' ? '如元素坐标范围为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' :
+                  tempElement.by === 'coordinate' ? '请填写具体坐标: (x, y)' : '元素表达式'"
+                :style="{'width': ['bounds', 'coordinate'].indexOf(tempElement.by) !== -1 ? '98%' : '100%'}"
               />
               <el-popover
-                v-show="tempElement.by === 'coordinate'"
+                v-show="['bounds', 'coordinate'].indexOf(tempElement.by) !== -1"
                 class="el_popover_class"
                 placement="top-start"
                 trigger="hover"
               >
-                <div>请填写定位工具上bounds字段的值：(x, y)</div>
-                <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
+                <div v-show="tempElement.by === 'bounds'">
+                  <div>请填写定位工具上bounds字段的值：[[x1, y1], [x2, y2]]</div>
+                  <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
+                </div>
+                <div v-show="tempElement.by === 'coordinate'">
+                  <div>请填写具体坐标值：(x, y)</div>
+                  <div>如坐标为(918,1079)，则填写: (918,1079)</div>
+                </div>
                 <el-button slot="reference" type="text" icon="el-icon-question" />
               </el-popover>
             </el-form-item>

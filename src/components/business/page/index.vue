@@ -259,10 +259,6 @@ export default {
     }
   },
 
-  beforeCreate() {
-    getFindElementOption(this) // 获取定位方式
-  },
-
   created() {
     if (this.dataType === 'appUi') {
       this.pageListUrl = appPageList
@@ -279,6 +275,8 @@ export default {
       this.uploadElementDirUrl = webUiUploadElementDir
       this.downloadElementTemplateUrl = webUiDownloadElementTemplate
     }
+
+    getFindElementOption(this, this.dataType) // 获取定位方式
 
     this.oldList = this.pageList.map(v => v.id)
     this.newList = this.oldList.slice()

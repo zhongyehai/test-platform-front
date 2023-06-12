@@ -243,17 +243,17 @@
         <template slot-scope="scope">
           <!-- 选择自定义函数，则输入自定义函数 -->
           <el-input
-            v-show="scope.row.extract_type === 'func'"
+            v-if="['func', 'variable'].indexOf(scope.row.extract_type) !== -1"
             v-model="scope.row.value"
             size="mini"
             type="textarea"
             :rows="1"
-            placeholder="请填写正确的自定义函数"
+            :placeholder="`请填写正确的自定义${scope.row.extract_type === 'func' ? '函数' : '变量'}函数表达式`"
           />
 
           <!-- 选择页面元素提取，则选择具体元素 -->
           <el-select
-            v-show="scope.row.extract_type !== 'func'"
+            v-else
             v-model="scope.row.value"
             placeholder="选择元素"
             style="width: 100%"

@@ -81,11 +81,6 @@
           <el-table-column header-align="center" min-width="30%">
             <template slot="header">
               <span><span style="color: red">*</span>元素表达式</span>
-              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                <div>请填写定位工具上bounds字段的值：(x, y)</div>
-                <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
-                <el-button slot="reference" type="text" icon="el-icon-question" />
-              </el-popover>
             </template>
             <template slot-scope="scope">
               <el-input
@@ -93,7 +88,10 @@
                 size="mini"
                 type="textarea"
                 :rows="1"
-                :placeholder="scope.row.by === 'coordinate' ? '如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' : '元素表达式'"
+                :placeholder="
+                  scope.row.by === 'bounds' ? '如元素坐标范围为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])' :
+                  scope.row.by === 'coordinate' ? '请填写具体坐标: (x, y)' : '元素表达式'
+                "
               />
             </template>
           </el-table-column>
