@@ -328,7 +328,11 @@ import {
   putElement as appUiPutElement,
   elementFrom as appUiElementFrom
 } from '@/apis/appUiTest/element'
-import { postStep as appUiPostStep, putStep as appUiPutStep } from '@/apis/appUiTest/step'
+import {
+  executeList as appUiExecuteList,
+  postStep as appUiPostStep,
+  putStep as appUiPutStep
+} from '@/apis/appUiTest/step'
 
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
 import { getPage as webUiGetPage } from '@/apis/webUiTest/page'
@@ -339,7 +343,11 @@ import {
   putElement as webUiPutElement,
   elementFrom as webUiElementFrom
 } from '@/apis/webUiTest/element'
-import { postStep as webUiPostStep, putStep as webUiPutStep } from '@/apis/webUiTest/step'
+import {
+  executeList as webUiExecuteList,
+  postStep as webUiPostStep,
+  putStep as webUiPutStep
+} from '@/apis/webUiTest/step'
 
 export default {
   name: 'EditStep',
@@ -366,7 +374,7 @@ export default {
         'id': '',
         'status': '',
         'name': '',
-        'wait_time_out': 10,
+        'wait_time_out': 3,
         'up_func': '',
         'down_func': '',
         'skip_if': {},
@@ -392,7 +400,8 @@ export default {
       putElementUrl: '',
       postStepUrl: '',
       putStepUrl: '',
-      elementFromUrl: ''
+      elementFromUrl: '',
+      executeListUrl: ''
     }
   },
 
@@ -448,6 +457,19 @@ export default {
         this.currentStep.send_keys = file_name_list[0]
       }
     })
+
+    // 如果是ui测试用例，则获取步骤执行方式
+    if (this.dataType !== 'api') {
+      if (!this.$busEvents.data.executeTypeList || this.$busEvents.data.executeTypeList.length === 0) {
+        this.executeListUrl().then(response => {
+          this.executeTypeList = response.data
+          this.$busEvents.data.executeTypeList = response.data
+          this.$busEvents.data.executeTypeList.forEach(executeType => {
+            this.$busEvents.data.uiTestExecuteTypeDict[executeType.value] = executeType.label
+          })
+        })
+      }
+    }
   },
 
   created() {
@@ -461,6 +483,7 @@ export default {
       this.postStepUrl = webUiPostStep
       this.putStepUrl = webUiPutStep
       this.elementFromUrl = webUiElementFrom
+      this.executeListUrl = webUiExecuteList
     } else {
       this.getProjectUrl = appUiGetProject
       this.getPageUrl = appUiGetPage
@@ -471,6 +494,7 @@ export default {
       this.postStepUrl = appUiPostStep
       this.putStepUrl = appUiPutStep
       this.elementFromUrl = appUiElementFrom
+      this.executeListUrl = appUiExecuteList
     }
   },
 

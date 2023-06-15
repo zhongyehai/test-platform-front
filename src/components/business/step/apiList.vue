@@ -70,6 +70,7 @@
         ref="apiTable"
         :data="apiList.data"
         stripe
+        @cell-dblclick="cellDblclick"
       >
         <el-table-column prop="num" align="center" label="序号" min-width="8%">
           <template slot-scope="scope">
@@ -204,6 +205,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = `${row.name}: ${row.addr}`
+      this.$copyText(data).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     // 获取接口归属
     getApiMsgBelongTo() {

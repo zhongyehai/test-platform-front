@@ -275,7 +275,7 @@
                 size="mini"
                 type="textarea"
                 :disabled="assertOne.indexOf(scope.row.validate_method) !== -1"
-                autosize
+                :rows="1"
                 :placeholder="
                   assertBatch.indexOf(scope.row.validate_method) !== -1 ? `请填写具体字段，如: ['key1', 'key2']` :
                   scope.row.validate_method === '契约校验' ?
@@ -478,7 +478,7 @@ export default {
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
-          validate_type: null,
+          validate_type: this.dataType === 'api' ? 'data' : 'page',
           data_source: null,
           key: null,
           validate_method: null,

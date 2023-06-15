@@ -53,6 +53,7 @@
         <el-tab-pane label="元素列表" name="elementInfo">
           <elementManage
             :data-type="dataType"
+            :current-project="currentProject"
             :current-page-id="tempPage.id"
             :current-module-id="tempPage.module_id"
             :current-project-id="tempPage.project_id"
@@ -106,7 +107,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'currentProjectId', 'currentModuleId'
+    'dataType', 'currentProject', 'currentProjectId', 'currentModuleId'
   ],
   data() {
     return {

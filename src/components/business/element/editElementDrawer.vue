@@ -36,7 +36,7 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="元素表达式" prop="element" class="is-required">
+            <el-form-item label="元素表达式" prop="element" size="mini" class="is-required">
               <el-input
                 v-model="tempElement.element"
                 size="mini"
@@ -65,7 +65,34 @@
               </el-popover>
             </el-form-item>
 
-            <el-form-item label="等待超时时间" class="is-required" style="margin-bottom: 5px">
+            <el-form-item
+              v-if="dataType==='appUi' && tempElement.by === 'bounds'"
+              label="参照设备"
+              prop="template_device"
+              size="mini"
+              class="is-required"
+            >
+              <el-select
+                v-model="tempElement.template_device"
+                filterable
+                size="mini"
+                style="width: 98%"
+                placeholder="请选则元素定位时参照的设备"
+              >
+                <el-option
+                  v-for="script in deviceList"
+                  :key="script.id"
+                  :label="script.name"
+                  :value="script.id"
+                />
+              </el-select>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
+              </el-popover>
+            </el-form-item>
+
+            <el-form-item label="等待超时时间" size="mini" class="is-required">
               <el-input-number v-model="tempElement.wait_time_out" size="mini" :min="2" />
               <el-popover class="el_popover_class" placement="top-start" trigger="hover">
                 <div>
@@ -108,7 +135,7 @@ export default {
   components: {},
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
+    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId', 'deviceList'
   ],
   data() {
     return {
@@ -121,6 +148,7 @@ export default {
         name: null,
         by: null,
         element: null,
+        template_device: undefined,
         desc: null,
         wait_time_out: 5
       },
@@ -161,10 +189,10 @@ export default {
       if (_type === 'elementInfo') {
         if (status === 'edit') { // 修改
           this.tempElement.id = element.id
-          this.updateTempElement(element)
+          this.updateTempElement(JSON.parse(JSON.stringify(element)))
         } else if (status === 'copy') { // 复制
           this.tempElement.id = ''
-          this.updateTempElement(element)
+          this.updateTempElement(JSON.parse(JSON.stringify(element)))
         }
 
         if (this.tempElement.by === null) {
@@ -188,6 +216,7 @@ export default {
       this.tempElement.name = row.name
       this.tempElement.by = row.by
       this.tempElement.element = row.element
+      this.tempElement.template_device = row.template_device
       this.tempElement.desc = row.desc
       this.tempElement.wait_time_out = row.wait_time_out
       this.tempElement.page_id = row.page_id
@@ -204,6 +233,7 @@ export default {
         name: this.tempElement.name,
         by: this.tempElement.by,
         element: this.tempElement.element,
+        template_device: this.tempElement.template_device,
         desc: this.tempElement.desc,
         wait_time_out: this.tempElement.wait_time_out,
         page_id: this.tempElement.page_id,

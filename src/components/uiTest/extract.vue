@@ -239,16 +239,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="选择元素" header-align="center" min-width="23%">
+      <el-table-column label="元素/表达式" header-align="center" min-width="23%">
         <template slot-scope="scope">
           <!-- 选择自定义函数，则输入自定义函数 -->
           <el-input
-            v-if="['func', 'variable'].indexOf(scope.row.extract_type) !== -1"
+            v-if="['const', 'func', 'variable'].indexOf(scope.row.extract_type) !== -1"
             v-model="scope.row.value"
             size="mini"
             type="textarea"
             :rows="1"
-            :placeholder="`请填写正确的自定义${scope.row.extract_type === 'func' ? '函数' : '变量'}函数表达式`"
+            :placeholder="`请填写正确的自定义${
+              scope.row.extract_type === 'func' ? '函数表达式'
+              : scope.row.extract_type === 'variable' ? '变量表达式'
+                : '常量'}`"
           />
 
           <!-- 选择页面元素提取，则选择具体元素 -->

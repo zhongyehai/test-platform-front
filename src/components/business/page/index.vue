@@ -16,6 +16,7 @@
           :data="pageList"
           row-key="id"
           stripe
+          @cell-dblclick="cellDblclick"
         >
           <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
@@ -172,6 +173,7 @@
 
     <editPageDrawer
       :data-type="dataType"
+      :current-project="currentProject"
       :current-project-id="currentProjectId"
       :current-module-id="currentModuleId"
     />
@@ -222,6 +224,7 @@ export default {
 
   // 接收父组件传参的key
   props: [
+    // eslint-disable-next-line vue/require-prop-types
     'dataType'
   ],
   data() {
@@ -232,6 +235,7 @@ export default {
 
       currentModuleId: '',
       currentProjectId: '',
+      currentProject: '',
 
       // 页面数据列表
       pageNum: 1,
@@ -287,10 +291,11 @@ export default {
 
   mounted() {
     // 点击树时，请求对应的页面列表
-    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId) => {
+    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, moduleId, projectId, project) => {
       if (_type === 'module') {
         this.currentModuleId = moduleId
         this.currentProjectId = projectId
+        this.currentProject = project
         this.getPageList()
       }
     })
@@ -310,6 +315,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     // 打开编辑框
     showEditForm(row) {

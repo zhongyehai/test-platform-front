@@ -84,6 +84,33 @@
               </el-popover>
             </el-form-item>
 
+            <el-form-item
+              v-if="dataType==='appUi'"
+              label="参照设备"
+              prop="template_device"
+              size="mini"
+              class="is-required"
+            >
+              <el-select
+                v-model="tempProject.template_device"
+                filterable
+                size="mini"
+                style="width: 98%"
+                placeholder="请选则元素定位时参照的设备"
+              >
+                <el-option
+                  v-for="script in deviceList"
+                  :key="script.id"
+                  :label="script.name"
+                  :value="script.id"
+                />
+              </el-select>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
+                <el-button slot="reference" type="text" icon="el-icon-question" />
+              </el-popover>
+            </el-form-item>
+
             <!-- 脚本文件 -->
             <el-form-item label="脚本文件" prop="func_files" size="mini">
               <scriptView
@@ -158,6 +185,7 @@ import { postProject as apiPostProject, putProject as apiPutProject } from '@/ap
 import { postProject as webUiPostProject, putProject as webUiPutProject } from '@/apis/webUiTest/project'
 import { postProject as AppPostProject, putProject as AppPutProject } from '@/apis/appUiTest/project'
 import { scriptList } from '@/apis/assist/script'
+import { phoneList } from '@/apis/appUiTest/device'
 
 export default {
   name: 'Drawer',
@@ -183,13 +211,15 @@ export default {
         id: null,
         name: null,
         manager: null,
-        swagger: '',
-        business_id: '',
-        app_package: '',
-        app_activity: '',
+        swagger: undefined,
+        business_id: undefined,
+        app_package: undefined,
+        app_activity: undefined,
+        template_device: undefined,
         script_list: [],
         create_user: null
       },
+      deviceList: [],
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       user_list: [], // 用户列表
       scriptListData: [],
@@ -229,6 +259,12 @@ export default {
   },
 
   mounted() {
+    if (this.dataType === 'appUi' && this.deviceList.length === 0) {
+      phoneList({ pageNum: 1, pageSize: 9999 }).then(response => {
+        this.deviceList = response.data.data
+      })
+    }
+
     this.getScriptList()
 
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
@@ -237,7 +273,7 @@ export default {
         if (status === 'add') {
           this.initTempProject() // 新增
         } else if (status === 'edit') {
-          this.updateTempProject(data) // 修改
+          this.updateTempProject(JSON.parse(JSON.stringify(data))) // 修改
         }
         this.drawerIsShow = true
       }
@@ -277,10 +313,11 @@ export default {
         id: null,
         name: null,
         manager: null,
-        swagger: '',
-        business_id: '',
-        app_package: '',
-        app_activity: '',
+        swagger: undefined,
+        business_id: undefined,
+        app_package: undefined,
+        app_activity: undefined,
+        template_device: this.dataType === 'appUi' && this.deviceList.length > 0 ? this.deviceList[0].id : undefined,
         script_list: []
       }
       this.submitButtonIsShow = true
@@ -295,6 +332,7 @@ export default {
       this.tempProject.business_id = row.business_id
       this.tempProject.app_package = row.app_package
       this.tempProject.app_activity = row.app_activity
+      this.tempProject.template_device = row.template_device
       this.tempProject.script_list = row.script_list
       this.submitButtonIsShow = true
     },
@@ -308,6 +346,7 @@ export default {
         swagger: this.tempProject.swagger,
         app_package: this.tempProject.app_package,
         app_activity: this.tempProject.app_activity,
+        template_device: this.tempProject.template_device,
         manager: this.$refs.userSelect.tempData,
         business_id: this.tempProject.business_id,
         script_list: this.$refs.scriptView.tempScriptList

@@ -481,7 +481,22 @@ export default {
       this.currentModuleIdForCommit = data.id
       this.currentParent = data
       this.$refs.tree.store.nodesMap[data.id].expanded = !this.$refs.tree.store.nodesMap[data.id].expanded // 展开/收缩节点
-      this.$bus.$emit(this.$busEvents.treeIsChoice, 'module', data.id, this.tempDataForm.project_id)
+
+      // 获取project对象
+      let currentProject = {}
+      this.projectListData.forEach(project => {
+        if (project.id === this.tempDataForm.project_id) {
+          currentProject = project
+        }
+      })
+
+      this.$bus.$emit(
+        this.$busEvents.treeIsChoice,
+        'module',
+        data.id,
+        this.tempDataForm.project_id,
+        currentProject
+      )
     },
 
     // 添加一级模块

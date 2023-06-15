@@ -92,11 +92,12 @@
       :tree-props="{ children: 'children', hasChildren: 'hasStep' }"
       @selection-change="clickSelectAll"
       @expand-change="changeExpandStatus"
+      @cell-dblclick="cellDblclick"
     >
 
       <el-table-column type="selection" min-width="2%" />
 
-      <el-table-column align="left" label="步骤名称" min-width="48%">
+      <el-table-column align="left" prop="name" label="步骤名称" min-width="48%">
         <template slot-scope="scope">
           <el-tag
             size="small"
@@ -108,20 +109,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="dataType !== 'api'" align="left" label="执行事件" min-width="15%">
+      <el-table-column v-if="dataType !== 'api'" align="left" prop="execute_type" label="执行事件" min-width="15%">
         <template slot-scope="scope">
           <span>{{ parseExecuteType(scope.row.execute_type) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="left" min-width="5%">
+      <el-table-column align="left" prop="status" min-width="5%">
         <template slot="header">
           <span>执行</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
+          <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               <div>若此处设置为不运行，则执行测试时将不会运行此步骤</div>
             </div>
@@ -429,6 +426,17 @@ export default {
           resolve(response.data.data)
         })
       }
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
     },
 
     // 点击打开或者收起引用用例

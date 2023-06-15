@@ -9,6 +9,7 @@
       :data="elementList"
       row-key="id"
       stripe
+      @cell-dblclick="cellDblclick"
     >
       <el-table-column prop="num" label="序号" min-width="6%">
         <template slot-scope="scope">
@@ -22,14 +23,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" min-width="12%">
+      <el-table-column :show-overflow-tooltip="true" prop="by" align="center" min-width="12%">
         <template slot="header">
           <span>定位方式</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
+          <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               <div>在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址</div>
             </div>
@@ -47,7 +44,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" min-width="10%">
+      <el-table-column :show-overflow-tooltip="true" prop="wait_time_out" align="center" min-width="10%">
         <template slot="header">
           <span>等待时间(秒)</span>
           <el-tooltip class="item" effect="dark" placement="top-start">
@@ -129,6 +126,7 @@
 
     <elementDrawer
       :data-type="dataType"
+      :device-list="deviceList"
       :current-project-id="currentProjectId"
       :current-module-id="currentModuleId"
       :current-page-id="pageId"
@@ -136,6 +134,8 @@
 
     <addElementDrawer
       :data-type="dataType"
+      :device-list="deviceList"
+      :current-project="currentProject"
       :current-project-id="currentProjectId"
       :current-module-id="currentModuleId"
       :current-page-id="pageId"
@@ -160,6 +160,7 @@ import {
   deleteElement as appDeleteElement,
   elementSort as appElementSort
 } from '@/apis/appUiTest/element'
+import { phoneList } from '@/apis/appUiTest/device'
 
 export default {
   name: 'Index',
@@ -172,7 +173,7 @@ export default {
   // 接收父组件传参的key
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
+    'dataType', 'currentProject', 'currentProjectId', 'currentModuleId', 'currentPageId'
   ],
   data() {
     return {
@@ -185,6 +186,7 @@ export default {
       elementTotal: 0,
       elementList: [],
 
+      deviceList: [],
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -237,6 +239,12 @@ export default {
   },
 
   mounted() {
+    if (this.dataType === 'appUi' && this.deviceList.length === 0) {
+      phoneList({ pageNum: 1, pageSize: 9999 }).then(response => {
+        this.deviceList = response.data.data
+      })
+    }
+
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
       if (_type === 'elementInfo') {
         this.getElementList()
@@ -250,6 +258,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     // 打开编辑框
     showEditForm(row) {

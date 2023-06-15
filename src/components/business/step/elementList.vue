@@ -72,6 +72,7 @@
         ref="apiTable"
         :data="elementList.data"
         stripe
+        @cell-dblclick="cellDblclick"
       >
         <el-table-column prop="num" label="序号" align="center" min-width="10%">
           <template slot-scope="scope">
@@ -85,13 +86,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="addr" align="center" label="定位方式" min-width="20%">
+        <el-table-column :show-overflow-tooltip="true" prop="by" align="center" label="定位方式" min-width="20%">
           <template slot-scope="scope">
             <span> {{ parseFindBy(scope.row.by) }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="addr" align="center" label="定位元素" min-width="20%">
+        <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="定位元素" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.element }} </span>
           </template>
@@ -201,13 +202,24 @@ export default {
 
   methods: {
 
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
+
     // 递归把列表转为树行结构
     arrayToTree(arr, parentId) {
       //  arr 是返回的数据  parendId 父id
       const temp = []
       const treeArr = arr
       treeArr.forEach((item, index) => {
-        if (item.parent == parentId) {
+        if (item.parent === parentId) {
           if (this.arrayToTree(treeArr, treeArr[index].id).length > 0) {
             // 递归调用此函数
             treeArr[index].children = this.arrayToTree(treeArr, treeArr[index].id)

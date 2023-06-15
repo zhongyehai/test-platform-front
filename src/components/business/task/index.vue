@@ -26,6 +26,7 @@
               :data="taskList"
               row-key="id"
               stripe
+              @cell-dblclick="cellDblclick"
             >
               <el-table-column prop="num" label="序号" align="center" min-width="7%">
                 <template slot-scope="scope">
@@ -296,6 +297,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     // 进入编辑
     editTask(row) {

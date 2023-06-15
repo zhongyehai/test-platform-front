@@ -439,6 +439,13 @@ export default {
       if (this.$busEvents.data.assertMappingList.length === 0) {
         getUiAssertMappingList(this)
       }
+
+      // 从后端获取UI测试数据提取方式映射
+      if (this.$busEvents.data.uiTestExtractMappingList.length === 0) {
+        extractMappingList().then(response => {
+          this.$busEvents.data.uiTestExtractMappingList = response.data
+        })
+      }
     }
 
     // 从后端获取跳过方式映射
@@ -460,11 +467,9 @@ export default {
 
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {
-      if (this.$busEvents.data.keyboardKeyCodeList.length === 0) {
-        getConfigByName({ 'name': 'app_key_code' }).then(response => {
-          this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
-        })
-      }
+      getConfigByName({ 'name': 'app_key_code' }).then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
+      })
     }
 
     // 从后端获取响应对象数据源映射
@@ -483,21 +488,9 @@ export default {
 
     // 从后端获取PC键盘code类型映射
     if (this.dataType === 'webUi') {
-      // getConfigByName({'name': 'app_key_code'}).then(response => {
-      //   this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
-      // })
-      if (this.$busEvents.data.keyboardKeyCodeList.length === 0) {
-        keyBoardCodeMappingList().then(response => {
-          this.$busEvents.data.keyboardKeyCodeList = response.data
-        })
-      }
-    } else {
-      // 从后端获取UI测试数据提取方式映射
-      if (this.$busEvents.data.uiTestExtractMappingList.length === 0) {
-        extractMappingList().then(response => {
-          this.$busEvents.data.uiTestExtractMappingList = response.data
-        })
-      }
+      keyBoardCodeMappingList().then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = response.data
+      })
     }
   },
 

@@ -9,6 +9,7 @@
       :data="dataList"
       row-key="id"
       stripe
+      @cell-dblclick="cellDblclick"
     >
       <el-table-column prop="num" label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
@@ -16,37 +17,31 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="服务器名称" min-width="25%">
+      <el-table-column prop="name" align="center" label="服务器名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="os" align="center" label="服务器系统类型" min-width="10%">
+      <el-table-column prop="os" align="center" label="服务器系统类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="ip" align="center" label="服务器ip地址" min-width="15%">
+      <el-table-column prop="ip" align="center" label="服务器ip地址" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.ip }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="port" align="center" label="服务器端口" min-width="10%">
+      <el-table-column prop="port" align="center" label="服务器端口" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.port }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="status"
-        align="center"
-        label="最近一次访问状态"
-        min-width="15%"
-      >
+      <el-table-column prop="status" align="center" label="最近一次访问状态" min-width="15%">
         <template slot-scope="scope">
           <el-tag size="small" :type="statusTagTypeMapping[scope.row.status]">
             {{ statusContentMapping[scope.row.status] }}
@@ -282,6 +277,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     // 复制用例
     runServer(row) {

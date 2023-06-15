@@ -4,32 +4,13 @@
     <!-- 新增/修改页面表单 -->
     <el-drawer
       title="新增元素"
-      size="85%"
+      size="95%"
       :wrapper-closable="false"
       :append-to-body="true"
       :visible.sync="drawerIsShow"
       :direction="direction"
     >
       <div style="margin-left: 20px; margin-right: 20px">
-
-        <!--        <el-form label-width="80px">-->
-        <!--          <el-form-item label="所属模块" class="is-required" style="margin-bottom: 5px">-->
-        <!--            <el-select v-model="moduleLabel" placeholder="请选择模块" size="mini" style="width: 100%">-->
-        <!--              <el-option :value="[]" style="height: auto">-->
-        <!--                <el-tree-->
-        <!--                  ref="moduleTree"-->
-        <!--                  :data="moduleTree"-->
-        <!--                  show-checkbox-->
-        <!--                  node-key="id"-->
-        <!--                  check-strictly-->
-        <!--                  highlight-current-->
-        <!--                  :props="defaultProps"-->
-        <!--                  @check-change="handleNodeClick"-->
-        <!--                />-->
-        <!--              </el-option>-->
-        <!--            </el-select>-->
-        <!--          </el-form-item>-->
-        <!--        </el-form>-->
 
         <el-table
           ref="dataTable"
@@ -54,7 +35,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column header-align="center" min-width="20%">
+          <el-table-column header-align="center" min-width="15%">
             <template slot="header">
               <span><span style="color: red">*</span>定位方式</span>
             </template>
@@ -96,7 +77,37 @@
             </template>
           </el-table-column>
 
-          <el-table-column header-align="center" min-width="20%">
+          <el-table-column v-if="dataType==='appUi'" header-align="center" min-width="20%">
+            <template slot="header">
+              <span>
+                <span style="color: red">*</span>
+                参照设备
+                <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                  <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
+                  <el-button slot="reference" type="text" icon="el-icon-question" />
+                </el-popover>
+              </span>
+            </template>
+            <template slot-scope="scope">
+              <el-select
+                v-model="scope.row.template_device"
+                :disabled="scope.row.by !== 'bounds'"
+                filterable
+                size="mini"
+                style="width: 100%"
+                placeholder="请选则元素定位时参照的设备"
+              >
+                <el-option
+                  v-for="script in deviceList"
+                  :key="script.id"
+                  :label="script.name"
+                  :value="script.id"
+                />
+              </el-select>
+            </template>
+          </el-table-column>
+
+          <el-table-column header-align="center" min-width="15%">
             <template slot="header">
               <span>元素描述</span>
             </template>
@@ -171,7 +182,7 @@ export default {
   name: 'Drawer',
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'currentProjectId', 'currentModuleId', 'currentPageId'
+    'dataType', 'currentProject', 'currentProjectId', 'currentModuleId', 'currentPageId', 'deviceList'
   ],
   data() {
     return {
@@ -185,6 +196,7 @@ export default {
         name: null,
         by: null,
         element: null,
+        template_device: this.dataType === 'appUi' ? this.currentProject.template_device : undefined,
         desc: null,
         wait_time_out: this.wait_time_out
       }],
@@ -210,6 +222,7 @@ export default {
             name: null,
             by: null,
             element: null,
+            template_device: this.dataType === 'appUi' ? this.currentProject.template_device : undefined,
             desc: null,
             wait_time_out: this.wait_time_out
           }]
@@ -232,6 +245,7 @@ export default {
         name: null,
         by: null,
         element: null,
+        template_device: this.dataType === 'appUi' ? this.currentProject.template_device : undefined,
         desc: null,
         wait_time_out: this.wait_time_out
       })

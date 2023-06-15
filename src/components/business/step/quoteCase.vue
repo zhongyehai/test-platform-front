@@ -68,6 +68,7 @@
         :load="getStep"
         :tree-props="{ children: 'children', hasChildren: 'hasStep' }"
         @expand-change="changeExpandStatus"
+        @cell-dblclick="cellDblclick"
       >
 
         <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="left" min-width="55%">
@@ -257,6 +258,17 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     cancelCopyStepPopover(row) {
       this.$set(row, 'copyStepPopoverIsShow', false)

@@ -9,32 +9,33 @@
       :data="dataList"
       row-key="id"
       stripe
+      @cell-dblclick="cellDblclick"
     >
-      <el-table-column prop="num" label="序号" align="center" min-width="7%">
+      <el-table-column prop="id" label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="手机名称" min-width="25%">
+      <el-table-column prop="name" align="center" label="设备名称" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="手机系统类型" min-width="25%">
+      <el-table-column prop="os" align="center" label="系统类型" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.os }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="手机系统版本" min-width="25%">
+      <el-table-column prop="os_version" align="center" label="系统版本" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.os_version }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" min-width="25%">
+      <el-table-column prop="device_id" align="center" min-width="20%">
         <template slot="header">
           <span> 设备id </span>
           <el-tooltip class="item" effect="dark" placement="top-start">
@@ -49,10 +50,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="16%">
+      <el-table-column prop="screen" align="center" label="分辨率" min-width="10%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.screen }} </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
 
-          <!-- 修改手机 -->
+          <!-- 修改设备 -->
           <el-button
             type="text"
             size="mini"
@@ -60,7 +67,7 @@
             @click.native="showDrawer(scope.row)"
           >修改</el-button>
 
-          <!-- 复制手机 -->
+          <!-- 复制设备 -->
           <el-popover
             :ref="scope.row.id"
             v-model="scope.row.copyPopoverIsShow"
@@ -68,7 +75,7 @@
             style="margin-right: 10px"
             popper-class="down-popover"
           >
-            <p>复制此手机并生成新的手机?</p>
+            <p>复制此设备并生成新的设备?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyServerPopover(scope.row)">取消</el-button>
               <el-button type="primary" size="mini" @click="serverCopy(scope.row)">确定</el-button>
@@ -81,33 +88,33 @@
             >复制</el-button>
           </el-popover>
 
-          <!-- 删除手机 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeleteServerPopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="removeServer(scope.row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-              :loading="scope.row.deleteLoadingIsShow"
-            >删除</el-button>
-          </el-popover>
+          <!-- 删除设备 -->
+          <!--          <el-popover-->
+          <!--            :ref="scope.row.id"-->
+          <!--            v-model="scope.row.deletePopoverIsShow"-->
+          <!--            placement="top"-->
+          <!--            popper-class="down-popover"-->
+          <!--          >-->
+          <!--            <p>确定删除【{{ scope.row.name }}】?</p>-->
+          <!--            <div style="text-align: right; margin: 0">-->
+          <!--              <el-button size="mini" type="text" @click="cancelDeleteServerPopover(scope.row)">取消</el-button>-->
+          <!--              <el-button type="primary" size="mini" @click="removeServer(scope.row)">确定</el-button>-->
+          <!--            </div>-->
+          <!--            <el-button-->
+          <!--              slot="reference"-->
+          <!--              style="color: red"-->
+          <!--              type="text"-->
+          <!--              size="mini"-->
+          <!--              :loading="scope.row.deleteLoadingIsShow"-->
+          <!--            >删除</el-button>-->
+          <!--          </el-popover>-->
 
         </template>
       </el-table-column>
     </el-table>
 
     <el-drawer
-      :title="tempData.id ? '修改手机' : '新增手机'"
+      :title="tempData.id ? '修改设备' : '新增设备'"
       size="65%"
       :visible.sync="drawerIsShow"
       :direction="direction"
@@ -116,7 +123,7 @@
       <el-form label-width="100px" style="margin-left: 20px;margin-right: 20px">
 
         <el-form-item label="别名" class="is-required" size="mini">
-          <el-input v-model="tempData.name" size="mini" placeholder="手机名字" />
+          <el-input v-model="tempData.name" size="mini" placeholder="设备名字" />
         </el-form-item>
 
         <el-form-item label="系统类型" class="is-required" size="mini">
@@ -127,7 +134,7 @@
             clearable
             size="mini"
             style="width:100%"
-            placeholder="请选择执行app自动化的手机的系统类型"
+            placeholder="请选择执行app自动化的设备的系统类型"
             class="filter-item"
           >
             <el-option
@@ -143,11 +150,30 @@
           <el-input v-model="tempData.os_version" size="mini" placeholder="系统版本" />
         </el-form-item>
 
-        <el-form-item label="设备id" size="mini">
+        <el-form-item label="设备id" class="is-required" size="mini">
           <el-input v-model="tempData.device_id" size="mini" style="width: 98%" placeholder="设备id" />
           <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               <div>使用 adb devices 命令查看</div>
+            </div>
+            <span><i style="color: #409EFF" class="el-icon-question" /></span>
+          </el-tooltip>
+        </el-form-item>
+
+        <el-form-item label="设备分辨率" class="is-required" size="mini">
+          <el-input
+            v-model="tempData.screen"
+            size="mini"
+            style="width: 98%"
+            placeholder="设备分辨率, 使用 adb shell dumpsys window displays 命令查看，用于坐标定位时计算元素的具体位置"
+          />
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <div slot="content">
+              <div style="margin-bottom: 20px; color: white; font-size: 18px">使用 adb shell dumpsys window displays | findstr app= 命令查看</div>
+              <el-image
+                style="width: 1000px; height: 150px"
+                :src="require('../../../assets/showScreen.png')"
+              />
             </div>
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
@@ -215,6 +241,7 @@ export default {
         num: '',
         name: '',
         os: '',
+        screen: '1440x3040',
         device_id: '',
         os_version: '',
         extends: {}
@@ -264,7 +291,18 @@ export default {
 
   methods: {
 
-    // 获取手机列表
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
+
+    // 获取设备列表
     gePhoneList() {
       phoneList({
         pageNum: this.pageNum,
@@ -294,6 +332,7 @@ export default {
         this.tempData.name = ''
         this.tempData.os = ''
         this.tempData.device_id = ''
+        this.tempData.screen = '1440x3040'
         this.tempData.extends = this.device_extends
         this.tempData.os_version = ''
       }
