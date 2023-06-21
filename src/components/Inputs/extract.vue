@@ -281,6 +281,19 @@
         </template>
       </el-table-column>
 
+      <el-table-column header-align="center" min-width="7%">
+        <template slot="header">
+          <span>是否执行</span>
+        </template>
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            :inactive-value="0"
+            :active-value="1"
+          />
+        </template>
+      </el-table-column>
+
       <el-table-column header-align="center" min-width="20%">
         <template slot="header">
           <span><span style="color: red">*</span>变量key</span>
@@ -330,12 +343,8 @@
 
       <el-table-column header-align="center" min-width="10%">
         <template slot="header">
-          <span>是否更新到头部</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
+          <span>更新到头部</span>
+          <el-tooltip class="item" effect="dark" placement="top-start">
             <div slot="content">
               <div>作用：在特殊场景中，直接把提取到的值设置到后续操作中的头部参数中</div>
               <div>1、若打开此开关，则会将此处提取到的值，以当前设置的key更新到后续步骤的头部信息中</div>
@@ -345,7 +354,6 @@
             <span><i style="color: #409EFF" class="el-icon-question" /></span>
           </el-tooltip>
         </template>
-
         <template slot-scope="scope">
           <el-switch v-model="scope.row.update_to_header" />
         </template>
@@ -465,6 +473,7 @@ export default {
       if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
+          status: 1,
           key: null,
           data_source: this.responseDataSourceMapping[0].value,
           value: null,
@@ -474,6 +483,7 @@ export default {
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
+          status: 1,
           key: null,
           data_source: null,
           value: null,
@@ -495,6 +505,7 @@ export default {
 
     // 清除数据
     clearData() {
+      this.tempData[0].status = 0
       this.tempData[0].key = null
       this.tempData[0].value = null
       this.tempData[0].remark = null

@@ -68,7 +68,10 @@
 
       <el-table
         ref="apiTable"
+        v-loading="tableLoadingIsShow"
         :data="apiList.data"
+        element-loading-text="正在获取数据..."
+        element-loading-spinner="el-icon-loading"
         stripe
         @cell-dblclick="cellDblclick"
       >
@@ -157,7 +160,7 @@ export default {
   data() {
     return {
       selectedOptions: [],
-
+      tableLoadingIsShow: false,
       tempModuleList: [],
       currentProjectId: '',
       moduleId: '',
@@ -281,11 +284,13 @@ export default {
 
     // 根据模块id内容获取接口列表
     getApiListByModuleId() {
+      this.tableLoadingIsShow = true
       apiList({
         'moduleId': this.moduleId,
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.apiList.data = response.data.data ? response.data.data : []
         this.apiList.total = response.data.total ? response.data.total : 0
       })

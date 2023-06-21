@@ -263,7 +263,10 @@
                   </template>
                   <el-table
                     ref="multipleTable"
+                    v-loading="tableLoadingIsShow"
                     :data="currentCaseList"
+                    element-loading-text="正在获取数据..."
+                    element-loading-spinner="el-icon-loading"
                     tooltip-effect="dark"
                     style="width: 100%"
                     @select="selectRow"
@@ -418,6 +421,7 @@ export default {
       submitButtonIsLoading: false,
       drawerIsShow: false,
       isShowDebugLoading: false,
+      tableLoadingIsShow: false,
       tempTask: {
         call_back: [
           {
@@ -653,7 +657,9 @@ export default {
 
     // 获取当前模块下的用例列表
     getCaseList(suiteId) {
+      this.tableLoadingIsShow = true
       this.caseListUrl({ suiteId: suiteId, status: 1 }).then(response => {
+        this.tableLoadingIsShow = false
         this.currentCaseList = response.data.data
         this.defaultClick() // 获取完用例列表过后 ，执行默认选中事件
       })

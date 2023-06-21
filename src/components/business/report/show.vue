@@ -183,13 +183,11 @@
                             'active':case_index === showColor[0] && step_index === showColor[1],
                             'wire': step_index === 0
                           }"
-                          @click="handleNodeClick(case_index, step_index)"
+                          @click="clickStep(case_index, step_index, step_data.report_step_id)"
                         >
-                          <div
-                            :style="getStepColor(step_data.status)"
-                          >
+                          <div :style="getStepColor(step_data.status)">
                             <span class="test-name">{{ step_data.name }}</span>
-                            <span class="test-time">{{ step_data.meta_datas.stat.response_time_ms }} ms</span>
+                            <span class="test-time">{{ step_data.stat.response_time_ms }} ms</span>
                             <el-tooltip
                               class="test-status"
                               effect="dark"
@@ -197,48 +195,49 @@
                               placement="top-start"
                             >
                               <el-button
-                                v-if="step_data.meta_datas.case_id"
+                                v-if="step_data.case_id"
                                 :style="getStepColor(step_data.status)"
                                 size="mini"
                                 type="text"
                                 class="test-status"
-                                @click="showCaseInfo(step_data.meta_datas.case_id)"
+                                @click="showCaseInfo(step_data.case_id)"
                               >打开用例
                               </el-button>
                             </el-tooltip>
-                            <el-tooltip
-                              class="test-status"
-                              effect="dark"
-                              content="复制此步骤的数据到剪切板"
-                              placement="top-start"
-                            >
-                              <el-button
-                                v-if="dataType === 'api'"
-                                v-clipboard:copy="getCopyData(step_data.meta_datas.data[0])"
-                                v-clipboard:success="onCopy"
-                                v-clipboard:error="onError"
-                                size="mini"
-                                type="text"
-                                class="test-status"
-                                :style="getStepColor(step_data.status)"
-                              >复制数据
-                              </el-button>
-                              <el-button
-                                v-else
-                                v-clipboard:copy="getCopyData({
-                                  extract_msgs: step_data.meta_datas.data[0].extract_msgs,
-                                  request: step_data.meta_datas.data[0].request,
-                                  test_action: step_data.meta_datas.data[0].test_action
-                                })"
-                                v-clipboard:success="onCopy"
-                                v-clipboard:error="onError"
-                                size="mini"
-                                type="text"
-                                class="test-status"
-                                :style="getStepColor(step_data.status)"
-                              >复制数据
-                              </el-button>
-                            </el-tooltip>
+                            <!--                            <el-tooltip-->
+                            <!--                              class="test-status"-->
+                            <!--                              effect="dark"-->
+                            <!--                              content="复制此步骤的数据到剪切板"-->
+                            <!--                              placement="top-start"-->
+                            <!--                            >-->
+                            <!--                              <el-button-->
+                            <!--                                v-if="dataType === 'api'"-->
+                            <!--                                v-clipboard:copy="getCopyData(step_data.meta_datas.data[0])"-->
+                            <!--                                v-clipboard:success="onCopy"-->
+                            <!--                                v-clipboard:error="onError"-->
+                            <!--                                size="mini"-->
+                            <!--                                type="text"-->
+                            <!--                                class="test-status"-->
+                            <!--                                :style="getStepColor(step_data.status)"-->
+                            <!--                              >复制数据-->
+                            <!--                              </el-button>-->
+                            <!--                              <el-button-->
+                            <!--                                v-else-->
+                            <!--                                v-clipboard:copy="getCopyData({-->
+                            <!--                                  extract_msgs: step_data.meta_datas.data[0].extract_msgs,-->
+                            <!--                                  request: step_data.meta_datas.data[0].request,-->
+                            <!--                                  test_action: step_data.meta_datas.data[0].test_action-->
+                            <!--                                })"-->
+                            <!--                                v-clipboard:success="onCopy"-->
+                            <!--                                v-clipboard:error="onError"-->
+                            <!--                                size="mini"-->
+                            <!--                                type="text"-->
+                            <!--                                class="test-status"-->
+                            <!--                                :style="getStepColor(step_data.status)"-->
+                            <!--                              >复制数据-->
+                            <!--                              </el-button>-->
+                            <!--                            </el-tooltip>-->
+
                             <!--                            <span-->
                             <!--                              class="test-status"-->
                             <!--                              style="margin-left: 30px"-->
@@ -262,441 +261,10 @@
                 <div
                   style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
                 >
-                  <el-collapse v-model="defaultShowDetailInfo">
-
-                    <el-collapse-item v-show="attachment" name="01">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '备注信息：' }}</div>
-                      </template>
-                      <pre class="el-collapse-item-content" style="overflow: auto">{{ attachment }}</pre>
-                    </el-collapse-item>
-
-                    <el-collapse-item v-show="meta_datas.data[0].validation_results && meta_datas.data[0].validation_results.length > 0" name="02">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '断言详情：' }}</div>
-                      </template>
-                      <div>
-                        <el-table
-                          :data="meta_datas.data[0].validation_results"
-                          stripe
-                          style="width: 100%"
-                          @cell-dblclick="cellDblclick"
-                        >
-                          <el-table-column prop="check_value" label="数据源" align="center" min-width="30%">
-                            <template slot-scope="scope">
-                              <span> {{ scope.row.check_value }} </span>
-                            </template>
-                          </el-table-column>
-
-                          <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
-                            <template slot-scope="scope">
-                              <span> {{ scope.row.comparator_str }} </span>
-                            </template>
-                          </el-table-column>
-
-                          <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
-                            <template slot-scope="scope">
-                              <span> {{ scope.row.expect }} </span>
-                            </template>
-                          </el-table-column>
-
-                          <el-table-column prop="check_result" label="断言结果" align="center" min-width="15%">
-                            <template slot-scope="scope">
-                              <el-tag :type="scope.row.check_result === 'pass' ? 'success' : 'danger'">
-                                {{ scope.row.check_result === 'pass' ? '通过' : '不通过' }}
-                              </el-tag>
-                            </template>
-                          </el-table-column>
-                        </el-table>
-                      </div>
-                    </el-collapse-item>
-
-                    <el-collapse-item v-if="dataType === 'api'" name="03">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">请求信息：</div>
-                      </template>
-                      <el-collapse v-model="defaultShowRequestInFo" style="margin-left: 30px; margin-right: 30px">
-                        <el-descriptions class="margin-top" :column="2" border>
-                          <el-descriptions-item>
-                            <template slot="label"> 请求方法 </template>
-                            {{ meta_datas.data[0].request.method }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 请求地址 </template>
-                            {{ meta_datas.data[0].request.url }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 发送时间 </template>
-                            {{ meta_datas.stat.request_at }}
-                          </el-descriptions-item>
-                        </el-descriptions>
-
-                        <el-row>
-                          <el-col :span="12">
-                            <el-collapse-item name="request_01">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ '头部参数：' }}</div>
-                              </template>
-                              <el-row>
-                                <el-col :span="20">
-                                  <div v-if="meta_datas.data[0].request.headers" style="margin-left: 30px">
-                                    <JsonViewer
-                                      :value="strToJson(meta_datas.data[0].request.headers)"
-                                      :expand-depth="5"
-                                      copyable
-                                    />
-                                  </div>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-button
-                                    v-if="meta_datas.data[0].request.headers"
-                                    v-clipboard:copy="getCopyData(meta_datas.data[0].request.headers)"
-                                    v-clipboard:success="onCopy"
-                                    v-clipboard:error="onError"
-                                    size="mini"
-                                    type="primary"
-                                  >复制
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                            </el-collapse-item>
-                          </el-col>
-                          <el-col :span="12">
-                            <el-collapse-item name="request_02">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
-                              </template>
-                              <el-row>
-                                <el-col :span="20">
-                                  <div v-if="meta_datas.data[0].request.params" style="margin-left: 30px">
-                                    <JsonViewer
-                                      :value="strToJson(meta_datas.data[0].request.params)"
-                                      :expand-depth="5"
-                                      copyable
-                                    />
-                                  </div>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-button
-                                    v-if="meta_datas.data[0].request.params"
-                                    v-clipboard:copy="getCopyData(meta_datas.data[0].request.params)"
-                                    v-clipboard:success="onCopy"
-                                    v-clipboard:error="onError"
-                                    size="mini"
-                                    type="primary"
-                                  >复制
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                            </el-collapse-item>
-                          </el-col>
-                        </el-row>
-
-                        <el-row>
-                          <el-col :span="12">
-                            <el-collapse-item name="request_03">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ 'data参数：' }}</div>
-                              </template>
-                              <el-row v-if=" typeof meta_datas.data[0].request.data === 'object'">
-                                <el-col :span="20">
-                                  <div v-if="meta_datas.data[0].request.data" style="margin-left: 30px">
-                                    <JsonViewer
-                                      :value="strToJson(meta_datas.data[0].request.data)"
-                                      :expand-depth="5"
-                                      copyable
-                                    />
-                                  </div>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-button
-                                    v-if="meta_datas.data[0].request.data"
-                                    v-clipboard:copy="getCopyData(meta_datas.data[0].request.data)"
-                                    v-clipboard:success="onCopy"
-                                    v-clipboard:error="onError"
-                                    size="mini"
-                                    type="primary"
-                                  >复制
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                              <el-row v-if=" typeof meta_datas.data[0].request.data === 'string'">
-                                <el-col :span="20">
-                                  <div v-if="meta_datas.data[0].request.data" style="margin-left: 30px">
-                                    <xmp>{{ formatXml(meta_datas.data[0].request.data) }}</xmp>
-                                  </div>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-button
-                                    v-if="meta_datas.data[0].request.data"
-                                    v-clipboard:copy="formatXml(meta_datas.data[0].request.data)"
-                                    v-clipboard:success="onCopy"
-                                    v-clipboard:error="onError"
-                                    size="mini"
-                                    type="primary"
-                                  >复制
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                            </el-collapse-item>
-                          </el-col>
-                          <el-col :span="12">
-                            <el-collapse-item name="request_04">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
-                              </template>
-                              <el-row>
-                                <el-col :span="20">
-                                  <div v-if="meta_datas.data[0].request.files" style="margin-left: 100px">
-                                    <JsonViewer
-                                      :value="strToJson(meta_datas.data[0].request.files)"
-                                      :expand-depth="5"
-                                      copyable
-                                    />
-                                  </div>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-button
-                                    v-if="meta_datas.data[0].request.files"
-                                    v-clipboard:copy="getCopyData(meta_datas.data[0].request.files)"
-                                    v-clipboard:success="onCopy"
-                                    v-clipboard:error="onError"
-                                    size="mini"
-                                    type="primary"
-                                  >复制
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                            </el-collapse-item>
-                          </el-col>
-                        </el-row>
-
-                        <el-collapse-item name="request_05">
-                          <template slot="title">
-                            <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
-                          </template>
-                          <el-row>
-                            <el-col :span="22">
-                              <div v-if="meta_datas.data[0].request.json" style="margin-left: 100px">
-                                <JsonViewer
-                                  :value="strToJson(meta_datas.data[0].request.json)"
-                                  :expand-depth="5"
-                                  copyable
-                                />
-                              </div>
-                            </el-col>
-                            <el-col :span="2">
-                              <el-button
-                                v-if="meta_datas.data[0].request.json"
-                                v-clipboard:copy="getCopyData(meta_datas.data[0].request.json)"
-                                v-clipboard:success="onCopy"
-                                v-clipboard:error="onError"
-                                size="mini"
-                                type="primary"
-                              >复制
-                              </el-button>
-                            </el-col>
-                          </el-row>
-                        </el-collapse-item>
-
-                      </el-collapse>
-                    </el-collapse-item>
-
-                    <el-collapse-item v-if="dataType === 'api'" name="04">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">响应信息: </div>
-                      </template>
-                      <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 30px; margin-right: 30px">
-
-                        <el-descriptions class="margin-top" :column="2" border>
-                          <el-descriptions-item>
-                            <template slot="label"> 响应时间 </template>
-                            {{ meta_datas.stat.response_at }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 响应状态码 </template>
-                            {{ meta_datas.data[0].response.status_code }}
-                          </el-descriptions-item>
-
-                          <el-collapse-item name="response_01">
-                            <template slot="title">
-                              <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
-                            </template>
-                            <div class="el-collapse-item-content" v-html="meta_datas.data[0].response.text" />
-                          </el-collapse-item>
-
-                          <el-collapse-item name="response_02">
-                            <template slot="title">
-                              <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
-                            </template>
-                            <el-row>
-                              <el-col :span="22">
-                                <div v-if="meta_datas.data[0].response.json" style="margin-left: 100px">
-                                  <JsonViewer
-                                    :value="strToJson(meta_datas.data[0].response.json)"
-                                    :expand-depth="5"
-                                    copyable
-                                  />
-                                </div>
-                              </el-col>
-                              <el-col :span="2">
-                                <el-button
-                                  v-if="meta_datas.data[0].response.json"
-                                  v-clipboard:copy="getCopyData(meta_datas.data[0].response.json)"
-                                  v-clipboard:success="onCopy"
-                                  v-clipboard:error="onError"
-                                  size="mini"
-                                  type="primary"
-                                >复制
-                                </el-button>
-                              </el-col>
-                            </el-row>
-                          </el-collapse-item>
-
-                        </el-descriptions></el-collapse>
-
-                    </el-collapse-item>
-
-                    <el-collapse-item v-if="dataType !== 'api'" name="05">
-                      <template slot="title">
-                        <div class="el-collapse-item-title">执行信息：</div>
-                      </template>
-
-                      <el-collapse v-model="defaultShowExecuteInFo" style="margin-left: 30px; margin-right: 30px">
-                        <el-descriptions class="margin-top" :column="2" border>
-                          <el-descriptions-item>
-                            <template slot="label"> 执行方式 </template>
-                            {{ meta_datas.data[0].test_action.execute_name }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 输入内容 </template>
-                            {{ meta_datas.data[0].test_action.text }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 元素定位方式 </template>
-                            {{ meta_datas.data[0].test_action.by_type }}
-                          </el-descriptions-item>
-
-                          <el-descriptions-item>
-                            <template slot="label"> 元素定位表达式 </template>
-                            {{ meta_datas.data[0].test_action.element }}
-                          </el-descriptions-item>
-                        </el-descriptions>
-
-                        <el-row>
-                          <el-col :span="12">
-                            <el-collapse-item name="execute_01">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
-                              </template>
-                              <div class="el-collapse-item-content">
-                                <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].before " />
-                              </div>
-                            </el-collapse-item>
-                          </el-col>
-                          <el-col :span="12">
-                            <el-collapse-item name="execute_02">
-                              <template slot="title">
-                                <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
-                              </template>
-                              <div class="el-collapse-item-content">
-                                <el-image :src="'data:image/jpg;base64,' + meta_datas.data[0].after " />
-                              </div>
-                            </el-collapse-item>
-                          </el-col>
-                        </el-row>
-                      </el-collapse>
-
-                    </el-collapse-item>
-
-                    <el-collapse-item name="06">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '执行测试时内存中的公共变量：' }}</div>
-                      </template>
-                      <el-row>
-                        <el-col :span="22">
-                          <div v-if="meta_datas.variables_mapping" style="margin-left: 100px">
-                            <JsonViewer
-                              :value="strToJson(meta_datas.variables_mapping)"
-                              :expand-depth="5"
-                              copyable
-                            />
-                          </div>
-                        </el-col>
-                        <el-col :span="2">
-                          <el-button
-                            v-if="meta_datas.variables_mapping"
-                            v-clipboard:copy="getCopyData(meta_datas.variables_mapping)"
-                            v-clipboard:success="onCopy"
-                            v-clipboard:error="onError"
-                            size="mini"
-                            type="primary"
-                          >复制
-                          </el-button>
-                        </el-col>
-                      </el-row>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="07">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '提取数据：' }}</div>
-                      </template>
-                      <el-row>
-                        <el-col :span="22">
-                          <div v-if="meta_datas.data[0].extract_msgs" style="margin-left: 100px">
-                            <JsonViewer
-                              :value="strToJson(meta_datas.data[0].extract_msgs)"
-                              :expand-depth="5"
-                              copyable
-                            />
-                          </div>
-                        </el-col>
-                        <el-col :span="2">
-                          <el-button
-                            v-if="meta_datas.data[0].extract_msgs"
-                            v-clipboard:copy="getCopyData(meta_datas.data[0].extract_msgs)"
-                            v-clipboard:success="onCopy"
-                            v-clipboard:error="onError"
-                            size="mini"
-                            type="primary"
-                          >复制
-                          </el-button>
-                        </el-col>
-                      </el-row>
-                    </el-collapse-item>
-
-                    <el-collapse-item name="08">
-                      <template slot="title">
-                        <div class="el-collapse-item-title"> {{ '脚本print打印信息：' }}</div>
-                      </template>
-                      <el-row>
-                        <el-col :span="22">
-                          <pre
-                            class="el-collapse-item-content"
-                            style="text-align: left; overflow: auto"
-                          >{{ meta_datas.redirect_print }}</pre>
-                        </el-col>
-                        <el-col :span="2">
-                          <el-button
-                            v-if="meta_datas.redirect_print"
-                            v-clipboard:copy="getCopyData(meta_datas.redirect_print)"
-                            v-clipboard:success="onCopy"
-                            v-clipboard:error="onError"
-                            size="mini"
-                            type="primary"
-                          >复制
-                          </el-button>
-                        </el-col>
-                      </el-row>
-
-                    </el-collapse-item>
-
-                  </el-collapse>
+                  <showStepView
+                    :data-type="dataType"
+                    :step-data="stepData"
+                  />
                 </div>
               </div>
             </el-scrollbar>
@@ -749,28 +317,30 @@
 </template>
 
 <script>
-
-import JsonViewer from 'vue-json-viewer'
 import vkbeautify from 'vkbeautify' // xml格式化组件
 import hitDrawer from '@/views/assist/hits/drawer'
 import pythonScriptIndex from '@/views/assist/script/index'
 import caseDrawer from '@/components/business/case/editDrawer.vue'
+import showStepView from '@/components/business/report/showStep'
 
 import { runEnvList } from '@/apis/config/runEnv'
-import { deleteReport as deleteApiReport, reportDetail as apiReportDetail, getReport as apiGetReport } from '@/apis/apiTest/report'
+import { deleteReport as deleteApiReport, getReport as apiGetReport,
+  reportStepDetail as apiReportStepDetail } from '@/apis/apiTest/report'
 import { getProject as apiGetProject } from '@/apis/apiTest/project'
 import { runApi as apiRun } from '@/apis/apiTest/api'
 import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
 import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import { getCase as apiGetCase, caseRun as apiCaseRun, caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
 
-import { deleteReport as deleteWebUiReport, reportDetail as webUiReportDetail, getReport as webUiGetReport } from '@/apis/webUiTest/report'
+import { deleteReport as deleteWebUiReport, getReport as webUiGetReport,
+  reportStepDetail as appUiReportStepDetail } from '@/apis/webUiTest/report'
 import { getCase as webUiGetCase, caseRun as webUiCaseRun, caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
 import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 
-import { deleteReport as deleteAppUiReport, reportDetail as appUiReportDetail, getReport as appUiGetReport } from '@/apis/appUiTest/report'
+import { deleteReport as deleteAppUiReport, getReport as appUiGetReport,
+  reportStepDetail as webUiReportStepDetail } from '@/apis/appUiTest/report'
 import { getCase as appUiGetCase, caseRun as appUiCaseRun, caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
 import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
@@ -786,8 +356,8 @@ export default {
     runProcess, selectRunEnv,
     caseDrawer,
     pythonScriptIndex,
-    JsonViewer,
-    hitDrawer
+    hitDrawer,
+    showStepView
   },
   // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
@@ -800,6 +370,62 @@ export default {
       runTestTypeList: [],
       envList: [],
       runEnvDict: {},
+
+      stepData: {
+        'case_id': undefined,
+        'name': undefined,
+        'stat': {
+          'response_time_ms': undefined,
+          'elapsed_ms': undefined,
+          'content_size': undefined,
+          'request_at': undefined,
+          'response_at': undefined
+        },
+        'redirect_print': undefined,
+        'variables_mapping': {},
+        'request': {
+          'url': undefined,
+          'method': undefined,
+          'headers': {},
+          'body': {},
+          'timeout': 60,
+          'params': {},
+          'json': {},
+          'data': {},
+          'files': {},
+          'verify': false,
+          'allow_redirects': false
+        },
+        'response': {
+          'ok': true,
+          'url': undefined,
+          'status_code': 200,
+          'reason': 'OK',
+          'cookies': {},
+          'encoding': 'utf-8',
+          'headers': {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Content-Length': '84',
+            'Server': 'Werkzeug/2.0.1 Python/3.9.6',
+            'Date': 'Tue, 20 Jun 2023 05:56:20 GMT'
+          },
+          'content_type': 'text/html; charset=utf-8',
+          'json': {}
+        },
+        'extract_msgs': {},
+        'validation_results': [
+          {
+            'check': 'content.status',
+            'expect': 200,
+            'comparator': '_01equals',
+            'comparator_str': '相等',
+            'check_value': 404,
+            'check_result': 'fail'
+          }
+        ],
+        'before': null,
+        'after': null
+      },
 
       // 选中打开用例
       caseProjectId: '',
@@ -877,20 +503,6 @@ export default {
       caseScrollbarHeight: `${window.innerHeight * 0.85}px`, // 用例和步骤内容的高度
       picStatus: false, // 是否展示饼图
       showColor: [],
-      attachment: '',
-      meta_datas: {
-        data: [{
-          request: { body: null, url: null, headers: null, data: null, params: null, json: null },
-          response: { content: null, json: null, status_code: null },
-          test_action: { action: null, by_type: null, element: null, text: null }
-        }],
-        stat: {
-          elapsed_ms: '',
-          request_at: '',
-          response_at: '',
-          response_time_ms: ''
-        }
-      },
       caseChartData: {
         columns: ['caseName', 'num'],
         rows: [
@@ -909,24 +521,22 @@ export default {
 
       reportData: {
         'details': [{ name: '' }],
-        'platform': { 'duration': '', 'python_version': '' },
         'stat': {
+          'testcases': { 'fail': '', 'success': '', 'total': '' },
           'teststeps': {
-            'errors': '',
-            'expectedFailures': '',
+            'total': '',
             'failures': '',
+            'errors': '',
             'skipped': '',
             'successes': '',
-            'total': '',
+            'expectedFailures': '',
             'unexpectedSuccesses': ''
-          },
-          'testcases': { 'fail': '', 'success': '', 'total': '' }
+          }
         },
         'time': { 'start_at': '', 'duration': 1, 'start_datetime': '' }
       },
-
       resultMapping: reportStepResultMapping,
-      reRunReport: '',
+      reRunReport: {},
       apiRunUrl: '',
       caseRunUrl: '',
       taskRunUrl: '',
@@ -934,9 +544,9 @@ export default {
       getProjectUrl: '',
       getReportUrl: '',
       getCaseUrl: '',
-      reportDetailUrl: '',
       deleteReportUrl: '',
-      getCaseProjectUrl: ''
+      getCaseProjectUrl: '',
+      reportStepDetailUrl: ''
     }
   },
 
@@ -962,9 +572,9 @@ export default {
       this.getCaseUrl = apiGetCase
       this.getReportUrl = apiGetReport
       this.getProjectUrl = apiGetProject
-      this.reportDetailUrl = apiReportDetail
       this.deleteReportUrl = deleteApiReport
       this.getCaseProjectUrl = apiGetCaseProject
+      this.reportStepDetailUrl = apiReportStepDetail
     } else if (this.dataType === 'webUi') {
       this.taskRunUrl = webUiRunTask
       this.caseSuiteRunUrl = webUiRunCaseSuite
@@ -972,9 +582,9 @@ export default {
       this.getCaseUrl = webUiGetCase
       this.getReportUrl = webUiGetReport
       this.getProjectUrl = webUiGetProject
-      this.reportDetailUrl = webUiReportDetail
       this.deleteReportUrl = deleteWebUiReport
       this.getCaseProjectUrl = webUiGetCaseProject
+      this.reportStepDetailUrl = webUiReportStepDetail
     } else {
       this.taskRunUrl = appUiRunTask
       this.caseSuiteRunUrl = appUiRunCaseSuite
@@ -982,9 +592,9 @@ export default {
       this.getCaseUrl = appUiGetCase
       this.getReportUrl = appUiGetReport
       this.getProjectUrl = appUiGetProject
-      this.reportDetailUrl = appUiReportDetail
       this.deleteReportUrl = deleteAppUiReport
       this.getCaseProjectUrl = appUiGetCaseProject
+      this.reportStepDetailUrl = appUiReportStepDetail
     }
 
     // 获取环境列表
@@ -1010,9 +620,9 @@ export default {
     getStepColor(status) {
       return status === 'success' ? 'color:#19D4AE'
         : status === true ? 'color:#19D4AE'
-          : status === 'failure' ? 'color:#FA6E86'
+          : status === 'fail' ? 'color:#FA6E86'
             : status === false ? 'color:#FA6E86'
-              : status === 'skipped' ? 'color:#60C0DD' : 'color:#E87C25'
+              : status === 'skip' ? 'color:#60C0DD' : 'color:#E87C25'
     },
 
     // 打开用例信息
@@ -1101,26 +711,39 @@ export default {
       )
     },
 
-    handleNodeClick(i1, i2) {
+    clickStep(i1, i2, report_step_id) {
       this.showColor = [i1, i2]
-      this.meta_datas = this.reportData['details'][i1]['records'][i2]['meta_datas']
-      this.attachment = this.reportData['details'][i1]['records'][i2]['attachment']
-    },
-
-    // 获取测试报告具体内容
-    getReportDataById() {
       const loading = this.$loading({
         lock: true,
         text: `${this.dataType === 'api' ? '测试报告' : 'ui自动化测试报告包含截图，'}数据较大，所以数据传输会稍久，请耐心等待`,
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      this.reportDetailUrl({ 'id': this.$route.query.id }).then((response) => {
+      this.reportStepDetailUrl({ id: report_step_id }).then(response => {
+        loading.close()
+        this.stepData = response.data.step_data
+      })
+    },
+
+    // 获取测试报告具体内容
+    getReportDataById() {
+      const loading = this.$loading({
+        lock: true,
+        text: '数据获取中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.getReportUrl({ 'id': this.$route.query.id }).then((response) => {
         loading.close()
         if (this.showMessage(this, response)) {
-          this.reportData = response['data']
-          this.meta_datas = this.reportData['details'][0]['records'][0]['meta_datas']
-          this.attachment = this.reportData['details'][0]['records'][0]['attachment']
+          this.reRunReport = response.data
+          this.reportData = response.data.summary
+
+          // 默认获取第一个步骤的数据
+          if (this.reportData.details.length > 0) {
+            this.clickStep(0, 0, this.reportData.details[0].records[0].report_step_id)
+          }
+
           // 渲染饼图需要的数据
           this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
           this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
@@ -1140,42 +763,37 @@ export default {
 
     // 触发重跑
     reRun() {
-      // 获取报告
-      this.getReportUrl({ 'id': this.$route.query.id }).then(response => {
-        this.reRunReport = response.data
+      // 获取报告对应的服务的业务线id
+      let project = null
 
-        // 获取报告对应的服务的业务线id
-        let project = null
+      // 获取服务
+      this.getProjectUrl({ id: this.reRunReport.project_id }).then(response => {
+        project = response.data
 
-        // 获取服务
-        this.getProjectUrl({ id: this.reRunReport.project_id }).then(response => {
-          project = response.data
-
-          const run_type = this.reRunReport.run_type
-          if (run_type === 'case') {
-            const temp_variables = this.reRunReport.temp_variables
-            if (temp_variables) { // 本身就有临时参数
-              this.sendReRun(project.business_id, temp_variables)
-            } else { // 没有就获取用例的数据
-              const run_id = this.reRunReport.run_id
-              if (run_id.length === 1) {
-                this.getCaseUrl({ id: run_id[0] }).then(response => {
-                  const case_data = response.data
-                  this.sendReRun(project.business_id, {
-                    skip_if: case_data.skip_if,
-                    variables: case_data.variables,
-                    run_times: case_data.run_times,
-                    headers: case_data.headers
-                  })
+        const run_type = this.reRunReport.run_type
+        if (run_type === 'case') {
+          const temp_variables = this.reRunReport.temp_variables
+          if (temp_variables) { // 本身就有临时参数
+            this.sendReRun(project.business_id, temp_variables)
+          } else { // 没有就获取用例的数据
+            const run_id = this.reRunReport.run_id
+            if (run_id.length === 1) {
+              this.getCaseUrl({ id: run_id[0] }).then(response => {
+                const case_data = response.data
+                this.sendReRun(project.business_id, {
+                  skip_if: case_data.skip_if,
+                  variables: case_data.variables,
+                  run_times: case_data.run_times,
+                  headers: case_data.headers
                 })
-              } else {
-                this.sendReRun(project.business_id, null)
-              }
+              })
+            } else {
+              this.sendReRun(project.business_id, null)
             }
-          } else {
-            this.sendReRun(project.business_id, null)
           }
-        })
+        } else {
+          this.sendReRun(project.business_id, null)
+        }
       })
     },
 

@@ -124,9 +124,22 @@
       size="mini"
       row-key="id"
     >
-      <el-table-column label="序号" header-align="center" min-width="4%">
+      <el-table-column label="序号" header-align="center" min-width="5%">
         <template slot-scope="scope">
           <div>{{ scope.$index + 1 }}</div>
+        </template>
+      </el-table-column>
+
+      <el-table-column header-align="center" min-width="8%">
+        <template slot="header">
+          <span><span style="color: red">*</span>是否执行</span>
+        </template>
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            :inactive-value="0"
+            :active-value="1"
+          />
         </template>
       </el-table-column>
 
@@ -275,7 +288,7 @@
                 size="mini"
                 type="textarea"
                 :disabled="assertOne.indexOf(scope.row.validate_method) !== -1"
-                :rows="1"
+                :rows="scope.row.value ? 2 : 1"
                 :placeholder="
                   assertBatch.indexOf(scope.row.validate_method) !== -1 ? `请填写具体字段，如: ['key1', 'key2']` :
                   scope.row.validate_method === '契约校验' ?
@@ -468,6 +481,7 @@ export default {
       if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
+          status: 1,
           validate_type: this.dataType === 'api' ? 'data' : 'page',
           data_source: this.dataType === 'api' ? this.responseDataSourceMapping[0].value : this.elementList[0].value,
           key: null,
@@ -478,6 +492,7 @@ export default {
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
+          status: 1,
           validate_type: this.dataType === 'api' ? 'data' : 'page',
           data_source: null,
           key: null,
@@ -498,6 +513,7 @@ export default {
       this.tempData[0].validate_type = 'data'
       this.tempData[0].data_source = null
       this.tempData[0].key = null
+      this.tempData[0].status = 0
       this.tempData[0].validate_method = null
       this.tempData[0].data_type = null
       this.tempData[0].value = null

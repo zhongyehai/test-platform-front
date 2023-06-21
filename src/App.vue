@@ -29,6 +29,7 @@ export default {
       this.$busEvents.data.permissions = permissions ? JSON.parse(permissions) : []
       // 根据权限更新菜单，自动收缩一下侧边栏，展示效果，否则需要手动进行收缩才会展示
       this.$store.dispatch('app/toggleSideBar')
+      // this.$store.dispatch('app/toggleSideBar')
     }
   }
 

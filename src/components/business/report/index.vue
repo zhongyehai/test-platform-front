@@ -121,6 +121,9 @@
 
             <el-table
               ref="reportTable"
+              v-loading="tableIsLoading"
+              element-loading-text="正在获取数据..."
+              element-loading-spinner="el-icon-loading"
               :data="reportDataList"
               stripe
               @selection-change="clickSelectAll"
@@ -272,8 +275,7 @@ import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
 import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import {
   reportList as apiReportList,
-  deleteReport as apiDeleteReport,
-  downloadReport as apiDownloadReport
+  deleteReport as apiDeleteReport
 } from '@/apis/apiTest/report'
 
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
@@ -282,8 +284,7 @@ import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 import {
   reportList as webUiReportList,
-  deleteReport as webUiDeleteReport,
-  downloadReport as webUiDownloadReport
+  deleteReport as webUiDeleteReport
 } from '@/apis/webUiTest/report'
 
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
@@ -292,8 +293,7 @@ import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
 import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 import {
   reportList as appUiReportList,
-  deleteReport as appUiDeleteReport,
-  downloadReport as appUiDownloadReport
+  deleteReport as appUiDeleteReport
 } from '@/apis/appUiTest/report'
 
 import { getConfigByName } from '@/apis/config/config'
@@ -329,6 +329,7 @@ export default {
         env_list: [],
         run_type: undefined
       },
+      tableIsLoading: false,
       isAdmin: localStorage.getItem('permissions').indexOf('admin') !== -1,
       queryTotal: 0,
       userList: [],
@@ -349,8 +350,7 @@ export default {
       getProjectUrl: '',
       getCaseUrl: '',
       reportListUrl: '',
-      deleteReportUrl: '',
-      downloadReportUrl: ''
+      deleteReportUrl: ''
     }
   },
 
@@ -398,7 +398,6 @@ export default {
       this.getProjectUrl = apiGetProject
       this.reportListUrl = apiReportList
       this.deleteReportUrl = apiDeleteReport
-      this.downloadReportUrl = apiDownloadReport
     } else if (this.dataType === 'webUi') {
       this.taskRunUrl = webUiRunTask
       this.caseSuiteRunUrl = webUiRunCaseSuite
@@ -407,7 +406,6 @@ export default {
       this.getProjectUrl = webUiGetProject
       this.reportListUrl = webUiReportList
       this.deleteReportUrl = webUiDeleteReport
-      this.downloadReportUrl = webUiDownloadReport
     } else {
       this.taskRunUrl = appUiRunTask
       this.caseSuiteRunUrl = appUiRunCaseSuite
@@ -416,7 +414,6 @@ export default {
       this.getProjectUrl = appUiGetProject
       this.reportListUrl = appUiReportList
       this.deleteReportUrl = appUiDeleteReport
-      this.downloadReportUrl = appUiDownloadReport
     }
   },
 
@@ -441,7 +438,9 @@ export default {
     // 获取服务对应的报告列表
     getReportList() {
       this.query.projectId = this.projectId
+      this.tableIsLoading = true
       this.reportListUrl(this.query).then(response => {
+        this.tableIsLoading = false
         this.reportDataList = response.data.data
         this.queryTotal = response.data.total
       })

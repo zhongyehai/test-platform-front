@@ -70,7 +70,10 @@
 
       <el-table
         ref="apiTable"
+        v-loading="tableLoadingIsShow"
         :data="elementList.data"
+        element-loading-text="正在获取数据..."
+        element-loading-spinner="el-icon-loading"
         stripe
         @cell-dblclick="cellDblclick"
       >
@@ -146,7 +149,7 @@ export default {
     return {
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       selectedOptions: [],
-
+      tableLoadingIsShow: false,
       tempModuleList: [],
       moduleId: '',
       pageId: '',
@@ -234,7 +237,9 @@ export default {
 
     // 获取项目列表
     getProjectList() {
+      this.tableLoadingIsShow = true
       this.projectListUrl().then(response => {
+        this.tableLoadingIsShow = false
         this.tempProjectList = response.data.data
       })
     },

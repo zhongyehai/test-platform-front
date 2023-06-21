@@ -204,6 +204,19 @@
         </template>
       </el-table-column>
 
+      <el-table-column header-align="center" min-width="7%">
+        <template slot="header">
+          <span>是否执行</span>
+        </template>
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            :inactive-value="0"
+            :active-value="1"
+          />
+        </template>
+      </el-table-column>
+
       <el-table-column header-align="center" min-width="23%">
         <template slot="header">
           <span><span style="color: red">*</span>变量key</span>
@@ -407,6 +420,7 @@ export default {
       if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
+          status: 1,
           key: null,
           extract_type: this.$busEvents.data.uiTestExtractMappingList[0].value,
           value: null,
@@ -415,6 +429,7 @@ export default {
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
+          status: 1,
           key: null,
           extract_type: null,
           value: null,
@@ -435,6 +450,7 @@ export default {
 
     // 清除数据
     clearData() {
+      this.tempData[0].status = 0
       this.tempData[0].key = null
       this.tempData[0].value = null
       this.tempData[0].remark = null

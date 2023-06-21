@@ -477,8 +477,10 @@ export default {
 
     // 获取步骤列表
     getStepList(case_id) {
-      this.tableIsLoading = true
+      this.tableLoadingIsShow = true
       this.stepListUrl({ 'caseId': case_id || this.caseId }).then(response => {
+        this.tableLoadingIsShow = false
+
         this.stepList = response.data.data
 
         this.oldList = this.stepList.map(v => v.id)
@@ -487,7 +489,6 @@ export default {
           this.setSort()
         })
       })
-      this.tableIsLoading = false
     },
 
     // 删除步骤

@@ -304,7 +304,7 @@ export default {
 
     // 获取环境信息
     getEnv(envId, projectId) {
-      const loading = getLoading(this, '获取环境数据中，请耐心等待')
+      const loading = getLoading(this, '获取环境数据中...')
       this.getProjectEnvUrl({ env_id: envId, projectId: projectId }).then(response => {
         loading.close()
         this.tempEnv.id = response.data.id

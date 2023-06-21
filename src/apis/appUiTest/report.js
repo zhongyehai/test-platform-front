@@ -2,6 +2,7 @@ import request from '@/utils/request' // 加载请求配置文件
 import { baseDirAppUiTest } from '@/apis/base'
 
 const reportDir = baseDirAppUiTest + '/report'
+const reportStepDir = baseDirAppUiTest + '/report/step'
 
 function Func(method, data = null, params = null) {
   return request({ url: reportDir, method: method, data: data, params: params })
@@ -22,11 +23,6 @@ export function reportList(data) {
   return request({ url: reportDir + '/list', method: 'post', data: data })
 }
 
-// 下载报告
-export function downloadReport(params) {
-  return request({ url: reportDir + '/download', method: 'get', data: null, params: params })
-}
-
 // 报告是否生成
 export function reportIsDone(params) {
   return request({ url: reportDir + '/status', method: 'get', data: null, params: params })
@@ -37,7 +33,12 @@ export function reportShowId(params) {
   return request({ url: reportDir + '/showId', method: 'get', data: null, params: params })
 }
 
-// 报告详情
-export function reportDetail(params) {
-  return request({ url: reportDir + '/detail', method: 'get', data: null, params: params })
+// 报告步骤列表
+export function reportStepList(params) {
+  return request({ url: reportStepDir + '/list', method: 'get', data: null, params: params })
+}
+
+// 报告步骤数据
+export function reportStepDetail(params) {
+  return request({ url: reportStepDir, method: 'get', data: null, params: params })
 }

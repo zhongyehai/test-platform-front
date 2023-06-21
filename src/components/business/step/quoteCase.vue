@@ -60,8 +60,11 @@
     <el-row>
       <el-table
         ref="caseTable"
+        v-loading="tableLoadingIsShow"
         row-key="row_id"
         :data="caseList"
+        element-loading-text="正在获取数据..."
+        element-loading-spinner="el-icon-loading"
         :expand-row-keys="expands"
         stripe
         lazy
@@ -206,7 +209,7 @@ export default {
     return {
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       selectedOptions: [],
-
+      tableLoadingIsShow: false,
       projectSelectedId: '',
       currentProjectList: [],
       currentCaseSuiteList: [],
@@ -347,6 +350,7 @@ export default {
       if (caseSuiteList.length > 0) {
         this.currentSetId = caseSuiteList.slice(-1)[0] // 取列表中的最后一个
       }
+      this.tableLoadingIsShow = true
       this.caseListUrl({
         pageNum: this.quotePageNum,
         pageSize: this.quotePageSize,
@@ -354,6 +358,7 @@ export default {
         status: 1,
         getHasStep: true
       }).then(response => {
+        this.tableLoadingIsShow = false
         this.caseList = []
         this.expands = []
         response.data.data.forEach(caseData => {
