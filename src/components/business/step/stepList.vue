@@ -249,7 +249,6 @@
 </template>
 
 <script>
-import { Message } from 'element-ui'
 import Sortable from 'sortablejs'
 
 import {
@@ -353,9 +352,6 @@ export default {
       if (_type === 'stepInfo') {
         this.getStepList(caseId)
       }
-      // else if (_type === 'showStepList') {
-      //   this.showCaseEditDrawer(caseId)
-      // }
     })
   },
 
@@ -523,10 +519,6 @@ export default {
 
     cancelCopyStepPopover(row) {
       this.$set(row, 'copyStepPopoverIsShow', false)
-    },
-
-    cancelPullStepPopover(row) {
-      this.$set(row, 'pullStepPopoverIsShow', false)
     },
 
     // 点击编辑步骤

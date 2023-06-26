@@ -24,7 +24,7 @@ export function reportList(data) {
 }
 
 // 报告是否生成
-export function reportIsDone(params) {
+export function reportStatus(params) {
   return request({ url: reportDir + '/status', method: 'get', data: null, params: params })
 }
 

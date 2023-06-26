@@ -41,21 +41,9 @@
                 :height="tableHeight"
                 size="mini"
               >
-                <el-table-column prop="num" label="序号" align="left" min-width="10%">
+                <el-table-column prop="num" label="序号" align="left" min-width="5%">
                   <template slot-scope="scope">
                     <span> {{ scope.$index + 1 }} </span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column prop="name" label="步骤名" min-width="60%">
-                  <template slot-scope="scope">
-                    <span> {{ scope.row.name }} </span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column prop="process" label="执行进度" min-width="10%">
-                  <template slot-scope="scope">
-                    <el-tag size="small" type="info">{{ processMapping[scope.row.process] }}</el-tag>
                   </template>
                 </el-table-column>
 
@@ -68,11 +56,25 @@
                   </template>
                 </el-table-column>
 
-                <el-table-column prop="result" label="操作" min-width="10%">
+                <el-table-column prop="name" label="步骤名" min-width="70%">
+                  <template slot-scope="scope">
+                    <span
+                      :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
+                    > {{ scope.row.name }} </span>
+                  </template>
+                </el-table-column>
+
+                <el-table-column prop="process" label="执行节点" min-width="10%">
+                  <template slot-scope="scope">
+                    <el-tag size="small" type="info">{{ processMapping[scope.row.process] }}</el-tag>
+                  </template>
+                </el-table-column>
+
+                <el-table-column prop="result" label="操作" min-width="5%">
                   <template slot-scope="scope">
                     <el-button
                       v-show="scope.row.result !== 'waite'"
-                      type="primary"
+                      type="text"
                       size="mini"
                       @click="showStepData(scope.row.id)"
                     >查看</el-button>
@@ -117,21 +119,21 @@
 </template>
 <script>
 import {
-  reportIsDone as apiReportIsDone,
+  reportStatus as apiReportStatus,
   reportShowId as apiGetReport,
   reportStepList as apiReportStepList,
   reportStepDetail as apiReportStepDetail
 } from '@/apis/apiTest/report'
 
 import {
-  reportIsDone as appUiReportIsDone,
+  reportStatus as appUiReportStatus,
   reportShowId as appUiGetReport,
   reportStepList as appUiReportStepList,
   reportStepDetail as appUiReportStepDetail
 } from '@/apis/appUiTest/report'
 
 import {
-  reportIsDone as webUiReportIsDone,
+  reportStatus as webUiReportStatus,
   reportShowId as webUiGetReport,
   reportStepList as webUiReportStepList,
   reportStepDetail as webUiReportStepDetail
@@ -195,7 +197,7 @@ export default {
       defaultShowResponseInFo: ['response_02'], // 接口自动化，响应信息
       defaultShowExecuteInFo: ['execute_01', 'execute_02'], // UI自动化，执行信息
 
-      reportIsDoneUrl: '',
+      reportStatusUrl: '',
       reportShowIdUrl: '',
       reportStepListUrl: '',
       reportStepDetailUrl: ''
@@ -220,17 +222,17 @@ export default {
 
   created() {
     if (this.dataType === 'api') {
-      this.reportIsDoneUrl = apiReportIsDone
+      this.reportStatusUrl = apiReportStatus
       this.reportShowIdUrl = apiGetReport
       this.reportStepListUrl = apiReportStepList
       this.reportStepDetailUrl = apiReportStepDetail
     } else if (this.dataType === 'webUi') {
-      this.reportIsDoneUrl = webUiReportIsDone
+      this.reportStatusUrl = webUiReportStatus
       this.reportShowIdUrl = webUiGetReport
       this.reportStepListUrl = webUiReportStepList
       this.reportStepDetailUrl = webUiReportStepDetail
     } else {
-      this.reportIsDoneUrl = appUiReportIsDone
+      this.reportStatusUrl = appUiReportStatus
       this.reportShowIdUrl = appUiGetReport
       this.reportStepListUrl = appUiReportStepList
       this.reportStepDetailUrl = appUiReportStepDetail
@@ -277,29 +279,30 @@ export default {
     },
 
     getReport(batch_id) {
-      // 触发运行成功，每三秒查询一次，
-      // 查询10次没出结果，则停止查询，提示用户去测试报告页查看
+      // 触发运行成功，每1.5秒查询一次，
+      // 最后都没查出结果，则停止查询，提示用户去测试报告页查看
       // 已出结果，则停止查询，展示测试报告
 
       const that = this
-      const runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 3000
+      const runTimeoutCount = Number(this.$busEvents.runTimeout) * 1000 / 1500
       let queryCount = 1
       that.timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
-          that.reportIsDoneUrl({
-            batch_id: batch_id,
-            process: that.activeProcess,
-            status: that.activeStatus
-          }).then(response => {
-            that.activeProcess = response.data.process
-            that.activeStatus = response.data.status
-            if (that.reportId && that.activeProcess === 2) { // 执行中，则获取执行步骤
-              that.reportStepListUrl({ report_id: that.reportId }).then(response => {
-                that.reportStepDataList = response.data
-              })
-            } else if (that.activeProcess === 3 && that.activeStatus === 2) {
-              that.processIsShow = false // 关闭进度框
-              that.getShowReportId(batch_id)
+          that.reportStatusUrl({ batch_id: batch_id, process: that.activeProcess, status: that.activeStatus }).then(response => {
+            if (response.status === 200) {
+              that.activeProcess = response.data.process
+              that.activeStatus = response.data.status
+              if (that.reportId && that.activeProcess === 2) { // 执行中，则获取执行步骤
+                that.reportStepListUrl({ report_id: that.reportId }).then(response => {
+                  that.reportStepDataList = response.data
+                })
+              } else if (that.activeProcess === 3 && that.activeStatus === 2) {
+                that.processIsShow = false // 关闭进度框
+                that.getShowReportId(batch_id)
+                clearInterval(that.timer) // 关闭定时器
+              }
+            } else {
+              this.processIsShow = false // 关闭进度框
               clearInterval(that.timer) // 关闭定时器
             }
           })
@@ -309,7 +312,7 @@ export default {
           this.processIsShow = false // 关闭进度框
           clearInterval(that.timer) // 关闭定时器
         }
-      }, 3000)
+      }, 1500)
     },
 
     openReportById(reportId) {
@@ -327,18 +330,18 @@ export default {
 
 <style>
 .el-table .error-row {
-  background: #F0805AFF;
+  color: rgb(232, 124, 37);
 }
 
 .el-table .success-row {
-  background: #67c23a;
+  color: rgb(25, 212, 174);
 }
 
 .el-table .fail-row {
-  background: rgb(250, 110, 134);
+  color: rgb(250, 110, 134);
 }
 
 .el-table .skip-row {
-  background: #60C0DDFF;
+  color: #909399;
 }
 </style>

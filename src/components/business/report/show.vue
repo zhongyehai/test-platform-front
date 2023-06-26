@@ -3,7 +3,7 @@
     <div class="reportShow" style="line-height: 36px;">
 
       <!-- 有测试报告数据 -->
-      <div v-if="reportData.details.length > 0">
+      <div v-if="reportData && reportData.details.length > 0">
 
         <!-- 第一行，头部信息 -->
         <div class="grid-content" style="background-color: #f5f5f5 !important;">
@@ -272,8 +272,8 @@
         </el-row>
       </div>
 
-      <!-- 无测试报告数据 -->
-      <div v-show="reportData.details.length === 0" class="str">
+      <!-- 无测试报告数据，历史的测试报告没有数据 -->
+      <div v-show="!reportData || reportData.details.length === 0" class="str">
         无运行数据或所有运行数据均已跳过
       </div>
 
