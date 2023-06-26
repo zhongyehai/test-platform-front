@@ -170,7 +170,7 @@
 
           <!-- 当前用例下的步骤才允许编辑 -->
           <el-button
-            v-if="!scope.row.quote_case && scope.row.case_id === caseId"
+            v-if="!scope.row.quote_case"
             type="text"
             size="mini"
             style="margin-right: 10px"
@@ -293,7 +293,6 @@ export default {
 
       tableLoadingIsShow: false, // 加载状态
       stepList: [], // 步骤列表
-      currentStep: {}, // 当前步骤
 
       // 拖拽排序参数
       sortable: null,
@@ -523,12 +522,11 @@ export default {
 
     // 点击编辑步骤
     editStep(row) {
-      this.currentStep = row
       this.$bus.$emit(
         this.$busEvents.drawerIsShow,
         'stepInfo',
         'edit',
-        JSON.parse(JSON.stringify(this.currentStep))
+        row.case_id === this.caseId ? JSON.parse(JSON.stringify(row)) : row // 如果是引用用例下的步骤，就不深拷贝，就不必再取请求和加载被引用用例下的步骤列表
       )
     },
 
