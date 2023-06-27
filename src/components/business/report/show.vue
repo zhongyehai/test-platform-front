@@ -333,14 +333,14 @@ import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import { getCase as apiGetCase, caseRun as apiCaseRun, caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
 
 import { deleteReport as deleteWebUiReport, getReport as webUiGetReport,
-  reportStepDetail as appUiReportStepDetail } from '@/apis/webUiTest/report'
+  reportStepDetail as webUiReportStepDetail } from '@/apis/webUiTest/report'
 import { getCase as webUiGetCase, caseRun as webUiCaseRun, caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
 import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 
 import { deleteReport as deleteAppUiReport, getReport as appUiGetReport,
-  reportStepDetail as webUiReportStepDetail } from '@/apis/appUiTest/report'
+  reportStepDetail as appUiReportStepDetail } from '@/apis/appUiTest/report'
 import { getCase as appUiGetCase, caseRun as appUiCaseRun, caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
 import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
