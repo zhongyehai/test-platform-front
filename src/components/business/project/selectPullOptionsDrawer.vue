@@ -1,10 +1,6 @@
 <template>
 
-  <el-dialog
-    title="选择需要拉取的字段"
-    :visible.sync="pullDialogIsShow"
-    width="50%"
-  >
+  <el-dialog title="选择需要拉取的内容" :visible.sync="pullDialogIsShow" width="55%">
 
     <div style="margin-bottom: 20px">
       {{ `从${pullProject.yapi_id ? 'yapi' : 'swagger'}拉取此服务下的模块、接口及接口的以下字段` }}
@@ -33,12 +29,14 @@ import { yapiPull } from '@/apis/assist/yapi'
 import { swaggerPull } from '@/apis/assist/swagger'
 
 export default {
-  name: 'Project',
+  name: 'SelectPullOptionsDrawer',
   // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
   data() {
     return {
       apiOptions: {
+        controller_name: '更新模块名',
+        api_name: '更新接口名',
         headers: '请求头',
         query: '查询字符串',
         json: '请求体-json',
@@ -58,6 +56,7 @@ export default {
       if (_type === 'pullProjectData') {
         this.pullProject = project
         this.checkedOptions = ['query', 'json', 'form', 'response']
+        this.pullButtonIsLoading = false
         this.pullDialogIsShow = true
       }
     })

@@ -358,7 +358,7 @@ export default {
       }).then(response => {
         this.$set(this.currentTask, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id, response.data.report_id)
         }
       })
     },
