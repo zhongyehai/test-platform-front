@@ -67,7 +67,7 @@
 
             <el-descriptions-item>
               <template slot="label"> 发送时间 </template>
-              {{ stepData.stat.request_at }}
+              {{ stepData.stat ? stepData.stat.request_at : '-' }}
             </el-descriptions-item>
           </el-descriptions>
 
@@ -251,7 +251,7 @@
           <el-descriptions class="margin-top" :column="2" border>
             <el-descriptions-item>
               <template slot="label"> 响应时间 </template>
-              {{ stepData.stat.response_at }}
+              {{ stepData.stat ? stepData.stat.response_at : '-' }}
             </el-descriptions-item>
 
             <el-descriptions-item>
@@ -331,8 +331,11 @@
                 <template slot="title">
                   <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                 </template>
-                <div class="el-collapse-item-content">
+                <div v-show="stepData.before" class="el-collapse-item-content">
                   <el-image :src="'data:image/jpg;base64,' + stepData.before " />
+                </div>
+                <div v-show="!stepData.before" class="el-collapse-item-content">
+                  <span>无</span>
                 </div>
               </el-collapse-item>
             </el-col>
@@ -341,8 +344,11 @@
                 <template slot="title">
                   <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                 </template>
-                <div class="el-collapse-item-content">
+                <div v-show="stepData.after" class="el-collapse-item-content">
                   <el-image :src="'data:image/jpg;base64,' + stepData.after " />
+                </div>
+                <div v-show="!stepData.after" class="el-collapse-item-content">
+                  <span>无</span>
                 </div>
               </el-collapse-item>
             </el-col>
@@ -432,7 +438,6 @@
         </el-row>
 
       </el-collapse-item>
-
     </el-collapse>
   </div>
 

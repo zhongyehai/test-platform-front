@@ -7,7 +7,16 @@
       size="mini"
       type="primary"
       style="display:inline-block;float: right;margin: 10px;padding-left: 10px"
-      @click.native="download()"
+      @click.native="showDownloadAsContactOptionDialog()"
+    >导出为通讯录文件
+    </el-button>
+
+    <el-button
+      v-show="makedUserDictList.length > 0"
+      size="mini"
+      type="primary"
+      style="display:inline-block;float: right;margin: 10px;padding-left: 10px"
+      @click.native="downloadAsExcel()"
     >导出为EXCEL
     </el-button>
 
@@ -29,7 +38,7 @@
       <el-form>
         <el-form-item label="选择语言：" label-width="100px">
           <el-radio-group v-model="language">
-            <el-radio v-for="(value, key) in languageDict" :label="key">{{ value }}</el-radio>
+            <el-radio v-for="(languageValue, languageKey) in languageDict" :label="languageKey">{{ languageValue }}</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -62,30 +71,52 @@
       :data="makedUserDictList"
       :height="autoHeight"
       stripe
+      @cell-dblclick="cellDblclick"
     >
 
-      <el-table-column label="序号">
+      <el-table-column label="序号" width="50px">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
 
       <el-table-column
-        v-for="key in allOptionKeys"
-        :label="allOptionsMapping[key]"
+        v-for="optionKey in allSelectOptionKeys"
+        show-overflow-tooltip
+        :label="allOptionsMapping[optionKey]"
+        :prop="optionKey"
+        :min-width="`${allOptionKeys.length / allOptionsMapping.length}%`"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row[key] }}</span>
+          <span>{{ scope.row[optionKey] }}</span>
         </template>
       </el-table-column>
     </el-table>
 
+    <el-dialog
+      title="导出为通讯录选项"
+      append-to-body
+      :visible.sync="showDownloadAsContactOption"
+      :close-on-click-modal="false"
+      width="30%"
+    >
+      <el-form>
+        <el-form-item label="导出条数：" label-width="100px" style="display:inline-block;margin-top: 15px">
+          <el-input-number v-model="downloadAsContactCount" :min="1" :max="makedUserDictList.length" size="mini" />
+          <span style="margin-left: 20px">共{{ makedUserDictList.length }}条数据</span>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button v-loading="downloadAsContactIsLoading" size="mini" type="primary" @click="downloadAsContact()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 
 </template>
 
 <script>
-import { makeUser } from '@/apis/tools/makeUser'
+import { makeUser, exportAsContact } from '@/apis/tools/makeUser'
 import { getConfigByName } from '@/apis/config/config'
 
 export default {
@@ -94,6 +125,11 @@ export default {
     return {
       drawerIsShow: true, // 抽屉的显示状态
       direction: 'rtl', // 抽屉打开方式
+
+      showDownloadAsContactOption: false,
+      downloadAsContactIsLoading: false,
+      downloadAsContactCount: 0,
+
       makeLoadingIsShow: false,
       isIndeterminate: true,
       language: '',
@@ -103,6 +139,7 @@ export default {
       checkedData: ['name', 'ssn', 'phone_number', 'credit_card_number', 'company_email', 'company', 'address'], // 用户选中的项
       allOptionsMapping: [], // 所有项和对应的值
       allOptionKeys: [], // 所有项的key
+      allSelectOptionKeys: [], // 所有选中的key
       makedUserDictList: [], // 接口返回的生成的用户信息
       autoHeight: window.innerHeight * 0.7 // 获取表格能渲染的高度, 屏幕的70%
     }
@@ -139,8 +176,8 @@ export default {
     // 导出的表头
     getExportHeadersList() {
       const exportHeadersList = []
-      for (const index in this.allOptionKeys) {
-        const key = this.allOptionKeys[index]
+      for (const index in this.allSelectOptionKeys) {
+        const key = this.allSelectOptionKeys[index]
         exportHeadersList.push(this.allOptionsMapping[key])
       }
       return exportHeadersList
@@ -168,19 +205,58 @@ export default {
       ).then(response => {
         this.makeLoadingIsShow = false
         this.makedUserDictList = response.data
-        this.allOptionKeys = this.checkedData // 方便渲染列表，把用户选中的项记录下来
+        this.allSelectOptionKeys = this.checkedData // 方便渲染列表，把用户选中的项记录下来
         this.drawerIsShow = false
       })
     },
 
+    // 双击复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      if (typeof (data) === 'string') {
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
+    },
+
     // 导出为excel
-    download() {
+    downloadAsExcel() {
       import('@/vendor/Export2Excel').then(excel => {
         excel.export_json_to_excel({
           header: this.getExportHeadersList(), // 表头
           data: this.getExportContentList(), // 数据 [[value1, value2], [value1, value2]]
           filename: '用户信息'
         })
+      })
+    },
+
+    showDownloadAsContactOptionDialog() {
+      this.showDownloadAsContactOption = true
+      this.downloadAsContactCount = this.makedUserDictList.length
+    },
+
+    // 导出为通讯录文件
+    downloadAsContact() {
+      this.downloadAsContactIsLoading = true
+      exportAsContact({
+        'language': this.languageDict[this.language],
+        'count': this.downloadAsContactCount,
+        'data_list': this.makedUserDictList
+      }).then(response => {
+        this.downloadAsContactIsLoading = false
+        this.showDownloadAsContactOption = false
+        const blob = new Blob([response], {
+          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+        })
+        // 保存文件到本地
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob) // 生成一个url
+        a.download = '通讯录.vcf'
+        a.click()
       })
     }
   }

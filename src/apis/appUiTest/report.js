@@ -2,6 +2,7 @@ import request from '@/utils/request' // 加载请求配置文件
 import { baseDirAppUiTest } from '@/apis/base'
 
 const reportDir = baseDirAppUiTest + '/report'
+const reportCaseDir = baseDirAppUiTest + '/report/case'
 const reportStepDir = baseDirAppUiTest + '/report/step'
 
 function Func(method, data = null, params = null) {
@@ -31,6 +32,16 @@ export function reportStatus(params) {
 // 获取运行批次中要展示的报告id
 export function reportShowId(params) {
   return request({ url: reportDir + '/showId', method: 'get', data: null, params: params })
+}
+
+// 报告用例列表
+export function reportCaseList(params) {
+  return request({ url: reportCaseDir + '/list', method: 'get', data: null, params: params })
+}
+
+// 报告用例数据
+export function reportCaseDetail(params) {
+  return request({ url: reportCaseDir, method: 'get', data: null, params: params })
 }
 
 // 报告步骤列表

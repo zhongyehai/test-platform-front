@@ -2,7 +2,7 @@
   <div>
 
     <el-dialog
-      width="70%"
+      width="85%"
       title="测试执行进度"
       :visible.sync="processIsShow"
       :close-on-click-modal="false"
@@ -22,11 +22,11 @@
         </el-steps>
 
         <div>
-          <div v-show="activeProcess === 0" style="margin-top: 50px; text-align: center">
+          <div v-show="activeProcess === 0" style="margin-top: 20px; text-align: center">
             <div>正在触发执行测试...</div>
           </div>
 
-          <div v-show="activeProcess === 1" style="margin-top: 50px; text-align: center">
+          <div v-show="activeProcess === 1" style="margin-top: 20px; text-align: center">
             <div>正在解析数据...</div>
             <div>若一直卡在此节点</div>
             <div>1、可能是数据较多，解析确实需要花一些时间</div>
@@ -35,52 +35,98 @@
 
           <div v-show="activeProcess === 2">
             <div v-show="reportId">
-              <el-table
-                :data="reportStepDataList"
-                :row-class-name="tableRowClassName"
-                :height="tableHeight"
-                size="mini"
-              >
-                <el-table-column prop="num" label="序号" align="left" min-width="5%">
-                  <template slot-scope="scope">
-                    <span> {{ scope.$index + 1 }} </span>
-                  </template>
-                </el-table-column>
+              <el-row>
+                <el-col style="width: 35%; border:3px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+                  <el-tabs v-model="caseTab">
+                    <el-tab-pane :label="caseTab" :name="caseTab">
+                      <el-table
+                        :data="reportCaseDataList"
+                        :row-class-name="tableRowClassName"
+                        :height="tableHeight"
+                        size="mini"
+                        @row-click="clickCase"
+                      >
+                        <el-table-column prop="num" label="序号" align="center" min-width="15%">
+                          <template slot-scope="scope">
+                            <span> {{ scope.$index + 1 }} </span>
+                          </template>
+                        </el-table-column>
+                        <el-table-column prop="result" label="状态" align="center" min-width="20%">
+                          <template slot-scope="scope">
+                            <el-tag
+                              size="small"
+                              :type="resultTagMapping[scope.row.result]"
+                            >{{ resultMapping[scope.row.result] }}</el-tag>
+                          </template>
+                        </el-table-column>
 
-                <el-table-column prop="result" label="执行结果" min-width="10%">
-                  <template slot-scope="scope">
-                    <el-tag
-                      size="small"
-                      :type="resultTagMapping[scope.row.result]"
-                    >{{ resultMapping[scope.row.result] }}</el-tag>
-                  </template>
-                </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="name" label="用例名" align="left" min-width="55%">
+                          <template slot-scope="scope">
+                            <span
+                              :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
+                            > {{ scope.row.name }} </span>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                    </el-tab-pane>
+                  </el-tabs>
 
-                <el-table-column prop="name" label="步骤名" min-width="70%">
-                  <template slot-scope="scope">
-                    <span
-                      :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
-                    > {{ scope.row.name }} </span>
-                  </template>
-                </el-table-column>
+                </el-col>
 
-                <el-table-column prop="process" label="执行节点" min-width="10%">
-                  <template slot-scope="scope">
-                    <el-tag size="small" type="info">{{ processMapping[scope.row.process] }}</el-tag>
-                  </template>
-                </el-table-column>
+                <el-col style="width: 64%; margin-left: 5px">
+                  <el-tabs v-model="stepTab">
+                    <el-tab-pane :label="stepTab" :name="stepTab">
+                      <el-table
+                        :data="reportStepDataList"
+                        :row-class-name="tableRowClassName"
+                        :height="tableHeight"
+                        size="mini"
+                      >
+                        <el-table-column prop="num" label="序号" align="center" min-width="10%">
+                          <template slot-scope="scope">
+                            <span> {{ scope.$index + 1 }} </span>
+                          </template>
+                        </el-table-column>
 
-                <el-table-column prop="result" label="操作" min-width="5%">
-                  <template slot-scope="scope">
-                    <el-button
-                      v-show="scope.row.result !== 'waite'"
-                      type="text"
-                      size="mini"
-                      @click="showStepData(scope.row.id)"
-                    >查看</el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
+                        <el-table-column prop="result" label="状态" align="center" min-width="10%">
+                          <template slot-scope="scope">
+                            <el-tag
+                              size="small"
+                              :type="resultTagMapping[scope.row.result]"
+                            >{{ resultMapping[scope.row.result] }}</el-tag>
+                          </template>
+                        </el-table-column>
+
+                        <el-table-column show-overflow-tooltip prop="name" align="left" label="步骤名" min-width="55%">
+                          <template slot-scope="scope">
+                            <span
+                              :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
+                            > {{ scope.row.name }} </span>
+                          </template>
+                        </el-table-column>
+
+                        <el-table-column prop="process" align="center" label="节点" min-width="15%">
+                          <template slot-scope="scope">
+                            <el-tag size="small" type="info">{{ processMapping[scope.row.process] }}</el-tag>
+                          </template>
+                        </el-table-column>
+
+                        <el-table-column prop="result" align="center" label="操作" min-width="10%">
+                          <template slot-scope="scope">
+                            <el-button
+                              v-show="scope.row.result !== 'waite'"
+                              type="text"
+                              size="mini"
+                              @click="showStepData(scope.row.id)"
+                            >查看</el-button>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                    </el-tab-pane>
+                  </el-tabs>
+                </el-col>
+              </el-row>
+
             </div>
 
             <div v-show="!reportId" style="margin-top: 50px; text-align: center">
@@ -121,6 +167,8 @@
 import {
   reportStatus as apiReportStatus,
   reportShowId as apiGetReport,
+  reportCaseList as apiReportCaseList,
+  reportCaseDetail as apiReportCaseDetail,
   reportStepList as apiReportStepList,
   reportStepDetail as apiReportStepDetail
 } from '@/apis/apiTest/report'
@@ -128,6 +176,8 @@ import {
 import {
   reportStatus as appUiReportStatus,
   reportShowId as appUiGetReport,
+  reportCaseList as appUiReportCaseList,
+  reportCaseDetail as appUiReportCaseDetail,
   reportStepList as appUiReportStepList,
   reportStepDetail as appUiReportStepDetail
 } from '@/apis/appUiTest/report'
@@ -135,6 +185,8 @@ import {
 import {
   reportStatus as webUiReportStatus,
   reportShowId as webUiGetReport,
+  reportCaseList as webUiReportCaseList,
+  reportCaseDetail as webUiReportCaseDetail,
   reportStepList as webUiReportStepList,
   reportStepDetail as webUiReportStepDetail
 } from '@/apis/webUiTest/report'
@@ -160,9 +212,10 @@ export default {
         4: 'finish'
       },
       tableHeight: '',
-      activeProcess: 0,
+      activeProcess: 2, // 0,
       activeStatus: 1,
       reportId: 1,
+      reportCaseId: undefined,
       processMapping: {
         'waite': '等待解析',
         'parse': '解析数据',
@@ -173,7 +226,7 @@ export default {
         'validate': '断言'
       },
       resultMapping: {
-        'waite': '等待执行',
+        'waite': '等待',
         'running': '执行中',
         'fail': '不通过',
         'success': '通过',
@@ -188,7 +241,11 @@ export default {
         'skip': 'info',
         'error': 'warning'
       },
-      reportStepDataList: [], // [(24, '登录', 'before', 'running')]
+      reportCaseDataList: [], // [{ 'id': 1, 'name': '用例1', 'result': 'success' }],
+      caseTab: '用例列表',
+      stepTab: '步骤列表',
+      reportCaseData: {},
+      reportStepDataList: [], // [{ 'id': 1, 'name': '步骤1', 'process': 'before', 'result': 'success' }]
       reportStepData: {},
       direction: 'rtl',
       reportStepDetailIsShow: false,
@@ -199,6 +256,8 @@ export default {
 
       reportStatusUrl: '',
       reportShowIdUrl: '',
+      reportCaseListUrl: '',
+      reportCaseDetailUrl: '',
       reportStepListUrl: '',
       reportStepDetailUrl: ''
     }
@@ -224,16 +283,22 @@ export default {
     if (this.dataType === 'api') {
       this.reportStatusUrl = apiReportStatus
       this.reportShowIdUrl = apiGetReport
+      this.reportCaseListUrl = apiReportCaseList
+      this.reportCaseDetailUrl = apiReportCaseDetail
       this.reportStepListUrl = apiReportStepList
       this.reportStepDetailUrl = apiReportStepDetail
     } else if (this.dataType === 'webUi') {
       this.reportStatusUrl = webUiReportStatus
       this.reportShowIdUrl = webUiGetReport
+      this.reportCaseListUrl = webUiReportCaseList
+      this.reportCaseDetailUrl = webUiReportCaseDetail
       this.reportStepListUrl = webUiReportStepList
       this.reportStepDetailUrl = webUiReportStepDetail
     } else {
       this.reportStatusUrl = appUiReportStatus
       this.reportShowIdUrl = appUiGetReport
+      this.reportCaseListUrl = appUiReportCaseList
+      this.reportCaseDetailUrl = appUiReportCaseDetail
       this.reportStepListUrl = appUiReportStepList
       this.reportStepDetailUrl = appUiReportStepDetail
     }
@@ -246,6 +311,7 @@ export default {
         this.activeProcess = 1
         this.activeStatus = 1
         this.reportId = report_id
+        this.reportCaseId = undefined
         this.tableHeight = window.innerHeight * 0.85
         this.processIsShow = true
         this.getReport(batch_id)
@@ -278,6 +344,10 @@ export default {
       ))
     },
 
+    clickCase(row, column, event) {
+      this.reportCaseId = row.id
+    },
+
     getReport(batch_id) {
       // 触发运行成功，每1.5秒查询一次，
       // 最后都没查出结果，则停止查询，提示用户去测试报告页查看
@@ -292,8 +362,18 @@ export default {
             if (response.status === 200) {
               that.activeProcess = response.data.process
               that.activeStatus = response.data.status
-              if (that.reportId && that.activeProcess === 2) { // 执行中，则获取执行步骤
-                that.reportStepListUrl({ report_id: that.reportId }).then(response => {
+
+              if (that.reportId && that.activeProcess === 2) { // 执行中
+                // 获取执行的用例
+                that.reportCaseListUrl({ report_id: that.reportId }).then(response => {
+                  that.reportCaseDataList = response.data
+                  if (!that.reportCaseId) {
+                    that.reportCaseId = response.data[0].id
+                  }
+                })
+
+                // 获取指定用例的执行步骤
+                that.reportStepListUrl({ report_case_id: that.reportCaseId }).then(response => {
                   that.reportStepDataList = response.data
                 })
               } else if (that.activeProcess === 3 && that.activeStatus === 2) {

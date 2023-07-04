@@ -108,7 +108,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" :label="`${titleType}名称`" min-width="20%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" :label="`${titleType}名称`" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -116,9 +116,10 @@
 
       <el-table-column
         v-if="dataType === 'api'"
-        :show-overflow-tooltip="true"
+        show-overflow-tooltip
         align="center"
         label="swagger"
+        prop="swagger"
         min-width="35%"
       >
         <template slot-scope="scope">
@@ -139,10 +140,13 @@
         min-width="10%"
       >
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" placement="top-start">
-            <div slot="content">
-              <div>{{ scope.row.last_pull_status !== 1 ? '点击查看详情' : '' }}</div>
-            </div>
+          <el-tooltip
+            v-if="scope.row.last_pull_status !== 1"
+            content="点击查看详情"
+            class="item"
+            effect="dark"
+            placement="top-start"
+          >
             <el-tag
               :type="pullStatusTagType[scope.row.last_pull_status]"
               @click="getSwaggerPullLog(scope.row)"
@@ -150,6 +154,15 @@
               {{ pullStatusContent[scope.row.last_pull_status] }}
             </el-tag>
           </el-tooltip>
+
+          <el-tag
+            v-else
+            :type="pullStatusTagType[scope.row.last_pull_status]"
+            @click="getSwaggerPullLog(scope.row)"
+          >
+            {{ pullStatusContent[scope.row.last_pull_status] }}
+          </el-tag>
+
         </template>
       </el-table-column>
 
@@ -278,7 +291,7 @@ import Sortable from 'sortablejs'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination/index.vue'
 import projectDrawer from '@/components/business/project/drawer.vue'
-import pullDrawerView from '@/components/business/project/pullDrawer.vue'
+import pullDrawerView from '@/components/business/project/selectPullOptionsDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
 import showSwaggerPullLog from '@/components/business/project/showSwaggerPullLog.vue'
 import { getConfigByName } from '@/apis/config/config'

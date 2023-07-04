@@ -176,13 +176,13 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否生成" align="center" min-width="8%">
+              <el-table-column label="是否完成" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <el-tag
                     size="small"
                     :type="scope.row.process === 3 && scope.row.status === 2 ? 'success' : 'warning'"
                   >
-                    {{ scope.row.process === 3 && scope.row.status === 2 ? '已生成' : '未生成' }}
+                    {{ scope.row.process === 3 && scope.row.status === 2 ? '已完成' : '执行中' }}
                   </el-tag>
                 </template>
               </el-table-column>
@@ -190,23 +190,23 @@
               <el-table-column label="操作" align="center" min-width="12%">
                 <template slot-scope="scope">
 
-                  <!--查看报告-->
+                  <!--重跑-->
+                  <!-- v-show="scope.row.run_type !== 'api' && (scope.row.process === 3 && scope.row.status === 2 || isAdmin)"-->
                   <el-button
-                    v-show="scope.row.process === 3 && scope.row.status === 2"
+                    v-show="scope.row.run_type !== 'api' || isAdmin"
                     type="text"
                     size="mini"
-                    @click.native="openReportById(scope.row.id)"
-                  >查看
+                    @click.native="reRun(scope.row)"
+                  >重跑
                   </el-button>
 
-                  <!--重跑-->
+                  <!--查看报告-->
                   <el-button
-                    v-show="scope.row.process === 3 && scope.row.status === 2 || isAdmin"
                     type="text"
                     size="mini"
                     style="margin-right: 10px"
-                    @click.native="reRun(scope.row)"
-                  >重跑
+                    @click.native="openReportById(scope.row.id)"
+                  >查看
                   </el-button>
 
                   <!-- 删除报告 -->
@@ -527,7 +527,7 @@ export default {
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id, response.data.report_id)
         }
       })
     },
@@ -627,7 +627,9 @@ export default {
           selectedIdList.push(report.id)
         })
       }
+      this.tableIsLoading = true
       this.deleteReportUrl({ id: selectedIdList }).then(response => {
+        this.tableIsLoading = false
         if (this.showMessage(this, response)) {
           this.getReportList()
         }

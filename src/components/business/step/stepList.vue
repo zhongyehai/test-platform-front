@@ -333,19 +333,15 @@ export default {
       getCaseUrl: ''
     }
   },
-  watch: {
-    'caseId': {
-      handler(newVal, oldVal) {
-        this.expands = []
-        this.stepList = []
-        if (newVal) {
-          this.getStepList()
-        }
-      }
-    }
-  },
 
   mounted() {
+    // 打开用例编辑框，获取步骤列表
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, currentCase) => {
+      if (_type === 'caseInfo' && command === 'edit') {
+        this.getStepList(currentCase.id)
+      }
+    })
+
     // 步骤提交事件，获取步骤列表
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, caseId) => {
       if (_type === 'stepInfo') {
@@ -388,7 +384,7 @@ export default {
 
     this.tableHeight = window.innerHeight * 0.80
 
-    // 初始化父组件传过来的步骤列表
+    // 擦混关键组件时，初始化父组件传过来的步骤列表
     if (this.caseId) {
       this.getStepList()
     }
@@ -476,6 +472,8 @@ export default {
       this.stepListUrl({ 'caseId': case_id || this.caseId }).then(response => {
         this.tableLoadingIsShow = false
 
+        this.expands = []
+        this.stepList = []
         this.stepList = response.data.data
 
         this.oldList = this.stepList.map(v => v.id)

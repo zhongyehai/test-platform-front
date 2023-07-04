@@ -289,7 +289,8 @@ import {
   caseRun as apiCaseRun,
   deleteCase as apiDeleteCase,
   putCaseIsRun as apiPutCaseIsRun,
-  caseSort as apiCaseSort
+  caseSort as apiCaseSort,
+  copyCase as apiCopyCase
 } from '@/apis/apiTest/case'
 
 import {
@@ -297,7 +298,8 @@ import {
   caseRun as webUiCaseRun,
   deleteCase as webUiDeleteCase,
   putCaseIsRun as webUiPutCaseIsRun,
-  caseSort as webUiCaseSort
+  caseSort as webUiCaseSort,
+  copyCase as webUiCopyCase
 } from '@/apis/webUiTest/case'
 import { executeList as webUiExecuteList } from '@/apis/webUiTest/step'
 
@@ -306,7 +308,8 @@ import {
   caseRun as appUiCaseRun,
   deleteCase as appUiDeleteCase,
   putCaseIsRun as appUiPutCaseIsRun,
-  caseSort as appUiCaseSort
+  caseSort as appUiCaseSort,
+  copyCase as appUiCopyCase
 } from '@/apis/appUiTest/case'
 import { executeList as appUiExecuteList } from '@/apis/appUiTest/step'
 
@@ -361,6 +364,7 @@ export default {
 
       caseListUrl: '',
       caseRunUrl: '',
+      copyCaseUrl: '',
       deleteCaseUrl: '',
       putCaseIsRunUrl: '',
       caseSortUrl: '',
@@ -425,12 +429,14 @@ export default {
     if (this.dataType === 'api') {
       this.caseListUrl = apiCaseList
       this.caseRunUrl = apiCaseRun
+      this.copyCaseUrl = apiCopyCase
       this.deleteCaseUrl = apiDeleteCase
       this.putCaseIsRunUrl = apiPutCaseIsRun
       this.caseSortUrl = apiCaseSort
     } else if (this.dataType === 'webUi') {
       this.caseListUrl = webUiCaseList
       this.caseRunUrl = webUiCaseRun
+      this.copyCaseUrl = webUiCopyCase
       this.deleteCaseUrl = webUiDeleteCase
       this.putCaseIsRunUrl = webUiPutCaseIsRun
       this.caseSortUrl = webUiCaseSort
@@ -438,6 +444,7 @@ export default {
     } else {
       this.caseListUrl = appUiCaseList
       this.caseRunUrl = appUiCaseRun
+      this.copyCaseUrl = appUiCopyCase
       this.deleteCaseUrl = appUiDeleteCase
       this.putCaseIsRunUrl = appUiPutCaseIsRun
       this.caseSortUrl = appUiCaseSort
@@ -516,18 +523,32 @@ export default {
 
     // 复制用例
     copyCase(caseData) {
-      this.tempCase = caseData
-      this.tempCase.num = ''
-      this.tableLoadingIsShow = true
-      this.$bus.$emit(
-        this.$busEvents.drawerIsShow,
-        'caseInfo',
-        'copy',
-        JSON.parse(JSON.stringify(this.tempCase)),
-        'caseIndex'
-      )
-      this.tableLoadingIsShow = false
-      this.$set(caseData, 'copyPopoverIsShow', false)
+      // this.tempCase = caseData
+      // this.tempCase.num = ''
+      // this.tableLoadingIsShow = true
+      // this.$bus.$emit(
+      //   this.$busEvents.drawerIsShow,
+      //   'caseInfo',
+      //   'copy',
+      //   JSON.parse(JSON.stringify(this.tempCase)),
+      //   'caseIndex'
+      // )
+      //
+      // this.$set(caseData, 'copyPopoverIsShow', false)
+      //
+      //
+
+      this.copyCaseUrl({ id: caseData.id }).then(response => {
+        this.tableLoadingIsShow = false
+        this.$set(caseData, 'copyPopoverIsShow', false)
+
+        if (this.showMessage(this, response)) {
+          this.tempCase = response.data.case
+
+          this.getCaseList()
+          this.editCase(this.tempCase) // 复制完毕后打开编辑框
+        }
+      })
     },
 
     cancelDeletePopover(caseData) {

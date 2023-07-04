@@ -264,11 +264,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button size="mini" @click="dialogIsShow = false">取 消</el-button>
-      <el-button
-        size="mini"
-        type="primary"
-        @click="runData()"
-      >确 定</el-button>
+      <el-button v-loading="submitButtonIsLoading" size="mini" type="primary" @click="runData()">确 定</el-button>
     </span>
 
   </el-dialog>
@@ -296,6 +292,7 @@ export default {
   data() {
     return {
       dialogIsShow: false,
+      submitButtonIsLoading: false,
       runModeData: {},
 
       runBrowser: undefined,
@@ -348,7 +345,9 @@ export default {
             headers: []
           }
         }
+
         this.showTabName = 'selectRunEnv'
+        this.submitButtonIsLoading = false
         this.dialogIsShow = true
       }
     })
@@ -402,6 +401,7 @@ export default {
             noReset: this.noReset,
             temp_variables: temp_variables
           })
+        this.submitButtonIsLoading = true
         this.dialogIsShow = false
       } else {
         Message.warning('请选择运行环境')

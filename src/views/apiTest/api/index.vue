@@ -148,11 +148,7 @@
                 <div slot="content">
                   <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
                 </div>
-                <el-tag
-                  v-if="scope.row.quote_count"
-                  :loading="queryApiMsgBelongToStepIsLoading"
-                  @click="getApiMsgBelongToStep(scope.row)"
-                >
+                <el-tag v-if="scope.row.quote_count" @click="getApiMsgBelongToStep(scope.row)">
                   {{ scope.row.quote_count }}
                 </el-tag>
                 <el-tag v-else type="info">0</el-tag>
@@ -302,8 +298,6 @@ export default {
         'P2': '#67C23A'
       },
 
-      queryApiMsgBelongToStepIsLoading: false,
-
       // 拖拽排序参数
       sortable: null,
       oldList: [],
@@ -368,9 +362,9 @@ export default {
 
     // 获取接口使用情况
     getApiMsgBelongToStep(row) {
-      this.queryApiMsgBelongToStepIsLoading = true
+      this.tableLoadingIsShow = true
       apiMsgBelongToStep({ id: row.id }).then(response => {
-        this.queryApiMsgBelongToStepIsLoading = false
+        this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
         }

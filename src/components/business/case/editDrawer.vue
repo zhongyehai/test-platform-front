@@ -252,7 +252,6 @@ import stepView from '@/components/business/step/index.vue'
 
 import {
   putCase as apiPutCase,
-  copyCase as apiCopyCase,
   caseRun as apiCaseRun,
   getCase as apiGetCase,
   caseFrom as apiCaseFrom
@@ -261,7 +260,6 @@ import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
 
 import {
   putCase as webUiPutCase,
-  copyCase as webUiCopyCase,
   caseRun as webUiCaseRun,
   getCase as webUiGetCase,
   caseFrom as webUiCaseFrom
@@ -270,7 +268,6 @@ import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
 
 import {
   putCase as appUiPutCase,
-  copyCase as appUiCopyCase,
   caseRun as appUiCaseRun,
   getCase as appUiGetCase,
   caseFrom as appUiCaseFrom
@@ -344,7 +341,6 @@ export default {
       caseFromStr: '', // 用例来源
 
       putCaseUrl: '',
-      copyCaseUrl: '',
       caseRunUrl: '',
       getCaseUrl: '',
       getCaseFromUrl: '',
@@ -389,18 +385,6 @@ export default {
           this.getCaseFrom(currentCase.id)
           this.initUpdateTempCase(currentCase)
           this.activeName = 'stepInFo'
-        } else if (command === 'copy') { // 复制用例
-          this.copyCaseUrl({ id: currentCase.id }).then(response => {
-            if (this.showMessage(this, response)) {
-              this.tempCase = response.data.case
-              this.getCaseFrom(this.tempCase.id)
-              this.drawerType = 'copy'
-              this.drawerIsShow = true
-              this.sendDrawerIsCommit()
-              this.activeName = 'caseInFo'
-            }
-          }
-          )
         }
       }
     })
@@ -497,21 +481,18 @@ export default {
   created() {
     if (this.dataType === 'api') {
       this.putCaseUrl = apiPutCase
-      this.copyCaseUrl = apiCopyCase
       this.caseRunUrl = apiCaseRun
       this.getCaseUrl = apiGetCase
       this.getCaseFromUrl = apiCaseFrom
       this.getCaseSuiteUrl = apiGetCaseSuite
     } else if (this.dataType === 'webUi') {
       this.putCaseUrl = webUiPutCase
-      this.copyCaseUrl = webUiCopyCase
       this.caseRunUrl = webUiCaseRun
       this.getCaseUrl = webUiGetCase
       this.getCaseFromUrl = webUiCaseFrom
       this.getCaseSuiteUrl = webUiGetCaseSuite
     } else {
       this.putCaseUrl = appUiPutCase
-      this.copyCaseUrl = appUiCopyCase
       this.caseRunUrl = appUiCaseRun
       this.getCaseUrl = appUiGetCase
       this.getCaseFromUrl = appUiCaseFrom

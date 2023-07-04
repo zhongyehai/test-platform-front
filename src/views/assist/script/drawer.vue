@@ -83,14 +83,20 @@
     </el-form>
 
     <el-container style="margin-left: 20px;margin-right: 20px">
-      <editor
+      <aceEditor
         v-model="tempScript.script_data"
         :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
         lang="python"
         theme="monokai"
-        :options="{enableSnippets:true, enableBasicAutocompletion: true, enableLiveAutocompletion: true}"
+        :options="{
+          enableBasicAutocompletion: true, //启动代码补全功能
+          enableSnippets: true, //启动代码段
+          enableLiveAutocompletion: true, //启用实时自动完成
+          showPrintMargin: false //去除编辑器里的竖线
+        }"
         @init="editorInit"
       />
+
     </el-container>
 
     <div class="demo-drawer__footer">
@@ -173,12 +179,17 @@
           <el-tab-pane label="执行脚本" name="script">
             <div v-if="debugResultDrawerIsShow">
               <el-container style="margin-left: 20px">
-                <editor
+                <aceEditor
                   v-model="debugResultDetail.script"
                   :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
                   lang="python"
                   theme="monokai"
-                  :options="{enableSnippets:true, enableBasicAutocompletion: true, enableLiveAutocompletion: true}"
+                  :options="{
+                    enableBasicAutocompletion: true, //启动代码补全功能
+                    enableSnippets: true, //启动代码段
+                    enableLiveAutocompletion: true, //启用实时自动完成
+                    showPrintMargin: false //去除编辑器里的竖线
+                  }"
                   @init="editorInit"
                 />
               </el-container>
@@ -193,18 +204,21 @@
 </template>
 
 <script>
+// 引入vue2-ace-editor
+import aceEditor from 'vue2-ace-editor'
+
 import { postScript, putScript, debugScript, getScript } from '@/apis/assist/script'
 import { runEnvList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Drawer',
+  components: {
+    aceEditor
+  },
   props: [
     // eslint-disable-next-line vue/require-prop-types
     'scriptTypeDict', 'useFrom'
   ],
-  components: {
-    editor: require('vue2-ace-editor')
-  },
   data() {
     return {
       direction: 'rtl', // 抽屉打开方式
@@ -379,8 +393,8 @@ export default {
     editorInit() {
       require('brace/ext/language_tools')
       require('brace/mode/python')
-      require('brace/theme/monokai')
       require('brace/snippets/python')
+      require('brace/theme/monokai')
     }
   }
 

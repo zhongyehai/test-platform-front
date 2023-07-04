@@ -1,9 +1,10 @@
 <template>
   <div>
-    <div class="reportShow" style="line-height: 36px;">
 
+    <div class="reportShow" style="line-height: 36px;">
+      <!-- 用例列表组件根据条件加载只能用v-show，不能用v-if -->
       <!-- 有测试报告数据 -->
-      <div v-if="reportData && reportData.details.length > 0">
+      <div v-show="reportData && reportData.stat.testcases.total > 0">
 
         <!-- 第一行，头部信息 -->
         <div class="grid-content" style="background-color: #f5f5f5 !important;">
@@ -12,8 +13,8 @@
             size="mini"
             round
             style="margin-left: 10px; margin-top: 5px;padding: 4px 10px ;"
-            @click="isShowPic()"
-          >{{ picStatus ? '隐藏统计图' : '展示统计图' }}
+            @click="isShowStatImg = !isShowStatImg"
+          >{{ isShowStatImg ? '隐藏统计图' : '展示统计图' }}
           </el-button>
 
           <el-select
@@ -32,21 +33,21 @@
             />
           </el-select>
 
-          <el-select
-            v-model="showStepResultType"
-            placeholder="步骤展示类型"
-            size="mini"
-            style="margin-left: 10px; width: 130px"
-            filterable
-            default-first-option
-          >
-            <el-option
-              v-for="item in showStepResultTypeList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
+          <!--          <el-select-->
+          <!--            v-model="showStepResultType"-->
+          <!--            placeholder="步骤展示类型"-->
+          <!--            size="mini"-->
+          <!--            style="margin-left: 10px; width: 130px"-->
+          <!--            filterable-->
+          <!--            default-first-option-->
+          <!--          >-->
+          <!--            <el-option-->
+          <!--              v-for="item in showStepResultTypeList"-->
+          <!--              :key="item.value"-->
+          <!--              :label="item.label"-->
+          <!--              :value="item.value"-->
+          <!--            />-->
+          <!--          </el-select>-->
 
           <span style="float: right;font-size: 13px;color: #3a8ee6">
             <span v-if="dataType !== 'appUi'" style="margin-right: 10px">环境: {{
@@ -75,6 +76,7 @@
 
             <!-- Python脚本 -->
             <el-button
+              v-show="reRunReport.run_type !== 'api'"
               type="primary"
               size="mini"
               style="margin-right: 10px"
@@ -106,7 +108,7 @@
         </div>
 
         <!-- 第二行，饼图 -->
-        <el-row v-show="picStatus">
+        <el-row v-show="isShowStatImg">
           <!-- 步骤 -->
           <el-col :span="12">
             <div style="height: 200px;float:left;">
@@ -134,146 +136,16 @@
           </el-col>
         </el-row>
 
-        <!-- 第三行，用例和详情 -->
-        <el-row>
-          <!-- 用例、步骤列表 -->
-          <el-col :span="8">
-            <el-scrollbar>
-              <div :style="{height:caseScrollbarHeight}">
-                <el-collapse accordion>
-                  <!-- 遍历用例 -->
-                  <el-collapse-item
-                    v-for="(case_data, case_index) in reportData['details']"
-                    v-show="showCaseResultType === 'all' || showCaseResultType === case_data.success"
-                    :key="case_index"
-                  >
-                    <template slot="title">
-                      <el-tooltip
-                        class="item"
-                        effect="dark"
-                        :content="case_data.records ? `${case_data.records.length}个步骤` : ''"
-                        placement="top-start"
-                      >
-                        <div>
-                          <div
-                            style="font-weight:600 ;font-size: 15px;margin-left: 10px; overflow: hidden"
-                            :style="case_data.success === true ? 'color:#409eff': 'color:rgb(255, 74, 74)'"
-                          > {{ case_data.name }}
-                            <el-button
-                              v-if="case_data.case_id"
-                              style="margin-left: 20px"
-                              size="mini"
-                              type="text"
-                              @click.stop.prevent="showCaseInfo(case_data.case_id)"
-                            >打开用例
-                            </el-button>
-                          </div>
-                        </div>
-                      </el-tooltip>
-                    </template>
-                    <div>
-                      <ol id="test" style="padding:5px;font-family:Times New Roman">
-                        <!-- 遍历步骤 -->
-                        <li
-                          v-for="(step_data, step_index) in case_data['records']"
-                          v-show="showStepResultType === 'all' || showStepResultType === step_data.status"
-                          :key="step_index"
-                          style="list-style-type:none;border-bottom: 1px solid #eee;margin-left: 10px"
-                          :class="{
-                            'active':case_index === showColor[0] && step_index === showColor[1],
-                            'wire': step_index === 0
-                          }"
-                          @click="clickStep(case_index, step_index, step_data.report_step_id)"
-                        >
-                          <div :style="getStepColor(step_data.status)">
-                            <span class="test-name">{{ step_data.name }}</span>
-                            <span class="test-time">{{ step_data.stat.response_time_ms }} ms</span>
-                            <el-tooltip
-                              class="test-status"
-                              effect="dark"
-                              content="打开此步骤所在的用例，可查看和编辑"
-                              placement="top-start"
-                            >
-                              <el-button
-                                v-if="step_data.case_id"
-                                :style="getStepColor(step_data.status)"
-                                size="mini"
-                                type="text"
-                                class="test-status"
-                                @click="showCaseInfo(step_data.case_id)"
-                              >打开用例
-                              </el-button>
-                            </el-tooltip>
-                            <!--                            <el-tooltip-->
-                            <!--                              class="test-status"-->
-                            <!--                              effect="dark"-->
-                            <!--                              content="复制此步骤的数据到剪切板"-->
-                            <!--                              placement="top-start"-->
-                            <!--                            >-->
-                            <!--                              <el-button-->
-                            <!--                                v-if="dataType === 'api'"-->
-                            <!--                                v-clipboard:copy="getCopyData(step_data.meta_datas.data[0])"-->
-                            <!--                                v-clipboard:success="onCopy"-->
-                            <!--                                v-clipboard:error="onError"-->
-                            <!--                                size="mini"-->
-                            <!--                                type="text"-->
-                            <!--                                class="test-status"-->
-                            <!--                                :style="getStepColor(step_data.status)"-->
-                            <!--                              >复制数据-->
-                            <!--                              </el-button>-->
-                            <!--                              <el-button-->
-                            <!--                                v-else-->
-                            <!--                                v-clipboard:copy="getCopyData({-->
-                            <!--                                  extract_msgs: step_data.meta_datas.data[0].extract_msgs,-->
-                            <!--                                  request: step_data.meta_datas.data[0].request,-->
-                            <!--                                  test_action: step_data.meta_datas.data[0].test_action-->
-                            <!--                                })"-->
-                            <!--                                v-clipboard:success="onCopy"-->
-                            <!--                                v-clipboard:error="onError"-->
-                            <!--                                size="mini"-->
-                            <!--                                type="text"-->
-                            <!--                                class="test-status"-->
-                            <!--                                :style="getStepColor(step_data.status)"-->
-                            <!--                              >复制数据-->
-                            <!--                              </el-button>-->
-                            <!--                            </el-tooltip>-->
-
-                            <!--                            <span-->
-                            <!--                              class="test-status"-->
-                            <!--                              style="margin-left: 30px"-->
-                            <!--                              :style="getStepColor(step_data)"-->
-                            <!--                            >{{ resultMapping[step_data.status] }}</span>-->
-                          </div>
-                        </li>
-                      </ol>
-                    </div>
-
-                  </el-collapse-item>
-                </el-collapse>
-              </div>
-            </el-scrollbar>
-          </el-col>
-
-          <!-- 详情页 -->
-          <el-col :span="16">
-            <el-scrollbar>
-              <div :style="{height:caseScrollbarHeight}">
-                <div
-                  style="padding:10px;font-size: 14px;line-height: 25px;width: 100%;position:relative;"
-                >
-                  <showStepView
-                    :data-type="dataType"
-                    :step-data="stepData"
-                  />
-                </div>
-              </div>
-            </el-scrollbar>
-          </el-col>
-        </el-row>
+        <!-- 用例/步骤详情 -->
+        <showCaseAndStepListView
+          :data-type="dataType"
+          :show-case-type="showCaseResultType"
+          :show-step-type="showStepResultType"
+        />
       </div>
 
       <!-- 无测试报告数据，历史的测试报告没有数据 -->
-      <div v-show="!reportData || reportData.details.length === 0" class="str">
+      <div v-show="!reportData || reportData.stat.testcases.total === 0" class="str">
         无运行数据或所有运行数据均已跳过
       </div>
 
@@ -317,31 +189,44 @@
 </template>
 
 <script>
-import vkbeautify from 'vkbeautify' // xml格式化组件
 import hitDrawer from '@/views/assist/hits/drawer'
 import pythonScriptIndex from '@/views/assist/script/index'
 import caseDrawer from '@/components/business/case/editDrawer.vue'
-import showStepView from '@/components/business/report/showStep'
+import showCaseAndStepListView from '@/components/business/report/showCaseAndStepList.vue'
 
 import { runEnvList } from '@/apis/config/runEnv'
-import { deleteReport as deleteApiReport, getReport as apiGetReport,
-  reportStepDetail as apiReportStepDetail } from '@/apis/apiTest/report'
+import {
+  deleteReport as deleteApiReport,
+  getReport as apiGetReport
+} from '@/apis/apiTest/report'
 import { getProject as apiGetProject } from '@/apis/apiTest/project'
 import { runApi as apiRun } from '@/apis/apiTest/api'
 import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
 import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import { getCase as apiGetCase, caseRun as apiCaseRun, caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
 
-import { deleteReport as deleteWebUiReport, getReport as webUiGetReport,
-  reportStepDetail as webUiReportStepDetail } from '@/apis/webUiTest/report'
-import { getCase as webUiGetCase, caseRun as webUiCaseRun, caseProject as webUiGetCaseProject } from '@/apis/webUiTest/case'
+import {
+  deleteReport as deleteWebUiReport,
+  getReport as webUiGetReport
+} from '@/apis/webUiTest/report'
+import {
+  getCase as webUiGetCase,
+  caseRun as webUiCaseRun,
+  caseProject as webUiGetCaseProject
+} from '@/apis/webUiTest/case'
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
 import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 
-import { deleteReport as deleteAppUiReport, getReport as appUiGetReport,
-  reportStepDetail as appUiReportStepDetail } from '@/apis/appUiTest/report'
-import { getCase as appUiGetCase, caseRun as appUiCaseRun, caseProject as appUiGetCaseProject } from '@/apis/appUiTest/case'
+import {
+  deleteReport as deleteAppUiReport,
+  getReport as appUiGetReport
+} from '@/apis/appUiTest/report'
+import {
+  getCase as appUiGetCase,
+  caseRun as appUiCaseRun,
+  caseProject as appUiGetCaseProject
+} from '@/apis/appUiTest/case'
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
 import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
 import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
@@ -357,7 +242,7 @@ export default {
     caseDrawer,
     pythonScriptIndex,
     hitDrawer,
-    showStepView
+    showCaseAndStepListView
   },
   // eslint-disable-next-line vue/require-prop-types
   props: ['dataType'],
@@ -371,62 +256,6 @@ export default {
       envList: [],
       runEnvDict: {},
 
-      stepData: {
-        'case_id': undefined,
-        'name': undefined,
-        'stat': {
-          'response_time_ms': undefined,
-          'elapsed_ms': undefined,
-          'content_size': undefined,
-          'request_at': undefined,
-          'response_at': undefined
-        },
-        'redirect_print': undefined,
-        'variables_mapping': {},
-        'request': {
-          'url': undefined,
-          'method': undefined,
-          'headers': {},
-          'body': {},
-          'timeout': 60,
-          'params': {},
-          'json': {},
-          'data': {},
-          'files': {},
-          'verify': false,
-          'allow_redirects': false
-        },
-        'response': {
-          'ok': true,
-          'url': undefined,
-          'status_code': 200,
-          'reason': 'OK',
-          'cookies': {},
-          'encoding': 'utf-8',
-          'headers': {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Content-Length': '84',
-            'Server': 'Werkzeug/2.0.1 Python/3.9.6',
-            'Date': 'Tue, 20 Jun 2023 05:56:20 GMT'
-          },
-          'content_type': 'text/html; charset=utf-8',
-          'json': {}
-        },
-        'extract_msgs': {},
-        'validation_results': [
-          {
-            'check': 'content.status',
-            'expect': 200,
-            'comparator': '_01equals',
-            'comparator_str': '相等',
-            'check_value': 404,
-            'check_result': 'fail'
-          }
-        ],
-        'before': null,
-        'after': null
-      },
-
       // 选中打开用例
       caseProjectId: '',
       caseSuiteId: '',
@@ -437,21 +266,26 @@ export default {
       defaultShowRequestInFo: ['request_05'], // 接口自动化，请求信息
       defaultShowResponseInFo: ['response_02'], // 接口自动化，响应信息
       defaultShowExecuteInFo: ['execute_01', 'execute_02'], // UI自动化，执行信息
+
+      // 要展示的用例类型
       showCaseResultType: 'all',
       showCaseResultTypeList: [
         { label: '展示全部用例', value: 'all' },
-        { label: '展示成功的用例', value: true },
-        { label: '展示失败的用例', value: false }
+        { label: '展示成功的用例', value: 'success' },
+        { label: '展示失败的用例', value: 'fail' },
+        { label: '展示跳过的用例', value: 'skip' }
       ], // 根据用例结果类型展示报告
 
+      // 要展示的步骤类型
       showStepResultType: 'all',
       showStepResultTypeList: [
         { label: '展示全部步骤', value: 'all' },
         { label: '展示成功的步骤', value: 'success' },
-        { label: '展示失败的步骤', value: 'failure' },
+        { label: '展示失败的步骤', value: 'fail' },
         { label: '展示错误的步骤', value: 'error' },
-        { label: '展示跳过的步骤', value: 'skipped' }
+        { label: '展示跳过的步骤', value: 'skip' }
       ], // 根据步骤结果类型展示报告
+
       caseChartSettings: {
         radius: 80,
         avoidLabelOverlap: false,
@@ -501,7 +335,7 @@ export default {
         }
       },
       caseScrollbarHeight: `${window.innerHeight * 0.85}px`, // 用例和步骤内容的高度
-      picStatus: false, // 是否展示饼图
+      isShowStatImg: false, // 是否展示统计饼图
       showColor: [],
       caseChartData: {
         columns: ['caseName', 'num'],
@@ -545,22 +379,29 @@ export default {
       getReportUrl: '',
       getCaseUrl: '',
       deleteReportUrl: '',
-      getCaseProjectUrl: '',
-      reportStepDetailUrl: ''
+      getCaseProjectUrl: ''
     }
   },
 
   mounted() {
-    // 用例提交成功，请求用例列表
+    // 提交选择运行环境，执行运行
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
       if (_type === 'selectRunEnv' && _runUnit === 'reportShow') {
         this.runCase(runDict)
+      }
+    })
+
+    // 监听列表上的打开用例
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, caseId) => {
+      if (_type === 'reportShowCaseInfo') {
+        this.showCaseEditDrawer(caseId)
       }
     })
   },
 
   beforeDestroy() {
     this.$bus.$off(this.$busEvents.drawerIsCommit)
+    this.$bus.$off(this.$busEvents.drawerIsShow)
   },
 
   created() {
@@ -574,7 +415,6 @@ export default {
       this.getProjectUrl = apiGetProject
       this.deleteReportUrl = deleteApiReport
       this.getCaseProjectUrl = apiGetCaseProject
-      this.reportStepDetailUrl = apiReportStepDetail
     } else if (this.dataType === 'webUi') {
       this.taskRunUrl = webUiRunTask
       this.caseSuiteRunUrl = webUiRunCaseSuite
@@ -584,7 +424,6 @@ export default {
       this.getProjectUrl = webUiGetProject
       this.deleteReportUrl = deleteWebUiReport
       this.getCaseProjectUrl = webUiGetCaseProject
-      this.reportStepDetailUrl = webUiReportStepDetail
     } else {
       this.taskRunUrl = appUiRunTask
       this.caseSuiteRunUrl = appUiRunCaseSuite
@@ -594,7 +433,6 @@ export default {
       this.getProjectUrl = appUiGetProject
       this.deleteReportUrl = deleteAppUiReport
       this.getCaseProjectUrl = appUiGetCaseProject
-      this.reportStepDetailUrl = appUiReportStepDetail
     }
 
     // 获取环境列表
@@ -617,16 +455,8 @@ export default {
       })
     },
 
-    getStepColor(status) {
-      return status === 'success' ? 'color:#19D4AE'
-        : status === true ? 'color:#19D4AE'
-          : status === 'fail' ? 'color:#FA6E86'
-            : status === false ? 'color:#FA6E86'
-              : status === 'skip' ? 'color:#60C0DD' : 'color:#E87C25'
-    },
-
     // 打开用例信息
-    showCaseInfo(caseId) {
+    showCaseEditDrawer(caseId) {
       this.getCaseProjectUrl({ id: caseId }).then(response => {
         this.projectBusinessId = response.data.project.business_id
         this.caseProjectId = response.data.project.id
@@ -654,77 +484,6 @@ export default {
         })
     },
 
-    formatXml(xml) {
-      var text = xml
-      if (xml && xml.length > 0) {
-        text = vkbeautify.xml(xml)
-        // console.log('xml: ', xml)
-        // console.log('text: ', text)
-      }
-      return text
-    },
-
-    // 获取复制的内容，如果是字符串，则直接返回，否则转为字符串后返回
-    getCopyData(data) {
-      if (typeof data === 'string') {
-        return data
-      }
-      return this.jsonToStr(data)
-    },
-
-    // 复制成功
-    onCopy(e) {
-      this.$message.success('内容已复制到剪贴板')
-    },
-
-    // 复制失败
-    onError(e) {
-      this.$message.error('内容复制失败')
-    },
-
-    // 解析字符串为json
-    strToJson(str) {
-      try {
-        return JSON.parse(str)
-      } catch (err) {
-        return str
-      }
-    },
-
-    // json转换为字符串
-    jsonToStr(jsonObj) {
-      try {
-        return JSON.stringify(jsonObj, null, 4)
-      } catch (err) {
-        return jsonObj
-      }
-    },
-
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      const copy_data = typeof (data) === 'string' ? data : JSON.stringify(data)
-      this.$copyText(copy_data).then(
-        function(e) {
-          that.$message.success('复制成功')
-        }
-      )
-    },
-
-    clickStep(i1, i2, report_step_id) {
-      this.showColor = [i1, i2]
-      const loading = this.$loading({
-        lock: true,
-        text: `${this.dataType === 'api' ? '测试报告' : 'ui自动化测试报告包含截图，'}数据较大，所以数据传输会稍久，请耐心等待`,
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
-      this.reportStepDetailUrl({ id: report_step_id }).then(response => {
-        loading.close()
-        this.stepData = response.data.step_data
-      })
-    },
-
     // 获取测试报告具体内容
     getReportDataById() {
       const loading = this.$loading({
@@ -739,26 +498,20 @@ export default {
           this.reRunReport = response.data
           this.reportData = response.data.summary
 
-          // 默认获取第一个步骤的数据
-          if (this.reportData.details.length > 0) {
-            this.clickStep(0, 0, this.reportData.details[0].records[0].report_step_id)
-          }
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'showReportCaseList', this.reRunReport.id)
 
-          // 渲染饼图需要的数据
-          this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
-          this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
-          this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
-          this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
-          this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
-          this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
+          // 渲染饼图需要的数据, 如果是没完成的报告，则饼图统计为0
+          if (this.reportData.stat) {
+            this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
+            this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
+            this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
+            this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
+            this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
+            this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
+          }
         }
       }
       )
-    },
-
-    // 控制是否显示统计图
-    isShowPic() {
-      this.picStatus = !this.picStatus
     },
 
     // 触发重跑
@@ -834,7 +587,7 @@ export default {
         'trigger_type': 'page'
       }).then(response => {
         if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id)
+          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id, response.data.report_id)
         }
       })
     }
@@ -867,34 +620,6 @@ export default {
 .active {
   background: #f7f7f7;
   font-weight: 600;
-}
-
-.case-name {
-  display: inline-block;
-  word-break: break-all;
-  font-size: 14px;
-  width: 100% !important;
-}
-
-.test-name {
-  display: inline-block;
-  word-break: break-all;
-  font-size: 16px;
-  width: 100% !important;
-}
-
-.test-status {
-  text-transform: capitalize;
-  font-size: 13px;
-  float: right !important;
-  margin-right: 20px;
-}
-
-.step-operate {
-  text-transform: capitalize;
-  font-size: 13px;
-  float: right !important;
-  margin-right: 20px;
 }
 
 .grid-content {
