@@ -1,8 +1,23 @@
 <template>
   <el-tabs v-model="activeName">
     <el-tab-pane label="用例信息" name="showCaseInfo">
-      <label>用例描述：</label>
-      <div style="margin-bottom: 20px">{{ caseDesc }}</div>
+      <div v-show="caseId" style="margin-bottom: 20px">
+        <label>用例来源：</label>
+        <el-button
+          v-show="!caseFrom"
+          v-loading="getCaseFromIsLoading"
+          type="primary"
+          size="mini"
+          @click.native="getCaseFrom()"
+        >查看
+        </el-button>
+        <div>{{ caseFrom }}</div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label>用例描述：</label>
+        <div>{{ caseDesc }}</div>
+      </div>
 
       <!-- 跳过条件 -->
       <label>跳过条件：</label>
@@ -111,7 +126,15 @@
 
 <script>
 import showCaseVariables from '@/components/business/case/showCaseVariables.vue'
-
+import {
+  caseFrom as apiCaseFrom
+} from '@/apis/apiTest/case'
+import {
+  caseFrom as webUiCaseFrom
+} from '@/apis/webUiTest/case'
+import {
+  caseFrom as appUiCaseFrom
+} from '@/apis/appUiTest/case'
 export default {
   name: 'ShowCaseDesc',
   components: {
@@ -119,17 +142,42 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'caseDesc', 'caseSkipIf', 'caseVariables', 'caseExtracts', 'projectId'
+    'dataType', 'caseDesc', 'caseSkipIf', 'caseVariables', 'caseExtracts', 'projectId', 'caseId'
   ],
   data() {
     return {
       activeName: 'showCaseInfo',
-      tableHeight: '500'
+      tableHeight: '500',
+      getCaseFromIsLoading: false,
+      caseFrom: undefined,
+      getCaseFromUrl: ''
     }
   },
 
   mounted() {
     this.tableHeight = window.innerHeight * 0.90
+  },
+
+  created() {
+    if (this.dataType === 'api') {
+      this.getCaseFromUrl = apiCaseFrom
+    } else if (this.dataType === 'webUi') {
+      this.getCaseFromUrl = webUiCaseFrom
+    } else {
+      this.getCaseFromUrl = appUiCaseFrom
+    }
+  },
+
+  methods: {
+    getCaseFrom() {
+      this.getCaseFromIsLoading = true
+      this.getCaseFromUrl({ id: this.caseId }).then(response => {
+        this.getCaseFromIsLoading = false
+        if (this.showMessage(this, response)) {
+          this.caseFrom = response.data
+        }
+      })
+    }
   }
 }
 </script>

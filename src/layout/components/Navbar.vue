@@ -86,9 +86,11 @@ export default {
       }
     }
   },
+
   computed: {
     ...mapGetters(['sidebar', 'avatar'])
   },
+
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')

@@ -27,9 +27,13 @@ export default {
     getPermissions() {
       const permissions = localStorage.getItem('permissions')
       this.$busEvents.data.permissions = permissions ? JSON.parse(permissions) : []
+
       // 根据权限更新菜单，自动收缩一下侧边栏，展示效果，否则需要手动进行收缩才会展示
-      this.$store.dispatch('app/toggleSideBar')
-      // this.$store.dispatch('app/toggleSideBar')
+      this.$store.dispatch('app/toggleSideBar') // 先收起/关闭
+      const that = this
+      setTimeout(function() {
+        that.$store.dispatch('app/toggleSideBar') // 等100毫秒再关闭/收起
+      }, 100)
     }
   }
 

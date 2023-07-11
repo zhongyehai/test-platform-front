@@ -31,7 +31,6 @@
           <!--          </el-popover>-->
 
           <el-popover
-            v-show="selectedList.length > 0"
             v-model="showBatchChangeStatusToNotDebugAndNotRun"
             placement="top"
             popper-class="down-popover"
@@ -44,6 +43,7 @@
             </div>
             <el-button
               slot="reference"
+              :disabled="selectedList.length === 0"
               type="primary"
               size="mini"
               style="margin-left: 5px"
@@ -52,7 +52,6 @@
           </el-popover>
 
           <el-popover
-            v-show="selectedList.length > 0"
             v-model="showBatchChangeStatusToDebugPassAndRun"
             placement="top"
             popper-class="down-popover"
@@ -65,6 +64,7 @@
             </div>
             <el-button
               slot="reference"
+              :disabled="selectedList.length === 0"
               type="primary"
               size="mini"
               style="margin-left: 5px"
@@ -73,7 +73,6 @@
           </el-popover>
 
           <el-popover
-            v-show="selectedList.length > 0"
             v-model="showBatchChangeStatusToDebugPassAndNotRun"
             placement="top"
             popper-class="down-popover"
@@ -86,6 +85,7 @@
             </div>
             <el-button
               slot="reference"
+              :disabled="selectedList.length === 0"
               type="primary"
               size="mini"
               style="margin-left: 5px"
@@ -94,7 +94,6 @@
           </el-popover>
 
           <el-popover
-            v-show="selectedList.length > 0"
             v-model="showBatchChangeStatusToNotDebugPassAndNotRun"
             placement="top"
             popper-class="down-popover"
@@ -107,6 +106,7 @@
             </div>
             <el-button
               slot="reference"
+              :disabled="selectedList.length === 0"
               type="primary"
               size="mini"
               style="margin-left: 5px"
@@ -115,7 +115,7 @@
           </el-popover>
 
           <el-button
-            v-show="selectedList.length > 0"
+            :disabled="selectedList.length === 0"
             type="primary"
             size="mini"
             style="margin-left: 5px"

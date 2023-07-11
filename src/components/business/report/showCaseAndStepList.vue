@@ -1,7 +1,7 @@
 <template>
   <div style="margin-left: 5px; margin-right: 5px">
     <el-row>
-      <el-col style="width: 35%; border:3px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+      <el-col style="width: 44%; border:3px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
         <el-tabs v-model="caseListTab">
           <el-tab-pane :label="caseListTab" :name="caseListTab">
             <el-table
@@ -31,14 +31,17 @@
                 <template slot-scope="scope">
                   <span
                     :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
-                  > {{ resultMapping[scope.row.result] }}：{{ scope.row.name }} </span>
+                  >
+                    <!--                    {{ resultMapping[scope.row.result] }}：{{ scope.row.name }} -->
+                    {{ scope.row.name }}
+                  </span>
                 </template>
               </el-table-column>
 
               <el-table-column show-overflow-tooltip prop="duration" label="耗时" align="center" min-width="20%">
                 <template slot-scope="scope">
-                  <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.summary.time.duration || '-' }}秒 </span>
-                  <span v-else> {{ scope.row.summary.elapsed_ms || '-' }}毫秒 </span>
+                  <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.duration || '-' : '-' }}秒 </span>
+                  <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>
                 </template>
               </el-table-column>
 
@@ -61,13 +64,24 @@
         </el-tabs>
       </el-col>
 
-      <el-col style="width: 64%; margin-left: 5px">
-        <el-tabs v-model="stepDataTab">
+      <el-col style="width: 55%; margin-left: 5px">
+        <el-tabs v-show="reportStepDetailIsShow" v-model="stepDataTab">
           <el-tab-pane :label="stepDataTab" :name="stepDataTab">
             <el-scrollbar class="aside_scroll" :style="{height: `${tableHeight}px`}">
               <showStepView
                 :data-type="dataType"
                 :step-data="stepData"
+              />
+            </el-scrollbar>
+          </el-tab-pane>
+        </el-tabs>
+
+        <el-tabs v-show="reportCaseDetailIsShow" v-model="caseDataTab">
+          <el-tab-pane :label="caseDataTab" :name="caseDataTab">
+            <el-scrollbar class="aside_scroll" :style="{height: `${tableHeight}px`}">
+              <showCaseView
+                :data-type="dataType"
+                :case-data="caseData"
               />
             </el-scrollbar>
           </el-tab-pane>
@@ -100,10 +114,11 @@ import {
   reportStepDetail as appUiReportStepDetail
 } from '@/apis/appUiTest/report'
 import showStepView from '@/components/business/report/showStep'
+import showCaseView from '@/components/business/report/showCase'
 
 export default {
   name: 'ShowCaseAndStepList',
-  components: { showStepView },
+  components: { showStepView, showCaseView },
   props: [
     // eslint-disable-next-line vue/require-prop-types
     'dataType', 'showCaseType', 'showStepType'
@@ -114,11 +129,13 @@ export default {
       tableHeight: window.innerHeight * 0.85,
 
       caseListTab: '用例列表',
+      caseDataTab: '用例明细',
       stepDataTab: '步骤明细',
 
       // 展示步骤的数据
       direction: 'rtl',
       reportStepDetailIsShow: false,
+      reportCaseDetailIsShow: false,
       stepData: {
         'case_id': undefined,
         'name': undefined,
@@ -170,20 +187,11 @@ export default {
           'wait_time_out': ''
         },
         'extract_msgs': {},
-        'validation_results': [
-          {
-            'check': 'content.status',
-            'expect': 200,
-            'comparator': '_01equals',
-            'comparator_str': '相等',
-            'check_value': 404,
-            'check_result': 'fail'
-          }
-        ],
+        'validation_results': [],
         'before': null,
         'after': null
       },
-
+      caseData: {},
       resultMapping: {
         'waite': '等待',
         'running': '执行中',
@@ -208,6 +216,7 @@ export default {
       successCaseList: [],
       failCaseList: [],
       skipCaseList: [],
+      errorCaseList: [],
 
       showStepList: [],
       allStepList: [],
@@ -235,6 +244,8 @@ export default {
           this.showCaseList = this.failCaseList
         } else if (newVal === 'skip') {
           this.showCaseList = this.skipCaseList
+        } else if (newVal === 'error') {
+          this.showCaseList = this.errorCaseList
         }
       }
     },
@@ -297,12 +308,12 @@ export default {
     },
 
     // 报告步骤的详细数据
-    showStepData(stepDataId) {
-      this.reportStepDetailUrl({ id: stepDataId }).then(response => {
-        this.stepData = response.data.step_data
-        this.reportStepDetailIsShow = true
-      })
-    },
+    // showStepData(stepDataId) {
+    //   this.reportStepDetailUrl({ id: stepDataId }).then(response => {
+    //     this.stepData = response.data.step_data
+    //     this.reportStepDetailIsShow = true
+    //   })
+    // },
 
     // 点击打开或者收起引用用例
     changeExpandStatus(row, status) {
@@ -318,7 +329,12 @@ export default {
     // 点击用例/步骤
     clickRow(row, column, event) {
       if (row.row_id.indexOf('step') !== -1 && column.property === 'name') { // 点步骤
-        this.showStepData(row.id)
+        this.getStepData(row.id)
+        this.reportCaseDetailIsShow = false
+      } else if (row.row_id.indexOf('case') !== -1 && column.property === 'name') { // 点用例
+        this.caseData = row
+        this.reportStepDetailIsShow = false
+        this.reportCaseDetailIsShow = true
       }
     },
 
@@ -333,7 +349,13 @@ export default {
         this.errorStepList = []
 
         this.reportStepListUrl({ report_case_id: row.id, get_summary: true }).then(response => {
-          this.parseStepList(response.data)
+          // 自动获取第一个步骤的数据
+          if (response.data.length > 0) {
+            this.getStepData(response.data[0].id)
+          }
+
+          this.parseStepList(response.data) // 分状态存储步骤数据
+
           this.expands.push(row.row_id)
           resolve(this.showStepList)
         })
@@ -350,26 +372,37 @@ export default {
       this.reportStepDetailUrl({ id: id }).then(response => {
         loading.close()
         this.stepData = response.data.step_data
+        this.reportStepDetailIsShow = true
       })
     },
 
     // 解析和分状态储存用例列表
     parseCaseList(caseList) {
+      // 展示用例信息
+      if (caseList.length > 0) {
+        this.caseData = caseList[0]
+        this.reportCaseDetailIsShow = true
+      }
       caseList.forEach(caseData => {
-        // 判断用例下有没有步骤
         caseData['row_id'] = `case_${caseData.id}`
-        caseData.children = []
-        const summary = JSON.parse(caseData.summary)
-        caseData.hasStep = summary.stat.total > 0 // 直接跳过的用例、用例下所有步骤都跳过的，total为0
-        caseData.summary = summary
+
+        // 判断用例下有没有步骤
+        if (caseData.result !== 'error') {
+          caseData.children = []
+          const summary = JSON.parse(caseData.summary)
+          caseData.hasStep = summary.stat.total > 0 // 直接跳过的用例、用例下所有步骤都跳过的，total为0
+          caseData.summary = summary
+        }
 
         // 分开储存用例
         if (caseData.result === 'success') {
           this.successCaseList.push(caseData)
         } else if (caseData.result === 'fail') {
           this.failCaseList.push(caseData)
-        } else {
+        } else if (caseData.result === 'skip') {
           this.skipCaseList.push(caseData)
+        } else {
+          this.errorCaseList.push(caseData)
         }
         this.allCaseList.push(caseData)
       })
@@ -403,14 +436,12 @@ export default {
       this.tableIsLoading = true
       this.reportCaseListUrl({ get_summary: true, report_id: report_id }).then(response => {
         this.tableIsLoading = false
-
         this.parseCaseList(response.data)
       })
     },
 
     // 打开数据所在的用例，有可能传入的是用例，也有可能传入的是步骤
     showCaseInfo(row) {
-      console.log(JSON.stringify(row))
       const case_id = row.row_id.indexOf('case') !== -1 ? row.from_id : row.case_id
       this.$bus.$emit(
         this.$busEvents.drawerIsShow,

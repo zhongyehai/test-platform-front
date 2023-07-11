@@ -1,10 +1,10 @@
 <template>
   <div>
-
     <div class="reportShow" style="line-height: 36px;">
       <!-- 用例列表组件根据条件加载只能用v-show，不能用v-if -->
       <!-- 有测试报告数据 -->
-      <div v-show="reportData && reportData.stat.testcases.total > 0">
+      <!--      <div v-show="reportData && reportData.stat.testcases.total > 0">-->
+      <div v-show="reportData && reportData.count_step > 0">
 
         <!-- 第一行，头部信息 -->
         <div class="grid-content" style="background-color: #f5f5f5 !important;">
@@ -56,7 +56,7 @@
             <span style="margin-right: 10px">模式: {{ reportData.is_async === 1 ? '并行运行' : '串行运行' }}</span>
             <span style="margin-right: 10px">开始: {{ reportData.time.start_at }}</span>
             <!-- 执行耗时保留3为小数 -->
-            <span style="margin-right: 10px"> 耗时: {{ reportData.time.duration.toString().slice(0, 5) }} 秒</span>
+            <span style="margin-right: 10px"> 耗时: {{ reportData.time.duration ? reportData.time.duration.toString().slice(0, 5) : '-' }} 秒</span>
 
             <el-button
               v-if="!reportData.success"
