@@ -5,7 +5,7 @@
     size="mini"
     element-loading-text="正在获取数据..."
     element-loading-spinner="el-icon-loading"
-    :data="stepList"
+    :data="stepDataList"
     fit
     row-key="id"
     highlight-current-row
@@ -21,11 +21,12 @@
     <el-table-column :min-width="minWidth.toString() + '%'" />
 
     <el-table-column type="expand" min-width="2%">
-      <template slot-scope="props">
+      <template slot-scope="scope">
         <ExpandStepList
-          :step-list="props.row.children"
+          :ref="`${scope.row.id}_${scope.$index}_${scope.row.quote_case}`"
+          :step-list="scope.row.children"
           :data-type="dataType"
-          :current-case-id="currentCaseId"
+          :current-case-id="scope.row.quote_case"
           :min-width="minWidth + 1"
         />
       </template>
@@ -183,11 +184,20 @@ export default {
       tableLoadingIsShow: false, // 加载状态
       expandIds: [], // 要展开的行数据的id
       selectedDataList: [], // 通过复选框勾选的数据
-
+      stepDataList: this.stepList,
       putStepIsRunUrl: '',
       stepListUrl: '',
       caseFromUrl: '',
       getCaseUrl: ''
+    }
+  },
+
+  watch: {
+    'stepList': {
+      deep: true,
+      handler(newVal, oldVal) {
+        this.stepDataList = newVal
+      }
     }
   },
 
@@ -219,12 +229,14 @@ export default {
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
       const that = this
-      const data = row[column.property]
-      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
-        function(e) {
-          that.$message.success('复制成功')
-        }
-      )
+      if (column.property === 'name') {
+        const data = row[column.property]
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
     },
 
     // 点击打开或者收起引用用例
@@ -279,7 +291,7 @@ export default {
       this.tableLoadingIsShow = true
       this.stepListUrl({ 'caseId': case_id || this.currentCaseId }).then(response => {
         this.tableLoadingIsShow = false
-        this.stepList = response.data.data
+        this.stepDataList = response.data.data
       })
     },
 
@@ -294,10 +306,10 @@ export default {
         this.$busEvents.drawerIsShow,
         'stepInfo',
         'edit',
-        row.case_id === this.currentCaseId ? JSON.parse(JSON.stringify(row)) : row // 如果是引用用例下的步骤，就不深拷贝，就不必再取请求和加载被引用用例下的步骤列表
+        // 如果是引用用例下的步骤，就不深拷贝，就不必提交后再去请求和加载被引用用例下的步骤列表
+        row.case_id === this.currentCaseId ? JSON.parse(JSON.stringify(row)) : row
       )
     }
-
   }
 }
 </script>

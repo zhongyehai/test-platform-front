@@ -191,7 +191,7 @@ import {
   reportStepDetail as webUiReportStepDetail
 } from '@/apis/webUiTest/report'
 import { runTestTimeOutMessage } from '@/utils/message'
-import showStepView from '@/components/business/report/showStep'
+import showStepView from '@/components/business/report/showStepDetail.vue'
 
 export default {
   name: 'RunStep',

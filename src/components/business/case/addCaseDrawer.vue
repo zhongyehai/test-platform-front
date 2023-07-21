@@ -160,7 +160,7 @@ export default {
     'drawerIsShow': {
       deep: true,
       handler(newVal, oldVal) {
-        if (newVal) {
+        if (newVal && this.currentSetId) {
           this.getCaseSuiteUrl({ 'id': this.currentSetId }).then(response => {
             this.caseSuiteLabel = response.data.name
             this.$refs.suiteTree.setCheckedKeys([this.currentSetId])
@@ -175,6 +175,7 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command) => {
       if (_type === 'caseInfo') {
         if (command === 'add') {
+          this.suiteId = this.currentSetId
           this.initNewTempData()
           this.drawerIsShow = true
         }
@@ -241,6 +242,7 @@ export default {
 
     // 勾选树事件
     handleNodeClick(data, checked, node) {
+      this.suiteId = data.id
       if (checked && [data.id] !== this.$refs.suiteTree.getCheckedKeys()) {
         this.$refs.suiteTree.setCheckedKeys([data.id]) // 选中
         this.caseSuiteLabel = data.name
@@ -250,7 +252,7 @@ export default {
     // 新增用例
     addCase() {
       this.submitLoadingIsShow = true
-      this.postCaseUrl({ suite_id: this.currentSetId, case_list: this.tempData }).then(response => {
+      this.postCaseUrl({ suite_id: this.suiteId, case_list: this.tempData }).then(response => {
         this.submitLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsCommit, 'caseInfo')

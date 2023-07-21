@@ -94,6 +94,7 @@
     <el-table
       ref="projectTable"
       v-loading="tableIsLoading"
+      size="mini"
       element-loading-text="数据获取中"
       element-loading-spinner="el-icon-loading"
       :data="project_list"

@@ -30,6 +30,15 @@
           <!--            </el-button>-->
           <!--          </el-popover>-->
 
+          <el-button
+            :disabled="!currentProjectId"
+            type="primary"
+            size="mini"
+            style="margin-left: 5px"
+            @click="clickAddCase"
+          >添加用例
+          </el-button>
+
           <el-popover
             v-model="showBatchChangeStatusToNotDebugAndNotRun"
             placement="top"
@@ -128,6 +137,7 @@
         <el-table
           ref="caseTable"
           v-loading="tableLoadingIsShow"
+          size="mini"
           element-loading-text="正在获取数据..."
           element-loading-spinner="el-icon-loading"
           :data="case_list"
@@ -263,7 +273,7 @@
 
     </el-tabs>
 
-    <add-case-drawer
+    <addCaseDrawer
       :data-type="dataType"
       :current-set-id="currentSetId"
     />
@@ -557,6 +567,17 @@ export default {
 
     cancelCopyPopover(caseData) {
       this.$set(caseData, 'copyPopoverIsShow', false)
+    },
+
+    // 点击添加用例
+    clickAddCase() {
+      this.$bus.$emit(
+        this.$busEvents.drawerIsShow,
+        'caseInfo',
+        'add',
+        null,
+        'caseIndex'
+      )
     },
 
     // 点击运行用例

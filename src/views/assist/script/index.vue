@@ -63,6 +63,7 @@
     <el-table
       ref="scriptTable"
       v-loading="tableIsLoading"
+      size="mini"
       element-loading-text="正在排序中"
       element-loading-spinner="el-icon-loading"
       :data="scripts.list"
@@ -192,7 +193,7 @@ export default {
       },
 
       scriptTypeDict: {
-        test: '执行测试', encryption: '加密脚本', decryption: '解密脚本'
+        test: '执行测试', mock: 'mock脚本', encryption: '加密脚本', decryption: '解密脚本'
       },
 
       // 拖拽排序参数

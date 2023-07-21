@@ -382,6 +382,9 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, currentCase) => {
       if (_type === 'caseInfo') {
         if (command === 'edit') {
+          this.getCaseUrl({ id: currentCase.id }).then(response => {
+            this.tempCase = response.data
+          })
           this.getCaseFrom(currentCase.id)
           this.initUpdateTempCase(currentCase)
           this.activeName = 'stepInFo'

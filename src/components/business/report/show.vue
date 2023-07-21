@@ -234,6 +234,7 @@ import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 import { reportStepResultMapping } from '@/utils/mapping'
 import selectRunEnv from '@/components/selectRunEnv.vue'
 import runProcess from '@/components/runProcess.vue'
+import { phoneList, serverList } from '@/apis/appUiTest/device'
 
 export default {
   name: 'ReportShow',
@@ -516,6 +517,21 @@ export default {
 
     // 触发重跑
     reRun() {
+      // 获取运行服务器和设备
+      if (this.dataType === 'appUi') {
+        if (this.$busEvents.data.runServerList.length < 1) {
+          serverList().then(response => {
+            this.$busEvents.data.runServerList = response.data.data
+          })
+        }
+
+        if (this.$busEvents.data.runPhoneList.length < 1) {
+          phoneList().then(response => {
+            this.$busEvents.data.runPhoneList = response.data.data
+          })
+        }
+      }
+
       // 获取报告对应的服务的业务线id
       let project = null
 

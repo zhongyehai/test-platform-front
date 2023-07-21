@@ -122,6 +122,7 @@
             <el-table
               ref="reportTable"
               v-loading="tableIsLoading"
+              size="mini"
               element-loading-text="正在获取数据..."
               element-loading-spinner="el-icon-loading"
               :data="reportDataList"

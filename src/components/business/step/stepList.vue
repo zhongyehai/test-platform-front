@@ -94,7 +94,7 @@
       element-loading-spinner="el-icon-loading"
       :data="stepList"
       fit
-      size="small"
+      size="mini"
       row-key="id"
       highlight-current-row
       style="width: 100%"
@@ -110,12 +110,13 @@
       <el-table-column type="selection" min-width="2%" />
 
       <el-table-column v-show="false" type="expand" min-width="0%">
-        <template slot-scope="props">
+        <template slot-scope="scope">
           <expandStepList
+            :ref="`${scope.row.id}_${scope.$index}_${scope.row.quote_case}`"
             :data-type="dataType"
             :min-width="7"
-            :current-case-id="caseId"
-            :step-list="props.row.stepList"
+            :current-case-id="scope.row.quote_case"
+            :step-list="scope.row.stepList"
           />
         </template>
       </el-table-column>
@@ -187,6 +188,7 @@
             popper-class="down-popover"
           >
             <showCaseDesc
+              :data-type="dataType"
               :case-desc="scope.row.desc"
               :case-skip-if="scope.row.skip_if"
               :case-variables="scope.row.variables"
@@ -527,12 +529,14 @@ export default {
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
       const that = this
-      const data = row[column.property]
-      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
-        function(e) {
-          that.$message.success('复制成功')
-        }
-      )
+      if (column.property === 'name') {
+        const data = row[column.property]
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
     },
 
     // 点击打开或者收起引用用例

@@ -27,6 +27,7 @@
               style="width: 90%"
               size="mini"
               class="filter-item"
+              @change="selectScriptType()"
             >
               <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key" />
             </el-select>
@@ -57,7 +58,7 @@
         </el-col>
       </el-row>
 
-      <el-form-item label="调试函数" size="mini">
+      <el-form-item v-show="tempScript.script_type !== 'mock'" label="调试函数" size="mini">
         <el-input
           v-model="expression"
           placeholder="输入格式：${func(abc,123)}"
@@ -96,7 +97,6 @@
         }"
         @init="editorInit"
       />
-
     </el-container>
 
     <div class="demo-drawer__footer">
@@ -242,14 +242,33 @@ export default {
       activeName: 'debugResult',
       scriptPrintLog: '',
       debugResultDetail: '',
-      debugResultMessage: ''
+      debugResultMessage: '',
+      addTestScriptMsg: '\n# 1、支持python3.9及以下语法 \n' +
+        '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
+        '# 3、在执行自定义函数的时候，系统会强制在第一行加入一个参数：env \n' +
+        '# 4、系统插入的env参数为运行时选择的环境对应的code，详见配置管理-运行环境，默认为debug \n' +
+        '# 5、若自定义函数需要根据运行选中的环境进行调整，则可以使用此参数判断，然后给对应的变量赋值\n' +
+        '#   如：当前文件为操作数据库，则可以根据这个env判断，连哪个库，操作哪些表 \n' +
+        '# 注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试 \n',
+      addMockScriptMsg: '\n# 1、支持python3.9及以下语法 \n' +
+        '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
+        '# 3、在执行自定义函数的时候，系统会强制写入请求路径、头部参数、查询字符串参数、body参数 \n' +
+        '#     不用再次声明变量，可直接使用，以下是样例： \n' +
+        '#        path = "请求路径" \n' +
+        '#        query = {} \n' +
+        '#        headers = {} \n' +
+        '#        body = {} \n' +
+        '# 4、最后的result的值为mock返回值，可自己随意定义 \n' +
+        '# 5、支持get、post、put、delete \n' +
+        '# 6、访问 【域名 + /api/tools/mock/脚本名字】即可获取到 result 对应的值 \n\n\n\n\n\n' +
+        'result = {"code": 200, "msg": "操作成功"} \n'
     }
   },
 
   computed: {
     // 实时获 取屏幕高度-150px 作为函数文件代码编辑器的高度
     scriptEditHeight() {
-      return `${window.innerHeight - 100}px`
+      return `${window.innerHeight * 0.755}px`
     }
   },
 
@@ -276,14 +295,9 @@ export default {
             getScript({ id: data.id }).then(res => {
               this.tempScript.script_data = res.script_data
             })
+          } else {
+            this.tempScript.script_data = this.addTestScriptMsg
           }
-          this.tempScript.script_data = data ? data.script_data : '\n# 1、支持python3.9及以下语法 \n' +
-            '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
-            '# 3、在执行自定义函数的时候，系统会强制在第一行加入一个参数：env \n' +
-            '# 4、系统插入的env参数为运行时选择的环境对应的code，详见配置管理-运行环境，默认为debug \n' +
-            '# 5、若自定义函数需要根据运行选中的环境进行调整，则可以使用此参数判断，然后给对应的变量赋值\n' +
-            '#   如：当前文件为操作数据库，则可以根据这个env判断，连哪个库，操作哪些表 \n' +
-            '# 注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试 \n'
         } else if (status === 'update') {
           this.tempScript.id = data.id
           this.tempScript.name = data.name
@@ -293,6 +307,7 @@ export default {
             this.tempScript.script_data = res.script_data
           })
         }
+        this.deBugButtonIsLoading = false
         this.scriptDrawerIsShow = true
       }
     })
@@ -304,6 +319,13 @@ export default {
   },
 
   methods: {
+
+    selectScriptType() {
+      if ([this.addMockScriptMsg, this.addTestScriptMsg].indexOf(this.tempScript.script_data) !== -1) {
+        this.tempScript.script_data = this.tempScript.script_type === 'mock' ? this.addMockScriptMsg : this.addTestScriptMsg
+      }
+    },
+
     showDetail(res) {
       this.debugResultDetail = res.message.result
       this.debugResultMessage = res.message.msg

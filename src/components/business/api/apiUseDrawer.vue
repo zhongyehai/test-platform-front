@@ -7,75 +7,76 @@
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
-
-    <el-table
-      ref="apiTable"
-      :data="caseList"
-      stripe
-    >
-      <el-table-column prop="num" align="center" label="序号" min-width="8%">
-        <template slot-scope="scope">
-          <span> {{ scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口对应步骤" align="center" min-width="50%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.from }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="25%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.name }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="level"
-        align="center"
-        min-width="17%"
+    <div style="margin-left: 20px; margin-right: 20px">
+      <el-table
+        ref="apiTable"
+        :data="caseList"
+        size="mini"
+        stripe
       >
-        <template slot="header">
-          <span> 调试结果 </span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
-            <div slot="content">
-              <div>1: 批量运行时，只有调试结果为通过的才会执行</div>
-              <div>2: 请务必将用例调试通过后再设为调试通过</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <div>
-            <div style="width: 80%; margin-left:auto; margin-right:auto">
-              <el-select
-                :ref="`statusSelector${scope.row.id}`"
-                slot="prepend"
-                v-model="scope.row.status"
-                size="mini"
-                placeholder="选择调试结果"
-                filterable
-                class="select"
-                @change="changeCaseIsRun(scope.row)"
-              >
-                <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span></el-option>
-                <el-option label="调试通过-要执行" :value="1"><span style="color: #67C23A">调试通过-要执行</span></el-option>
-                <el-option label="调试通过-不执行" :value="2"><span style="color: #909399">调试通过-不执行</span></el-option>
-                <el-option label="调试不通过-不执行" :value="3"><span style="color: #F56C6C">调试不通过-不执行</span></el-option>
-              </el-select>
-            </div>
-          </div>
-        </template>
-      </el-table-column>
+        <el-table-column prop="num" align="center" label="序号" min-width="8%">
+          <template slot-scope="scope">
+            <span> {{ scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-    </el-table>
+        <el-table-column :show-overflow-tooltip="true" prop="name" label="接口对应步骤" align="center" min-width="50%">
+          <template slot-scope="scope">
+            <span>{{ scope.row.from }}</span>
+          </template>
+        </el-table-column>
 
+        <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="25%">
+          <template slot-scope="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="level"
+          align="center"
+          min-width="17%"
+        >
+          <template slot="header">
+            <span> 调试结果 </span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="top-start"
+            >
+              <div slot="content">
+                <div>1: 批量运行时，只有调试结果为通过的才会执行</div>
+                <div>2: 请务必将用例调试通过后再设为调试通过</div>
+              </div>
+              <span><i style="color: #409EFF" class="el-icon-question" /></span>
+            </el-tooltip>
+          </template>
+          <template slot-scope="scope">
+            <div>
+              <div style="width: 80%; margin-left:auto; margin-right:auto">
+                <el-select
+                  :ref="`statusSelector${scope.row.id}`"
+                  slot="prepend"
+                  v-model="scope.row.status"
+                  size="mini"
+                  placeholder="选择调试结果"
+                  filterable
+                  class="select"
+                  @change="changeCaseIsRun(scope.row)"
+                >
+                  <el-option label="未调试-不执行" :value="0"><span style="color: #dcdfe6">未调试-不执行</span></el-option>
+                  <el-option label="调试通过-要执行" :value="1"><span style="color: #67C23A">调试通过-要执行</span></el-option>
+                  <el-option label="调试通过-不执行" :value="2"><span style="color: #909399">调试通过-不执行</span></el-option>
+                  <el-option label="调试不通过-不执行" :value="3"><span style="color: #F56C6C">调试不通过-不执行</span></el-option>
+                </el-select>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+
+      </el-table>
+    </div>
   </el-drawer>
 </template>
 

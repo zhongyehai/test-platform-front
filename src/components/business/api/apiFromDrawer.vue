@@ -8,168 +8,161 @@
     :direction="direction"
   >
 
-    <el-table
-      ref="apiTable"
-      :data="apiList"
-      stripe
-    >
-      <el-table-column prop="num" align="center" label="序号" min-width="10%">
-        <template slot-scope="scope">
-          <span> {{ scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+    <div style="margin-left: 20px; margin-right: 20px">
+      <el-table
+        ref="apiTable"
+        :data="apiList"
+        size="mini"
+        stripe
+        @cell-dblclick="cellDblclick"
+      >
+        <el-table-column prop="num" align="center" label="序号" min-width="5%">
+          <template slot-scope="scope">
+            <span> {{ scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口归属" align="center" min-width="40%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.from }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip prop="from" label="接口归属" align="left" min-width="30%">
+          <template slot-scope="scope">
+            <span>{{ scope.row.from }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="40%">
-        <template slot-scope="scope">
-          <div
-            class="block"
-            :class="`block_${scope.row.method.toLowerCase()}`"
-            :style="{
-              'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
-              'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
-            }"
-          >
-            <span
-              class="block-method block_method_color"
-              :class="`block_method_${scope.row.method.toLowerCase()}`"
+        <el-table-column show-overflow-tooltip prop="name" label="接口信息" align="left" min-width="40%">
+          <template slot-scope="scope">
+            <div
+              class="block"
+              :class="`block_${scope.row.method.toLowerCase()}`"
               :style="{
-                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
+                'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
               }"
             >
-              {{ scope.row.method }}
-            </span>
-            <span class="block-method block_url">{{ scope.row.addr }}</span>
-            <span class="block-summary-description">{{ scope.row.name }}</span>
-          </div>
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="level"
-        align="center"
-        min-width="10%"
-      >
-        <template slot="header">
-          <span> 重要级别 </span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
-            <div slot="content">
-              <div>标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <div>
-            <div style="width: 80%; margin-left:auto; margin-right:auto">
-              <el-select
-                :ref="`levelSelector${scope.row.id}`"
-                slot="prepend"
-                v-model="scope.row.level"
-                size="mini"
-                placeholder="选择重要程度"
-                filterable
-                class="select"
-                @change="selectApiLevel(scope.row)"
+              <span
+                class="block-method block_method_color"
+                :class="`block_method_${scope.row.method.toLowerCase()}`"
+                :style="{
+                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                }"
               >
-                <el-option label="高" value="P0"><span style="color: #F56C6C">高</span></el-option>
-                <el-option label="中" value="P1"><span style="color: #E6A23C">中</span></el-option>
-                <el-option label="低" value="P2"><span style="color: #67C23A">低</span></el-option>
-              </el-select>
+                {{ scope.row.method }}
+              </span>
+              <span class="block-method block_url">{{ scope.row.addr }}</span>
+              <span class="block-summary-description">{{ scope.row.name }}</span>
             </div>
-          </div>
-        </template>
-      </el-table-column>
+          </template>
+        </el-table-column>
 
-      <el-table-column align="center" min-width="12%">
-        <template slot="header">
-          <span>是否可用</span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
-            <div slot="content">
-              <div>标识接口是否被废弃</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.deprecated"
-            :inactive-value="true"
-            :active-value="false"
-            @change="changeStatus(scope.row)"
-          />
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="create_user"
-        align="center"
-        min-width="12%"
-      >
-        <template slot="header">
-          <span> 使用次数 </span>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
-            <div slot="content">
-              <div>1: 统计有多少条用例里直接使用了此接口</div>
-              <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" placement="top-start">
-            <div slot="content">
-              <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
-            </div>
-            <el-tag
-              v-if="scope.row.quote_count"
-              @click="getApiMsgBelongToStep(scope.row)"
+        <el-table-column prop="level" align="center" min-width="7%">
+          <template slot="header">
+            <span> 重要级别 </span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="top-start"
             >
-              {{ scope.row.quote_count }}
-            </el-tag>
-            <el-tag v-else type="info">0</el-tag>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+              <div slot="content">
+                <div>标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口</div>
+              </div>
+              <span><i style="color: #409EFF" class="el-icon-question" /></span>
+            </el-tooltip>
+          </template>
+          <template slot-scope="scope">
+            <div>
+              <div style="width: 80%; margin-left:auto; margin-right:auto">
+                <el-select
+                  :ref="`levelSelector${scope.row.id}`"
+                  slot="prepend"
+                  v-model="scope.row.level"
+                  size="mini"
+                  placeholder="选择重要程度"
+                  filterable
+                  class="select"
+                  @change="selectApiLevel(scope.row)"
+                >
+                  <el-option label="高" value="P0"><span style="color: #F56C6C">高</span></el-option>
+                  <el-option label="中" value="P1"><span style="color: #E6A23C">中</span></el-option>
+                  <el-option label="低" value="P2"><span style="color: #67C23A">低</span></el-option>
+                </el-select>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="15%">
-        <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-left: 5px"
-            @click="showEditForm(scope.row)"
-          >查看</el-button>
+        <el-table-column align="center" min-width="5%">
+          <template slot="header">
+            <span>状态</span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="top-start"
+            >
+              <div slot="content">
+                <div>标识接口是否被废弃</div>
+              </div>
+              <span><i style="color: #409EFF" class="el-icon-question" /></span>
+            </el-tooltip>
+          </template>
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.deprecated"
+              :inactive-value="true"
+              :active-value="false"
+              @change="changeStatus(scope.row)"
+            />
+          </template>
+        </el-table-column>
 
-          <el-button
-            v-if="caseId"
-            type="text"
-            size="mini"
-            @click.native="addApiToStep(scope.row)"
-          >转步骤</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column prop="quote_count" align="center" min-width="5%">
+          <template slot="header">
+            <span> 次数 </span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="top-start"
+            >
+              <div slot="content">
+                <div>1: 统计有多少条用例里直接使用了此接口</div>
+                <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
+              </div>
+              <span><i style="color: #409EFF" class="el-icon-question" /></span>
+            </el-tooltip>
+          </template>
+          <template slot-scope="scope">
+            <el-tooltip class="item" effect="dark" placement="top-start">
+              <div slot="content">
+                <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
+              </div>
+              <el-tag
+                v-if="scope.row.quote_count"
+                @click="getApiMsgBelongToStep(scope.row)"
+              >
+                {{ scope.row.quote_count }}
+              </el-tag>
+              <el-tag v-else type="info">0</el-tag>
+            </el-tooltip>
+          </template>
+        </el-table-column>
 
+        <el-table-column align="center" label="操作" min-width="7%">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="mini"
+              style="margin-left: 5px"
+              @click="showEditForm(scope.row)"
+            >查看</el-button>
+
+            <el-button
+              v-if="caseId"
+              type="text"
+              size="mini"
+              @click.native="addApiToStep(scope.row)"
+            >转步骤</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </el-drawer>
 </template>
 
@@ -229,6 +222,25 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      let data = ''
+      if (column.property === 'from') {
+        data = row.from
+      } else if (column.property === 'name') {
+        data = `${row.name}: ${row.addr}`
+      } else {
+        return
+      }
+
+      this.$copyText(data).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
 
     getApiMsgBelongToStep(row) {
       apiMsgBelongToStep({ id: row.id }).then(response => {

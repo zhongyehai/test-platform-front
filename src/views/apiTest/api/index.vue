@@ -11,6 +11,7 @@
         <el-table
           ref="apiListTable"
           v-loading="tableLoadingIsShow"
+          size="mini"
           show-overflow-tooltip
           element-loading-text="数据获取中"
           element-loading-spinner="el-icon-loading"

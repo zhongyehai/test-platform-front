@@ -69,6 +69,7 @@
       <el-table
         ref="apiTable"
         v-loading="tableLoadingIsShow"
+        size="mini"
         :data="apiList.data"
         element-loading-text="正在获取数据..."
         element-loading-spinner="el-icon-loading"

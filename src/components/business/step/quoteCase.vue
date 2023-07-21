@@ -61,6 +61,7 @@
       <el-table
         ref="caseTable"
         v-loading="tableLoadingIsShow"
+        size="mini"
         row-key="row_id"
         :data="caseList"
         element-loading-text="正在获取数据..."

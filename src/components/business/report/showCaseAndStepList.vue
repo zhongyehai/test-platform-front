@@ -113,7 +113,7 @@ import {
   reportStepList as appUiReportStepList,
   reportStepDetail as appUiReportStepDetail
 } from '@/apis/appUiTest/report'
-import showStepView from '@/components/business/report/showStep'
+import showStepView from '@/components/business/report/showStepDetail.vue'
 import showCaseView from '@/components/business/report/showCase'
 
 export default {
@@ -322,6 +322,8 @@ export default {
       } else {
         if (this.expands.indexOf(row.id) === -1) {
           this.expands.push(row.id)
+          this.reportStepDetailIsShow = true
+          this.reportCaseDetailIsShow = false
         }
       }
     },

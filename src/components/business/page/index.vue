@@ -11,6 +11,7 @@
         <el-table
           ref="pageListTable"
           v-loading="tableLoadingIsShow"
+          size="mini"
           element-loading-text="正在排序中"
           element-loading-spinner="el-icon-loading"
           :data="pageList"

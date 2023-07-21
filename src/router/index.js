@@ -403,6 +403,12 @@ export const constantRoutes = [
         name: 'Account',
         component: () => import('@/views/testWork/env'),
         meta: { title: '地址和账号管理', icon: 'el-icon-s-check' }
+      },
+      {
+        path: 'bugTrack',
+        name: 'BugTrack',
+        component: () => import('@/views/testWork/bugTrack'),
+        meta: { title: '线上问题跟踪', icon: 'el-icon-warning-outline' }
       }
     ]
   },

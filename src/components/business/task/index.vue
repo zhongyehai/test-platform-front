@@ -21,6 +21,7 @@
             <el-table
               ref="taskTable"
               v-loading="tableLoadingIsShow"
+              size="mini"
               element-loading-text="正在获取数据..."
               element-loading-spinner="el-icon-loading"
               :data="taskList"
