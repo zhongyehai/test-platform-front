@@ -75,7 +75,7 @@
         @cell-dblclick="cellDblclick"
       >
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="left" min-width="55%">
+        <el-table-column :show-overflow-tooltip="true" prop="name" label="用例名称" align="left" min-width="65%">
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -87,7 +87,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="描述" min-width="10%">
+        <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="描述" min-width="20%">
           <template slot-scope="scope">
             <el-popover
               v-show="scope.row.suite_id || scope.row.quote_case"
@@ -148,18 +148,6 @@
               >引用
               </el-button>
             </el-tooltip>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="num" label="序号" align="left" min-width="5%">
-          <template slot-scope="scope">
-            <span> {{ (quotePageNum - 1) * quotePageSize + scope.$index + 1 }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="id" label="数据id" align="left" min-width="5%">
-          <template slot-scope="scope">
-            <span> {{ scope.row.id }} </span>
           </template>
         </el-table-column>
 

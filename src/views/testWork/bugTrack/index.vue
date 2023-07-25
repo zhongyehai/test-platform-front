@@ -104,6 +104,7 @@
       <el-table-column align="center" prop="status" label="状态" min-width="10%">
         <template slot-scope="scope">
           <el-select
+            :ref="`statusSelector${scope.row.id}`"
             v-model="scope.row.status"
             filterable
             placeholder="选择状态"
@@ -123,6 +124,7 @@
       <el-table-column align="center" prop="replay" label="是否复盘" min-width="10%">
         <template slot-scope="scope">
           <el-select
+            :ref="`replaySelector${scope.row.id}`"
             v-model="scope.row.replay"
             filterable
             placeholder="选择状态"
@@ -355,7 +357,6 @@ import Pagination from '@/components/Pagination'
 import { businessList } from '@/apis/config/business'
 import {
   bugList,
-  getBug,
   putBug,
   postBug,
   deleteBug,
@@ -372,6 +373,15 @@ export default {
   },
   data() {
     return {
+      statusColorDict: {
+        'todo': '#F56C6C',
+        'doing': '#409EFF',
+        'done': '#58D68D'
+      },
+      replayColorDict: {
+        0: '#F56C6C',
+        1: '#58D68D'
+      },
       pickerOptions: {
         shortcuts: [{
           text: '今天',
@@ -440,6 +450,20 @@ export default {
     }
   },
 
+  watch: {
+    // 重新获取用例列表后，修改对应的重要等级背景色颜色
+    'bugDataList': {
+      deep: true, // 深度监听
+      handler(newVal, oldVal) {
+        this.$nextTick(function() {
+          newVal.forEach(bug => {
+            this.changeSelectBackgroundColorColor(bug)
+          })
+        })
+      }
+    }
+  },
+
   mounted() {
     // 获取业务线
     if (this.$busEvents.data.businessList.length < 1) {
@@ -457,6 +481,12 @@ export default {
   },
 
   methods: {
+
+    // 修改选择框颜色
+    changeSelectBackgroundColorColor(row) {
+      this.$refs[`statusSelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.statusColorDict[row.status]
+      this.$refs[`replaySelector${row.id}`].$el.children[0].children[0].style.backgroundColor = this.replayColorDict[row.replay]
+    },
 
     async getUserList(func) {
       const response = await userList()

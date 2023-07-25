@@ -5,23 +5,79 @@
         <el-tabs v-model="caseListTab">
           <el-tab-pane :label="caseListTab" :name="caseListTab">
             <el-table
-              v-loading="tableIsLoading"
+              v-loading="caseTableIsLoading"
               element-loading-text="数据获取中"
               element-loading-spinner="el-icon-loading"
               :data="showCaseList"
-              row-key="row_id"
+              row-key="id"
               :row-class-name="tableRowClassName"
               :height="tableHeight"
               size="mini"
-              :expand-row-keys="expands"
+              :expand-row-keys="expandIds"
               stripe
-              lazy
-              :load="getStep"
-              :tree-props="{ children: 'children', hasChildren: 'hasStep' }"
               @expand-change="changeExpandStatus"
               @row-click="clickRow"
             >
-              <el-table-column prop="num" label="序号" align="center" min-width="20%">
+
+              <!-- 步骤列表 -->
+              <el-table-column type="expand" min-width="2%">
+                <template slot-scope="scope">
+                  <el-table
+                    :ref="scope.row.id"
+                    v-loading="stepTableIsLoading"
+                    :show-header="false"
+                    element-loading-text="数据获取中"
+                    element-loading-spinner="el-icon-loading"
+                    :data="showStepList"
+                    row-key="id"
+                    :header-cell-style="{'text-align':'center'}"
+                    :row-class-name="tableRowClassName"
+                    size="mini"
+                    stripe
+                    @row-click="clickRow"
+                  >
+                    <el-table-column prop="num" label="序号" align="center" min-width="10%">
+                      <template slot-scope="scope">
+                        <span> {{ scope.$index + 1 }} </span>
+                      </template>
+                    </el-table-column>
+
+                    <el-table-column show-overflow-tooltip prop="name" label="名称" align="left" min-width="45%">
+                      <template slot-scope="scope">
+                        <span
+                          :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
+                        >
+                          {{ scope.row.name }}
+                        </span>
+                      </template>
+                    </el-table-column>
+
+                    <el-table-column show-overflow-tooltip prop="duration" label="耗时" align="center" min-width="20%">
+                      <template slot-scope="scope">
+                        <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.duration || '-' : '-' }}秒 </span>
+                        <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>
+                      </template>
+                    </el-table-column>
+
+                    <el-table-column prop="operate" align="center" label="操作" min-width="12%">
+                      <template slot-scope="scope">
+                        <el-button
+                          v-show="scope.row.result !== 'waite'"
+                          type="text"
+                          size="mini"
+                          @click="showCaseInfo(scope.row)"
+                        >
+                          <!-- {{ `${scope.row.row_id.indexOf('case') !== -1 ? '用例' : '步骤'}` }}-->
+                          编辑
+                        </el-button>
+                      </template>
+                    </el-table-column>
+
+                  </el-table>
+                </template>
+              </el-table-column>
+
+              <el-table-column prop="num" label="序号" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ scope.$index + 1 }} </span>
                 </template>
@@ -32,7 +88,6 @@
                   <span
                     :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
                   >
-                    <!--                    {{ resultMapping[scope.row.result] }}：{{ scope.row.name }} -->
                     {{ scope.row.name }}
                   </span>
                 </template>
@@ -125,7 +180,8 @@ export default {
   ],
   data() {
     return {
-      tableIsLoading: false,
+      caseTableIsLoading: false,
+      stepTableIsLoading: false,
       tableHeight: window.innerHeight * 0.85,
 
       caseListTab: '用例列表',
@@ -191,7 +247,9 @@ export default {
         'before': null,
         'after': null
       },
-      caseData: {},
+      caseData: {
+        case_data: '{}'
+      },
       resultMapping: {
         'waite': '等待',
         'running': '执行中',
@@ -209,7 +267,7 @@ export default {
         'error': 'warning'
       },
 
-      expands: [], // 要展开的行数据的id
+      expandIds: [], // 要展开的行数据的id
 
       showCaseList: [],
       allCaseList: [],
@@ -317,14 +375,13 @@ export default {
 
     // 点击打开或者收起引用用例
     changeExpandStatus(row, status) {
-      if (status === false) {
-        this.expands.pop(row.id)
+      this.reportCaseDetailIsShow = false
+      const expandIdIndex = this.expandIds.indexOf(row.id)
+      if (expandIdIndex === -1) { // 打开用例
+        this.expandIds.push(row.id)
+        this.getStepList(row.id)
       } else {
-        if (this.expands.indexOf(row.id) === -1) {
-          this.expands.push(row.id)
-          this.reportStepDetailIsShow = true
-          this.reportCaseDetailIsShow = false
-        }
+        this.expandIds.splice(expandIdIndex, 1)
       }
     },
 
@@ -334,34 +391,30 @@ export default {
         this.getStepData(row.id)
         this.reportCaseDetailIsShow = false
       } else if (row.row_id.indexOf('case') !== -1 && column.property === 'name') { // 点用例
-        this.caseData = row
+        this.caseData = JSON.parse(JSON.stringify(row))
         this.reportStepDetailIsShow = false
         this.reportCaseDetailIsShow = true
       }
     },
 
     // 点击用例
-    getStep(row, treeNode, resolve) {
-      if (this.expands.indexOf(row.row_id) === -1) {
-        this.showStepList = []
-        this.allStepList = []
-        this.successStepList = []
-        this.failStepList = []
-        this.skipStepList = []
-        this.errorStepList = []
+    getStepList(report_case_id) {
+      this.showStepList = []
+      this.allStepList = []
+      this.successStepList = []
+      this.failStepList = []
+      this.skipStepList = []
+      this.errorStepList = []
 
-        this.reportStepListUrl({ report_case_id: row.id, get_summary: true }).then(response => {
-          // 自动获取第一个步骤的数据
-          if (response.data.length > 0) {
-            this.getStepData(response.data[0].id)
-          }
-
-          this.parseStepList(response.data) // 分状态存储步骤数据
-
-          this.expands.push(row.row_id)
-          resolve(this.showStepList)
-        })
-      }
+      this.stepTableIsLoading = true
+      this.reportStepListUrl({ report_case_id: report_case_id, get_summary: true }).then(response => {
+        this.stepTableIsLoading = false
+        // 自动获取第一个步骤的数据
+        if (response.data.length > 0) {
+          this.getStepData(response.data[0].id)
+        }
+        this.parseStepList(response.data) // 分状态存储步骤数据
+      })
     },
 
     getStepData(id) {
@@ -387,6 +440,7 @@ export default {
       }
       caseList.forEach(caseData => {
         caseData['row_id'] = `case_${caseData.id}`
+        caseData.case_data = this.parseVariables(caseData)
 
         // 判断用例下有没有步骤
         if (caseData.result !== 'error') {
@@ -435,9 +489,9 @@ export default {
 
     // 获取用例列表
     getStepCaseList(report_id) {
-      this.tableIsLoading = true
+      this.caseTableIsLoading = true
       this.reportCaseListUrl({ get_summary: true, report_id: report_id }).then(response => {
-        this.tableIsLoading = false
+        this.caseTableIsLoading = false
         this.parseCaseList(response.data)
       })
     },
@@ -450,6 +504,24 @@ export default {
         'reportShowCaseInfo',
         case_id
       )
+    },
+
+    parseVariables(caseData) {
+      const case_data = JSON.parse(caseData.case_data)
+
+      const variables = []
+      for (var variable_key in case_data.variables) {
+        variables.push({ key: variable_key, value: case_data.variables[variable_key] })
+      }
+      case_data.variables = variables
+
+      const headers = []
+      for (var header_key in case_data.headers) {
+        headers.push({ key: header_key, value: case_data.variables[header_key] })
+      }
+      case_data.headers = headers
+
+      return case_data
     }
   }
 }
