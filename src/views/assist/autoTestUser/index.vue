@@ -24,6 +24,7 @@
     <el-table
       ref="apiTree"
       v-loading="listLoading"
+      size="mini"
       :data="currentDataList"
       stripe
       style="width: 100%"

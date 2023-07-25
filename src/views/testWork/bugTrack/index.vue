@@ -152,7 +152,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="detail" label="缺陷描述" min-width="28%">
+      <el-table-column show-overflow-tooltip align="center" prop="detail" label="缺陷详情" min-width="28%">
         <template slot-scope="scope">
           <span> {{ scope.row.detail }} </span>
         </template>
@@ -257,7 +257,7 @@
         </el-form-item>
 
         <el-form-item :label="'缺陷描述'" class="filter-item is-required" size="mini">
-          <el-input v-model="bugTemplate.name" placeholder="缺陷名字" />
+          <el-input v-model="bugTemplate.name" placeholder="缺陷描述" />
         </el-form-item>
 
         <el-form-item :label="'缺陷详情'" class="filter-item is-required" size="mini">
@@ -352,7 +352,6 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import addTable from '@/views/testWork/bugTrack/addTable'
 import { businessList } from '@/apis/config/business'
 import {
   bugList,
@@ -431,7 +430,7 @@ export default {
         replay: 0,
         bug_from: '',
         trigger_time: '',
-        manager: '',
+        manager: null,
         reason: '',
         solution: ''
       },
@@ -482,7 +481,7 @@ export default {
         replay: 0,
         bug_from: '',
         trigger_time: new Date(),
-        manager: '',
+        manager: null,
         reason: '',
         solution: ''
       }

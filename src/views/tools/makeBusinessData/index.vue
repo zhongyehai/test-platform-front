@@ -49,6 +49,7 @@
             <el-table
               ref="caseTable"
               element-loading-text="正在获取数据..."
+              size="mini"
               element-loading-spinner="el-icon-loading"
               :data="case_list"
               stripe

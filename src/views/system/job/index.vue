@@ -5,6 +5,7 @@
     <el-table
       key="id"
       v-loading="listLoading"
+      size="mini"
       :data="jobFuncListData"
       fit
       stripe

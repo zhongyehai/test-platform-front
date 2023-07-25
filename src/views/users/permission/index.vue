@@ -39,6 +39,7 @@
     <el-table
       ref="listTable"
       v-loading="tableLoadingIsShow"
+      size="mini"
       element-loading-text="正在排序中"
       element-loading-spinner="el-icon-loading"
       :data="permission_list"
@@ -180,7 +181,7 @@
         </el-form-item>
 
         <el-form-item :label="'权限名'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempPermission.name" :placeholder="'权限名'"/>
+          <el-input v-model="tempPermission.name" :placeholder="'权限名'" />
         </el-form-item>
 
         <el-form-item :label="'权限地址'" class="is-required" size="mini">
@@ -194,7 +195,7 @@
         </el-form-item>
 
         <el-form-item :label="'备注'" prop="desc" size="mini">
-          <el-input v-model="tempPermission.desc" type="textarea"/>
+          <el-input v-model="tempPermission.desc" type="textarea" />
         </el-form-item>
       </el-form>
 
@@ -233,14 +234,14 @@ export default {
   components: {
     Pagination
   },
-  directives: {waves},
+  directives: { waves },
   data() {
     return {
       activeName: 'front',
       sourceClass: [
-        {"key": "menu", "value": "菜单"},
-        {"key": "addr", "value": "地址"},
-        {"key": "button", "value": "按钮"}
+        { 'key': 'menu', 'value': '菜单' },
+        { 'key': 'addr', 'value': '地址' },
+        { 'key': 'button', 'value': '按钮' }
       ],
       // 查询对象
       listQuery: {
@@ -299,17 +300,16 @@ export default {
     selectSourceType() {
       if (this.tempPermission.source_type === 'api') {
         this.sourceClass = [
-          {"key": "GET", "value": "GET请求"},
-          {"key": "POST", "value": "POST请求"},
-          {"key": "PUT", "value": "PUT请求"},
-          {"key": "DELETE", "value": "DELETE请求"}
+          { 'key': 'GET', 'value': 'GET请求' },
+          { 'key': 'POST', 'value': 'POST请求' },
+          { 'key': 'PUT', 'value': 'PUT请求' },
+          { 'key': 'DELETE', 'value': 'DELETE请求' }
         ]
-
       } else {
         this.sourceClass = [
-          {"key": "menu", "value": "菜单"},
-          {"key": "addr", "value": "地址"},
-          {"key": "button", "value": "按钮"}
+          { 'key': 'menu', 'value': '菜单' },
+          { 'key': 'addr', 'value': '地址' },
+          { 'key': 'button', 'value': '按钮' }
         ]
       }
       this.tempPermission.source_class = this.sourceClass[0].key
@@ -406,7 +406,7 @@ export default {
     delPermission(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      deletePermission({'id': row.id}).then(response => {
+      deletePermission({ 'id': row.id }).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getPermissionList() // 重新从后台获取权限列表
@@ -425,7 +425,7 @@ export default {
       const el = this.$refs.listTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function (dataTransfer) {
+        setData: function(dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {

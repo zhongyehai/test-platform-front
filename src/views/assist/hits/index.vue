@@ -64,6 +64,7 @@
     <el-table
       ref="hitTable"
       v-loading="tableIsLoading"
+      size="mini"
       :data="hitListData"
       row-key="id"
       stripe

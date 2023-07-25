@@ -36,6 +36,7 @@
       <el-table
         ref="apiTree"
         v-loading="listLoading"
+        size="mini"
         :data="currentAccountList"
         stripe
       >

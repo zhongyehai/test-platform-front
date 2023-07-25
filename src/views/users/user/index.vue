@@ -64,6 +64,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
+      size="mini"
       :data="user_list"
       fit
       stripe

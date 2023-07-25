@@ -24,6 +24,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
+      size="mini"
       :data="role_list"
       fit
       stripe

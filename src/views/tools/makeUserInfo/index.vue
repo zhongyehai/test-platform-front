@@ -70,6 +70,7 @@
     <el-table
       :data="makedUserDictList"
       :height="autoHeight"
+      size="mini"
       stripe
       @cell-dblclick="cellDblclick"
     >

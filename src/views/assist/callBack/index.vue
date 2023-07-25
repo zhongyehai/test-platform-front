@@ -5,6 +5,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
+      size="mini"
       :data="record_list"
       fit
       stripe

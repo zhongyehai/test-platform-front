@@ -76,6 +76,7 @@
 
     <el-table
       ref="apiTree"
+      size="mini"
       highlight-current-row
       :data="dataPoolList"
       stripe

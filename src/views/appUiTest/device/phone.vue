@@ -6,6 +6,7 @@
       v-loading="tableLoadingIsShow"
       element-loading-text="正在排序中"
       element-loading-spinner="el-icon-loading"
+      size="mini"
       :data="dataList"
       row-key="id"
       stripe
