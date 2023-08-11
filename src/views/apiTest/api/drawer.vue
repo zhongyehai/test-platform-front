@@ -264,9 +264,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'currentProjectId',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentModuleId'
+    'currentProjectId', 'currentModuleId'
   ],
   data() {
     return {
@@ -304,7 +302,7 @@ export default {
         data_urlencoded: JSON.stringify({}),
         data_text: '',
         extracts: [{ key: null, value: null, remark: null }],
-        validates: [{ key: null, value: null, validate_type: null, remark: null }],
+        validates: [{ key: null, value: null, validate_type: 'data', remark: null }],
         response: {},
         module_id: '',
         project_id: ''
@@ -533,7 +531,7 @@ export default {
       this.tempApi.data_text = ''
       this.tempApi.response = {}
       this.tempApi.extracts = [{ key: null, value: null, remark: null }]
-      this.tempApi.validates = [{ key: null, value: null, validate_type: null, remark: null }]
+      this.tempApi.validates = [{ key: null, value: null, validate_type: 'data', remark: null }]
       this.tempApi.module_id = this.currentModuleId ? this.currentModuleId : ''
       this.tempApi.project_id = this.currentProjectId || ''
       this.drawerType = 'create'

@@ -58,33 +58,58 @@
         </el-col>
       </el-row>
 
-      <el-form-item v-show="tempScript.script_type !== 'mock'" label="调试函数" size="mini">
-        <el-input
-          v-model="expression"
-          placeholder="输入格式：${func(abc,123)}"
-          type="textarea"
-          :rows="1"
-          style="width: 90%"
-        />
-        <el-button
-          type="primary"
-          style="margin-left: 5px"
-          size="mini"
-          :loading="deBugButtonIsLoading"
-          @click="dialogIsShow = true"
-        >调试
-        </el-button>
-        <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-          <div>1、输入运行表达式，调试自定义函数</div>
-          <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
-          <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
-          <el-button slot="reference" type="text" icon="el-icon-question" />
-        </el-popover>
-      </el-form-item>
+      <el-row>
+        <el-col :span="8">
+          <el-form-item v-show="tempScript.script_data" label="查找代码" size="mini">
+            <el-input
+              v-model="findStr"
+              placeholder="输入具体代码"
+              style="width: 80%"
+            />
+            <el-button
+              type="primary"
+              style="margin-left: 5px"
+              size="mini"
+              @click="findCode()"
+            >查找
+            </el-button>
+          </el-form-item>
+
+        </el-col>
+
+        <el-col :span="16">
+          <el-form-item v-show="tempScript.script_type !== 'mock'" label="调试函数" size="mini">
+            <el-input
+              v-model="expression"
+              placeholder="输入格式：${func(abc,123)}"
+              type="textarea"
+              :rows="1"
+              style="width: 90%"
+            />
+            <el-button
+              type="primary"
+              style="margin-left: 5px"
+              size="mini"
+              :loading="deBugButtonIsLoading"
+              @click="dialogIsShow = true"
+            >调试
+            </el-button>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、输入运行表达式，调试自定义函数</div>
+              <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
+              <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
+          </el-form-item>
+
+        </el-col>
+      </el-row>
+
     </el-form>
 
     <el-container style="margin-left: 20px;margin-right: 20px">
       <aceEditor
+        ref="editor"
         v-model="tempScript.script_data"
         :style="{'min-height': scriptEditHeight, 'font-size': '15px'}"
         lang="python"
@@ -232,6 +257,7 @@ export default {
         script_data: '',
         script_type: ''
       },
+      findStr: '',
       runEnv: '',
       runEnvList: [],
       runEnvDict: {},
@@ -249,7 +275,11 @@ export default {
         '# 4、系统插入的env参数为运行时选择的环境对应的code，详见配置管理-运行环境，默认为debug \n' +
         '# 5、若自定义函数需要根据运行选中的环境进行调整，则可以使用此参数判断，然后给对应的变量赋值\n' +
         '#   如：当前文件为操作数据库，则可以根据这个env判断，连哪个库，操作哪些表 \n' +
-        '# 注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试 \n',
+        '# 注：建议在本地把自定义函数调试通过后直接贴进来，不建议一开始就在此编辑器中编写和调试 \n' +
+        'import sys\n' +
+        'this = sys.modules[__name__]\n\n' +
+        'if hasattr(this, "env") is False:\n' +
+        '    setattr(this, "env", "debug")  # 运行环境code\n\n',
       addMockScriptMsg: '\n# 1、支持python3.9及以下语法 \n' +
         '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
         '# 3、在执行自定义函数的时候，系统会强制写入请求路径、头部参数、查询字符串参数、body参数 \n' +
@@ -260,7 +290,18 @@ export default {
         '#        body = {} \n' +
         '# 4、最后的result的值为mock返回值，可自己随意定义 \n' +
         '# 5、支持get、post、put、delete \n' +
-        '# 6、访问 【域名 + /api/tools/mock/脚本名字】即可获取到 result 对应的值 \n\n\n\n\n\n' +
+        '# 6、访问 【域名 + /api/tools/mock/脚本名字】即可获取到 result 对应的值 \n\n\n' +
+        'import sys\n' +
+        'this = sys.modules[__name__]\n\n' +
+        'if hasattr(this, "path") is False:\n' +
+        '    setattr(this, "path", "http://localhost:8023")\n\n' +
+        'if hasattr(this, "query") is False:\n' +
+        '    setattr(this, "query", {})\n\n' +
+        'if hasattr(this, "headers") is False:\n' +
+        '    setattr(this, "headers", {})\n\n' +
+        'if hasattr(this, "body") is False:\n' +
+        '    setattr(this, "body", {})\n' +
+        '\n\n\n\n\n' +
         'result = {"code": 200, "msg": "操作成功"} \n'
     }
   },
@@ -307,6 +348,7 @@ export default {
             this.tempScript.script_data = res.script_data
           })
         }
+
         this.deBugButtonIsLoading = false
         this.scriptDrawerIsShow = true
       }
@@ -319,6 +361,13 @@ export default {
   },
 
   methods: {
+
+    findCode() {
+      if (this.findStr) {
+        const editor = this.$refs.editor.editor
+        editor.find(this.findStr)
+      }
+    },
 
     selectScriptType() {
       if ([this.addMockScriptMsg, this.addTestScriptMsg].indexOf(this.tempScript.script_data) !== -1) {

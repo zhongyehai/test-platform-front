@@ -53,7 +53,7 @@
           <template slot="title">
             <div class="el-collapse-item-title">请求信息：</div>
           </template>
-          <el-collapse v-model="defaultShowRequestInFo" style="margin-left: 30px; margin-right: 30px">
+          <el-collapse v-model="defaultShowRequestInFo" style="margin-left: 10px; margin-right: 10px">
 
             <el-descriptions class="margin-top" :column="2" border>
               <el-descriptions-item>
@@ -247,7 +247,7 @@
           <template slot="title">
             <div class="el-collapse-item-title">响应信息: </div>
           </template>
-          <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 30px; margin-right: 30px">
+          <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px; margin-right: 10px">
 
             <el-descriptions class="margin-top" :column="2" border>
               <el-descriptions-item>

@@ -110,6 +110,7 @@
 
           <!--编辑用户-->
           <el-button
+            :disabled="!isAdmin"
             type="text"
             size="mini"
             style="margin-right: 10px"
@@ -190,6 +191,7 @@ export default {
         status: undefined // 账号状态
         // role_id: undefined // 角色
       },
+      isAdmin: localStorage.getItem('permissions').indexOf('admin') !== -1,
       submitButtonIsLoading: false,
       commonBusiness: '',
       userDict: {},

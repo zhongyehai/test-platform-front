@@ -5,8 +5,22 @@
     <!-- 结构树/接口列表 -->
     <el-tabs v-model="apiTab" class="table_padding table_api">
 
-      <!-- 模块管理 -->
-      <el-tab-pane label="接口列表" name="api">
+      <!-- 接口管理 -->
+      <el-tab-pane name="api">
+        <template slot="label">
+          <span> 接口列表 </span>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>点击添加接口</div>
+            <el-button
+              v-show="currentModuleId"
+              slot="reference"
+              type="text"
+              style="margin-left: 10px"
+              icon="el-icon-plus"
+              @click="showAddApiDrawer()"
+            />
+          </el-popover>
+        </template>
 
         <el-table
           ref="apiListTable"
@@ -360,6 +374,11 @@ export default {
   },
 
   methods: {
+
+    // 添加接口
+    showAddApiDrawer(node, data) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'add')
+    },
 
     // 获取接口使用情况
     getApiMsgBelongToStep(row) {

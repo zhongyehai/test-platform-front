@@ -6,7 +6,21 @@
     <el-tabs v-model="pageTab" class="table_padding">
 
       <!-- 页面列表 -->
-      <el-tab-pane label="页面列表" name="pageList">
+      <el-tab-pane name="pageList">
+        <template slot="label">
+          <span> 页面列表 </span>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>点击添加页面</div>
+            <el-button
+              v-show="currentModuleId"
+              slot="reference"
+              type="text"
+              style="margin-left: 10px"
+              icon="el-icon-plus"
+              @click="showAddPageDrawer()"
+            />
+          </el-popover>
+        </template>
 
         <el-table
           ref="pageListTable"
@@ -316,6 +330,11 @@ export default {
   },
 
   methods: {
+
+    // 添加页面
+    showAddPageDrawer(node, data) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'pageInfo', 'add')
+    },
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {

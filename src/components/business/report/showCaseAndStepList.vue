@@ -32,6 +32,7 @@
                     row-key="id"
                     :header-cell-style="{'text-align':'center'}"
                     :row-class-name="tableRowClassName"
+                    :height="tableHeight * 0.8"
                     size="mini"
                     stripe
                     @row-click="clickRow"
