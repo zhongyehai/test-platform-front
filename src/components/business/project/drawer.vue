@@ -196,11 +196,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'currentProject',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentUserList',
-    // eslint-disable-next-line vue/require-prop-types
-    'dataType'
+    'currentProject', 'currentUserList', 'dataType'
   ],
   data() {
     return {
@@ -275,6 +271,7 @@ export default {
         } else if (status === 'edit') {
           this.updateTempProject(JSON.parse(JSON.stringify(data))) // 修改
         }
+        this.submitButtonIsLoading = false
         this.drawerIsShow = true
       }
     })

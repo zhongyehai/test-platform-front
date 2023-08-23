@@ -187,9 +187,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType',
-    // eslint-disable-next-line vue/require-prop-types
-    'dataTypeMapping'
+    'dataType', 'dataTypeMapping'
   ],
   data() {
     return {
@@ -230,6 +228,7 @@ export default {
       if (_type === 'env') {
         this.runEnvList = []
         this.tempEnv.project_id = project.id
+        this.submitButtonIsLoading = false
         this.drawerIsShow = true
         // 获取环境配置
         runEnvList({ business_id: project.business_id }).then(response => {

@@ -96,6 +96,7 @@ export default {
       if (_type === 'envSynchronizer') {
         this.projectId = projectId
         this.runEnvList = runEnvList
+        this.submitButtonIsLoading = false
         this.drawerIsShow = true
       }
     })

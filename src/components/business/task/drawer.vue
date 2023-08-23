@@ -528,6 +528,8 @@ export default {
             this.tempTask.conf.phone_id = this.$busEvents.data.runPhoneList[0].id
           }
         }
+        this.isShowDebugLoading = false
+        this.submitButtonIsLoading = false
         this.drawerIsShow = true
 
         // 获取当前服务对应的用例集列表

@@ -223,7 +223,7 @@
         type="primary"
         size="mini"
         :loading="isShowSubmitLoading"
-        @click=" drawerType === 'update' ? changApi() : addApi() "
+        @click="drawerType === 'update' ? changApi() : addApi() "
       >
         {{ '保存' }}
       </el-button>
@@ -369,6 +369,9 @@ export default {
           this.initUpdateTempApi(api) // 复制
           this.drawerType = 'add'
         }
+
+        this.isShowSubmitLoading = false
+        this.isShowDebugLoading = false
 
         if (isShowFrom) { // 查看接口详情打开的编辑框
           this.moduleTree = [{ id: api.module_id, name: this.moduleLabel }]

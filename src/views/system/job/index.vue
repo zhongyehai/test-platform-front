@@ -30,6 +30,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column :label="'定时表达式'" prop="cron" align="center" min-width="20%" size="mini">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cron }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column :label="'下次执行时间'" prop="name" align="center" min-width="20%" size="mini">
         <template slot-scope="scope">
           <span>{{ scope.row.next_run_time || '-' }}</span>

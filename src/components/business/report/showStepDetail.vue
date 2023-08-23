@@ -15,6 +15,7 @@
           </template>
           <div>
             <el-table
+              size="mini"
               :data="stepData.validation_results"
               stripe
               style="width: 100%"

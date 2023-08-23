@@ -271,6 +271,10 @@
           <el-select
             v-else
             v-model="scope.row.value"
+            :disabled="scope.row.extract_type.indexOf('cookie') !== -1 ||
+              scope.row.extract_type.indexOf('session_storage') !== -1 ||
+              scope.row.extract_type.indexOf('local_storage') !== -1 ||
+              scope.row.extract_type.indexOf('title') !== -1 "
             placeholder="选择元素"
             style="width: 100%"
             filterable

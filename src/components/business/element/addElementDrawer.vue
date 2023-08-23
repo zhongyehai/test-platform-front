@@ -226,6 +226,7 @@ export default {
             desc: null,
             wait_time_out: this.wait_time_out
           }]
+          this.isShowSubmitLoading = false
           this.drawerIsShow = true
         }
       }

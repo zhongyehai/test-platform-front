@@ -187,6 +187,7 @@ export default {
       if (_type === 'pageInfo') {
         if (command === 'add') {
           this.tempData = [{ id: `${Date.now()}`, name: null, desc: null }]
+          this.isShowSubmitLoading = false
           this.drawerIsShow = true
         }
       }

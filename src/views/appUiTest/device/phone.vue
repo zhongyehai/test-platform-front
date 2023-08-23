@@ -261,6 +261,7 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
       if (_type === 'appPhone') {
         this.showDrawer()
+        this.submitButtonIsLoading = false
       }
     })
 

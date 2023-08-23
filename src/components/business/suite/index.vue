@@ -274,7 +274,7 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" moduleDrawerStatus === 'add' ? addCaseSuite() : changCaseSuite() "
+          @click="moduleDrawerStatus === 'add' ? addCaseSuite() : changCaseSuite() "
         >
           {{ '保存' }}
         </el-button>
@@ -625,6 +625,7 @@ export default {
       } else {
         this.initNewSuite(data)
       }
+      this.isShowLoading = false
       this.moduleDrawerIsShow = true
     },
 

@@ -194,7 +194,7 @@
             </template>
             <skipIfView
               ref="skipIfView"
-              :data-typed="dataType"
+              :data-type="dataType"
               :skip-if-data="runArgs.skip_if"
               :env-list="runEnvDataSource"
               :project-id="''"

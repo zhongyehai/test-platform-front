@@ -373,6 +373,7 @@ export default {
 
           this.currentStepCopy = JSON.parse(JSON.stringify(this.currentStep)) // 深拷贝
           this.drawerType = 'add'
+          this.submitButtonIsLoading = false
           this.drawerIsShow = true
         }
       }

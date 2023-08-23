@@ -177,6 +177,7 @@ export default {
         if (command === 'add') {
           this.suiteId = this.currentSetId
           this.initNewTempData()
+          this.submitLoadingIsShow = false
           this.drawerIsShow = true
         }
       }

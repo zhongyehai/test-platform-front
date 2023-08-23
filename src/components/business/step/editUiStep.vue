@@ -441,6 +441,7 @@ export default {
           })
           this.currentStep = step
           this.currentStepCopy = JSON.parse(JSON.stringify(step)) // 深拷贝
+          this.submitButtonIsLoading = false
           this.drawerIsShow = true
         }
 

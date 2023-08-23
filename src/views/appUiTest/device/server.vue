@@ -254,6 +254,7 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type) => {
       if (_type === 'appServer') {
         this.showDrawer()
+        this.submitButtonIsLoading = false
       }
     })
 

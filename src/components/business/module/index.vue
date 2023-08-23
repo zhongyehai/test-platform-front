@@ -233,7 +233,7 @@
           size="mini"
           type="primary"
           :loading="isShowLoading"
-          @click=" moduleDrawerStatus === 'add' ? addModule() : changModule() "
+          @click="moduleDrawerStatus === 'add' ? addModule() : changModule() "
         >
           {{ '保存' }}
         </el-button>
@@ -530,6 +530,7 @@ export default {
       this.moduleDrawerStatus = command
       this.tempDataForm.name = command === 'edit' ? data.name : ''
       this.tempDataForm.controller = command === 'edit' ? data.controller : ''
+      this.isShowLoading = false
       this.moduleDrawerIsShow = true
     },
 

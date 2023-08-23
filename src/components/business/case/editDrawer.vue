@@ -388,6 +388,8 @@ export default {
           this.getCaseFrom(currentCase.id)
           this.initUpdateTempCase(currentCase)
           this.activeName = 'stepInFo'
+          this.isShowDebugLoading = false
+          this.submitLoadingIsShow = false
         }
       }
     })

@@ -7,7 +7,7 @@
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
-    <el-table ref="swaggerPullLogTable" :data="pullLogList" stripe>
+    <el-table ref="swaggerPullLogTable" :data="pullLogList" size="mini" stripe>
       <el-table-column prop="num" align="center" label="序号" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.$index + 1 }} </span>

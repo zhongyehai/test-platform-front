@@ -75,6 +75,7 @@
         element-loading-text="正在获取数据..."
         element-loading-spinner="el-icon-loading"
         stripe
+        size="mini"
         @cell-dblclick="cellDblclick"
       >
         <el-table-column prop="num" label="序号" align="center" min-width="10%">
