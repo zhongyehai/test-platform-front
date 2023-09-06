@@ -120,10 +120,10 @@
                           />
                           <el-dropdown-menu slot="dropdown">
 
-                            <el-dropdown-item
-                              @click.native.stop="addApiOrPage(node, data)"
-                            >{{ dataType === 'api' ? '添加接口' : '添加页面' }}
-                            </el-dropdown-item>
+                            <!--                            <el-dropdown-item-->
+                            <!--                              @click.native.stop="addApiOrPage(node, data)"-->
+                            <!--                            >{{ dataType === 'api' ? '添加接口' : '添加页面' }}-->
+                            <!--                            </el-dropdown-item>-->
 
                             <!--                          <el-dropdown-item-->
                             <!--                            v-if="dataType === 'api'"-->

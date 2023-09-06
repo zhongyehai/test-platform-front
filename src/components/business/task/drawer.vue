@@ -14,7 +14,7 @@
           </el-form-item>
 
           <!-- 选择运行环境 -->
-          <el-form-item v-if="dataType !== 'appUi'" label="运行环境" class="is-required">
+          <el-form-item v-if="dataType !== 'appUi'" label="运行环境" size="mini" class="is-required">
             <el-select
               v-model="tempTask.env_list"
               multiple
@@ -39,7 +39,7 @@
             </el-popover>
           </el-form-item>
 
-          <el-form-item v-if="dataType==='webUi'" label="运行浏览器" class="is-required">
+          <el-form-item v-if="dataType==='webUi'" label="运行浏览器" size="mini" class="is-required">
             <el-radio
               v-for="(value, key) in $busEvents.data.runBrowserNameDict "
               :key="key"
@@ -49,7 +49,7 @@
             </el-radio>
           </el-form-item>
 
-          <el-form-item v-if="dataType==='appUi'" label="运行服务器" class="is-required">
+          <el-form-item v-if="dataType==='appUi'" label="运行服务器" size="mini" class="is-required">
             <el-select
               v-model="tempTask.conf.server_id"
               filterable
@@ -67,7 +67,7 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item v-if="dataType==='appUi'" label="运行手机" class="is-required">
+          <el-form-item v-if="dataType==='appUi'" label="运行手机" size="mini" class="is-required">
             <el-select
               v-model="tempTask.conf.phone_id"
               filterable
@@ -85,18 +85,18 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item v-if="dataType==='appUi'" label="APP缓存" class="is-required">
+          <el-form-item v-if="dataType==='appUi'" label="APP缓存" size="mini" class="is-required">
             <el-radio v-model="tempTask.conf.no_reset" :label="false">重置</el-radio>
             <el-radio v-model="tempTask.conf.no_reset" :label="true">不重置</el-radio>
           </el-form-item>
 
-          <el-form-item label="发送报告" class="is-required">
+          <el-form-item label="发送报告" size="mini" class="is-required">
             <el-radio v-model="tempTask.is_send" label="1">不发送</el-radio>
             <el-radio v-model="tempTask.is_send" label="2">始终发送</el-radio>
             <el-radio v-model="tempTask.is_send" label="3">仅有不通过用例时发送</el-radio>
           </el-form-item>
 
-          <el-form-item v-show="tempTask.is_send !== '1'" class="is-required" label="接收方式">
+          <el-form-item v-show="tempTask.is_send !== '1'" size="mini" class="is-required" label="接收方式">
             <el-radio v-model="tempTask.receive_type" label="ding_ding">钉钉群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="we_chat">企业微信群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="email">邮件</el-radio>
@@ -108,7 +108,7 @@
 
           <div v-show="tempTask.is_send !== '1'">
             <div v-show="tempTask.receive_type === 'ding_ding' || tempTask.receive_type === 'we_chat'">
-              <el-form-item label="webhook地址" class="is-required">
+              <el-form-item label="webhook地址" size="mini" class="is-required">
                 <oneColumnRow
                   ref="webhookListInput"
                   :current-data="tempTask.webhook_list"
@@ -162,7 +162,7 @@
             </el-link>
           </el-form-item>
 
-          <el-form-item label="运行机制" class="is-required">
+          <el-form-item label="运行机制" size="mini" class="is-required">
             <el-radio
               v-for="(value, key) in runModeData"
               :key="key"
@@ -264,6 +264,7 @@
                   <el-table
                     ref="multipleTable"
                     v-loading="tableLoadingIsShow"
+                    size="mini"
                     :data="currentCaseList"
                     element-loading-text="正在获取数据..."
                     element-loading-spinner="el-icon-loading"

@@ -170,7 +170,7 @@ import {
   reportStepDetail as appUiReportStepDetail
 } from '@/apis/appUiTest/report'
 import showStepView from '@/components/business/report/showStepDetail.vue'
-import showCaseView from '@/components/business/report/showCase'
+import showCaseView from '@/components/business/report/showCaseDetail.vue'
 
 export default {
   name: 'ShowCaseAndStepList',

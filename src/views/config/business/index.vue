@@ -135,6 +135,18 @@
           <el-input v-model="tempBusiness.code" :disabled="drawerType === 'edit'" size="mini" />
         </el-form-item>
 
+        <el-form-item :label="'关联环境'" class="is-required" size="mini">
+          <el-radio v-model="tempBusiness.bind_env" label="human">手动关联</el-radio>
+          <el-radio v-model="tempBusiness.bind_env" label="auto">自动关联</el-radio>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>此业务线与运行环境的关联机制</div>
+            <div>1、手动绑定：新增运行环境后，需手动将此运行环境与此业务线关联</div>
+            <div>2、自动绑定：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
+            <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要在运行环境管理处进行一次手动关联</div>
+            <el-button slot="reference" type="text" icon="el-icon-question" />
+          </el-popover>
+        </el-form-item>
+
         <el-form-item :label="'统计通知'" class="is-required" size="mini">
           <el-radio v-model="tempBusiness.receive_type" label="0">不接收</el-radio>
           <el-radio v-model="tempBusiness.receive_type" label="ding_ding">钉钉</el-radio>
@@ -225,6 +237,7 @@ import businessToUser from './businessToUser.vue'
 import { businessList, postBusiness, putBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
 import { runEnvList } from '@/apis/config/runEnv'
+import * as types from '@/store/types'
 
 export default {
   name: 'Index',
@@ -257,6 +270,7 @@ export default {
         id: '',
         name: '',
         code: '',
+        bind_env: 'human',
         receive_type: '0',
         webhook_list: [],
         env_list: [],
@@ -332,6 +346,7 @@ export default {
           id: '',
           name: '',
           code: '',
+          bind_env: 'human',
           receive_type: '0',
           webhook_list: [],
           env_list: [],
@@ -349,6 +364,10 @@ export default {
       postBusiness(this.tempBusiness).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
+          // 保存新的token和权限
+          this.$store.commit(types.token, response.data.token)
+          localStorage.setItem('business', JSON.stringify(response.data.business_id))
+
           this.drawerIsShow = false
           this.getBusinessList()
         }

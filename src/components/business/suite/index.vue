@@ -118,10 +118,10 @@
 
                         <el-dropdown-menu slot="dropdown">
 
-                          <el-dropdown-item
-                            @click.native.stop="addCase(node, data)"
-                          >{{ '添加用例' }}
-                          </el-dropdown-item>
+                          <!--                          <el-dropdown-item-->
+                          <!--                            @click.native.stop="addCase(node, data)"-->
+                          <!--                          >{{ '添加用例' }}-->
+                          <!--                          </el-dropdown-item>-->
 
                           <el-dropdown-item
                             @click.native.stop="showCaseSuiteDialog('add', node, data)"

@@ -50,7 +50,22 @@
         </el-tab-pane>
 
         <!-- 页面元素 -->
-        <el-tab-pane label="元素列表" name="elementInfo">
+        <el-tab-pane name="elementInfo">
+          <template slot="label">
+            <span> 元素列表 </span>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>点击添加元素</div>
+              <el-button
+                v-show="showTab === 'elementInfo'"
+                slot="reference"
+                type="text"
+                style="margin-left: 10px"
+                icon="el-icon-plus"
+                @click="addElement()"
+              />
+            </el-popover>
+          </template>
+
           <elementManage
             :data-type="dataType"
             :current-project="currentProject"
@@ -63,14 +78,14 @@
       </el-tabs>
 
       <div class="demo-drawer__footer">
-        <el-button
-          v-show="showTab === 'elementInfo'"
-          size="mini"
-          type="primary"
-          style="float: left"
-          @click="addElement()"
-        > {{ '新增元素' }}
-        </el-button>
+        <!--        <el-button-->
+        <!--          v-show="showTab === 'elementInfo'"-->
+        <!--          size="mini"-->
+        <!--          type="primary"-->
+        <!--          style="float: left"-->
+        <!--          @click="addElement()"-->
+        <!--        > {{ '新增元素' }}-->
+        <!--        </el-button>-->
 
         <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
         <el-button

@@ -53,7 +53,6 @@ import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination'
 import { dataTypeTitleMappingContent } from '@/utils/mapping'
 import { phoneList, serverList } from '@/apis/appUiTest/device'
 import { getConfigByName } from '@/apis/config/config'
@@ -61,13 +60,9 @@ import { getConfigByName } from '@/apis/config/config'
 export default {
   name: 'ProjectTree',
   directives: { waves },
-  components: {
-    Pagination
-  },
   props: [
-    'dataType',
-    'menuName', // 菜单名
-    'labelWidth' // 树名字显示长度
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'menuName', 'labelWidth' // 树名字显示长度
   ],
 
   data() {
@@ -191,7 +186,7 @@ export default {
       if (this.currentProjectId !== data.id) {
         this.$bus.$emit(this.$busEvents.treeIsChoice, 'project', data)
       }
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', data)
+      // this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', data)
       this.currentProjectId = data.id
     }
   }

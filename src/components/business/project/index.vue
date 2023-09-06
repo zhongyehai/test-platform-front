@@ -17,17 +17,23 @@
           />
         </el-form-item>
 
-        <el-form-item label="创建人" size="mini">
+        <el-form-item label="业务线" size="mini">
           <el-select
-            v-model="listQuery.create_user"
-            :placeholder="'选择创建人'"
+            v-model="listQuery.business_id"
+            :placeholder="'选择业务线'"
             filterable
             default-first-option
             clearable
             size="mini"
             class="filter-item"
+            @clear="clearBusinessId"
           >
-            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
+            <el-option
+              v-for="business in $busEvents.data.businessList"
+              :key="business.id"
+              :label="business.name"
+              :value="business.id"
+            />
           </el-select>
         </el-form-item>
 
@@ -318,9 +324,10 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 20,
-        name: '', // 服务名
-        manager: '', // 负责人
-        create_user: '' // 创建人
+        name: undefined, // 服务名
+        manager: undefined, // 负责人
+        business_id: undefined, // 业务线
+        create_user: undefined // 创建人
       },
       currentProject: {}, // 当前选中的服务
       project_list: [], // 服务列表
@@ -397,6 +404,10 @@ export default {
       if (func) {
         func()
       }
+    },
+
+    clearBusinessId() {
+      this.listQuery.business_id = undefined
     },
 
     // 解析用户

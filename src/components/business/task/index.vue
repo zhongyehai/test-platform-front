@@ -8,16 +8,32 @@
         <projectTreeView
           ref="projectTree"
           :data-type="dataType"
-          :menu-name="'添加任务'"
           :label-width="5"
         />
+        <!--        :menu-name="'添加任务'"-->
       </el-col>
 
       <!-- 定时任务 -->
       <el-col style="width: 85%">
         <!-- 定时任务列表 -->
         <el-tabs v-model="taskTab" class="table_padding" style="margin-left: 5px">
-          <el-tab-pane label="定时任务列表" :name="taskTab">
+          <!--          <el-tab-pane label="定时任务列表" :name="taskTab">-->
+          <el-tab-pane name="taskTab">
+            <template slot="label">
+              <span> 定时任务列表 </span>
+              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+                <div>点击添加定时任务</div>
+                <el-button
+                  v-show="projectId"
+                  slot="reference"
+                  type="text"
+                  style="margin-left: 10px"
+                  icon="el-icon-plus"
+                  @click="showAddTaskDrawer()"
+                />
+              </el-popover>
+            </template>
+
             <el-table
               ref="taskTable"
               v-loading="tableLoadingIsShow"
@@ -214,6 +230,7 @@ export default {
       tableLoadingIsShow: false,
       taskTab: 'taskTab',
       taskList: [],
+      project: '',
       projectId: '',
       taskTotal: 0,
       pageNum: 0,
@@ -284,6 +301,7 @@ export default {
     // 服务树选中项事件
     this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
       if (_type === 'project') {
+        this.project = project
         this.projectId = project.id
         this.projectBusinessId = project.business_id
         this.getTaskList()
@@ -298,6 +316,10 @@ export default {
   },
 
   methods: {
+
+    showAddTaskDrawer() {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', this.project)
+    },
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {

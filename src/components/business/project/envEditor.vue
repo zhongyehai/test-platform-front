@@ -9,106 +9,124 @@
 
       <el-row>
         <el-col :span="3">
-          <el-tabs v-model="activeName" :tab-position="tabPosition" :before-leave="changeTab">
-            <!--          <el-tabs v-model="activeName" :tab-position="tabPosition">-->
-            <el-tab-pane
-              v-for="(runEnv) in runEnvList"
-              :key="runEnv.id"
-              :name="runEnv.id.toString()"
-              :label="runEnv.name"
-            />
-          </el-tabs>
+          <div style="margin-left: 10px">
+            <el-tabs v-model="envListTabActiveName">
+              <el-tab-pane label="环境列表" name="envList">
+                <el-scrollbar class="aside_scroll" :style="{height: `${envTabHeight}px`}">
+                  <el-tree
+                    ref="pTree"
+                    class="filter-tree project-tree"
+                    highlight-current
+                    default-expand-all
+                    node-key="id"
+                    :data="runEnvList"
+                    :props="defaultProps"
+                    @node-click="clickTable"
+                  >
+                    <span slot-scope="{ node, data }" class="custom-tree-node">
+                      <span> {{ data.name }} </span>
+                    </span>
+                  </el-tree>
+                </el-scrollbar>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
         </el-col>
 
         <el-col :span="21">
-          <div>
-            <el-form v-show="dataType !== 'appUi'" label-width="120px">
-              <el-form-item :label="'环境域名'" class="is-required" size="mini">
-                <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%" />
-                <el-popover
-                  class="el_popover_class"
-                  placement="top-start"
-                  trigger="hover"
-                >
-                  <div>当前服务在当前环境的域名</div>
-                  <el-button slot="reference" type="text" icon="el-icon-question" />
-                </el-popover>
-              </el-form-item>
-            </el-form>
+          <el-tabs v-model="envDetailTabActiveName">
+            <el-tab-pane name="envDetail">
+              <span slot="label" style="float: right">环境属性</span>
+              <el-scrollbar class="aside_scroll" :style="{height: `${envTabHeight}px`}">
+                <el-form v-show="dataType !== 'appUi'" label-width="120px">
+                  <el-form-item :label="'环境域名'" class="is-required" size="mini">
+                    <el-input v-model="tempEnv.host" placeholder="域名" style="width: 98%" />
+                    <el-popover
+                      class="el_popover_class"
+                      placement="top-start"
+                      trigger="hover"
+                    >
+                      <div>当前服务在当前环境的域名</div>
+                      <el-button slot="reference" type="text" icon="el-icon-question" />
+                    </el-popover>
+                  </el-form-item>
+                </el-form>
 
-            <el-tabs style="margin-left: 10px">
-              <!-- 公用变量 -->
-              <el-tab-pane label="自定义变量">
-                <template slot="label">
-                  <span> 自定义变量 </span>
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    placement="top-start"
-                  >
-                    <div slot="content">
-                      1、可用此功能设置一些预设值，比如token、账号信息 <br>
-                      2、在此处设置的值，对于此服务下的接口、用例均可直接引用 <br>
-                      3、若此处设置的值key为a，value为1，则只需要在要使用时使用“$a”即可获取到“1” <br>
-                      4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
-                      5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
-                    </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
-                  </el-tooltip>
-                </template>
-                <variablesView
-                  ref="variablesView"
-                  :current-data="tempEnv.variables"
-                  :placeholder-key="'key'"
-                  :placeholder-value="'value'"
-                  :placeholder-desc="'备注'"
-                />
-              </el-tab-pane>
+                <el-tabs style="margin-left: 10px">
+                  <!-- 公用变量 -->
+                  <el-tab-pane label="自定义变量">
+                    <template slot="label">
+                      <span> 自定义变量 </span>
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        placement="top-start"
+                      >
+                        <div slot="content">
+                          1、可用此功能设置一些预设值，比如token、账号信息 <br>
+                          2、在此处设置的值，对于此服务下的接口、用例均可直接引用 <br>
+                          3、若此处设置的值key为a，value为1，则只需要在要使用时使用“$a”即可获取到“1” <br>
+                          4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
+                          5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
+                        </div>
+                        <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                      </el-tooltip>
+                    </template>
+                    <variablesView
+                      ref="variablesView"
+                      :current-data="tempEnv.variables"
+                      :placeholder-key="'key'"
+                      :placeholder-value="'value'"
+                      :placeholder-desc="'备注'"
+                    />
+                  </el-tab-pane>
 
-              <!-- 头部信息 -->
-              <el-tab-pane v-if="dataType === 'api'" label="头部信息">
-                <template slot="label">
-                  <span> 头部信息 </span>
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    placement="top-start"
-                  >
-                    <div slot="content">
-                      1、可用此功能设置当前服务的固定的头部参数，比如token、cookie <br>
-                      2、在此处设置的值，在运行此服务下的接口、用例的时候，会自动加到对应的接口/步骤的头部参数上 <br>
-                      3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
-                      4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
-                    </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
-                  </el-tooltip>
-                </template>
-                <headersView
-                  ref="headersView"
-                  :current-data="tempEnv.headers"
-                  :placeholder-key="'key'"
-                  :placeholder-value="'value'"
-                  :placeholder-desc="'备注'"
-                />
-              </el-tab-pane>
+                  <!-- 头部信息 -->
+                  <el-tab-pane v-if="dataType === 'api'" label="头部信息">
+                    <template slot="label">
+                      <span> 头部信息 </span>
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        placement="top-start"
+                      >
+                        <div slot="content">
+                          1、可用此功能设置当前服务的固定的头部参数，比如token、cookie <br>
+                          2、在此处设置的值，在运行此服务下的接口、用例的时候，会自动加到对应的接口/步骤的头部参数上 <br>
+                          3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
+                          4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
+                        </div>
+                        <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                      </el-tooltip>
+                    </template>
+                    <headersView
+                      ref="headersView"
+                      :current-data="tempEnv.headers"
+                      :placeholder-key="'key'"
+                      :placeholder-value="'value'"
+                      :placeholder-desc="'备注'"
+                    />
+                  </el-tab-pane>
 
-              <!-- Python脚本 -->
-              <el-tab-pane label="python脚本">
-                <template slot="label">
-                  <span> Python脚本 </span>
-                  <el-tooltip class="item" effect="dark" placement="top-start">
-                    <div slot="content">
-                      1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
-                      2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
-                    </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
-                  </el-tooltip>
-                </template>
-                <pythonScriptIndex />
-              </el-tab-pane>
-            </el-tabs>
+                  <!-- Python脚本 -->
+                  <el-tab-pane label="python脚本">
+                    <template slot="label">
+                      <span> Python脚本 </span>
+                      <el-tooltip class="item" effect="dark" placement="top-start">
+                        <div slot="content">
+                          1、Python脚本管理，为了方便查找和修改，在此处可进行处理 <br>
+                          2、脚本本身不与环境进行关联，若需要脚本逻辑根据环境变化，请在脚本中编写内容
+                        </div>
+                        <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                      </el-tooltip>
+                    </template>
+                    <pythonScriptIndex />
+                  </el-tab-pane>
+                </el-tabs>
+              </el-scrollbar>
+            </el-tab-pane>
+          </el-tabs>
 
-          </div>
         </el-col>
       </el-row>
 
@@ -125,7 +143,7 @@
         </el-button>
 
         <el-button
-          v-show="activeName"
+          v-show="currentEnv"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -134,7 +152,7 @@
         </el-button>
 
         <el-button
-          v-show="activeName"
+          v-show="currentEnv"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -194,8 +212,11 @@ export default {
       drawerIsShow: false, // 抽屉的显示状态
       direction: 'rtl', // 抽屉打开方式
       tabPosition: 'left',
-      activeName: '',
-      defaultActiveName: '',
+      defaultProps: { children: 'children', label: 'name' }, // 树的显示规则详见element-ui
+      envListTabActiveName: 'envList',
+      envDetailTabActiveName: 'envDetail',
+      currentEnv: undefined,
+      envTabHeight: window.innerHeight * 0.75,
       getProjectEnvUrl: '',
       putProjectEnvUrl: '',
       // 临时数据
@@ -227,17 +248,19 @@ export default {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, project) => {
       if (_type === 'env') {
         this.runEnvList = []
+        this.envTabHeight = window.innerHeight * 0.72
         this.tempEnv.project_id = project.id
         this.submitButtonIsLoading = false
         this.drawerIsShow = true
+
         // 获取环境配置
         runEnvList({ business_id: project.business_id }).then(response => {
           this.runEnvList = response.data.data
           if (this.runEnvList.length > 0) {
-            this.activeName = this.runEnvList[0].id.toString()
-            this.getEnv(this.activeName, this.tempEnv.project_id)
+            this.$nextTick(() => {
+              document.querySelector('.el-tree-node__content').click()
+            })
           }
-          // this.getEnv(this.activeName, this.tempEnv.project_id)
         })
       }
     })
@@ -261,34 +284,16 @@ export default {
 
   methods: {
 
-    // 切换环境时，
-    changeTab(activeName, oldActiveName) {
-      // 自动保存，保存失败则不切换
-      // return new Promise((resolve, reject) => {
-      //   if (oldActiveName && oldActiveName !== '0') {
-      //     this.submitButtonIsLoading = true
-      //     this.tempEnv.env_id = parseInt(this.activeName)
-      //     this.tempEnv.variables = this.$refs.variablesView.tempData
-      //     if (this.dataType === 'api') {
-      //       this.tempEnv.headers = this.$refs.headersView.tempData
-      //     }
-      //     this.putProjectEnvUrl(this.tempEnv).then(response => {
-      //       this.submitButtonIsLoading = false
-      //       return this.showMessage(this, response) ? resolve() : reject()
-      //     })
-      //   }
-      // })
-
-      // 请求对应的数据
-      if (activeName && oldActiveName !== '0') {
-        this.getEnv(activeName, this.tempEnv.project_id)
-      }
+    // 切换环境
+    clickTable(row) {
+      this.currentEnv = row.id
+      this.getEnv(row.id, this.tempEnv.project_id)
     },
 
     // 保存环境设置
     saveEnv(isClose) {
       this.submitButtonIsLoading = true
-      this.tempEnv.env_id = parseInt(this.activeName)
+      this.tempEnv.env_id = this.currentEnv
       this.tempEnv.variables = this.$refs.variablesView.tempData
       if (this.dataType === 'api') {
         this.tempEnv.headers = this.$refs.headersView.tempData
@@ -324,5 +329,23 @@ export default {
 </script>
 
 <style scoped>
+.project-tree {
+  width: 100%;
+  height: 80%;
+  /*overflow: scroll;*/
+}
 
+.project-tree > .el-tree-node {
+  display: inline-block;
+  min-width: 100%;
+}
+
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
 </style>

@@ -80,6 +80,7 @@
     >
       <el-table
         :data="runLogList"
+        size="mini"
         fit
         stripe
         highlight-current-row
