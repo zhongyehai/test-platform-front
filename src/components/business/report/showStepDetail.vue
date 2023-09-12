@@ -2,14 +2,14 @@
   <div>
     <div v-show="stepData.case_id !== undefined">
       <el-collapse v-model="defaultShowDetailInfo">
-        <el-collapse-item v-show="stepData.attachment" name="01">
+        <el-collapse-item v-show="stepData.attachment" name="attachment">
           <template slot="title">
-            <div class="el-collapse-item-title"> {{ '备注信息：' }}</div>
+            <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
           </template>
-          <pre class="el-collapse-item-content" style="overflow: auto">{{ stepData.attachment }}</pre>
+          <pre class="el-collapse-item-content" style="overflow: auto; color: #FA6E86">{{ stepData.attachment }}</pre>
         </el-collapse-item>
 
-        <el-collapse-item v-show="stepData.validation_results && stepData.validation_results.length > 0" name="02">
+        <el-collapse-item v-show="stepData.validation_results && stepData.validation_results.length > 0" name="validationResults">
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '断言详情：' }}</div>
           </template>
@@ -50,7 +50,7 @@
           </div>
         </el-collapse-item>
 
-        <el-collapse-item v-if="dataType === 'api'" name="03">
+        <el-collapse-item v-if="dataType === 'api'" name="apiTestRequest">
           <template slot="title">
             <div class="el-collapse-item-title">请求信息：</div>
           </template>
@@ -75,13 +75,13 @@
 
             <el-row>
               <el-col :span="12">
-                <el-collapse-item name="request_01">
+                <el-collapse-item name="request_headers">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '头部参数：' }}</div>
                   </template>
                   <el-row>
-                    <el-col :span="20">
-                      <div v-if="stepData.request.headers" style="margin-left: 30px">
+                    <el-col :span="16">
+                      <div v-if="stepData.request.headers">
                         <JsonViewer
                           :value="strToJson(stepData.request.headers)"
                           :expand-depth="5"
@@ -89,7 +89,7 @@
                         />
                       </div>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
                       <el-button
                         v-if="stepData.request.headers"
                         v-clipboard:copy="getCopyData(stepData.request.headers)"
@@ -97,20 +97,31 @@
                         v-clipboard:error="onError"
                         size="mini"
                         type="primary"
-                      >复制
+                      >复制json
+                      </el-button>
+                      <br>
+                      <br>
+                      <el-button
+                        v-if="Object.keys(stepData.request.headers).length > 0"
+                        v-clipboard:copy="getCopyDataAsKV(stepData.request.headers)"
+                        v-clipboard:success="onCopy"
+                        v-clipboard:error="onError"
+                        size="mini"
+                        type="primary"
+                      >复制为k:v
                       </el-button>
                     </el-col>
                   </el-row>
                 </el-collapse-item>
               </el-col>
               <el-col :span="12">
-                <el-collapse-item name="request_02">
+                <el-collapse-item name="request_params">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                   </template>
                   <el-row>
-                    <el-col :span="20">
-                      <div v-if="stepData.request.params" style="margin-left: 30px">
+                    <el-col :span="16">
+                      <div v-if="stepData.request.params">
                         <JsonViewer
                           :value="strToJson(stepData.request.params)"
                           :expand-depth="5"
@@ -118,7 +129,7 @@
                         />
                       </div>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
                       <el-button
                         v-if="stepData.request.params"
                         v-clipboard:copy="getCopyData(stepData.request.params)"
@@ -126,7 +137,7 @@
                         v-clipboard:error="onError"
                         size="mini"
                         type="primary"
-                      >复制
+                      >复制json
                       </el-button>
                     </el-col>
                   </el-row>
@@ -136,13 +147,13 @@
 
             <el-row>
               <el-col :span="12">
-                <el-collapse-item name="request_03">
+                <el-collapse-item name="request_data">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ 'data参数：' }}</div>
                   </template>
                   <el-row v-if=" typeof stepData.request.data === 'object'">
-                    <el-col :span="20">
-                      <div v-if="stepData.request.data" style="margin-left: 30px">
+                    <el-col :span="16">
+                      <div v-if="stepData.request.data">
                         <JsonViewer
                           :value="strToJson(stepData.request.data)"
                           :expand-depth="5"
@@ -150,7 +161,7 @@
                         />
                       </div>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
                       <el-button
                         v-if="stepData.request.data"
                         v-clipboard:copy="getCopyData(stepData.request.data)"
@@ -158,7 +169,18 @@
                         v-clipboard:error="onError"
                         size="mini"
                         type="primary"
-                      >复制
+                      >复制json
+                      </el-button>
+                      <br>
+                      <br>
+                      <el-button
+                        v-if="Object.keys(stepData.request.data).length > 0"
+                        v-clipboard:copy="getCopyDataAsKV(stepData.request.data)"
+                        v-clipboard:success="onCopy"
+                        v-clipboard:error="onError"
+                        size="mini"
+                        type="primary"
+                      >复制为k:v
                       </el-button>
                     </el-col>
                   </el-row>
@@ -183,13 +205,13 @@
                 </el-collapse-item>
               </el-col>
               <el-col :span="12">
-                <el-collapse-item name="request_04">
+                <el-collapse-item name="request_file">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
                   </template>
                   <el-row>
-                    <el-col :span="20">
-                      <div v-if="stepData.request.files" style="margin-left: 100px">
+                    <el-col :span="16">
+                      <div v-if="stepData.request.files">
                         <JsonViewer
                           :value="strToJson(stepData.request.files)"
                           :expand-depth="5"
@@ -197,7 +219,7 @@
                         />
                       </div>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
                       <el-button
                         v-if="stepData.request.files"
                         v-clipboard:copy="getCopyData(stepData.request.files)"
@@ -213,7 +235,7 @@
               </el-col>
             </el-row>
 
-            <el-collapse-item name="request_05">
+            <el-collapse-item name="request_json">
               <template slot="title">
                 <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
               </template>
@@ -244,7 +266,7 @@
           </el-collapse>
         </el-collapse-item>
 
-        <el-collapse-item v-if="dataType === 'api'" name="04">
+        <el-collapse-item v-if="dataType === 'api'" name="apiTestResponse">
           <template slot="title">
             <div class="el-collapse-item-title">响应信息: </div>
           </template>
@@ -261,14 +283,21 @@
                 {{ stepData.response.status_code }}
               </el-descriptions-item>
             </el-descriptions>
-            <el-collapse-item name="response_01">
+
+            <el-collapse-item name="response_text">
               <template slot="title">
                 <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
               </template>
-              <div class="el-collapse-item-content" v-html="stepData.response.text" />
+              <!-- 可能返回的是个html文件，<!DOCTYPE 开头-->
+              <pre
+                v-if="stepData.response.text && stepData.response.text.startsWith('<!DOCTYPE')"
+                class="el-collapse-item-content"
+                style="overflow: auto"
+              >{{ stepData.response.text }}</pre>
+              <div v-else class="el-collapse-item-content" v-html="stepData.response.text" />
             </el-collapse-item>
 
-            <el-collapse-item name="response_02">
+            <el-collapse-item name="response_json">
               <template slot="title">
                 <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
               </template>
@@ -299,7 +328,7 @@
 
         </el-collapse-item>
 
-        <el-collapse-item v-if="dataType !== 'api'" name="05">
+        <el-collapse-item v-if="dataType !== 'api'" name="uiTestExecuteInfo">
           <template slot="title">
             <div class="el-collapse-item-title">执行信息：</div>
           </template>
@@ -329,7 +358,7 @@
 
             <el-row>
               <el-col :span="12">
-                <el-collapse-item name="execute_01">
+                <el-collapse-item name="execute_before_page">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                   </template>
@@ -342,7 +371,7 @@
                 </el-collapse-item>
               </el-col>
               <el-col :span="12">
-                <el-collapse-item name="execute_02">
+                <el-collapse-item name="execute_after_page">
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                   </template>
@@ -359,7 +388,7 @@
 
         </el-collapse-item>
 
-        <el-collapse-item name="06">
+        <el-collapse-item name="variablesMapping">
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '执行测试时内存中的公共变量：' }}</div>
           </template>
@@ -387,7 +416,7 @@
           </el-row>
         </el-collapse-item>
 
-        <el-collapse-item name="07">
+        <el-collapse-item name="extractMsg">
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '提取数据：' }}</div>
           </template>
@@ -415,7 +444,7 @@
           </el-row>
         </el-collapse-item>
 
-        <el-collapse-item name="08">
+        <el-collapse-item name="redirectPrint">
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '脚本print打印信息：' }}</div>
           </template>
@@ -466,10 +495,10 @@ export default {
 
   data() {
     return {
-      defaultShowDetailInfo: ['01', '03', '04', '05', '08'], // 默认展开报告详情的项
-      defaultShowRequestInFo: ['request_05'], // 接口自动化，请求信息
-      defaultShowResponseInFo: ['response_02'], // 接口自动化，响应信息
-      defaultShowExecuteInFo: ['execute_01', 'execute_02'] // UI自动化，执行信息
+      defaultShowDetailInfo: ['attachment', 'apiTestRequest', 'apiTestResponse', 'uiTestExecuteInfo', 'redirectPrint'], // 默认展开报告详情的项
+      defaultShowRequestInFo: ['request_json'], // 接口自动化，请求信息
+      defaultShowResponseInFo: ['response_text', 'response_json'], // 接口自动化，响应信息
+      defaultShowExecuteInFo: ['execute_before_page', 'execute_after_page'] // UI自动化，执行信息
     }
   },
 
@@ -491,6 +520,17 @@ export default {
         return data
       }
       return this.jsonToStr(data)
+    },
+
+    // 获取复制的内容，返回key:value的字符串，方便直接粘贴到postman调试
+    getCopyDataAsKV(data) {
+      console.log(data)
+      let str_data = ''
+      Object.keys(data).forEach(key => {
+        str_data += `${key}:${data[key]}\n`
+      })
+
+      return str_data
     },
 
     // 复制成功
@@ -543,6 +583,12 @@ export default {
   font-size: 15px;
   margin-left: 10px;
   color: #409eff
+}
+.el-collapse-item-error-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-left: 10px;
+  color: #FA6E86;
 }
 
 .el-collapse-item-content {

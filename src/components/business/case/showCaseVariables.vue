@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="caseVariables" :height="tableHeight" stripe style="width: 100%">
+  <el-table :data="caseVariables" :height="tableHeight" stripe style="width: 100%" size="mini">
     <el-table-column :show-overflow-tooltip="true" prop="num" label="序号" size="mini" width="50">
       <template slot-scope="scope">
         <span> {{ scope.$index + 1 }} </span>

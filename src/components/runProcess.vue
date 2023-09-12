@@ -56,7 +56,8 @@
                             <el-tag
                               size="small"
                               :type="resultTagMapping[scope.row.result]"
-                            >{{ resultMapping[scope.row.result] }}</el-tag>
+                            >{{ resultMapping[scope.row.result] }}
+                            </el-tag>
                           </template>
                         </el-table-column>
 
@@ -93,7 +94,8 @@
                             <el-tag
                               size="small"
                               :type="resultTagMapping[scope.row.result]"
-                            >{{ resultMapping[scope.row.result] }}</el-tag>
+                            >{{ resultMapping[scope.row.result] }}
+                            </el-tag>
                           </template>
                         </el-table-column>
 
@@ -118,7 +120,8 @@
                               type="text"
                               size="mini"
                               @click="showStepData(scope.row.id)"
-                            >查看</el-button>
+                            >查看
+                            </el-button>
                           </template>
                         </el-table-column>
                       </el-table>
@@ -192,6 +195,7 @@ import {
 } from '@/apis/webUiTest/report'
 import { runTestTimeOutMessage } from '@/utils/message'
 import showStepView from '@/components/business/report/showStepDetail.vue'
+import { count } from 'echarts/lib/component/dataZoom/history'
 
 export default {
   name: 'RunStep',
@@ -344,8 +348,17 @@ export default {
       ))
     },
 
+    // 点击用例，查对应用例的步骤执行信息
     clickCase(row, column, event) {
       this.reportCaseId = row.id
+    },
+
+    getRunningReportCaseId(reportCaseList) {
+      reportCaseList.forEach(reportCase => {
+        if (reportCase.result === 'running') {
+          this.reportCaseId = reportCase.id
+        }
+      })
     },
 
     getReport(batch_id) {
@@ -358,7 +371,11 @@ export default {
       let queryCount = 1
       that.timer = setInterval(function() {
         if (queryCount <= runTimeoutCount) {
-          that.reportStatusUrl({ batch_id: batch_id, process: that.activeProcess, status: that.activeStatus }).then(response => {
+          that.reportStatusUrl({
+            batch_id: batch_id,
+            process: that.activeProcess,
+            status: that.activeStatus
+          }).then(response => {
             if (response.status === 200) {
               that.activeProcess = response.data.process
               that.activeStatus = response.data.status
@@ -367,14 +384,14 @@ export default {
                 // 获取执行的用例
                 that.reportCaseListUrl({ report_id: that.reportId }).then(response => {
                   that.reportCaseDataList = response.data
+                  // that.getRunningReportCaseId(that.reportCaseDataList)  // 自动查最新的在执行的用例
                   if (!that.reportCaseId) {
                     that.reportCaseId = response.data[0].id
                   }
-                })
-
-                // 获取指定用例的执行步骤
-                that.reportStepListUrl({ report_case_id: that.reportCaseId }).then(response => {
-                  that.reportStepDataList = response.data
+                  // 获取指定用例的执行步骤
+                  that.reportStepListUrl({ report_case_id: that.reportCaseId }).then(response => {
+                    that.reportStepDataList = response.data
+                  })
                 })
               } else if (that.activeProcess === 3 && that.activeStatus === 2) {
                 that.processIsShow = false // 关闭进度框

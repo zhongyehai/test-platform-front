@@ -285,9 +285,9 @@ export default {
   methods: {
 
     // 切换环境
-    clickTable(row) {
-      this.currentEnv = row.id
-      this.getEnv(row.id, this.tempEnv.project_id)
+    clickTable(env) {
+      this.currentEnv = env.id
+      this.getEnv(env.id, this.tempEnv.project_id)
     },
 
     // 保存环境设置

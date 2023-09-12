@@ -8,7 +8,7 @@
     row-key="id"
   >
 
-    <el-table-column label="id" header-align="center" min-width="4%">
+    <el-table-column label="id" header-align="center" min-width="5%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
       </template>
@@ -27,7 +27,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="添加" header-align="center" min-width="6%">
+    <el-table-column label="添加" header-align="center" min-width="10%">
       <template slot-scope="scope">
         <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
           <el-button
@@ -69,11 +69,8 @@ import Sortable from 'sortablejs'
 export default {
   name: 'OneColumnRow',
   props: [
-    'currentData',
-    'placeholderKey',
-    'placeholderValue',
-    'placeholderDesc',
-    'busEventName'
+    // eslint-disable-next-line vue/require-prop-types
+    'currentData', 'placeholderKey', 'placeholderValue', 'placeholderDesc', 'busEventName'
   ],
   data() {
     return {

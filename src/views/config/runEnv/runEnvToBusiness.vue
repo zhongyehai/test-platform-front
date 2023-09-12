@@ -2,21 +2,14 @@
 
   <!-- 新增/修改配置表单 -->
   <el-drawer
-    title="批量管理【运行环境】与【业务线】的绑定关系"
+    title="批量管理【运行环境】与【业务线】的关联关系"
     size="70%"
     :visible.sync="drawerIsShow"
     :direction="direction"
   >
 
     <div style="margin-left: 20px">
-      <span>
-        <span style="color: red">注：</span>
-        所有运行环境都需要赋给
-        <span style="color: red">【中台业务线】</span>
-        和
-        <span style="color: red">【公共业务线】</span>
-      </span>
-      <div style="margin-top: 20px">
+      <div>
         <span>选择环境: </span>
         <runEnvCheckbox
           ref="runEnvCheckbox"
@@ -43,7 +36,7 @@
         size="mini"
         :loading="submitButtonIsLoading"
         @click="putRunEnvToBusiness('delete')"
-      >解除绑定
+      >解除关联
       </el-button>
 
       <el-button size="mini" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
@@ -53,7 +46,7 @@
         size="mini"
         :loading="submitButtonIsLoading"
         @click="putRunEnvToBusiness('add')"
-      >设置绑定
+      >设置关联
       </el-button>
 
     </div>

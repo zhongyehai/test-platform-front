@@ -174,7 +174,7 @@ export default {
         data: []
       },
       pageNum: 0,
-      pageSize: 10,
+      pageSize: 20,
       queryAddr: '',
       marker: 'caseApiList'
     }

@@ -140,9 +140,9 @@
           <el-radio v-model="tempBusiness.bind_env" label="auto">自动关联</el-radio>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>此业务线与运行环境的关联机制</div>
-            <div>1、手动绑定：新增运行环境后，需手动将此运行环境与此业务线关联</div>
-            <div>2、自动绑定：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
-            <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要在运行环境管理处进行一次手动关联</div>
+            <div>1、手动关联：新增运行环境后，需手动将此运行环境与此业务线关联</div>
+            <div>2、自动关联：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
+            <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要进行一次手动关联</div>
             <el-button slot="reference" type="text" icon="el-icon-question" />
           </el-popover>
         </el-form-item>

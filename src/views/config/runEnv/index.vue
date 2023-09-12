@@ -68,7 +68,7 @@
         type="primary"
         size="mini"
         @click.native="showRunEnvToBusinessDrawer()"
-      >绑定管理</el-button>
+      >环境与业务线关联管理</el-button>
 
     </el-form>
 

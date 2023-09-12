@@ -17,23 +17,33 @@
               <el-input v-model="currentStep.name" placeholder="步骤名称" />
             </el-form-item>
 
-            <el-form-item label="前置处理" size="small">
-              <el-input
-                v-model="currentStep.up_func"
-                type="textarea"
-                autosize
-                placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-              />
-            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="前置处理" size="small">
+                  <template slot="label">
+                    <span> 前置处理 </span>
+                    <el-tooltip class="item" effect="dark" placement="top-start">
+                      <div slot="content">在运行步骤之前要做的一些前置操作，使用自定义函数的形式实现</div>
+                      <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    </el-tooltip>
+                  </template>
+                  <oneColumnRow ref="upFuncInput" :current-data="currentStep.up_func" />
+                </el-form-item>
+              </el-col>
 
-            <el-form-item label="后置处理" size="small">
-              <el-input
-                v-model="currentStep.down_func"
-                type="textarea"
-                autosize
-                placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-              />
-            </el-form-item>
+              <el-col :span="12">
+                <el-form-item label="后置处理" size="small">
+                  <template slot="label">
+                    <span> 后置处理 </span>
+                    <el-tooltip class="item" effect="dark" placement="top-start">
+                      <div slot="content">在运行步骤之后要做的一些后置操作，使用自定义函数的形式实现</div>
+                      <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                    </el-tooltip>
+                  </template>
+                  <oneColumnRow ref="downFuncInput" :current-data="currentStep.down_func" />
+                </el-form-item>
+              </el-col>
+            </el-row>
 
             <el-form-item label="执行方式" prop="execute_type" size="small" class="is-required">
               <el-select
@@ -348,10 +358,12 @@ import {
   postStep as webUiPostStep,
   putStep as webUiPutStep
 } from '@/apis/webUiTest/step'
+import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
 export default {
   name: 'EditStep',
   components: {
+    oneColumnRow,
     extractsView,
     validatesView,
     uploadFileView,
@@ -375,8 +387,8 @@ export default {
         'status': '',
         'name': '',
         'wait_time_out': 3,
-        'up_func': '',
-        'down_func': '',
+        'up_func': [],
+        'down_func': [],
         'skip_if': {},
         'skip_on_fail': 1,
         'execute_type': '',
@@ -416,8 +428,8 @@ export default {
           this.currentStep.status = 1
           this.currentStep.name = step.name
           this.currentStep.wait_time_out = step.wait_time_out
-          this.currentStep.up_func = ''
-          this.currentStep.down_func = ''
+          this.currentStep.up_func = []
+          this.currentStep.down_func = []
           this.currentStep.execute_type = this.$busEvents.data.executeTypeList[1].value
           this.currentStep.send_keys = ''
           this.currentStep.run_times = 1
@@ -513,8 +525,8 @@ export default {
         'status': this.currentStep.status,
         'name': this.currentStep.name,
         'wait_time_out': this.currentStep.wait_time_out,
-        'up_func': this.currentStep.up_func,
-        'down_func': this.currentStep.down_func,
+        'up_func': this.$refs.upFuncInput.getData(),
+        'down_func': this.$refs.downFuncInput.getData(),
         'skip_if': this.$refs.skipIfView.tempData,
         'skip_on_fail': this.currentStep.skip_on_fail,
         'run_times': this.currentStep.run_times,

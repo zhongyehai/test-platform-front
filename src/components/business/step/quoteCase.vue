@@ -203,7 +203,7 @@ export default {
       currentProjectList: [],
       currentCaseSuiteList: [],
       quotePageNum: 1,
-      quotePageSize: 10,
+      quotePageSize: 20,
       caseList: [],
       caseTotal: 0,
       currentSetId: '',

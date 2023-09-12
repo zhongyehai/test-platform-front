@@ -51,40 +51,32 @@
 
       </el-row>
 
-      <!-- 前置条件 -->
       <el-row>
-        <el-form-item label="前置条件" prop="up_func" style="margin-bottom: 5px">
-          <el-input
-            v-model="tempApi.up_func"
-            type="textarea"
-            autosize
-            style="width: 98%"
-            placeholder="前置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-            size="mini"
-          />
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>在运行接口之前要做的一些前置操作，使用自定义函数的形式实现</div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
-        </el-form-item>
-      </el-row>
+        <el-col :span="12">
+          <el-form-item label="前置条件" prop="up_func" style="margin-bottom: 5px">
+            <template slot="label">
+              <span> 前置条件 </span>
+              <el-tooltip class="item" effect="dark" placement="top-start">
+                <div slot="content">在运行接口之前要做的一些前置操作，使用自定义函数的形式实现</div>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
+              </el-tooltip>
+            </template>
+            <oneColumnRow ref="upFuncInput" :current-data="tempApi.up_func" />
+          </el-form-item>
+        </el-col>
 
-      <!-- 后置条件 -->
-      <el-row>
-        <el-form-item label="后置条件" prop="down_func" style="margin-bottom: 5px">
-          <el-input
-            v-model="tempApi.down_func"
-            type="textarea"
-            autosize
-            style="width: 98%"
-            placeholder="后置处理函数，多个时用英文的 分号 ' ; ' 分隔"
-            size="mini"
-          />
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>在运行接口之后要做的一些后置操作，使用自定义函数的形式实现</div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
-        </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="后置条件" prop="down_func" style="margin-bottom: 5px">
+            <template slot="label">
+              <span> 后置条件 </span>
+              <el-tooltip class="item" effect="dark" placement="top-start">
+                <div slot="content">在运行接口之后要做的一些后置操作，使用自定义函数的形式实现</div>
+                <span><i style="color: #409EFF" class="el-icon-question" /></span>
+              </el-tooltip>
+            </template>
+            <oneColumnRow ref="downFuncInput" :current-data="tempApi.down_func" />
+          </el-form-item>
+        </el-col>
       </el-row>
 
     </el-form>
@@ -244,6 +236,7 @@ import bodyView from '@/components/apiBody'
 import extractsView from '@/components/Inputs/extract'
 import validatesView from '@/components/Inputs/validates'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
+import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
 import { postApi, putApi, runApi } from '@/apis/apiTest/api'
 import { getModule } from '@/apis/apiTest/module'
@@ -260,7 +253,8 @@ export default {
     headersView,
     bodyView,
     extractsView,
-    validatesView
+    validatesView,
+    oneColumnRow
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
@@ -289,8 +283,8 @@ export default {
         id: '',
         name: '',
         desc: '',
-        up_func: '',
-        down_func: '',
+        up_func: [],
+        down_func: [],
         method: '',
         addr: '',
         time_out: 60,
@@ -520,8 +514,8 @@ export default {
       this.tempApi.id = ''
       this.tempApi.name = ''
       this.tempApi.desc = ''
-      this.tempApi.up_func = ''
-      this.tempApi.down_func = ''
+      this.tempApi.up_func = []
+      this.tempApi.down_func = []
       this.tempApi.method = ''
       this.tempApi.addr = ''
       this.tempApi.time_out = 60
@@ -558,8 +552,8 @@ export default {
         id: this.tempApi.id,
         name: this.tempApi.name,
         desc: this.tempApi.desc,
-        up_func: this.tempApi.up_func,
-        down_func: this.tempApi.down_func,
+        up_func: this.$refs.upFuncInput.getData(),
+        down_func: this.$refs.downFuncInput.getData(),
         addr: this.tempApi.addr.split('?')[0],
         time_out: this.tempApi.time_out,
         method: this.$refs.methodsSelectorView.tempMethod,
