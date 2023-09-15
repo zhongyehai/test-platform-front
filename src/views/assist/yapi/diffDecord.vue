@@ -43,7 +43,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="project" align="center" label="名称" min-width="20%">
+      <el-table-column show-overflow-tooltip prop="project" align="center" label="名称" min-width="20%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
@@ -61,7 +61,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="是否有改变" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="是否有改变" min-width="10%">
         <template slot-scope="scope">
           <el-tag size="small" :type="scope.row.is_changed === 1 ? 'danger' : 'success'">
             {{ scope.row.is_changed === 1 ? '有改变' : '没有改变' }}

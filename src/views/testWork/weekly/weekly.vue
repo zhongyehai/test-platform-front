@@ -146,37 +146,37 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="product_id" align="center" label="所属产品" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="product_id" align="center" label="所属产品" min-width="15%">
             <template slot-scope="scope">
               <span> {{ parseProduct(scope.row.product_id) }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="version" align="center" label="版本号" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="version" align="center" label="版本号" min-width="15%">
             <template slot-scope="scope">
               <span> {{ scope.row.version }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="开始时间" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="create_user" align="center" label="开始时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.start_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="结束时间" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="create_user" align="center" label="结束时间" min-width="15%">
             <template slot-scope="scope">
               <span>{{ thisFormatTime(scope.row.end_time) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="创建者" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建者" min-width="15%">
             <template slot-scope="scope">
               <span>{{ parseUser(scope.row.create_user) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="15%">
+          <el-table-column show-overflow-tooltip prop="desc" align="center" label="备注" min-width="15%">
             <template slot-scope="scope">
               <span>{{ scope.row.desc }}</span>
             </template>

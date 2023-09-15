@@ -82,7 +82,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" label="接口信息" align="center" min-width="90%">
+        <el-table-column show-overflow-tooltip prop="name" label="接口信息" align="center" min-width="90%">
           <template slot-scope="scope">
             <div
               class="block"

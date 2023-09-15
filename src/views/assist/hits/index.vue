@@ -75,43 +75,43 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="date" label="触发日期" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="date" label="触发日期" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.date }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="project_id" label="所属服务" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="project_id" label="所属服务" min-width="10%">
         <template slot-scope="scope">
           <span>{{ projectDictData[scope.row.project_id] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="test_type" label="测试类型" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="test_type" label="测试类型" min-width="10%">
         <template slot-scope="scope">
           <span>{{ runTestTypeDict[scope.row.test_type] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="test_type" label="运行环境" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="test_type" label="运行环境" min-width="10%">
         <template slot-scope="scope">
           <span>{{ envDict[scope.row.env] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题类型" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="hit_type" label="问题类型" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.hit_type }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="问题详情" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" prop="hit_type" label="问题详情" min-width="15%">
         <template slot-scope="scope">
           <span>{{ scope.row.hit_detail }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="hit_type" label="报告id" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="hit_type" label="报告id" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.report_id }}</span>
         </template>

@@ -76,31 +76,31 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="脚本类型" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="name" label="脚本类型" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scriptTypeDict[scope.row.script_type] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="脚本文件名" min-width="30%">
+      <el-table-column show-overflow-tooltip align="center" prop="name" label="脚本文件名" min-width="30%">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" prop="desc" label="备注" min-width="15%">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="create_user" label="创建者" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="create_user" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="update_user" label="最后修改人" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" prop="update_user" label="最后修改人" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>

@@ -46,25 +46,25 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" align="center" label="账号名" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="账号名" min-width="15%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" align="center" label="账号" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="账号" min-width="15%">
           <template slot-scope="scope">
             <span> {{ scope.row.value }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" align="center" label="密码" min-width="30%">
+        <el-table-column show-overflow-tooltip align="center" label="密码" min-width="30%">
           <template slot-scope="scope">
             <span> {{ scope.row.password }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" prop="desc" label="备注" min-width="15%">
           <template slot-scope="scope">
             <span> {{ scope.row.desc }} </span>
           </template>

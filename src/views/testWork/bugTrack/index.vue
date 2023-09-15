@@ -473,10 +473,9 @@ export default {
         this.$busEvents.data.businessList.forEach(business => {
           this.$busEvents.data.businessDict[business.id] = business.name
         })
-        this.getBugList()
       })
     }
-
+    this.getBugList()
     this.getUserList(this.getIterationList)
   },
 

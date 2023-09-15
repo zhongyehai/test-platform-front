@@ -14,7 +14,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" label="状态" align="center" min-width="50%">
+      <el-table-column show-overflow-tooltip prop="name" label="状态" align="center" min-width="50%">
         <template slot-scope="scope">
           <el-tag :type="pullStatusTagType[scope.row.status]">
             {{ pullStatusContent[scope.row.status] }}
@@ -22,19 +22,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="操作时间" min-width="25%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="操作时间" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.created_time }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="操作人员" min-width="25%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="操作人员" min-width="25%">
         <template slot-scope="scope">
           <span> {{ userDict[scope.row.create_user].name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="操作" min-width="25%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="操作" min-width="25%">
         <template slot-scope="scope">
           <el-button
             type="primary"

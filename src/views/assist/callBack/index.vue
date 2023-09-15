@@ -24,13 +24,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'回调地址'" prop="name" align="center" min-width="20%" :show-overflow-tooltip="true">
+      <el-table-column :label="'回调地址'" prop="name" align="center" min-width="20%" show-overflow-tooltip>
         <template slot-scope="scope">
           <span> {{ scope.row.url }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'操作'" prop="detail" align="center" min-width="10%" :show-overflow-tooltip="true">
+      <el-table-column :label="'操作'" prop="detail" align="center" min-width="10%" show-overflow-tooltip>
         <template slot-scope="{row, $index}">
           <el-button
             size="mini"

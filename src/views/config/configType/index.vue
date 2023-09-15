@@ -61,25 +61,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="参数类型" min-width="35%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="参数类型" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="备注" min-width="35%">
+      <el-table-column show-overflow-tooltip prop="desc" align="center" label="备注" min-width="35%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="create_user" align="center" label="创建者" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建者" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.create_user) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="操作" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="desc" align="center" label="操作" min-width="10%">
         <template slot-scope="scope">
           <el-button
             type="text"

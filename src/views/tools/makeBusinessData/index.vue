@@ -60,13 +60,13 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip="true" align="left" label="用例名称" min-width="64%">
+              <el-table-column show-overflow-tooltip align="left" label="用例名称" min-width="64%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.name }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip="true" align="left" label="用例描述" min-width="20%">
+              <el-table-column show-overflow-tooltip align="left" label="用例描述" min-width="20%">
                 <template slot-scope="scope">
                   <el-popover
                     :ref="scope.row.id"
@@ -90,7 +90,7 @@
                 <template slot-scope="scope">
 
                   <!-- 运行用例 -->
-                  <el-button slot="reference" type="text" size="mini" @click="clickRunCase(scope.row)">运行 </el-button>
+                  <el-button type="text" size="mini" @click="clickRunCase(scope.row)">运行 </el-button>
 
                   <!--修改用例-->
                   <el-button type="text" size="mini" @click="editCase(scope.row)">修改 </el-button>
@@ -104,6 +104,7 @@
 
     <selectRunEnv
       :data-type="'api'"
+      :project-business-id="businessActiveId"
     />
 
     <runProcess
@@ -130,6 +131,7 @@ import { businessList } from '@/apis/config/business'
 import { projectList } from '@/apis/apiTest/project'
 import { assertCaseList, caseRun } from '@/apis/apiTest/case'
 import editCaseDrawer from '@/components/business/case/editDrawer.vue'
+
 export default {
   name: 'MakeBusinessData',
   components: {

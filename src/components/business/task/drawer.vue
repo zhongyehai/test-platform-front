@@ -275,9 +275,9 @@
                   >
                     <el-table-column type="selection" :selectable="isDisable" min-width="10%" />
 
-                    <el-table-column :show-overflow-tooltip="true" label="用例名" prop="name" min-width="50%" />
+                    <el-table-column show-overflow-tooltip label="用例名" prop="name" min-width="50%" />
 
-                    <el-table-column :show-overflow-tooltip="true" label="用例描述" min-width="15%">
+                    <el-table-column show-overflow-tooltip label="用例描述" min-width="15%">
                       <template slot-scope="scope">
                         <el-popover
                           :ref="scope.row.id"

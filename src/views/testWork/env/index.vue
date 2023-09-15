@@ -64,19 +64,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="业务线" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" label="业务线" min-width="15%">
         <template slot-scope="scope">
           <span> {{ $busEvents.data.businessDict[scope.row.business] }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="环境名" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" label="环境名" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="环境域名" min-width="30%">
+      <el-table-column show-overflow-tooltip align="center" label="环境域名" min-width="30%">
         <template slot-scope="scope">
           <a :href="scope.row.value" target="_blank" style="color: #3a8ee6">
             {{ scope.row.value }}
@@ -84,7 +84,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="desc" label="备注" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" prop="desc" label="备注" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.desc }} </span>
         </template>
@@ -320,9 +320,9 @@ export default {
         this.$busEvents.data.businessList.forEach(business => {
           this.$busEvents.data.businessDict[business.id] = business.name
         })
-        this.getEnvList()
       })
     }
+    this.getEnvList()
   },
 
   methods: {

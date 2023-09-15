@@ -39,25 +39,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="文件名" min-width="40%">
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="文件名" min-width="40%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="size" align="center" label="文件大小" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="size" align="center" label="文件大小" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.size }} 字节</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="lastVisitTime" label="最近一次使用时间" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" prop="lastVisitTime" label="最近一次使用时间" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.lastVisitTime }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" prop="LastModifiedTime" label="最后一次更新时间" min-width="15%">
+      <el-table-column show-overflow-tooltip align="center" prop="LastModifiedTime" label="最后一次更新时间" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.LastModifiedTime }} </span>
         </template>

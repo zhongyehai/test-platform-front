@@ -84,19 +84,19 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="元素名称" min-width="20%">
+        <el-table-column show-overflow-tooltip prop="name" align="center" label="元素名称" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="by" align="center" label="定位方式" min-width="20%">
+        <el-table-column show-overflow-tooltip prop="by" align="center" label="定位方式" min-width="20%">
           <template slot-scope="scope">
             <span> {{ parseFindBy(scope.row.by) }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="定位元素" min-width="20%">
+        <el-table-column show-overflow-tooltip prop="element" align="center" label="定位元素" min-width="20%">
           <template slot-scope="scope">
             <span> {{ scope.row.element }} </span>
           </template>

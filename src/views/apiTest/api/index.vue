@@ -42,7 +42,7 @@
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip="true"
+            show-overflow-tooltip
             prop="addr"
             label="接口信息"
             align="center"
@@ -73,7 +73,7 @@
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip="true"
+            show-overflow-tooltip
             prop="level"
             align="center"
             min-width="10%"
@@ -138,7 +138,7 @@
           </el-table-column>
 
           <el-table-column
-            :show-overflow-tooltip="true"
+            show-overflow-tooltip
             prop="quote_count"
             align="center"
             min-width="10%"

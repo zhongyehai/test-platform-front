@@ -154,13 +154,13 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="name" align="left" label="用例名称" min-width="40%">
+          <el-table-column show-overflow-tooltip prop="name" align="left" label="用例名称" min-width="40%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="desc" align="left" label="详情" min-width="10%">
+          <el-table-column show-overflow-tooltip prop="desc" align="left" label="详情" min-width="10%">
             <template slot-scope="scope">
               <el-popover
                 :ref="scope.row.id"
@@ -181,7 +181,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="level" align="left" min-width="20%">
+          <el-table-column show-overflow-tooltip prop="level" align="left" min-width="20%">
             <template slot="header">
               <span> 用例状态 </span>
               <el-tooltip

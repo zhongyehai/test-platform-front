@@ -51,7 +51,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="任务名称" min-width="25%">
+              <el-table-column show-overflow-tooltip prop="name" align="center" label="任务名称" min-width="25%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.name }} </span>
                 </template>

@@ -87,26 +87,26 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="env" align="center" label="环境" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="env" align="center" label="环境" min-width="10%">
         <template slot-scope="scope">
           <span> {{ runEnvDict[scope.row.env] }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="mobile" align="center" label="手机号" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="mobile" align="center" label="手机号" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.mobile }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="password" align="center" label="密码" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="password" align="center" label="密码" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.password }} </span>
         </template>
       </el-table-column>
 
       <el-table-column
-        :show-overflow-tooltip="true"
+        show-overflow-tooltip
         prop="business_order_no"
         align="center"
         label="订单号"
@@ -117,14 +117,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="amount" align="center" label="金额" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="amount" align="center" label="金额" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.amount }} </span>
         </template>
       </el-table-column>
 
       <el-table-column
-        :show-overflow-tooltip="true"
+        show-overflow-tooltip
         prop="business_status"
         align="center"
         label="业务状态"
@@ -135,7 +135,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="use_status" align="center" label="使用状态" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="use_status" align="center" label="使用状态" min-width="10%">
         <template slot-scope="scope">
           <el-tag
             size="mini"
@@ -146,7 +146,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="desc" align="center" label="描述" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="desc" align="center" label="描述" min-width="10%">
         <template slot-scope="scope">
           <span>{{ scope.row.desc }}</span>
         </template>

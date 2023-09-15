@@ -138,7 +138,7 @@
               </el-table-column>
 
               <el-table-column
-                :show-overflow-tooltip="true"
+                show-overflow-tooltip
                 prop="name"
                 align="center"
                 label="任务名称"
@@ -151,19 +151,19 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="触发方式" align="center" min-width="8%">
+              <el-table-column show-overflow-tooltip label="触发方式" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <span> {{ reportTriggerType[scope.row.trigger_type] }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column v-if="dataType !== 'appUi'" label="运行环境" align="center" min-width="10%">
+              <el-table-column v-if="dataType !== 'appUi'" show-overflow-tooltip label="运行环境" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <span> {{ eventDict[scope.row.env] }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column label="运行单元" align="center" min-width="8%">
+              <el-table-column show-overflow-tooltip label="运行单元" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <span> {{ runTypeDict[scope.row.run_type] }} </span>
                 </template>

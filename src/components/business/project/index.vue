@@ -141,7 +141,7 @@
 
       <el-table-column
         v-if="dataType === 'api'"
-        :show-overflow-tooltip="true"
+        show-overflow-tooltip
         align="center"
         label="拉取状态"
         min-width="10%"
@@ -173,19 +173,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="业务线" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" label="业务线" min-width="10%">
         <template slot-scope="scope">
           <span>{{ $busEvents.data.businessDict[scope.row.business_id] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="负责人" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" label="负责人" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.manager) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" align="center" label="最后修改" min-width="10%">
+      <el-table-column show-overflow-tooltip align="center" label="最后修改" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
         </template>

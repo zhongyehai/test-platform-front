@@ -39,7 +39,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="页面名称" min-width="20%">
+          <el-table-column show-overflow-tooltip prop="name" align="center" label="页面名称" min-width="20%">
             <template slot-scope="scope">
               <span> {{ scope.row.name }} </span>
             </template>
@@ -47,7 +47,7 @@
 
           <el-table-column
             v-if="dataType==='webUi'"
-            :show-overflow-tooltip="true"
+            show-overflow-tooltip
             prop="addr"
             align="center"
             min-width="50%"

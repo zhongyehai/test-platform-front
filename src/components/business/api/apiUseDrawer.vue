@@ -20,20 +20,20 @@
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" label="接口对应步骤" align="center" min-width="50%">
+        <el-table-column show-overflow-tooltip prop="name" label="接口对应步骤" align="center" min-width="50%">
           <template slot-scope="scope">
             <span>{{ scope.row.from }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column :show-overflow-tooltip="true" prop="name" align="center" label="用例名称" min-width="25%">
+        <el-table-column show-overflow-tooltip prop="name" align="center" label="用例名称" min-width="25%">
           <template slot-scope="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
         <el-table-column
-          :show-overflow-tooltip="true"
+          show-overflow-tooltip
           prop="level"
           align="center"
           min-width="17%"

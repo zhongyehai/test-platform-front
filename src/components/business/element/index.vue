@@ -18,13 +18,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="name" label="元素名称" min-width="15%">
+      <el-table-column show-overflow-tooltip prop="name" label="元素名称" min-width="15%">
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="by" align="center" min-width="12%">
+      <el-table-column show-overflow-tooltip prop="by" align="center" min-width="12%">
         <template slot="header">
           <span>定位方式</span>
           <el-tooltip class="item" effect="dark" placement="top-start">
@@ -39,13 +39,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="element" align="center" label="元素表达式" min-width="42%">
+      <el-table-column show-overflow-tooltip prop="element" align="center" label="元素表达式" min-width="42%">
         <template slot-scope="scope">
           <span> {{ scope.row.element }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :show-overflow-tooltip="true" prop="wait_time_out" align="center" min-width="10%">
+      <el-table-column show-overflow-tooltip prop="wait_time_out" align="center" min-width="10%">
         <template slot="header">
           <span>等待时间(秒)</span>
           <el-tooltip class="item" effect="dark" placement="top-start">
