@@ -160,14 +160,17 @@ import {
   reportCaseList as webUiReportCaseList,
   reportCaseDetail as webUiReportCaseDetail,
   reportStepList as webUiReportStepList,
-  reportStepDetail as webUiReportStepDetail
+  reportStepDetail as webUiReportStepDetail,
+  reportStepImg as webUiReportStepImg
+
 } from '@/apis/webUiTest/report'
 
 import {
   reportCaseList as appUiReportCaseList,
   reportCaseDetail as appUiReportCaseDetail,
   reportStepList as appUiReportStepList,
-  reportStepDetail as appUiReportStepDetail
+  reportStepDetail as appUiReportStepDetail,
+  reportStepImg as appUiReportStepImg
 } from '@/apis/appUiTest/report'
 import showStepView from '@/components/business/report/showStepDetail.vue'
 import showCaseView from '@/components/business/report/showCaseDetail.vue'
@@ -184,7 +187,7 @@ export default {
       caseTableIsLoading: false,
       stepTableIsLoading: false,
       tableHeight: window.innerHeight * 0.85,
-
+      report_id: '',
       caseListTab: '用例列表',
       caseDataTab: '用例明细',
       stepDataTab: '步骤明细',
@@ -287,7 +290,8 @@ export default {
       reportCaseListUrl: '',
       reportCaseDetailUrl: '',
       reportStepListUrl: '',
-      reportStepDetailUrl: ''
+      reportStepDetailUrl: '',
+      reportStepImgUrl: ''
     }
   },
 
@@ -331,6 +335,7 @@ export default {
   mounted() {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, report_id) => {
       if (_type === 'showReportCaseList') {
+        this.report_id = report_id
         this.tableHeight = window.innerHeight * 0.85
         this.getStepCaseList(report_id)
       }
@@ -348,11 +353,13 @@ export default {
       this.reportCaseDetailUrl = webUiReportCaseDetail
       this.reportStepListUrl = webUiReportStepList
       this.reportStepDetailUrl = webUiReportStepDetail
+      this.reportStepImgUrl = webUiReportStepImg
     } else {
       this.reportCaseListUrl = appUiReportCaseList
       this.reportCaseDetailUrl = appUiReportCaseDetail
       this.reportStepListUrl = appUiReportStepList
       this.reportStepDetailUrl = appUiReportStepDetail
+      this.reportStepImgUrl = appUiReportStepImg
     }
   },
 
@@ -429,6 +436,19 @@ export default {
         loading.close()
         this.stepData = response.data.step_data
         this.reportStepDetailIsShow = true
+
+        // 非接口测试，获取对应的截图
+        if (this.dataType !== 'api') {
+          // 获前置取截图
+          this.reportStepImgUrl({ report_id: this.report_id, report_step_id: id, img_type: 'before_page' }).then(response => {
+            this.stepData.before = response.data.data
+          })
+
+          // 获后置取截图
+          this.reportStepImgUrl({ report_id: this.report_id, report_step_id: id, img_type: 'after_page' }).then(response => {
+            this.stepData.after = response.data.data
+          })
+        }
       })
     },
 

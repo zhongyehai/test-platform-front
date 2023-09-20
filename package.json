@@ -18,7 +18,7 @@
     "core-js": "3.6.5",
     "default-passive-events": "^2.0.0",
     "echarts": "^4.9.0",
-    "element-ui": "^2.13.2",
+    "element-ui": "^2.15.13",
     "file-saver": "^2.0.5",
     "js-cookie": "2.2.0",
     "kity": "^2.0.4",

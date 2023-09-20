@@ -53,3 +53,8 @@ export function reportStepList(params) {
 export function reportStepDetail(params) {
   return request({ url: reportStepDir, method: 'get', data: null, params: params })
 }
+
+// 报告步骤数据
+export function reportStepImg(data) {
+  return request({ url: reportStepDir + '/img', method: 'post', data: data })
+}

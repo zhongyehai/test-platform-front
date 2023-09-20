@@ -137,15 +137,9 @@
                 </template>
               </el-table-column>
 
-              <el-table-column
-                show-overflow-tooltip
-                prop="name"
-                align="center"
-                label="任务名称"
-                min-width="18%"
-              />
+              <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="18%" />
 
-              <el-table-column label="生成时间" align="center" min-width="15%">
+              <el-table-column show-overflow-tooltip label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.created_time }} </span>
                 </template>
@@ -163,13 +157,13 @@
                 </template>
               </el-table-column>
 
-              <el-table-column show-overflow-tooltip label="运行单元" align="center" min-width="8%">
-                <template slot-scope="scope">
-                  <span> {{ runTypeDict[scope.row.run_type] }} </span>
-                </template>
-              </el-table-column>
+              <!--              <el-table-column show-overflow-tooltip label="运行单元" align="center" min-width="8%">-->
+              <!--                <template slot-scope="scope">-->
+              <!--                  <span> {{ runTypeDict[scope.row.run_type] }} </span>-->
+              <!--                </template>-->
+              <!--              </el-table-column>-->
 
-              <el-table-column label="是否通过" align="center" min-width="10%">
+              <el-table-column show-overflow-tooltip label="是否通过" align="center" min-width="10%">
                 <template slot-scope="scope">
                   <el-tag size="small" :type="reportStatusTagType[scope.row.is_passed]">
                     {{ reportStatusContent[scope.row.is_passed] }}
@@ -177,7 +171,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="是否完成" align="center" min-width="8%">
+              <el-table-column show-overflow-tooltip label="是否完成" align="center" min-width="8%">
                 <template slot-scope="scope">
                   <el-tag
                     size="small"
@@ -185,6 +179,12 @@
                   >
                     {{ scope.row.process === 3 && scope.row.status === 2 ? '已完成' : '执行中' }}
                   </el-tag>
+                </template>
+              </el-table-column>
+
+              <el-table-column show-overflow-tooltip label="创建人" align="center" min-width="8%">
+                <template slot-scope="scope">
+                  <span> {{ userDict[scope.row.create_user] }} </span>
                 </template>
               </el-table-column>
 
@@ -334,6 +334,7 @@ export default {
       isAdmin: localStorage.getItem('permissions').indexOf('admin') !== -1,
       queryTotal: 0,
       userList: [],
+      userDict: {},
       eventDict: {},
       eventList: {},
       runTypeDict: {},
@@ -434,6 +435,9 @@ export default {
     async getUserList() {
       const response = await userList()
       this.userList = response.data.data
+      this.userList.forEach(user => {
+        this.userDict[user.id] = user.name
+      })
     },
 
     // 获取服务对应的报告列表
