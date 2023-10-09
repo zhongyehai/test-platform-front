@@ -5,21 +5,11 @@
     </el-radio-group>
 
     <el-row v-loading="card_is_loading" class="card-group">
-      <el-col :span="4">
-        <el-card shadow="hover" class="card"> 总共使用次数 {{ use_card_res.use_count }}</el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card shadow="hover" class="card"> 总体通过率 {{ (use_card_res.use_pass_rate * 100).toFixed(2).toString() }} % </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card shadow="hover" class="card"> 巡检次数 {{ use_card_res.patrol_count }}</el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card shadow="hover" class="card"> 巡检通过率 {{ (use_card_res.patrol_pass_rate * 100).toFixed(2).toString() }} %</el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card shadow="hover" class="card"> 造数据次数 {{ use_card_res.make_data_count }}</el-card>
-      </el-col>
+      <el-card class="card"> 总使用次数 {{ use_card_res.use_count }}</el-card>
+      <el-card class="card"> 总通过率 {{ (use_card_res.use_pass_rate * 100).toFixed(2).toString() }} % </el-card>
+      <el-card class="card"> 巡检次数 {{ use_card_res.patrol_count }}</el-card>
+      <el-card class="card"> 巡检通过率 {{ (use_card_res.patrol_pass_rate * 100).toFixed(2).toString() }} %</el-card>
+      <el-card class="card"> 造数据次数 {{ use_card_res.make_data_count }}</el-card>
     </el-row>
 
     <chart :key="use_chart_res.options_list" :chart-data="use_chart_res" />
@@ -124,8 +114,12 @@ export default {
 .card-group {
   padding-top: 10px;
   padding-bottom: 32px;
+  white-space: nowrap; /* 防止卡片换行 */
+  overflow-x: auto;    /* 如果内容超出容器宽度，显示水平滚动条 */
 
   .card {
+    width: 19%;        /* 设置卡片宽度，根据需要调整 */
+    display: inline-block; /* 设置卡片为内联块元素，使其在同一行显示 */
     color: #FFF;
     text-align: center;
     margin-right: 10px;

@@ -145,7 +145,7 @@ export default {
         this.$busEvents.data.businessList.forEach(business => {
           this.$busEvents.data.businessDict[business.id] = business.name
         })
-        if (this.$busEvents.data.businessList.length > 1) {
+        if (this.$busEvents.data.businessList.length > 0) {
           this.query_form.business_id = this.$busEvents.data.businessList[0].id
           this.get_analyse_chart()
         }
