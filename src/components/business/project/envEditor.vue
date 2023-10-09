@@ -143,7 +143,7 @@
         </el-button>
 
         <el-button
-          v-show="currentEnv"
+          v-show="tempEnv.env_id"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -152,7 +152,7 @@
         </el-button>
 
         <el-button
-          v-show="currentEnv"
+          v-show="tempEnv.env_id"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -215,7 +215,6 @@ export default {
       defaultProps: { children: 'children', label: 'name' }, // 树的显示规则详见element-ui
       envListTabActiveName: 'envList',
       envDetailTabActiveName: 'envDetail',
-      currentEnv: undefined,
       envTabHeight: window.innerHeight * 0.75,
       getProjectEnvUrl: '',
       putProjectEnvUrl: '',
@@ -223,6 +222,7 @@ export default {
       tempEnv: {
         id: '',
         host: '',
+        env_id: '',
         project_id: '',
         headers: [{ 'key': '', 'value': '', 'remark': '' }],
         variables: [{ 'key': '', 'value': '', 'remark': '' }]
@@ -268,10 +268,7 @@ export default {
     // 监听 环境同步是否完成 的状态
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, envData) => {
       if (_type === 'envSynchronizer') {
-        if (envData[this.tempEnv]) {
-          this.tempEnv.headers = envData[this.tempEnv].headers
-          this.tempEnv.variables = envData[this.tempEnv].variables
-        }
+        this.getEnv(this.tempEnv.env_id, this.tempEnv.project_id)
       }
     })
   },
@@ -286,14 +283,13 @@ export default {
 
     // 切换环境
     clickTable(env) {
-      this.currentEnv = env.id
+      this.tempEnv.env_id = env.id
       this.getEnv(env.id, this.tempEnv.project_id)
     },
 
     // 保存环境设置
     saveEnv(isClose) {
       this.submitButtonIsLoading = true
-      this.tempEnv.env_id = this.currentEnv
       this.tempEnv.variables = this.$refs.variablesView.tempData
       if (this.dataType === 'api') {
         this.tempEnv.headers = this.$refs.headersView.tempData

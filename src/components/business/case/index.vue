@@ -170,6 +170,7 @@
                 popper-class="down-popover"
               >
                 <showCaseDesc
+                  :ref="scope.row.id"
                   :case-desc="scope.row.desc"
                   :case-skip-if="scope.row.skip_if"
                   :case-variables="scope.row.variables"
