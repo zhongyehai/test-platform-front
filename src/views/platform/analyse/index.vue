@@ -53,16 +53,19 @@
     </el-form>
 
     <el-row style="margin-top: 10px">
+
       <el-col :span="12">
-        <count_chart :key="analyse_chart_res.use_count" :chart-data="analyse_chart_res.use_count" />
+        <count_chart :key="analyse_chart_res.use_count.stat" :chart-data="analyse_chart_res.use_count.stat" />
         <div style="text-align: center; color: #409EFF">
-          报告总计{{ analyse_chart_res.use_count.all_count }}条，执行通过{{ analyse_chart_res.use_count.pass_count }}
-          条，执行失败{{ analyse_chart_res.use_count.fail_count }}条，执行通过率
-          {{ ((analyse_chart_res.use_count.pass_count / analyse_chart_res.use_count.all_count) * 100).toFixed(3).toString() }}%
+          报告总计{{ analyse_chart_res.use_count.detail.all_count }}条，执行通过{{ analyse_chart_res.use_count.detail.pass_count }}
+          条，执行失败{{ analyse_chart_res.use_count.detail.fail_count }}条，执行通过率
+          {{ ((analyse_chart_res.use_count.detail.pass_count / analyse_chart_res.use_count.detail.all_count) * 100).toFixed(3).toString() }}%
         </div>
       </el-col>
+
       <el-col :span="12">
-        <count_chart :key="analyse_chart_res.use_count" :chart-data="analyse_chart_res.use_count" />
+        <count_chart :key="analyse_chart_res.create.stat" :chart-data="analyse_chart_res.create.stat" />
+
       </el-col>
     </el-row>
 
@@ -126,7 +129,20 @@ export default {
 
       analyse_chart_res: {
         'use_count': {
-          'all_count': 0, 'pass_count': 0, 'fail_count': 0
+          'stat': {
+            'title': '执行次数统计',
+            'stat_list': [
+              { 'name': '通过数量', 'value': 0 },
+              { 'name': '不通过数量', 'value': 0 }
+            ]
+          },
+          'detail': { 'all_count': 0, 'pass_count': 0, 'fail_count': 0 }
+        },
+        'create': {
+          'stat': {
+            'title': '执行人员统计',
+            'stat_list': [{ 'name': '', 'value': 0 }]
+          }
         }
       }
 
@@ -159,8 +175,13 @@ export default {
   methods: {
 
     get_analyse_chart() {
-      this.query_form.start_time = this.time_list[0]
-      this.query_form.end_time = this.time_list[1]
+      if (this.time_list && this.time_list.length > 0) {
+        this.query_form.start_time = this.time_list[0]
+        this.query_form.end_time = this.time_list[1]
+      } else {
+        this.query_form.start_time = undefined
+        this.query_form.end_time = undefined
+      }
       analyseChart(this.query_form).then(response => {
         this.analyse_chart_res = response.data
       })
@@ -178,7 +199,7 @@ export default {
 
   .github-corner {
     position: absolute;
-    top: 0px;
+    top: 0;
     border: 0;
     right: 0;
   }

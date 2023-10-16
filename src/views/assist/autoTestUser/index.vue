@@ -28,43 +28,44 @@
       :data="currentDataList"
       stripe
       style="width: 100%"
+      @cell-dblclick="cellDblclick"
     >
-      <el-table-column show-overflow-tooltip label="数据id" align="center" min-width="8%">
+      <el-table-column show-overflow-tooltip label="数据id" align="center" prop="id" min-width="8%">
         <template slot-scope="scope">
           <span> {{ scope.row.id }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="手机号" align="center" min-width="10%">
+      <el-table-column show-overflow-tooltip label="手机号/账号" align="center" prop="mobile" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.mobile }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="密码" align="center" min-width="22%">
+      <el-table-column show-overflow-tooltip label="密码" align="center" prop="password" min-width="22%">
         <template slot-scope="scope">
           <span> {{ scope.row.password }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="access_token" align="center" min-width="25%">
+      <el-table-column show-overflow-tooltip label="access_token" align="center" prop="access_token" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.access_token }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="refresh_token" align="center" min-width="25%">
+      <el-table-column show-overflow-tooltip label="refresh_token" align="center" prop="refresh_token" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.refresh_token }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="公司名称" align="center" min-width="25%">
+      <el-table-column show-overflow-tooltip label="公司名称" align="center" prop="company_name" min-width="25%">
         <template slot-scope="scope">
           <span> {{ scope.row.company_name }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="角色" align="center" min-width="10%">
+      <el-table-column show-overflow-tooltip label="角色" align="center" prop="role" min-width="10%">
         <template slot-scope="scope">
           <span> {{ scope.row.role }} </span>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip label="所属环境" align="center" min-width="10%">
+      <el-table-column show-overflow-tooltip label="所属环境" align="center" prop="env" min-width="10%">
         <template slot-scope="scope">
           <span> {{ envDict[scope.row.env] }} </span>
         </template>
@@ -127,6 +128,17 @@ export default {
       getAutoTestUser({ 'env': this.currentEnv }).then(response => {
         this.currentDataList = response.data
       })
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
     }
 
   }

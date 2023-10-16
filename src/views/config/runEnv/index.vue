@@ -81,6 +81,7 @@
       :data="run_env_list"
       stripe
       row-key="id"
+      @cell-dblclick="cellDblclick"
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
@@ -265,6 +266,19 @@ export default {
 
     showRunEnvToBusinessDrawer(row) {
       this.$bus.$emit(this.$busEvents.drawerIsShow, 'runEnvToBusiness', JSON.parse(JSON.stringify(this.run_env_list)))
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      if (typeof (data) === 'string') {
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
     },
 
     showAddRunEnvDrawer(row) {

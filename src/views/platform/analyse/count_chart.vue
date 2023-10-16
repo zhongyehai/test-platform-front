@@ -51,7 +51,7 @@ export default {
 
       this.chart.setOption({
         title: {
-          text: '执行次数统计',
+          text: this.chartData.title,
           // subtext: 'Fake Data',
           left: 'center'
         },
@@ -64,13 +64,10 @@ export default {
         },
         series: [
           {
-            name: 'Access From',
+            name: this.chartData.title,
             type: 'pie',
             radius: '50%',
-            data: [
-              { value: this.chartData.pass_count, name: '通过数量' },
-              { value: this.chartData.fail_count, name: '不通过数量' }
-            ],
+            data: this.chartData.stat_list,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
