@@ -99,8 +99,7 @@ import {
   putProjectKYM,
   addKYM,
   KYMProjectList,
-  getKymAsXmind,
-  getDiffRecordAsXmind
+  getKymAsXmind
 } from '@/apis/testWork/kym'
 
 export default {

@@ -19,7 +19,7 @@
 <script>
 import waves from '@/directive/waves'
 import { useCard, useChart } from '@/apis/apiTest/stat'
-import Chart from '@/views/platform/overview/chart.vue' // waves directive
+import Chart from './chart.vue'
 
 export default {
   name: 'Index',

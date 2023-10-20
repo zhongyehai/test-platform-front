@@ -1,9 +1,8 @@
 # 基于 vue-admin-template 开发测试平台前端
 
-## [体验demo](http://139.196.100.202/#/login) ，  账号：admin、密码：admin123456Aliyun
+## [体验demo](http://139.196.100.202/#/login)，账号：admin、密码：123456，请不要修改密码
 
 ## [去后端](https://github.com/zhongyehai/test-platform-api)
-
 
 ## 步骤
 
@@ -22,24 +21,22 @@ npm run build
 
 浏览器访问 [http://localhost:8023](http://localhost:8023), 账号admin, 密码123456
 
-
-## 其它
-
-```bash
-# 预览发布环境效果
-npm run preview
-
-# 预览发布环境效果 + 静态资源分析
-npm run preview -- --report
-
-# 代码格式检查
-npm run lint
-
-# 代码格式检查并自动修复
-npm run lint -- --fix
-```
-
 ### 创作不易，麻烦给个星哦
 
 ### QQ交流群：249728408
+
 ### 博客地址：https://www.cnblogs.com/zhongyehai/
+
+## 项目关键截图
+
+#### 选择运行环境
+
+![选择运行环境](img/case/选择运行环境.png)
+
+#### 测试执行进度
+
+![用例执行进度](img/case/测试执行进度.png)
+
+#### 测试报告
+
+![测试报告](img/report/测试报告.png)

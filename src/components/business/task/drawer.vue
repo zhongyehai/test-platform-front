@@ -162,6 +162,23 @@
             </el-link>
           </el-form-item>
 
+          <el-form-item label="节假日/调休日" size="mini" class="is-required">
+            <el-radio
+              v-for="item in skip_holiday_item"
+              :key="item.value"
+              v-model="tempTask.skip_holiday"
+              :label="item.value"
+            >
+              {{ item.label }}
+            </el-radio>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、用于设置当定时任务触发时，当前日期为节假日或者调休日时，是否执行</div>
+              <div>2、节假日的数据来源：参数配置的holiday_list对应的值</div>
+              <div>注：每年需手动更新节假日，格式为 ["01-01", "10-01"] </div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
+          </el-form-item>
+
           <el-form-item label="运行机制" size="mini" class="is-required">
             <el-radio
               v-for="(value, key) in runModeData"
@@ -423,7 +440,12 @@ export default {
       drawerIsShow: false,
       isShowDebugLoading: false,
       tableLoadingIsShow: false,
+      skip_holiday_item: [
+        { label: '跳过执行', value: true },
+        { label: '不跳过执行', value: false }
+      ],
       tempTask: {
+        skip_holiday: true,
         call_back: [
           {
             'url': 'https://xxx',
@@ -677,6 +699,7 @@ export default {
         env_list: [],
         task_type: 'cron',
         cron: '0 15 10 ? * MON-FRI',
+        skip_holiday: true,
         is_send: '1',
         is_async: 1,
         receive_type: 'ding_ding',
@@ -710,6 +733,7 @@ export default {
         env_list: this.tempTask.env_list,
         task_type: this.tempTask.task_type,
         cron: this.tempTask.cron,
+        skip_holiday: this.tempTask.skip_holiday,
         is_send: this.tempTask.is_send,
         is_async: this.tempTask.is_async,
         receive_type: this.tempTask.receive_type,

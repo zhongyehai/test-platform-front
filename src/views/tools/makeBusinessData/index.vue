@@ -171,10 +171,16 @@ export default {
 
     // 用例提交成功，请求用例列表
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'selectRunEnv' && _runUnit === 'makeData') {
+      if (_type === 'caseInfo') {
+        this.getCaseList(this.projectActiveId)
+      } else if (_type === 'selectRunEnv' && _runUnit === 'makeData') {
         this.runCase(runDict)
       }
     })
+  },
+
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {

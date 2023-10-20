@@ -63,6 +63,12 @@
                 </template>
               </el-table-column>
 
+              <el-table-column prop="cron" label="节假日/调休日" align="center" min-width="10%">
+                <template slot-scope="scope">
+                  <span> {{ scope.row.skip_holiday === true ? "跳过": "不跳过" }} </span>
+                </template>
+              </el-table-column>
+
               <el-table-column
                 align="center"
                 min-width="15%"

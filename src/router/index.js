@@ -413,29 +413,6 @@ export const constantRoutes = [
     ]
   },
 
-  // 平台使用统计
-  {
-    path: '/platform',
-    component: Layout,
-    redirect: '/platform/overview',
-    name: 'Platform',
-    meta: { title: '平台使用分析', icon: 'el-icon-magic-stick' },
-    children: [
-      {
-        path: 'overview',
-        name: 'Overview',
-        component: () => import('@/views/platform/overview'),
-        meta: { title: '数据总览', icon: 'el-icon-s-operation' }
-      },
-      {
-        path: 'analyse',
-        name: 'Analyse',
-        component: () => import('@/views/platform/analyse'),
-        meta: { title: '业务线分析', icon: 'el-icon-pie-chart' }
-      }
-    ]
-  },
-
   // 配置管理
   {
     path: '/config',
@@ -508,6 +485,26 @@ export const constantRoutes = [
         name: 'systemErrorRecord',
         meta: { title: '系统错误记录', icon: 'el-icon-video-camera-solid' },
         component: () => import('@/views/system/errorRecord/index')
+      },
+      {
+        path: 'platform',
+        name: 'Platform',
+        component: () => import('@/views/system/platform'),
+        meta: { title: '平台使用分析', icon: 'el-icon-magic-stick' },
+        children: [
+          {
+            path: 'overview',
+            name: 'Overview',
+            component: () => import('@/views/system/platform/overview'),
+            meta: { title: '数据总览', icon: 'el-icon-s-operation' }
+          },
+          {
+            path: 'analyse',
+            name: 'Analyse',
+            component: () => import('@/views/system/platform/analyse'),
+            meta: { title: '业务线分析', icon: 'el-icon-pie-chart' }
+          }
+        ]
       }
     ]
   },
