@@ -138,6 +138,8 @@
               <showCaseView
                 :data-type="dataType"
                 :case-data="caseData"
+                :before-img-is-loading="before_img_is_loading"
+                :after-img-is-loading="after_img_is_loading"
               />
             </el-scrollbar>
           </el-tab-pane>
@@ -286,6 +288,8 @@ export default {
       failStepList: [],
       skipStepList: [],
       errorStepList: [],
+      before_img_is_loading: false,
+      after_img_is_loading: false,
 
       reportCaseListUrl: '',
       reportCaseDetailUrl: '',
@@ -440,13 +444,17 @@ export default {
         // 非接口测试，获取对应的截图
         if (this.dataType !== 'api') {
           // 获前置取截图
+          this.before_img_is_loading = true
           this.reportStepImgUrl({ report_id: this.report_id, report_step_id: id, img_type: 'before_page' }).then(response => {
             this.stepData.before = response.data.data
+            this.before_img_is_loading = false
           })
 
           // 获后置取截图
+          this.after_img_is_loading = true
           this.reportStepImgUrl({ report_id: this.report_id, report_step_id: id, img_type: 'after_page' }).then(response => {
             this.stepData.after = response.data.data
+            this.after_img_is_loading = false
           })
         }
       })

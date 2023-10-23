@@ -362,11 +362,16 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                   </template>
-                  <div v-show="stepData.before" class="el-collapse-item-content">
-                    <el-image :src="'data:image/jpg;base64,' + stepData.before " />
-                  </div>
-                  <div v-show="!stepData.before" class="el-collapse-item-content">
-                    <span>无</span>
+                  <div v-loading="beforeImgIsLoading">
+                    <el-image
+                      v-show="stepData.before"
+                      :src="'data:image/jpg;base64,' + stepData.before "
+                      :preview-src-list="[
+                        'data:image/jpg;base64,' + stepData.before,
+                        'data:image/jpg;base64,' + stepData.after
+                      ]"
+                    />
+                    <span v-show="!stepData.before">没有截图</span>
                   </div>
                 </el-collapse-item>
               </el-col>
@@ -375,11 +380,16 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                   </template>
-                  <div v-show="stepData.after" class="el-collapse-item-content">
-                    <el-image :src="'data:image/jpg;base64,' + stepData.after " />
-                  </div>
-                  <div v-show="!stepData.after" class="el-collapse-item-content">
-                    <span>无</span>
+                  <div v-loading="afterImgIsLoading" class="el-collapse-item-content">
+                    <el-image
+                      v-show="stepData.after"
+                      :src="'data:image/jpg;base64,' + stepData.after "
+                      :preview-src-list="[
+                        'data:image/jpg;base64,' + stepData.before,
+                        'data:image/jpg;base64,' + stepData.after
+                      ]"
+                    />
+                    <span v-show="!stepData.after">没有截图</span>
                   </div>
                 </el-collapse-item>
               </el-col>
@@ -490,7 +500,7 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'stepData'
+    'dataType', 'stepData', 'beforeImgIsLoading', 'afterImgIsLoading'
   ],
 
   data() {
