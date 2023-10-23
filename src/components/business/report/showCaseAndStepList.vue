@@ -127,6 +127,8 @@
               <showStepView
                 :data-type="dataType"
                 :step-data="stepData"
+                :before-img-is-loading="before_img_is_loading"
+                :after-img-is-loading="after_img_is_loading"
               />
             </el-scrollbar>
           </el-tab-pane>
@@ -138,8 +140,6 @@
               <showCaseView
                 :data-type="dataType"
                 :case-data="caseData"
-                :before-img-is-loading="before_img_is_loading"
-                :after-img-is-loading="after_img_is_loading"
               />
             </el-scrollbar>
           </el-tab-pane>

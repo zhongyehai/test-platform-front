@@ -380,7 +380,7 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                   </template>
-                  <div v-loading="afterImgIsLoading" class="el-collapse-item-content">
+                  <div v-loading="afterImgIsLoading">
                     <el-image
                       v-show="stepData.after"
                       :src="'data:image/jpg;base64,' + stepData.after "
