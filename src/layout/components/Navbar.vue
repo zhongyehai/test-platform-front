@@ -39,8 +39,11 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <span v-if="user_name === '管理员'" style="color: red; float: left">*此账号不允许修改密码</span>
+
         <el-button size="mini" @click="dialogFormVisible = false"> {{ '取消' }}</el-button>
         <el-button
+          :disabled="user_name === '管理员'"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -77,6 +80,8 @@ export default {
 
       // 密码修改框显示状态
       dialogFormVisible: false,
+
+      user_name: localStorage.getItem('userName'),
 
       // 密码修改临时表单
       tempPassword: {

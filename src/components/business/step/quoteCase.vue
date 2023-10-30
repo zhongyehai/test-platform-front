@@ -170,17 +170,17 @@ import Pagination from '@/components/Pagination'
 import showCaseDesc from '@/components/business/case/showCaseDesc'
 
 import { projectList as apiProjectList } from '@/apis/apiTest/project'
-import { caseSuiteList as apiCaseSuiteTree } from '@/apis/apiTest/caseSuite'
+import { caseSuiteList as apiCaseSuiteTree } from '@/apis/apiTest/suite'
 import { caseList as apiCaseList, copyCaseStep as apiCopyCaseStep } from '@/apis/apiTest/case'
 import { stepCopy as apiStepCopy, stepList as apiStepList } from '@/apis/apiTest/step'
 
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
-import { caseSuiteList as webUiCaseSuiteTree } from '@/apis/webUiTest/caseSuite'
+import { caseSuiteList as webUiCaseSuiteTree } from '@/apis/webUiTest/suite'
 import { caseList as webUiCaseList, copyCaseStep as webUiCopyCaseStep } from '@/apis/webUiTest/case'
 import { stepCopy as webUiStepCopy, stepList as webUiStepList } from '@/apis/webUiTest/step'
 
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
-import { caseSuiteList as appUiCaseSuiteTree } from '@/apis/appUiTest/caseSuite'
+import { caseSuiteList as appUiCaseSuiteTree } from '@/apis/appUiTest/suite'
 import { caseList as appUiCaseList, copyCaseStep as appUiCopyCaseStep } from '@/apis/appUiTest/case'
 import { stepCopy as appUiStepCopy, stepList as appUiStepList } from '@/apis/appUiTest/step'
 

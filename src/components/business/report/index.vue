@@ -272,7 +272,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import { getProject as apiGetProject } from '@/apis/apiTest/project'
 import { getCase as apiGetCase, caseRun as apiCaseRun } from '@/apis/apiTest/case'
 import { runApi as apiRun } from '@/apis/apiTest/api'
-import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
+import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/suite'
 import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import {
   reportList as apiReportList,
@@ -281,7 +281,7 @@ import {
 
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
 import { getCase as webUiGetCase, caseRun as webUiCaseRun } from '@/apis/webUiTest/case'
-import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/suite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 import {
   reportList as webUiReportList,
@@ -290,7 +290,7 @@ import {
 
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
 import { getCase as appUiGetCase, caseRun as appUiCaseRun } from '@/apis/appUiTest/case'
-import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/suite'
 import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 import {
   reportList as appUiReportList,

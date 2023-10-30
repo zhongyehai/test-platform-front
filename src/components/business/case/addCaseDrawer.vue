@@ -118,13 +118,13 @@
 <script>
 
 import { postCase as apiPostCase } from '@/apis/apiTest/case'
-import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
+import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/suite'
 
 import { postCase as webUiPostCase } from '@/apis/webUiTest/case'
-import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/suite'
 
 import { postCase as appUiPostCase } from '@/apis/appUiTest/case'
-import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/suite'
 
 export default {
   name: 'AddCaseDrawer',

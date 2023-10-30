@@ -201,7 +201,7 @@ import {
 } from '@/apis/apiTest/report'
 import { getProject as apiGetProject } from '@/apis/apiTest/project'
 import { runApi as apiRun } from '@/apis/apiTest/api'
-import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/caseSuite'
+import { caseSuiteRun as apiRunCaseSuite } from '@/apis/apiTest/suite'
 import { runTask as apiRunTask } from '@/apis/apiTest/task'
 import { getCase as apiGetCase, caseRun as apiCaseRun, caseProject as apiGetCaseProject } from '@/apis/apiTest/case'
 
@@ -215,7 +215,7 @@ import {
   caseProject as webUiGetCaseProject
 } from '@/apis/webUiTest/case'
 import { getProject as webUiGetProject } from '@/apis/webUiTest/project'
-import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { caseSuiteRun as webUiRunCaseSuite } from '@/apis/webUiTest/suite'
 import { runTask as webUiRunTask } from '@/apis/webUiTest/task'
 
 import {
@@ -228,7 +228,7 @@ import {
   caseProject as appUiGetCaseProject
 } from '@/apis/appUiTest/case'
 import { getProject as appUiGetProject } from '@/apis/appUiTest/project'
-import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { caseSuiteRun as appUiRunCaseSuite } from '@/apis/appUiTest/suite'
 import { runTask as appUiRunTask } from '@/apis/appUiTest/task'
 
 import { reportStepResultMapping } from '@/utils/mapping'

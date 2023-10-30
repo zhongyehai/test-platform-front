@@ -30,7 +30,7 @@ export function deleteElement(data) {
 
 // 指定页面下元素list
 export function changeElementById(data) {
-  return request({ url: currentBaseDir + '/changeById', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/id', method: 'put', data: data })
 }
 
 // 指定页面下元素list

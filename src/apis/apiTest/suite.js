@@ -1,9 +1,14 @@
 import request from '@/utils/request' // 加载请求配置文件
-import { baseDirApiTest, baseDirWebUiTest } from '@/apis/base'
+import { baseDirApiTest } from '@/apis/base'
 
-const currentBaseDir = baseDirWebUiTest + '/caseSuite'
+const currentBaseDir = baseDirApiTest + '/suite'
 
-export const uploadAddr = baseDirApiTest + '/caseSuite/upload'
+export const uploadAddr = baseDirApiTest + '/suite/upload'
+
+// 下载导入用例集模板
+export function downloadSuiteTemplate() {
+  return request({ url: currentBaseDir + '/template/download', method: 'get', responseType: 'blob' })
+}
 
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })

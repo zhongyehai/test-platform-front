@@ -334,7 +334,7 @@ import {
   putCaseSuite as apiPutCaseSuite,
   uploadAddr as apiUploadAddr,
   caseSuiteUpload as apiCaseSuiteUpload, downloadSuiteTemplate
-} from '@/apis/apiTest/caseSuite'
+} from '@/apis/apiTest/suite'
 
 import { projectList as webUiProjectList } from '@/apis/webUiTest/project'
 import {
@@ -346,7 +346,7 @@ import {
   putCaseSuite as webUiPutCaseSuite,
   uploadAddr as webUiUploadAddr,
   caseSuiteUpload as webUiCaseSuiteUpload
-} from '@/apis/webUiTest/caseSuite'
+} from '@/apis/webUiTest/suite'
 
 import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import {
@@ -358,7 +358,7 @@ import {
   putCaseSuite as appUiPutCaseSuite,
   uploadAddr as appUiUploadAddr,
   caseSuiteUpload as appUiCaseSuiteUpload
-} from '@/apis/appUiTest/caseSuite'
+} from '@/apis/appUiTest/suite'
 import { getConfigByName } from '@/apis/config/config'
 import { phoneList, serverList } from '@/apis/appUiTest/device'
 

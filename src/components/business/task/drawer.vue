@@ -394,15 +394,15 @@ import jsonEditorView from '@/components/jsonView.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
 import { postTask as apiPostTask, putTask as apiPutTask, runTask as apiRunTask } from '@/apis/apiTest/task'
-import { caseSuiteList as apiCaseSuiteList } from '@/apis/apiTest/caseSuite'
+import { caseSuiteList as apiCaseSuiteList } from '@/apis/apiTest/suite'
 import { caseList as apiCaseList, putCaseIsRun as apiPutCaseIsRun } from '@/apis/apiTest/case'
 
 import { postTask as webUiPostTask, putTask as webUiPutTask, runTask as webUiRunTask } from '@/apis/webUiTest/task'
-import { caseSuiteList as webUiCaseSuiteList } from '@/apis/webUiTest/caseSuite'
+import { caseSuiteList as webUiCaseSuiteList } from '@/apis/webUiTest/suite'
 import { caseList as webUiCaseList, putCaseIsRun as webUiPutCaseIsRun } from '@/apis/webUiTest/case'
 
 import { postTask as appUiPostTask, putTask as appUiPutTask, runTask as appUiRunTask } from '@/apis/appUiTest/task'
-import { caseSuiteList as appUiCaseSuiteList } from '@/apis/appUiTest/caseSuite'
+import { caseSuiteList as appUiCaseSuiteList } from '@/apis/appUiTest/suite'
 import { caseList as appUiCaseList, putCaseIsRun as appUiPutCaseIsRun } from '@/apis/appUiTest/case'
 
 import { arrayToTree } from '@/utils/parseData'

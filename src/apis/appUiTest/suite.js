@@ -1,9 +1,9 @@
 import request from '@/utils/request' // 加载请求配置文件
 import { baseDirApiTest, baseDirAppUiTest } from '@/apis/base'
 
-const currentBaseDir = baseDirAppUiTest + '/caseSuite'
+const currentBaseDir = baseDirAppUiTest + '/suite'
 
-export const uploadAddr = baseDirApiTest + '/caseSuite/upload'
+export const uploadAddr = baseDirApiTest + '/suite/upload'
 
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })

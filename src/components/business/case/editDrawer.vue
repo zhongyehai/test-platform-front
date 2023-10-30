@@ -256,7 +256,7 @@ import {
   getCase as apiGetCase,
   caseFrom as apiCaseFrom
 } from '@/apis/apiTest/case'
-import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/caseSuite'
+import { getCaseSuite as apiGetCaseSuite } from '@/apis/apiTest/suite'
 
 import {
   putCase as webUiPutCase,
@@ -264,7 +264,7 @@ import {
   getCase as webUiGetCase,
   caseFrom as webUiCaseFrom
 } from '@/apis/webUiTest/case'
-import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/caseSuite'
+import { getCaseSuite as webUiGetCaseSuite } from '@/apis/webUiTest/suite'
 
 import {
   putCase as appUiPutCase,
@@ -272,7 +272,7 @@ import {
   getCase as appUiGetCase,
   caseFrom as appUiCaseFrom
 } from '@/apis/appUiTest/case'
-import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/caseSuite'
+import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/suite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
 import {
   getConfigByName,

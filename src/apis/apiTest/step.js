@@ -34,7 +34,7 @@ export function putStepIsRun(data) {
 
 // 修改步骤引用的host
 export function putStepHost(data) {
-  return request({ url: currentBaseDir + '/changeHost', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/host', method: 'put', data: data })
 }
 
 // 获取步骤list
