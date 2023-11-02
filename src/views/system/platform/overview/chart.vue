@@ -76,14 +76,14 @@ export default {
         },
         series: [
           {
-            name: '使用次数',
+            name: '人工触发次数',
             type: 'bar',
-            data: this.chartData.use_count_list // [18203, 23489, 29034]
+            data: this.chartData.page_use_count_list // [18203, 23489, 29034]
           },
           {
-            name: '整体通过次数',
+            name: '人工通过次数',
             type: 'bar',
-            data: this.chartData.use_pass_count_list // [19325, 23438, 31000]
+            data: this.chartData.page_use_pass_count_list // [19325, 23438, 31000]
           },
           // {
           //   name: '整体通过率',
@@ -105,11 +105,11 @@ export default {
           //   type: 'bar',
           //   data: this.chartData.patrol_pass_rate_list // [19325, 23438, 31000]
           // },
-          {
-            name: '造数据次数',
-            type: 'bar',
-            data: this.chartData.make_data_count_list // [19325, 23438, 31000]
-          }
+          // {
+          //   name: '造数据次数',
+          //   type: 'bar',
+          //   data: this.chartData.make_data_count_list // [19325, 23438, 31000]
+          // }
         ]
       })
     }

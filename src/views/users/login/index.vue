@@ -151,7 +151,7 @@ export default {
               this.$store.commit(types.userName, response.data.name)
               localStorage.setItem('id', response.data.id)
               localStorage.setItem('permissions', JSON.stringify(response.data.front_permissions))
-              localStorage.setItem('business', JSON.stringify(response.data.business_id))
+              localStorage.setItem('business', JSON.stringify(response.data.business_list))
               // 重定向到指定路由
               const redirect = this.$route.query.redirect || '/'
               this.$router.push({ path: redirect }) // 重定向到指定路由
@@ -172,7 +172,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../../assets/loginBackground.jpg);
+  background-image: url(../../../assets/dashbroad.png);
   background-size: 100%;
 }
 
