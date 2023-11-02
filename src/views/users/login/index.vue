@@ -172,7 +172,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../../assets/dashbroad.png);
+  background-image: url(../../../assets/loginBackground.png);
   background-size: 100%;
 }
 
