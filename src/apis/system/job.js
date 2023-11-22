@@ -22,6 +22,11 @@ export function jobRun(data) {
   return request({ url: baseDir + '/run', method: 'post', data: data })
 }
 
+// 执行任务记录列表
+export function jobRunLogList(params) {
+  return request({ url: baseDir + '/log/list', method: 'get', params: params })
+}
+
 // 执行任务记录
 export function jobRunLog(params) {
   return request({ url: baseDir + '/log', method: 'get', params: params })

@@ -93,9 +93,9 @@
           </template>
         </el-table-column>
 
-        <el-table-column :label="'执行时间'" property="created_time" align="center" min-width="15%" size="mini">
+        <el-table-column :label="'执行时间'" property="create_time" align="center" min-width="15%" size="mini">
           <template slot-scope="scope">
-            <span>{{ scope.row.created_time }}</span>
+            <span>{{ scope.row.create_time }}</span>
           </template>
         </el-table-column>
 
@@ -119,15 +119,15 @@
           </template>
         </el-table-column>
 
-        <el-table-column :label="'概览'" property="detail" show-overflow-tooltip align="center" min-width="25%" size="mini">
-          <template slot-scope="scope">
-            <span>{{ scope.row.detail }}</span>
-          </template>
-        </el-table-column>
+<!--        <el-table-column :label="'概览'" property="detail" show-overflow-tooltip align="center" min-width="25%" size="mini">-->
+<!--          <template slot-scope="scope">-->
+<!--            <span>{{ scope.row.detail }}</span>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
 
         <el-table-column :label="'操作'" property="detail" show-overflow-tooltip align="center" min-width="10%" size="mini">
           <template slot-scope="scope">
-            <el-button type="text" size="mini" @click="showRunJobLogDetail(scope.row.detail)">详情</el-button>
+            <el-button type="text" size="mini" @click="showRunJobLogDetail(scope.row.id)">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -176,7 +176,7 @@
 <script>
 import waves from '@/directive/waves' // waves directive
 
-import { jobRunLog, jobFuncList, jobRun, postJob, deleteJob } from '@/apis/system/job'
+import {jobRunLog, jobFuncList, jobRun, postJob, deleteJob, jobRunLogList} from '@/apis/system/job'
 import Pagination from '@/components/Pagination/index.vue'
 import { businessList } from '@/apis/config/business'
 import JsonViewer from 'vue-json-viewer'
@@ -229,8 +229,10 @@ export default {
 
   methods: {
 
-    showRunJobLogDetail(detail) {
-      this.showDetail = detail
+    showRunJobLogDetail(data_id) {
+      jobRunLog({id: data_id}).then(response => {
+        this.showDetail = response.data.detail
+      })
       this.isShowDetail = true
     },
 
@@ -260,9 +262,6 @@ export default {
 
     // 双击单元格复制
     cellDblclick(row, column, cell, event) {
-      console.log('row: ', row)
-      console.log('column: ', column)
-      console.log('column.property: ', column.property)
       const that = this
       const data = row[column.property]
       if (typeof (data) === 'string') {
@@ -279,7 +278,7 @@ export default {
       if (row && row.func_name) {
         this.currentFuncName = row.func_name
       }
-      jobRunLog({ func_name: this.currentFuncName, pageNum: this.page_num, pageSize: this.page_size }).then(response => {
+      jobRunLogList({ func_name: this.currentFuncName, page_num: this.page_num, page_size: this.page_size }).then(response => {
         if (this.showMessage(this, response)) {
           this.runLogTotal = response.data.total
           this.runLogList = response.data.data
@@ -295,7 +294,7 @@ export default {
     // 手动执行认识
     runJob(row) {
       this.$set(row, 'runPopoverIsShow', false)
-      jobRun({ id: row.func_name }).then(response => {
+      jobRun({ func_name: row.func_name }).then(response => {
         this.showMessage(this, response)
       })
     },
@@ -312,14 +311,14 @@ export default {
       this.listLoading = true
 
       if (row.id) { // 关闭任务
-        deleteJob({ id: row.func_name }).then(response => {
+        deleteJob({ func_name: row.func_name }).then(response => {
           this.listLoading = false
           if (this.showMessage(this, response)) {
             this.getJobFuncList()
           }
         })
-      } else { // 添加任务
-        postJob({ func: row.func_name }).then(response => {
+      } else { // 启用任务
+        postJob({ func_name: row.func_name }).then(response => {
           this.listLoading = false
           if (this.showMessage(this, response)) {
             this.getJobFuncList()

@@ -51,7 +51,7 @@
 
       <el-table-column :label="'创建时间'" prop="id" align="center" min-width="20%">
         <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
+          <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
 
@@ -172,8 +172,8 @@ export default {
     // 选中服务
     getDiffRecordListData(value) {
       getDiffRecordList({
-        'pageNum': this.PageNum,
-        'pageSize': this.PageSize,
+        'page_num': this.PageNum,
+        'page_size': this.PageSize,
         'name': this.currentProject
       }).then(response => {
         this.diffRecordList = response.data.data

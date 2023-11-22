@@ -33,31 +33,16 @@ export function configList(params) {
 }
 
 // 根据配置名获取配置
-export function getConfigByName(params) {
-  return request({ url: currentBaseDir + '/byName', method: 'get', params: params })
-}
-
-// 获取配置的执行模式
-export function getRunModel() {
-  return request({ url: currentBaseDir + '/runModel', method: 'get' })
-}
-
-// 获取跳过条件类型
-export function getSkipIfTypeMapping() {
-  return request({ url: currentBaseDir + '/skipIfType', method: 'get' })
+export function getConfigByCode(params) {
+  return request({ url: currentBaseDir + '/by/code', method: 'get', params: params })
 }
 
 // 获取跳过条件数据源
 export function getSkipIfDataSourceMapping(params) {
-  return request({ url: currentBaseDir + '/skipIfDataSource', method: 'get', params: params })
-}
-
-// 获取数据提取数据源
-export function getExtractsMapping(params) {
-  return request({ url: currentBaseDir + '/extractsMapping', method: 'get', params: params })
+  return request({ url: currentBaseDir + '/skip-if', method: 'get', params: params })
 }
 
 // 获取定位方式数据源
 export function getGetFindElementBy(params) {
-  return request({ url: currentBaseDir + '/findElementBy', method: 'get', params: params })
+  return request({ url: currentBaseDir + '/find-element-by', method: 'get', params: params })
 }

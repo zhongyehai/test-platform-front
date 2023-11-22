@@ -92,17 +92,18 @@
 
 <script>
 import dataFormView from '@/components/Inputs/dataForm'
-import dataJsonView from '@/components/Inputs/dataJson'
 import jsonEditorView from '@/components/jsonView'
 
 export default {
   name: 'ApiEditBody',
   components: {
     dataFormView,
-    dataJsonView,
     jsonEditorView
   },
-  props: ['dataType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'dataType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'
+  ],
   data() {
     return {
       tempDataType: 'json',

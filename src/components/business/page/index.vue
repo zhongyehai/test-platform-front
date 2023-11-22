@@ -35,7 +35,7 @@
         >
           <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
-              <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+              <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
@@ -178,8 +178,8 @@
         <pagination
           v-show="pageTotal>0"
           :total="pageTotal"
-          :page.sync="pageNum"
-          :limit.sync="pageSize"
+          :page.sync="page_num"
+          :limit.sync="page_size"
           @pagination="getPageList"
         />
       </el-tab-pane>
@@ -253,8 +253,8 @@ export default {
       currentProject: '',
 
       // 页面数据列表
-      pageNum: 1,
-      pageSize: 20,
+      page_num: 1,
+      page_size: 20,
       pageTotal: 0,
       pageList: [],
 
@@ -388,9 +388,7 @@ export default {
     getPageList(params) {
       this.tableLoadingIsShow = true
       this.pageListUrl({
-        'moduleId': this.currentModuleId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
+        module_id: this.currentModuleId, page_num: this.page_num, page_size: this.page_size
       }).then(response => {
         this.pageList = response.data.data
         this.pageTotal = response.data.total
@@ -445,12 +443,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          this.pageSortUrl({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          this.pageSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
             this.showMessage(this, response)
+            this.getPageList()
             this.tableLoadingIsShow = false
           })
         }

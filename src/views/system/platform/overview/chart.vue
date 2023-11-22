@@ -72,45 +72,9 @@ export default {
         },
         yAxis: {
           type: 'category',
-          data: this.chartData.options_list // ['公共业务线', '印尼业务线', '印度业务线']
+          data: this.chartData.options_list // ['公共业务线', 'xx业务线']
         },
-        series: [
-          {
-            name: '人工触发次数',
-            type: 'bar',
-            data: this.chartData.page_use_count_list // [18203, 23489, 29034]
-          },
-          {
-            name: '人工通过次数',
-            type: 'bar',
-            data: this.chartData.page_use_pass_count_list // [19325, 23438, 31000]
-          },
-          // {
-          //   name: '整体通过率',
-          //   type: 'bar',
-          //   data: this.chartData.use_pass_rate_list // [19325, 23438, 31000]
-          // },
-          {
-            name: '巡检次数',
-            type: 'bar',
-            data: this.chartData.patrol_count_list // [19325, 23438, 31000]
-          },
-          {
-            name: '巡检通过次数',
-            type: 'bar',
-            data: this.chartData.patrol_pass_count_list // [19325, 23438, 31000]
-          },
-          // {
-          //   name: '巡检通过率',
-          //   type: 'bar',
-          //   data: this.chartData.patrol_pass_rate_list // [19325, 23438, 31000]
-          // },
-          // {
-          //   name: '造数据次数',
-          //   type: 'bar',
-          //   data: this.chartData.make_data_count_list // [19325, 23438, 31000]
-          // }
-        ]
+        series: this.chartData.items
       })
     }
   }

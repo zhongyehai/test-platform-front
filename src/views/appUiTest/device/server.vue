@@ -14,7 +14,7 @@
     >
       <el-table-column prop="num" label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -191,8 +191,8 @@
     <pagination
       v-show="dataTotal>0"
       :total="dataTotal"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="page_num"
+      :limit.sync="page_size"
       @pagination="getServerList"
     />
   </div>
@@ -211,7 +211,7 @@ import {
   sortServer,
   copyServer
 } from '@/apis/appUiTest/device'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
 export default {
@@ -222,8 +222,8 @@ export default {
       tableLoadingIsShow: false,
       dataList: [],
       dataTotal: 0,
-      pageNum: 0,
-      pageSize: 20,
+      page_num: 0,
+      page_size: 20,
 
       // 拖拽排序参数
       sortable: null,
@@ -258,8 +258,8 @@ export default {
       }
     })
 
-    getConfigByName({ 'name': 'server_os_mapping' }).then(response => {
-      this.serverOsMapping = JSON.parse(response.data)
+    getConfigByCode({ code: 'server_os_mapping' }).then(response => {
+      this.serverOsMapping = response.data
     })
 
     this.getServerList()
@@ -303,10 +303,7 @@ export default {
 
     // 获取服务器列表
     getServerList() {
-      serverList({
-        pageNum: this.pageNum,
-        pageSize: this.pageSize
-      }).then(response => {
+      serverList({ page_num: this.page_num, page_size: this.page_size, detail: true }).then(response => {
         this.dataList = response.data.data
         this.dataTotal = response.data.total
 
@@ -380,8 +377,7 @@ export default {
       copyServer({ 'id': row.id }).then(response => {
         this.$set(row, 'copyButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.dataList.push(response.data)
-          this.showDrawer(response.data)
+          this.getServerList()
         }
       })
     },
@@ -411,12 +407,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          sortServer({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          sortServer({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
             this.showMessage(this, response)
+            this.getServerList()
             this.tableLoadingIsShow = false
           })
         }

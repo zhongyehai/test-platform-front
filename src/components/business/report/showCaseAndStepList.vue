@@ -55,15 +55,16 @@
 
                     <el-table-column show-overflow-tooltip prop="duration" label="耗时" align="center" min-width="20%">
                       <template slot-scope="scope">
-                        <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.duration || '-' : '-' }}秒 </span>
-                        <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>
+                        <!--                        <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.duration || '-' : '-' }}秒 </span>-->
+                        <!--                        <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>-->
+                        <span> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>
                       </template>
                     </el-table-column>
 
                     <el-table-column prop="operate" align="center" label="操作" min-width="12%">
                       <template slot-scope="scope">
                         <el-button
-                          v-show="scope.row.result !== 'waite'"
+                          v-show="scope.row.case_id && scope.row.result !== 'waite'"
                           type="text"
                           size="mini"
                           @click="showCaseInfo(scope.row)"
@@ -96,15 +97,18 @@
 
               <el-table-column show-overflow-tooltip prop="duration" label="耗时" align="center" min-width="20%">
                 <template slot-scope="scope">
-                  <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.duration || '-' : '-' }}秒 </span>
-                  <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>
+                  <!--                  <span v-if="scope.row.row_id.indexOf('case') !== -1"> {{ scope.row.result !== 'error' ? scope.row.summary.time.case_duration || '-' : '-' }}秒 </span>-->
+                  <!--                  <span v-else> {{ scope.row.summary.elapsed_ms ? `${scope.row.summary.elapsed_ms}毫秒` : '-' }} </span>-->
+                  <span> {{
+                    scope.row.result !== 'error' ? scope.row.summary.time.case_duration || '-' : '-'
+                  }}秒 </span>
                 </template>
               </el-table-column>
 
               <el-table-column prop="operate" align="center" label="操作" min-width="12%">
                 <template slot-scope="scope">
                   <el-button
-                    v-show="scope.row.result !== 'waite'"
+                    v-show="scope.row.case_id && scope.row.result !== 'waite'"
                     type="text"
                     size="mini"
                     @click="showCaseInfo(scope.row)"
@@ -139,7 +143,7 @@
             <el-scrollbar class="aside_scroll" :style="{height: `${tableHeight}px`}">
               <showCaseView
                 :data-type="dataType"
-                :case-data="caseData"
+                :report-case-data="reportCaseData"
               />
             </el-scrollbar>
           </el-tab-pane>
@@ -164,7 +168,6 @@ import {
   reportStepList as webUiReportStepList,
   reportStepDetail as webUiReportStepDetail,
   reportStepImg as webUiReportStepImg
-
 } from '@/apis/webUiTest/report'
 
 import {
@@ -202,7 +205,6 @@ export default {
         'case_id': undefined,
         'name': undefined,
         'stat': {
-          'response_time_ms': undefined,
           'elapsed_ms': undefined,
           'content_size': undefined,
           'request_at': undefined,
@@ -253,8 +255,43 @@ export default {
         'before': null,
         'after': null
       },
-      caseData: {
-        case_data: '{}'
+      reportCaseData: {
+        'name': '测试用例',
+        'result': 'success',
+        'summary': {
+          'stat': {
+            'fail': 0,
+            'skip': 0,
+            'error': 0,
+            'total': 1,
+            'success': 1
+          },
+          'time': {
+            'end_at': '2023-09-15 13:51:47.911953',
+            'start_at': '2023-09-15 13:51:44.812429',
+            'all_duration': 3099.5240000000003,
+            'case_duration': 2.049,
+            'step_duration': 2049.046
+          },
+          'result': 'success'
+        },
+        'case_data': {
+          'id': 18,
+          'env': null,
+          'num': 0,
+          'desc': '测试用例',
+          'name': '测试用例',
+          'status': 1,
+          'headers': [],
+          'skip_if': [],
+          'suite_id': 20,
+          'module_id': null,
+          'run_times': 1,
+          'variables': [],
+          'create_user': 1,
+          'script_list': []
+        },
+        'error_msg': ''
       },
       resultMapping: {
         'waite': '等待',
@@ -403,7 +440,7 @@ export default {
         this.getStepData(row.id)
         this.reportCaseDetailIsShow = false
       } else if (row.row_id.indexOf('case') !== -1 && column.property === 'name') { // 点用例
-        this.caseData = JSON.parse(JSON.stringify(row))
+        this.reportCaseData = JSON.parse(JSON.stringify(row))
         this.reportStepDetailIsShow = false
         this.reportCaseDetailIsShow = true
       }
@@ -419,7 +456,7 @@ export default {
       this.errorStepList = []
 
       this.stepTableIsLoading = true
-      this.reportStepListUrl({ report_case_id: report_case_id, get_summary: true }).then(response => {
+      this.reportStepListUrl({ report_case_id: report_case_id, detail: true }).then(response => {
         this.stepTableIsLoading = false
         // 自动获取第一个步骤的数据
         if (response.data.length > 0) {
@@ -441,7 +478,7 @@ export default {
         this.stepData = response.data.step_data
         this.reportStepDetailIsShow = true
 
-        // 非接口测试，获取对应的截图
+        // 非接口测试，获取对应的步骤截图
         if (this.dataType !== 'api') {
           // 获前置取截图
           this.before_img_is_loading = true
@@ -464,7 +501,7 @@ export default {
     parseCaseList(caseList) {
       // 展示用例信息
       if (caseList.length > 0) {
-        this.caseData = caseList[0]
+        this.reportCaseData = caseList[0]
         this.reportCaseDetailIsShow = true
       }
       caseList.forEach(caseData => {
@@ -474,7 +511,7 @@ export default {
         // 判断用例下有没有步骤
         if (caseData.result !== 'error') {
           caseData.children = []
-          const summary = JSON.parse(caseData.summary)
+          const summary = caseData.summary
           caseData.hasStep = summary.stat.total > 0 // 直接跳过的用例、用例下所有步骤都跳过的，total为0
           caseData.summary = summary
         }
@@ -498,7 +535,6 @@ export default {
     parseStepList(stepList) {
       stepList.forEach(step => {
         step['row_id'] = `step_${step.id}`
-        step.summary = JSON.parse(step.summary)
 
         // 分开储存步骤
         if (step.result === 'success') {
@@ -519,7 +555,7 @@ export default {
     // 获取用例列表
     getStepCaseList(report_id) {
       this.caseTableIsLoading = true
-      this.reportCaseListUrl({ get_summary: true, report_id: report_id }).then(response => {
+      this.reportCaseListUrl({ detail: true, report_id: report_id }).then(response => {
         this.caseTableIsLoading = false
         this.parseCaseList(response.data)
       })
@@ -527,16 +563,11 @@ export default {
 
     // 打开数据所在的用例，有可能传入的是用例，也有可能传入的是步骤
     showCaseInfo(row) {
-      const case_id = row.row_id.indexOf('case') !== -1 ? row.from_id : row.case_id
-      this.$bus.$emit(
-        this.$busEvents.drawerIsShow,
-        'reportShowCaseInfo',
-        case_id
-      )
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'reportShowCaseInfo', row.case_id)
     },
 
     parseVariables(caseData) {
-      const case_data = JSON.parse(caseData.case_data)
+      const case_data = caseData.case_data
 
       const variables = []
       for (var variable_key in case_data.variables) {

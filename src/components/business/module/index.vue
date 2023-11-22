@@ -274,11 +274,10 @@ import showApiUseDrawer from '@/components/business/api/apiUseDrawer.vue'
 
 import { ellipsis, arrayToTree } from '@/utils/parseData'
 
-import { getConfigByName, getExtractsMapping } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import {
   apiMsgBelongTo,
   apiMsgBelongToStep,
-  getAssertMapping,
   downloadApiMsgTemplate,
   uploadApi,
   uploadApiMsg
@@ -384,8 +383,8 @@ export default {
       this.deleteModuleUrl = webUiDeleteModule
       this.postModuleUrl = webUiPostModule
       this.putModuleUrl = webUiPutModule
-      getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
+      getConfigByCode({ code: 'browser_name' }).then(response => {
+        this.$busEvents.data.runBrowserNameDict = response.data
       })
     } else {
       this.projectListUrl = appUiProjectList
@@ -406,17 +405,17 @@ export default {
 
   mounted() {
     // 从后端获取数据类型映射
-    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
+    getConfigByCode({ code: 'data_type_mapping' }).then(response => {
+      this.$busEvents.data.dataTypeMappingList = response.data
     })
 
     // 从后端获取响应对象数据源映射
-    getExtractsMapping().then(response => {
+    getConfigByCode({ code: 'extracts_mapping' }).then(response => {
       this.$busEvents.data.responseDataSourceMappingList = response.data
     })
 
     // 从后端获取断言数方式映射
-    getAssertMapping().then(response => {
+    getConfigByCode({ code: 'assert_mapping_list' }).then(response => {
       this.$busEvents.data.apiTestAssertMappingList = response.data
     })
   },
@@ -426,7 +425,7 @@ export default {
     // 获取接口归属
     getApiMsgBelongTo() {
       this.queryAddrIsLoading = true
-      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongTo({ api_addr: this.queryAddr }).then(response => {
         this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
@@ -437,7 +436,7 @@ export default {
     // 获取接口使用情况
     getApiMsgBelongToStep() {
       this.queryAddrIsLoading = true
-      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongToStep({ api_addr: this.queryAddr }).then(response => {
         this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)

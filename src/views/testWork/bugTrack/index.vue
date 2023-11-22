@@ -97,7 +97,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -345,8 +345,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="page_num"
+      :limit.sync="page_size"
       @pagination="getBugList"
     />
   </div>
@@ -356,6 +356,7 @@
 import Pagination from '@/components/Pagination'
 import { businessList } from '@/apis/config/business'
 import {
+    getBug,
   bugList,
   putBug,
   postBug,
@@ -445,8 +446,8 @@ export default {
         solution: ''
       },
       total: 0,
-      pageNum: 1,
-      pageSize: 20
+      page_num: 1,
+      page_size: 20
     }
   },
 
@@ -526,8 +527,8 @@ export default {
     // 获取bug列表
     getBugList() {
       bugList({
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize,
+        'page_num': this.page_num,
+        'page_size': this.page_size,
         'detail': this.inputDetail,
         'name': this.inputName,
         'status': this.inputStatus,
@@ -557,20 +558,20 @@ export default {
 
     // 执行查询
     doQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.getBugList()
     },
 
     // 重置
     initQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.selectBusiness = []
       this.inputDetail = ''
       this.inputName = ''
-      this.inputStatus = ''
-      this.inputIteration = ''
+      this.inputStatus = []
+      this.inputIteration = []
       this.getBugList()
     },
 
@@ -578,12 +579,13 @@ export default {
     showDrawer(row) {
       this.getIterationList()
       if (row) { // 修改
-        this.bugTemplate = JSON.parse(JSON.stringify(row))
-        this.editDrawerIsShow = true
+          getBug({id: row.id}).then(response => {
+              this.bugTemplate = response.data
+          })
       } else { // 增加
         this.initNewBug()
-        this.editDrawerIsShow = true
       }
+      this.editDrawerIsShow = true
     },
 
     // 添加bug

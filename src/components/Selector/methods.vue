@@ -9,12 +9,12 @@
     default-first-option
     @change="choiceMethod"
   >
-    <el-option v-for="item in methods_list" :key="item.value" :value="item.value" :label="item.value" />
+    <el-option v-for="item in methods_list" :key="item" :value="item" :label="item" />
   </el-select>
 </template>
 
 <script>
-import { getMethodsMapping } from '@/apis/apiTest/api'
+import {getConfigByCode} from "@/apis/config/config";
 
 export default {
   name: 'Methods',
@@ -50,9 +50,13 @@ export default {
 
     // 获取请求方式列表
     getMethods() {
-      getMethodsMapping().then(response => {
+      getConfigByCode({ code: 'http_method' }).then(response => {
         this.methods_list = response.data
       })
+
+      // getMethodsMapping().then(response => {
+      //   this.methods_list = response.data
+      // })
     },
 
     emitSelectorChoice(method) {

@@ -142,7 +142,7 @@
         >
           <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template slot-scope="scope">
-              <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+              <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
@@ -249,8 +249,8 @@
     <pagination
       v-show="weeklyTotal>0"
       :total="weeklyTotal"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getWeeklyList"
     />
 
@@ -442,8 +442,8 @@ export default {
         start_time: '', // 查询开始时间
         end_time: '', // 查询结束时间
         download_type: '',
-        pageNum: 1,
-        pageSize: 20
+        page_num: 1,
+        page_size: 20
       },
       queryProjectList: [],
       // 时间选择器
@@ -562,8 +562,8 @@ export default {
         this.getWeeklyList({
           'product_id': dataDict.product_id,
           'project_id': dataDict.project_id,
-          'pageNum': this.listQuery.pageNum,
-          'pageSize': this.listQuery.pageSize
+          'page_num': this.listQuery.page_num,
+          'page_size': this.listQuery.page_size
         })
       }
     })

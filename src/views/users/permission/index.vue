@@ -51,7 +51,7 @@
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="6%" size="mini">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -79,9 +79,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="15%" size="mini">
+      <el-table-column :label="'创建时间'" prop="create_time" align="center" min-width="15%" size="mini">
         <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
+          <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
 
@@ -135,8 +135,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getPermissionList"
     />
 
@@ -222,6 +222,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
 import {
+  getPermission,
   permissionType,
   permissionList,
   deletePermission,
@@ -245,8 +246,9 @@ export default {
       ],
       // 查询对象
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
+        detail: true,
         name: undefined,
         source_addr: undefined
       },
@@ -350,20 +352,17 @@ export default {
     //  初始化临时模板数据，点击修改按钮触发
     handleUpdate(row) {
       this.drawerType = 'edit' // dialog框标识为编辑
-      this.tempPermission.id = row.id
-      this.tempPermission.name = row.name
-      this.tempPermission.desc = row.desc
-      this.tempPermission.source_addr = row.source_addr
-      this.tempPermission.source_class = row.source_class
-      this.tempPermission.source_type = row.source_type
+      getPermission({id: row.id}).then(response => {
+        this.tempPermission = response.data
+      })
       this.drawerIsShow = true
     },
 
     // 重置查询数据
     handleInitListQuery() {
       this.listQuery = {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
         name: undefined,
         source_type: undefined,
         source_class: undefined,
@@ -416,7 +415,7 @@ export default {
 
     // 条件触发查询
     handleFilter() {
-      this.listQuery.pageNum = 1
+      this.listQuery.page_num = 1
       this.getPermissionList()
     },
 
@@ -436,12 +435,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          permissionSort({
-            List: this.newList,
-            pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize
-          }).then(response => {
+          permissionSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size}).then(response => {
             this.showMessage(this, response)
+            this.getPermissionList()
             this.tableLoadingIsShow = false
           })
         }

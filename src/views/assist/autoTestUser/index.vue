@@ -72,6 +72,15 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="page_num"
+      :limit.sync="page_size"
+      @pagination="getAutoTestUserData"
+    />
+
   </div>
 </template>
 
@@ -87,6 +96,9 @@ export default {
   data() {
     return {
       listLoading: false, // 加载状态
+      total: 0,
+      page_num: 1,
+      page_size: 20,
       currentDataList: [], // 数据列表
       currentEnv: '', // 选择的环境
       envList: [],
@@ -125,8 +137,9 @@ export default {
 
     // 获取数据池数据
     getAutoTestUserData() {
-      getAutoTestUser({ 'env': this.currentEnv }).then(response => {
-        this.currentDataList = response.data
+      getAutoTestUser({ env: this.currentEnv, page_num: this.page_num, page_size: this.page_size, }).then(response => {
+        this.currentDataList = response.data.data
+        this.total = response.data.total
       })
     },
 

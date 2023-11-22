@@ -1,10 +1,10 @@
-import { getConfigByName, getGetFindElementBy } from '@/apis/config/config'
+import { getConfigByCode, getGetFindElementBy } from '@/apis/config/config'
 import { assertMappingList, extractMappingList } from '@/apis/webUiTest/step'
 
 // 获取配置的运行等待超时时间
 export function getRunTimeout(_this) {
   let runTimeout = 0
-  getConfigByName({ 'name': 'run_time_out' }).then(response => {
+  getConfigByCode({ code: 'run_time_out' }).then(response => {
     _this.$busEvents.runTimeout = response.data
     runTimeout = response.data.value
   })

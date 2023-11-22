@@ -274,7 +274,7 @@
 import { Message } from 'element-ui'
 import { appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType } from '@/utils/mapping'
 
-import { getConfigByName, getRunModel } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { runEnvList } from '@/apis/config/runEnv'
 import { getRunTimeout } from '@/utils/getConfig'
 import runEnvCheckbox from '@/components/Selector/runEnvCheckbox.vue'
@@ -375,7 +375,7 @@ export default {
         temp_variables = {
           skip_if: this.$refs.skipIfView.tempData,
           variables: this.$refs.editVariables.caseVariables,
-          run_times: this.runArgs.run_times
+          run_times: this.runArgs.run_times || 1
         }
         if (this.dataType === 'api') {
           temp_variables['headers'] = this.$refs.headersView.tempData
@@ -411,8 +411,8 @@ export default {
     // 获取浏览器配置
     initBrowserName() {
       if (Object.keys(this.$busEvents.data.runBrowserNameDict).length === 0) {
-        getConfigByName({ 'name': 'browser_name' }).then(response => {
-          this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
+        getConfigByCode({ code: 'browser_name' }).then(response => {
+          this.$busEvents.data.runBrowserNameDict = response.data
           this.runBrowser = Object.keys(this.$busEvents.data.runBrowserNameDict)[0]
         })
       }
@@ -421,7 +421,7 @@ export default {
 
     // 获取执行模式配置
     initRunMode() {
-      getRunModel().then(response => {
+      getConfigByCode({ code: 'run_model' }).then(response => {
         this.runModeData = response.data
       })
     },

@@ -73,7 +73,7 @@
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -99,9 +99,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="20%">
+      <el-table-column :label="'创建时间'" prop="create_time" align="center" min-width="20%">
         <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
+          <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
 
@@ -146,8 +146,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getUserList"
     />
 
@@ -183,9 +183,9 @@ export default {
     return {
       // 查询对象
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
-        detail: 1,
+        page_num: 1,
+        page_size: 20,
+        detail: true,
         name: undefined, // 用户名
         account: undefined, // 账号
         status: undefined // 账号状态
@@ -244,7 +244,7 @@ export default {
 
     // 获取所有用户信息，同步请求
     async getAllUserList(func) {
-      const response = await userList({ 'detail': 1 })
+      const response = await userList({ detail: true })
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
         this.userDict[user.id] = user
@@ -277,8 +277,8 @@ export default {
     // 初始化查询数据
     handleInitListQuery() {
       this.listQuery = {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
         name: undefined, // 服务名
         manager: undefined, // 负责人
         create_user: undefined // 创建人
@@ -330,7 +330,7 @@ export default {
 
     // 触发查询
     handleFilter() {
-      this.listQuery.pageNum = 1
+      this.listQuery.page_num = 1
       this.getUserList()
     }
 

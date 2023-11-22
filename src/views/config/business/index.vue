@@ -76,7 +76,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -223,8 +223,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getBusinessList"
     />
   </div>
@@ -234,7 +234,7 @@
 import Pagination from '@/components/Pagination/index.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 import businessToUser from './businessToUser.vue'
-import { businessList, postBusiness, putBusiness } from '@/apis/config/business'
+import { getBusiness, businessList, postBusiness, putBusiness } from '@/apis/config/business'
 import { userList } from '@/apis/system/user'
 import { runEnvList } from '@/apis/config/runEnv'
 import * as types from '@/store/types'
@@ -249,11 +249,12 @@ export default {
   data() {
     return {
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
-        create_user: '',
-        name: '',
-        code: ''
+        page_num: 1,
+        page_size: 20,
+        detail: true,
+        create_user: undefined,
+        name: undefined,
+        code: undefined
       },
 
       // 请求列表等待响应的状态
@@ -267,14 +268,14 @@ export default {
       run_env_list: [],
       run_env_id_list: [],
       tempBusiness: {
-        id: '',
-        name: '',
-        code: '',
+        id: undefined,
+        name: undefined,
+        code: undefined,
         bind_env: 'human',
         receive_type: '0',
         webhook_list: [],
         env_list: [],
-        desc: ''
+        desc: undefined
       },
       currentUserList: [],
       userDict: {},
@@ -285,7 +286,7 @@ export default {
   },
 
   mounted() {
-    runEnvList({ pageNum: 1, pageSize: 9999 }).then(response => {
+    runEnvList({ page_num: 1, page_size: 9999 }).then(response => {
       this.run_env_list = response.data.data
       this.run_env_list.forEach(env => {
         this.run_env_id_list.push(env.id)
@@ -339,18 +340,20 @@ export default {
 
     showAddBusinessDialog(row) {
       if (row) {
-        this.tempBusiness = JSON.parse(JSON.stringify(row))
-        this.drawerType = 'edit'
+        getBusiness({ id: row.id }).then(response => {
+          this.tempBusiness = response.data
+          this.drawerType = 'edit'
+        })
       } else {
         this.tempBusiness = {
-          id: '',
-          name: '',
-          code: '',
+          id: undefined,
+          name: undefined,
+          code: undefined,
           bind_env: 'human',
           receive_type: '0',
           webhook_list: [],
           env_list: [],
-          desc: ''
+          desc: undefined
         }
         this.drawerType = 'add'
       }

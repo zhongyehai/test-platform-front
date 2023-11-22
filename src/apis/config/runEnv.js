@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { baseDirConfig } from '@/apis/base' // 加载请求配置类型文件
 
-const currentBaseDir = baseDirConfig + '/runEnv'
+const currentBaseDir = baseDirConfig + '/run-env'
 
 function Func(method, data = null, params = null) {
   return request({ url: currentBaseDir, method: method, data: data, params: params })
@@ -44,5 +44,5 @@ export function runEnvSort(data) {
 
 // 批量修改环境与业务线的绑定关系
 export function runEnvToBusiness(data) {
-  return request({ url: currentBaseDir + '/toBusiness', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/business', method: 'put', data: data })
 }

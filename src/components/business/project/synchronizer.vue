@@ -121,9 +121,7 @@ export default {
     saveEventSynchronizer() {
       this.submitButtonIsLoading = true
       this.projectEnvSynchronizationUrl({
-        projectId: this.projectId,
-        envFrom: this.dataSourceFrom,
-        envTo: this.dataSourceTo }).then(response => {
+        project_id: this.projectId, env_from: this.dataSourceFrom, env_to: this.dataSourceTo }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsCommit, 'envSynchronizer', response.data)

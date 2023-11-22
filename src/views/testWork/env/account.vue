@@ -42,7 +42,7 @@
       >
         <el-table-column prop="id" label="编号" align="center" min-width="10%">
           <template slot-scope="scope">
-            <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+            <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
@@ -110,8 +110,8 @@
       <pagination
         v-show="total>0"
         :total="total"
-        :page.sync="pageNum"
-        :limit.sync="pageSize"
+        :page.sync="page_num"
+        :limit.sync="page_size"
         @pagination="getAccountList"
       />
     </div>
@@ -196,10 +196,11 @@
 import Pagination from '@/components/Pagination'
 
 import {
-  envList,
-  postEnv,
-  putEnv,
-  deleteEnv
+  accountList,
+  postAccount,
+  putAccount,
+  getAccount,
+  deleteAccount
 } from '@/apis/testWork/env'
 import addTable from '@/views/testWork/env/addTable.vue'
 
@@ -216,24 +217,23 @@ export default {
       addAccountDrawerIsShow: false, // 编辑账号抽屉是否展示
       accountManageDrawerIsShow: false, // 账号列表抽屉是否展示
 
-      parentId: '', // 选中的账号
-      parentName: '', // 选中的账号
-      inputName: '', // 输入的名字
-      inputAccount: '', // 输入的账号
+      parentId: undefined, // 选中的账号
+      parentName: undefined, // 选中的账号
+      inputName: undefined, // 输入的名字
+      inputAccount: undefined, // 输入的账号
 
       currentAccountList: [], // 账号资源列表
       accountTemplate: {
-        id: '',
-        parent: '',
-        name: '',
-        source_type: 'account',
-        value: '',
-        password: '',
-        desc: ''
+        id: undefined,
+        parent: undefined,
+        name: undefined,
+        value: undefined,
+        password: undefined,
+        desc: undefined
       },
       total: 0,
-      pageNum: 1,
-      pageSize: 20
+      page_num: 1,
+      page_size: 20
     }
   },
 
@@ -257,12 +257,12 @@ export default {
 
     // 获取账号列表
     getAccountList() {
-      envList({
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize,
-        'parent': this.parentId,
-        'name': this.inputName,
-        'value': this.inputAccount
+      accountList({
+        page_num: this.page_num,
+        page_size: this.page_size,
+        parent: this.parentId,
+        name: this.inputName,
+        value: this.inputAccount
       }).then(response => {
         this.currentAccountList = response.data.data
         this.total = response.data.total
@@ -271,15 +271,15 @@ export default {
 
     // 执行查询
     doQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.getAccountList()
     },
 
     // 重置
     initQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.inputName = ''
       this.inputAccount = ''
       this.getAccountList()
@@ -297,7 +297,6 @@ export default {
 
     // 打开抽屉
     showDrawer(row) {
-      console.log()
       if (row) { // 修改
         this.accountTemplate = JSON.parse(JSON.stringify(row))
         this.editAccountDrawerIsShow = true
@@ -310,8 +309,7 @@ export default {
     // 添加账号
     addAccount() {
       this.submitButtonIsLoading = true
-      this.accountTemplate.data_list = this.$refs.addTable.tempData
-      postEnv(this.accountTemplate).then(response => {
+      postAccount({parent: this.accountTemplate.parent, data_list: this.$refs.addTable.tempData}).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.addAccountDrawerIsShow = false
@@ -323,7 +321,7 @@ export default {
     // 修改账号
     changeAccount() {
       this.submitButtonIsLoading = true
-      putEnv(this.accountTemplate).then(response => {
+      putAccount(this.accountTemplate).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.editAccountDrawerIsShow = false
@@ -340,7 +338,7 @@ export default {
     delAccount(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteButtonIsLoading', true)
-      deleteEnv({ 'id': row.id }).then(response => {
+      deleteAccount({ id: row.id }).then(response => {
         this.$set(row, 'deleteButtonIsLoading', false)
         if (this.showMessage(this, response)) {
           this.getAccountList()

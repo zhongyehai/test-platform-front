@@ -423,7 +423,11 @@ export default {
 
     initTempData(skipIfs) {
       if (skipIfs && skipIfs.length > 0) {
-        this.tempData = this.skipIfData
+        this.tempData = []
+        this.skipIfData.forEach((data, index) => {
+          data['id'] = `${Date.now()}_${index}`
+          this.tempData.push(JSON.parse(JSON.stringify(data)))
+        })
       } else {
         this.addRow()
       }

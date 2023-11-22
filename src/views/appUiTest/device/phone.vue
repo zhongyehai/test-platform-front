@@ -14,7 +14,7 @@
     >
       <el-table-column prop="id" label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -205,9 +205,9 @@
     <pagination
       v-show="dataTotal>0"
       :total="dataTotal"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
-      @pagination="gePhoneList"
+      :page.sync="page_num"
+      :limit.sync="page_size"
+      @pagination="getPhoneList"
     />
   </div>
 </template>
@@ -216,8 +216,8 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 
-import { copyPhone, deletePhone, phoneList, postPhone, putPhone, sortPhone } from '@/apis/appUiTest/device'
-import { getConfigByName } from '@/apis/config/config'
+import { getPhone, copyPhone, deletePhone, phoneList, postPhone, putPhone, sortPhone } from '@/apis/appUiTest/device'
+import { getConfigByCode } from '@/apis/config/config'
 import extendsEditorView from '@/components/jsonView.vue'
 import { assertStrIsJson } from '@/utils/validate'
 
@@ -229,8 +229,8 @@ export default {
       tableLoadingIsShow: false,
       dataList: [],
       dataTotal: 0,
-      pageNum: 0,
-      pageSize: 20,
+      page_num: 0,
+      page_size: 20,
 
       // 拖拽排序参数
       sortable: null,
@@ -265,17 +265,17 @@ export default {
       }
     })
 
-    getConfigByName({ 'name': 'phone_os_mapping' }).then(response => {
-      this.phoneOsMapping = JSON.parse(response.data)
+    getConfigByCode({ code: 'phone_os_mapping' }).then(response => {
+      this.phoneOsMapping = response.data
     })
 
     if (Object.keys(this.device_extends).length < 1) {
-      getConfigByName({ 'name': 'device_extends' }).then(response => {
-        this.device_extends = JSON.parse(response.data)
+      getConfigByCode({ code: 'device_extends' }).then(response => {
+        this.device_extends = response.data
       })
     }
 
-    this.gePhoneList()
+    this.getPhoneList()
   },
 
   created() {
@@ -305,11 +305,8 @@ export default {
     },
 
     // 获取设备列表
-    gePhoneList() {
-      phoneList({
-        pageNum: this.pageNum,
-        pageSize: this.pageSize
-      }).then(response => {
+    getPhoneList() {
+      phoneList({ page_num: this.page_num, page_size: this.page_size, detail:true }).then(response => {
         this.dataList = response.data.data
         this.dataTotal = response.data.total
 
@@ -320,14 +317,16 @@ export default {
 
     // 打开编辑框
     showDrawer(row) {
-      this.drawerIsShow = true
       this.initTempData(row)
+      this.drawerIsShow = true
     },
 
     // 初始化编辑框数据
     initTempData(row) {
       if (row) {
-        this.tempData = JSON.parse(JSON.stringify(row))
+        getPhone({id: row.id}).then(response => {
+          this.tempData = response.data
+        })
       } else {
         this.tempData.id = ''
         this.tempData.num = ''
@@ -340,7 +339,7 @@ export default {
       }
     },
 
-    // 新增服务
+    // 新增设备
     addServer() {
       const row = JSON.parse(JSON.stringify(this.tempData))
       const json_data = this.$refs.extendsEditorView.$refs.dataJsonView.tempDataJson
@@ -350,7 +349,7 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.gePhoneList()
+          this.getPhoneList()
         }
       })
     },
@@ -365,7 +364,7 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.drawerIsShow = false
-          this.gePhoneList()
+          this.getPhoneList()
         }
       })
     },
@@ -378,7 +377,7 @@ export default {
         deletePhone({ id: row.id }).then(response => {
           this.$set(row, 'deleteLoadingIsShow', false)
           if (this.showMessage(this, response)) {
-            this.gePhoneList()
+            this.getPhoneList()
           }
         })
       })
@@ -391,8 +390,7 @@ export default {
       copyPhone({ 'id': row.id }).then(response => {
         this.$set(row, 'copyButtonIsLoading', false)
         if (this.showMessage(this, response)) {
-          this.dataList.push(response.data)
-          this.showDrawer(response.data)
+          this.getPhoneList()
         }
       })
     },
@@ -422,12 +420,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          sortPhone({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          sortPhone({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size}).then(response => {
             this.showMessage(this, response)
+            this.getPhoneList()
             this.tableLoadingIsShow = false
           })
         }

@@ -5,3 +5,8 @@ import { baseDirAssist } from '@/apis/base'
 export function errorRecordList(params) {
   return request({ url: baseDirAssist + '/errorRecord/list', method: 'get', params: params })
 }
+
+// 获取错误列表
+export function errorRecord(params) {
+  return request({ url: baseDirAssist + '/errorRecord', method: 'get', params: params })
+}

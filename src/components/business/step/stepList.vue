@@ -519,7 +519,7 @@ export default {
     getStep(row, treeNode, resolve) {
       if (this.expandIds.indexOf(row.id) === -1) {
         // 获取引用用例的步骤列表
-        this.stepListUrl({ caseId: row.quote_case }).then(response => {
+        this.stepListUrl({ case_id: row.quote_case }).then(response => {
           this.expandIds.push(row.id)
           resolve(response.data.data)
         })
@@ -545,7 +545,7 @@ export default {
       if (expandIdIndex === -1) {
         // 获取引用用例的步骤列表
         this.tableLoadingIsShow = true
-        this.stepListUrl({ caseId: row.quote_case }).then(response => {
+        this.stepListUrl({ case_id: row.quote_case }).then(response => {
           this.tableLoadingIsShow = false
           this.expandIds.push(row.id)
           this.$set(row, 'stepList', response.data.data)
@@ -572,7 +572,7 @@ export default {
         changeStatus = row.status
       }
       this.tableLoadingIsShow = true
-      this.putStepIsRunUrl({ 'id': selectedIdList, 'status': changeStatus }).then(response => {
+      this.putStepIsRunUrl({ id_list: selectedIdList, status: changeStatus }).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
         if (isGetStepList) {
@@ -584,7 +584,7 @@ export default {
     // 获取步骤列表
     getStepList(case_id) {
       this.tableLoadingIsShow = true
-      this.stepListUrl({ 'caseId': case_id || this.caseId }).then(response => {
+      this.stepListUrl({ case_id: case_id || this.caseId, detail: true }).then(response => {
         this.tableLoadingIsShow = false
 
         this.expandIds = []
@@ -611,7 +611,7 @@ export default {
         })
       }
       this.tableLoadingIsShow = true
-      this.deleteStepUrl({ 'id': selectedIdList }).then(response => {
+      this.deleteStepUrl({ id_list: selectedIdList }).then(response => {
         this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.getStepList()
@@ -659,7 +659,7 @@ export default {
     // 复制步骤
     copy(row) {
       this.$set(row, 'copyIsDisabled', true)
-      this.stepCopyUrl({ 'id': row.id, 'caseId': this.caseId }).then(response => {
+      this.stepCopyUrl({ id: row.id, case_id: this.caseId }).then(response => {
         this.$set(row, 'copyIsDisabled', false)
         if (this.showMessage(this, response)) {
           this.getStepList()
@@ -670,7 +670,7 @@ export default {
     // 拉取步骤
     pullCaseStep(row) {
       this.$set(row, 'pullIsDisabled', true)
-      this.copyCaseStepUrl({ source: row.quote_case, to: this.caseId }).then(response => {
+      this.copyCaseStepUrl({ from_case: row.quote_case, to_case: this.caseId }).then(response => {
         this.$set(row, 'pullIsDisabled', false)
         if (this.showMessage(this, response)) {
           this.getStepList()
@@ -730,7 +730,7 @@ export default {
             this.newList.splice(evt.newIndex, 0, tempIndex)
 
             this.tableLoadingIsShow = true
-            this.stepSortUrl({ List: this.newList }).then(response => {
+            this.stepSortUrl({ id_list: this.newList }).then(response => {
               this.tableLoadingIsShow = false
               if (this.showMessage(this, response)) {
                 this.getStepList()

@@ -6,8 +6,9 @@
       :append-to-body="true"
       :visible.sync="drawerIsShow"
       :direction="direction"
+      :wrapper-closable="false"
     >
-      <!--      :wrapperClosable="false"-->
+
       <el-tabs v-model="activeName" style="margin-left: 20px;margin-right: 20px">
         <!-- 步骤信息 -->
         <el-tab-pane label="步骤信息" name="editStepInfo">

@@ -70,8 +70,8 @@
             :data-type="dataType"
             :current-project="currentProject"
             :current-page-id="tempPage.id"
-            :current-module-id="tempPage.module_id"
-            :current-project-id="tempPage.project_id"
+            :current-module-id="currentModuleId"
+            :current-project-id="currentProjectId"
           />
         </el-tab-pane>
 
@@ -175,7 +175,7 @@ export default {
       deep: true,
       handler(newVal, oldVal) {
         if (newVal) {
-          this.getModuleUrl({ 'id': this.tempPage.module_id }).then(response => {
+          this.getModuleUrl({ id: this.currentModuleId }).then(response => {
             this.moduleLabel = response.data.name
             this.$refs.moduleTree.setCheckedKeys([this.tempPage.module_id])
           })

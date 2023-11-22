@@ -181,9 +181,9 @@ import userSelector from '@/components/Selector/user.vue'
 import scriptView from '@/components/Selector/script.vue'
 import businessView from '@/components/Selector/business.vue'
 
-import { postProject as apiPostProject, putProject as apiPutProject } from '@/apis/apiTest/project'
-import { postProject as webUiPostProject, putProject as webUiPutProject } from '@/apis/webUiTest/project'
-import { postProject as AppPostProject, putProject as AppPutProject } from '@/apis/appUiTest/project'
+import { postProject as apiPostProject, putProject as apiPutProject, getProject as apiGetProject } from '@/apis/apiTest/project'
+import { postProject as webUiPostProject, putProject as webUiPutProject, getProject as webUiGetProject } from '@/apis/webUiTest/project'
+import { postProject as AppPostProject, putProject as AppPutProject, getProject as AppGetProject } from '@/apis/appUiTest/project'
 import { scriptList } from '@/apis/assist/script'
 import { phoneList } from '@/apis/appUiTest/device'
 
@@ -204,16 +204,16 @@ export default {
       direction: 'rtl', // 抽屉打开方式
       // 临时数据，添加、修改
       tempProject: {
-        id: null,
-        name: null,
-        manager: null,
+        id: undefined,
+        name: undefined,
+        manager: undefined,
         swagger: undefined,
         business_id: undefined,
         app_package: undefined,
         app_activity: undefined,
         template_device: undefined,
         script_list: [],
-        create_user: null
+        create_user: undefined
       },
       deviceList: [],
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
@@ -225,7 +225,8 @@ export default {
       responseMessage: '',
       dialogIsShow: false,
       postUrl: '',
-      putUrl: ''
+      putUrl: '',
+      getUrl: '',
     }
   },
 
@@ -245,18 +246,21 @@ export default {
     if (this.dataType === 'api') {
       this.postUrl = apiPostProject
       this.putUrl = apiPutProject
+      this.getUrl = apiGetProject
     } else if (this.dataType === 'appUi') {
       this.postUrl = AppPostProject
       this.putUrl = AppPutProject
+      this.getUrl = AppGetProject
     } else {
       this.postUrl = webUiPostProject
       this.putUrl = webUiPutProject
+      this.getUrl = webUiGetProject
     }
   },
 
   mounted() {
     if (this.dataType === 'appUi' && this.deviceList.length === 0) {
-      phoneList({ pageNum: 1, pageSize: 9999 }).then(response => {
+      phoneList({ page_num: 1, page_size: 9999 }).then(response => {
         this.deviceList = response.data.data
       })
     }
@@ -269,7 +273,10 @@ export default {
         if (status === 'add') {
           this.initTempProject() // 新增
         } else if (status === 'edit') {
-          this.updateTempProject(JSON.parse(JSON.stringify(data))) // 修改
+          this.getUrl({id: data.id}).then(response => {
+            this.updateTempProject(response.data)
+          })
+
         }
         this.submitButtonIsLoading = false
         this.drawerIsShow = true
@@ -322,15 +329,7 @@ export default {
 
     // 初始化临时服务数据 (修改)
     updateTempProject(row) {
-      this.tempProject.id = row.id
-      this.tempProject.name = row.name
-      this.tempProject.manager = row.manager
-      this.tempProject.swagger = row.swagger
-      this.tempProject.business_id = row.business_id
-      this.tempProject.app_package = row.app_package
-      this.tempProject.app_activity = row.app_activity
-      this.tempProject.template_device = row.template_device
-      this.tempProject.script_list = row.script_list
+      this.tempProject = row
       this.submitButtonIsShow = true
     },
 
@@ -357,9 +356,10 @@ export default {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.responseMessage = response.message
-          this.tempProject.id = response.data.id
+          // this.tempProject.id = response.data.id
           this.sendIsCommitStatus()
-          this.dialogIsShow = true
+          this.drawerIsShow = false
+          // this.dialogIsShow = true
         }
       })
     },

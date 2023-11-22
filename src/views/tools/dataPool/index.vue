@@ -83,7 +83,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -167,8 +167,8 @@
     <pagination
       v-show="dataPoolList.length>0"
       :total="dataPoolList.length"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getDataPoolList"
     />
 
@@ -197,8 +197,8 @@ export default {
   data() {
     return {
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
         env: undefined,
         mobile: undefined,
         business_order_no: undefined,

@@ -6,8 +6,8 @@
     :append-to-body="true"
     :visible.sync="drawerIsShow"
     :direction="direction"
+    :wrapper-closable="false"
   >
-    <!--    :wrapperClosable="false"-->
     <el-tabs v-show="currentStep.api_id" v-model="activeName" style="margin-left: 20px;margin-right: 20px">
       <!-- 步骤信息 -->
       <el-tab-pane label="步骤信息" name="editStepInfo">
@@ -331,7 +331,7 @@ export default {
         'params': [],
         'extracts': [],
         'validates': [],
-        'data_type': 'json',
+        'body_type': 'json',
         'data_form': [],
         'data_json': {},
         'data_urlencoded': {},
@@ -421,7 +421,7 @@ export default {
         'params': this.$refs.paramsView.tempData,
         'extracts': this.$refs.extractsView.tempData,
         'validates': this.$refs.validatesView.tempData,
-        'data_type': this.$refs.bodyView.tempDataType,
+        'body_type': this.$refs.bodyView.tempDataType,
         'data_form': this.$refs.bodyView.$refs.dataFormView.tempData,
         'data_json': json_data ? JSON.parse(json_data) : {},
         'data_urlencoded': data_urlencoded ? JSON.parse(data_urlencoded) : {},

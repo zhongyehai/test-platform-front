@@ -34,15 +34,15 @@
               class="block"
               :class="`block_${scope.row.method.toLowerCase()}`"
               :style="{
-                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
-                'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+                'backgroundColor': scope.row.status === 0 ? '#ebebeb' : '',
+                'textDecoration': scope.row.status === 0 ? 'line-through' : ''
               }"
             >
               <span
                 class="block-method block_method_color"
                 :class="`block_method_${scope.row.method.toLowerCase()}`"
                 :style="{
-                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                  'backgroundColor': scope.row.status === 0 ? '#ebebeb' : ''
                 }"
               >
                 {{ scope.row.method }}
@@ -105,7 +105,7 @@
           </template>
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.deprecated"
+              v-model="scope.row.status"
               :inactive-value="true"
               :active-value="false"
               @change="changeStatus(scope.row)"
@@ -113,7 +113,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="quote_count" align="center" min-width="5%">
+        <el-table-column prop="use_count" align="center" min-width="5%">
           <template slot="header">
             <span> 次数 </span>
             <el-tooltip
@@ -131,13 +131,13 @@
           <template slot-scope="scope">
             <el-tooltip class="item" effect="dark" placement="top-start">
               <div slot="content">
-                <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
+                <div>{{ scope.row.use_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
               </div>
               <el-tag
-                v-if="scope.row.quote_count"
+                v-if="scope.row.use_count"
                 @click="getApiMsgBelongToStep(scope.row)"
               >
-                {{ scope.row.quote_count }}
+                {{ scope.row.use_count }}
               </el-tag>
               <el-tag v-else type="info">0</el-tag>
             </el-tooltip>
@@ -270,10 +270,7 @@ export default {
     },
 
     changeStatus(row) {
-      changeApiStatus({
-        id: row.id,
-        deprecated: row.deprecated
-      }).then(response => {
+      changeApiStatus({id: row.id, status: row.status}).then(response => {
         this.showMessage(this, response)
       })
     },

@@ -6,8 +6,6 @@
     size="mini"
     row-key="id"
   >
-
-    {{ canEdite }}
     <el-table-column label="序号" header-align="center" min-width="4%">
       <template slot-scope="scope">
         <div>{{ scope.$index + 1 }}</div>
@@ -147,7 +145,11 @@ export default {
 
     initTempData(data) {
       if (data && data.length > 0) {
-        this.tempData = this.currentData
+        this.tempData = []
+        this.currentData.forEach((data, index) => {
+          data['id'] = `${Date.now()}_${index}`
+          this.tempData.push(JSON.parse(JSON.stringify(data)))
+        })
       } else {
         this.addRow()
       }

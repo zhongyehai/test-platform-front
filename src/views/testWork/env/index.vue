@@ -60,7 +60,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -255,8 +255,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="page_num"
+      :limit.sync="page_size"
       @pagination="getEnvList"
     />
 
@@ -293,21 +293,21 @@ export default {
       editDrawerIsShow: false, // 抽屉是否展示
       addDrawerIsShow: false, // 抽屉是否展示
       selectBusiness: [], // 选中的业务线
-      inputAddr: '', // 输入的域名地址
-      inputName: '', // 输入的环境名字
+      inputAddr: undefined, // 输入的域名地址
+      inputName: undefined, // 输入的环境名字
       businessList: [], // 业务线列表
       currentEnvList: [], // 环境资源列表
       envTemplate: {
-        id: '',
-        business: '',
-        name: '',
+        id: undefined,
+        business: undefined,
+        name: undefined,
         source_type: 'addr',
-        value: '',
-        desc: ''
+        value: undefined,
+        desc: undefined
       },
       total: 0,
-      pageNum: 1,
-      pageSize: 20
+      page_num: 1,
+      page_size: 20
     }
   },
 
@@ -330,12 +330,12 @@ export default {
     // 获取环境列表
     getEnvList() {
       envList({
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize,
-        'source_type': 'addr',
-        'value': this.inputAddr,
-        'name': this.inputName,
-        'business': this.selectBusiness
+        page_num: this.page_num,
+        page_size: this.page_size,
+        source_type: 'addr',
+        value: this.inputAddr,
+        name: this.inputName,
+        business: this.selectBusiness
       }).then(response => {
         this.currentEnvList = response.data.data
         this.total = response.data.total
@@ -344,15 +344,15 @@ export default {
 
     // 执行查询
     doQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.getEnvList()
     },
 
     // 重置
     initQuery() {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.selectBusiness = []
       this.inputAddr = ''
       this.inputName = ''
@@ -361,11 +361,11 @@ export default {
 
     // 初始化新环境
     initNewEnv() {
-      this.envTemplate.id = ''
+      this.envTemplate.id = undefined
       this.envTemplate.business = this.selectBusiness.length > 0 ? this.selectBusiness[0] : ''
-      this.envTemplate.name = ''
-      this.envTemplate.value = ''
-      this.envTemplate.desc = ''
+      this.envTemplate.name = undefined
+      this.envTemplate.value = undefined
+      this.envTemplate.desc = undefined
     },
 
     // 打开抽屉
@@ -387,8 +387,7 @@ export default {
     // 添加环境
     addEnv() {
       this.submitButtonIsLoading = true
-      this.envTemplate.data_list = this.$refs.addTable.tempData
-      postEnv(this.envTemplate).then(response => {
+      postEnv({business: this.envTemplate.business, data_list: this.$refs.addTable.tempData}).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.addDrawerIsShow = false
@@ -400,7 +399,13 @@ export default {
     // 修改环境
     changeEnv() {
       this.submitButtonIsLoading = true
-      putEnv(this.envTemplate).then(response => {
+      putEnv({
+        id: this.envTemplate.id,
+        business: this.envTemplate.business,
+        name: this.envTemplate.name,
+        value: this.envTemplate.value,
+        desc: this.envTemplate.desc
+      }).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
           this.editDrawerIsShow = false

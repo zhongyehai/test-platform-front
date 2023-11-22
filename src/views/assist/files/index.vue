@@ -35,7 +35,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -102,8 +102,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="page_num"
+      :limit.sync="page_size"
       @pagination="getFileList"
     />
 
@@ -141,8 +141,8 @@ export default {
       fileList: [],
 
       total: 0,
-      pageNum: 1,
-      pageSize: 20
+      page_num: 1,
+      page_size: 20
     }
   },
 
@@ -166,7 +166,7 @@ export default {
 
     // 获取文件列表
     getFileList() {
-      fileList({ 'pageNum': this.pageNum, 'pageSize': this.pageSize, 'fileType': this.fileType }).then(response => {
+      fileList({ page_num: this.page_num, page_size: this.page_size, file_type: this.fileType }).then(response => {
         this.fileList = response.data.data
         this.total = response.data.total
       })
@@ -174,15 +174,15 @@ export default {
 
     // 选中事件
     selectType(value) {
-      this.pageNum = 1
-      this.pageSize = 20
+      this.page_num = 1
+      this.page_size = 20
       this.getFileList()
     },
 
     // 下载文件
     downloadFile(row) {
       this.$set(row, 'downloadLoadingIsShow', true)
-      fileDownload({ 'name': row.name, 'fileType': this.fileType }).then(response => {
+      fileDownload({ file_name: row.name, file_type: this.fileType }).then(response => {
         this.$set(row, 'downloadLoadingIsShow', false)
         const blob = new Blob([response], {
           type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
@@ -203,7 +203,7 @@ export default {
     delFile(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      fileDelete({ 'name': row.name, 'fileType': this.fileType }).then(response => {
+      fileDelete({ file_name: row.name, file_type: this.fileType }).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getFileList()

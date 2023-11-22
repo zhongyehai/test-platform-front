@@ -38,7 +38,11 @@
       <el-form>
         <el-form-item label="选择语言：" label-width="100px">
           <el-radio-group v-model="language">
-            <el-radio v-for="(languageValue, languageKey) in languageDict" :label="languageKey">{{ languageValue }}</el-radio>
+            <el-radio
+              v-for="(languageValue, languageKey) in languageDict"
+              :key="languageKey"
+              :label="languageKey"
+            >{{ languageValue }}</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -83,6 +87,7 @@
 
       <el-table-column
         v-for="optionKey in allSelectOptionKeys"
+        :key="optionKey"
         show-overflow-tooltip
         :label="allOptionsMapping[optionKey]"
         :prop="optionKey"
@@ -118,7 +123,7 @@
 
 <script>
 import { makeUser, exportAsContact } from '@/apis/tools/makeUser'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 
 export default {
   name: 'MakeUserInfo',
@@ -148,14 +153,14 @@ export default {
 
   mounted() {
     // 获取生成用户信息可选项映射关系
-    getConfigByName({ 'name': 'make_user_info_mapping' }).then(response => {
-      this.allOptionsMapping = JSON.parse(response.data)
+    getConfigByCode({ code: 'make_user_info_mapping' }).then(response => {
+      this.allOptionsMapping = response.data
       this.allOptionKeys = Object.keys(this.allOptionsMapping)
     })
 
     // 获取语言映射关系
-    getConfigByName({ 'name': 'make_user_language_mapping' }).then(response => {
-      this.languageDict = JSON.parse(response.data)
+    getConfigByCode({ code: 'make_user_language_mapping' }).then(response => {
+      this.languageDict = response.data
       this.language = Object.keys(this.languageDict)[0]
     })
   },

@@ -187,6 +187,7 @@
             <el-upload
               class="upload-demo"
               :action="uploadAddrUrl"
+              :headers="uploadHeaders"
               :show-file-list="false"
               :on-success="uploadFile"
             >
@@ -359,7 +360,7 @@ import {
   uploadAddr as appUiUploadAddr,
   caseSuiteUpload as appUiCaseSuiteUpload
 } from '@/apis/appUiTest/suite'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { phoneList, serverList } from '@/apis/appUiTest/device'
 
 export default {
@@ -381,6 +382,9 @@ export default {
       direction: 'rtl', // 抽屉打开方式
       projectTab: '用例集列表',
       isShowLoading: false, // 用例集编辑框提交Loading
+
+      uploadHeaders: { 'X-Token': localStorage.getItem('token') },
+
       filterText: '', // 查询关键字
       projectListData: [], // 项目列表
       currentProjectId: '', // 当前选中的项目id
@@ -405,7 +409,7 @@ export default {
       runType: 1,
       runEnv: 'test',
       runSuiteData: undefined,
-      uploadCaseImage: require('../../../assets/uploadCase.png'),
+      uploadCaseImage: require('../../../assets/uploadCase.jpg'),
       projectListUrl: '',
       uploadAddrUrl: '',
       caseSuiteUploadUrl: '',
@@ -446,8 +450,8 @@ export default {
       this.uploadAddrUrl = webUiUploadAddr
       this.caseSuiteUploadUrl = webUiCaseSuiteUpload
       getFindElementOption(this, this.dataType) // 获取定位方式
-      getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
+      getConfigByCode({ code: 'browser_name' }).then(response => {
+        this.$busEvents.data.runBrowserNameDict = response.data
       })
     } else {
       this.getCaseSuiteUrl = appUiGetCaseSuite
@@ -473,8 +477,8 @@ export default {
 
   mounted() {
     // 获取用例集类型
-    getConfigByName({ 'name': this.dataType === 'api' ? 'api_suite_list' : 'ui_suite_list' }).then(response => {
-      this.suiteTypeList = JSON.parse(response.data)
+    getConfigByCode({ code: this.dataType === 'api' ? 'api_suite_list' : 'ui_suite_list' }).then(response => {
+      this.suiteTypeList = response.data
     })
 
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {

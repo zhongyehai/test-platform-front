@@ -57,7 +57,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -126,8 +126,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getConfigTypeList"
     />
   </div>
@@ -146,10 +146,11 @@ export default {
   data() {
     return {
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
-        create_user: '',
-        name: ''
+        page_num: 1,
+        page_size: 20,
+        detail:true,
+        create_user: undefined,
+        name: undefined
       },
       // 请求列表等待响应的状态
       listLoading: false,

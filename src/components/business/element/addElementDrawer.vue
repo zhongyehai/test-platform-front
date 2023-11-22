@@ -240,6 +240,16 @@ export default {
 
   methods: {
 
+    // 清除数据
+    clearData() {
+      this.tempData[0].name = null
+      this.tempData[0].by = null
+      this.tempData[0].element = null
+      this.tempData[0].template_device = null
+      this.tempData[0].desc = null
+      this.tempData[0].wait_time_out = null
+    },
+
     addRow() {
       this.tempData.push({
         id: `${Date.now()}`,

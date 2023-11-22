@@ -156,8 +156,8 @@
       <pagination
         v-show="caseTotal>0"
         :total="caseTotal"
-        :page.sync="quotePageNum"
-        :limit.sync="quotePageSize"
+        :page.sync="page_num"
+        :limit.sync="page_size"
         @pagination="getCaseList"
       />
 
@@ -202,8 +202,8 @@ export default {
       projectSelectedId: '',
       currentProjectList: [],
       currentCaseSuiteList: [],
-      quotePageNum: 1,
-      quotePageSize: 20,
+      page_num: 1,
+      page_size: 20,
       caseList: [],
       caseTotal: 0,
       currentSetId: '',
@@ -324,12 +324,7 @@ export default {
     selectedProject(projectId) {
       // 如果是访问的当前服务的用例集，则获取基础用例集和引用用例集，否则获取引用用例集
       const suite_type = this.projectSelectedId === this.projectId ? ['base', 'quote'] : ['quote']
-      this.caseSuiteTreeUrl({
-        'pageNum': 1,
-        'pageSize': 9999,
-        'project_id': projectId,
-        'suite_type': suite_type
-      }).then(response => {
+      this.caseSuiteTreeUrl({ project_id: projectId, suite_type: suite_type}).then(response => {
         this.currentCaseSuiteList = this.arrayToTree(response.data.data, null)
       })
     },
@@ -340,13 +335,7 @@ export default {
         this.currentSetId = caseSuiteList.slice(-1)[0] // 取列表中的最后一个
       }
       this.tableLoadingIsShow = true
-      this.caseListUrl({
-        pageNum: this.quotePageNum,
-        pageSize: this.quotePageSize,
-        suiteId: this.currentSetId,
-        status: 1,
-        getHasStep: true
-      }).then(response => {
+      this.caseListUrl({ page_num: this.page_num, page_size: this.page_size, suite_id: this.currentSetId, status: 1, has_step: true, detail: true}).then(response => {
         this.tableLoadingIsShow = false
         this.caseList = []
         this.expands = []
@@ -376,9 +365,11 @@ export default {
       new_api['status'] = 1
       new_api['run_times'] = 1
       new_api['name'] = row.name
+      new_api['body_type'] = 'json'
       new_api['headers'] = [{ 'key': null, 'remark': null, 'value': null }]
       new_api['params'] = [{ 'key': null, 'value': null }]
       new_api['data_form'] = [{ 'data_type': null, 'key': null, 'remark': null, 'value': null }]
+      new_api['data_json'] = {}
       new_api['data_json'] = {}
       new_api['extracts'] = [{ 'key': '', 'remark': null, 'value': '' }]
       new_api['validates'] = [{ 'key': '', 'remark': null, 'validate_type': '', 'value': '' }]
@@ -391,7 +382,7 @@ export default {
       this.$set(from, 'copyStepPopoverIsShow', false)
       this.$set(from, 'copyIsLoading', true)
       if (from.suite_id) { // 复制用例下的步骤
-        this.copyCaseStepUrl({ source: from.id, to: this.caseId }).then(response => {
+        this.copyCaseStepUrl({ from_case: from.id, to_case: this.caseId }).then(response => {
           this.$set(from, 'copyIsLoading', false)
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表
@@ -399,7 +390,7 @@ export default {
           }
         })
       } else { // 复制具体步骤
-        this.stepCopyUrl({ 'id': from.id, 'caseId': this.caseId }).then(response => {
+        this.stepCopyUrl({ id: from.id, case_id: this.caseId }).then(response => {
           this.$set(from, 'copyIsLoading', false)
           if (this.showMessage(this, response)) {
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 复制完成，重新请求步骤列表

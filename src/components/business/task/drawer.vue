@@ -91,12 +91,12 @@
           </el-form-item>
 
           <el-form-item label="发送报告" size="mini" class="is-required">
-            <el-radio v-model="tempTask.is_send" label="1">不发送</el-radio>
-            <el-radio v-model="tempTask.is_send" label="2">始终发送</el-radio>
-            <el-radio v-model="tempTask.is_send" label="3">仅有不通过用例时发送</el-radio>
+            <el-radio v-model="tempTask.is_send" label="not_send">不发送</el-radio>
+            <el-radio v-model="tempTask.is_send" label="always">始终发送</el-radio>
+            <el-radio v-model="tempTask.is_send" label="on_fail">仅有不通过用例时发送</el-radio>
           </el-form-item>
 
-          <el-form-item v-show="tempTask.is_send !== '1'" size="mini" class="is-required" label="接收方式">
+          <el-form-item v-show="tempTask.is_send !== 'not_send'" size="mini" class="is-required" label="接收方式">
             <el-radio v-model="tempTask.receive_type" label="ding_ding">钉钉群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="we_chat">企业微信群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="email">邮件</el-radio>
@@ -106,7 +106,7 @@
             </el-popover>
           </el-form-item>
 
-          <div v-show="tempTask.is_send !== '1'">
+          <div v-show="tempTask.is_send !== 'not_send'">
             <div v-show="tempTask.receive_type === 'ding_ding' || tempTask.receive_type === 'we_chat'">
               <el-form-item label="webhook地址" size="mini" class="is-required">
                 <oneColumnRow
@@ -393,20 +393,20 @@ import emailServerSelector from '@/components/Selector/email.vue'
 import jsonEditorView from '@/components/jsonView.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
-import { postTask as apiPostTask, putTask as apiPutTask, runTask as apiRunTask } from '@/apis/apiTest/task'
+import { getTask as apiGetTask, postTask as apiPostTask, putTask as apiPutTask, runTask as apiRunTask } from '@/apis/apiTest/task'
 import { caseSuiteList as apiCaseSuiteList } from '@/apis/apiTest/suite'
 import { caseList as apiCaseList, putCaseIsRun as apiPutCaseIsRun } from '@/apis/apiTest/case'
 
-import { postTask as webUiPostTask, putTask as webUiPutTask, runTask as webUiRunTask } from '@/apis/webUiTest/task'
+import { getTask as webUiGetTask, postTask as webUiPostTask, putTask as webUiPutTask, runTask as webUiRunTask } from '@/apis/webUiTest/task'
 import { caseSuiteList as webUiCaseSuiteList } from '@/apis/webUiTest/suite'
 import { caseList as webUiCaseList, putCaseIsRun as webUiPutCaseIsRun } from '@/apis/webUiTest/case'
 
-import { postTask as appUiPostTask, putTask as appUiPutTask, runTask as appUiRunTask } from '@/apis/appUiTest/task'
+import { getTask as appUiGetTask, postTask as appUiPostTask, putTask as appUiPutTask, runTask as appUiRunTask } from '@/apis/appUiTest/task'
 import { caseSuiteList as appUiCaseSuiteList } from '@/apis/appUiTest/suite'
 import { caseList as appUiCaseList, putCaseIsRun as appUiPutCaseIsRun } from '@/apis/appUiTest/case'
 
 import { arrayToTree } from '@/utils/parseData'
-import { getRunModel } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import {
   appiumServerRequestStatusMappingContent,
   appiumServerRequestStatusMappingTagType
@@ -424,7 +424,7 @@ export default {
     oneColumnRow
   },
   // eslint-disable-next-line vue/require-prop-types
-  props: ['dataType'],
+  props: ['dataType', 'currenProjectId'],
   data() {
     return {
       activeName: 'taskInfo',
@@ -491,6 +491,7 @@ export default {
       statusTagTypeMapping: appiumServerRequestStatusMappingTagType,
 
       putCaseIsRunUrl: '',
+      getTaskUrl: '',
       postTaskUrl: '',
       putTaskUrl: '',
       runTaskUrl: '',
@@ -533,14 +534,15 @@ export default {
     })
 
     // 监听服务树菜单点击事件
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, taskOrProject) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, task_id) => {
       if (_type === 'taskInfo') {
         if (status === 'update') { // 修改
-          this.tempTask = taskOrProject
-          this.tempTask.call_back = taskOrProject.call_back || this.callBackPlaceholder
+          this.getTaskUrl({ id: task_id }).then(response => {
+            this.tempTask = response.data
+            this.tempTask.call_back = response.data.call_back || this.callBackPlaceholder
+          })
         } else { // 新增
           this.initNewTask()
-          this.tempTask.project_id = taskOrProject.id
           if (this.dataType === 'webUi') {
             if (Object.keys(this.$busEvents.data.runBrowserNameDict).length > 0) {
               this.tempTask.conf.browser = Object.keys(this.$busEvents.data.runBrowserNameDict)[0]
@@ -570,6 +572,7 @@ export default {
 
   created() {
     if (this.dataType === 'api') {
+      this.getTaskUrl = apiGetTask
       this.postTaskUrl = apiPostTask
       this.putTaskUrl = apiPutTask
       this.runTaskUrl = apiRunTask
@@ -577,6 +580,7 @@ export default {
       this.caseListUrl = apiCaseList
       this.putCaseIsRunUrl = apiPutCaseIsRun
     } else if (this.dataType === 'webUi') {
+      this.getTaskUrl = webUiGetTask
       this.postTaskUrl = webUiPostTask
       this.putTaskUrl = webUiPutTask
       this.runTaskUrl = webUiRunTask
@@ -584,6 +588,7 @@ export default {
       this.caseListUrl = webUiCaseList
       this.putCaseIsRunUrl = webUiPutCaseIsRun
     } else {
+      this.getTaskUrl = appUiGetTask
       this.postTaskUrl = appUiPostTask
       this.putTaskUrl = appUiPutTask
       this.runTaskUrl = appUiRunTask
@@ -614,7 +619,7 @@ export default {
 
     // 获取执行模式配置
     initRunMode() {
-      getRunModel().then(response => {
+      getConfigByCode({ code: 'run_model' }).then(response => {
         this.runModeData = response.data
       })
     },
@@ -665,10 +670,10 @@ export default {
     // 获取服务id对应的用例集列表
     getCaseSuiteByProjectId(project_id) {
       this.caseSuiteListUrl({
-        'pageNum': 1,
-        'pageSize': 9999,
-        'project_id': project_id,
-        'suite_type': ['api', 'process']
+        page_num: 1,
+        page_size: 9999,
+        project_id: project_id,
+        suite_type: ['api', 'process']
       }).then(response => {
         const response_data = JSON.stringify(response.data.data) === '{}' ? [] : response.data.data
         this.tempCaseSuiteList = arrayToTree(response_data, null)
@@ -683,7 +688,7 @@ export default {
     // 获取当前模块下的用例列表
     getCaseList(suiteId) {
       this.tableLoadingIsShow = true
-      this.caseListUrl({ suiteId: suiteId, status: 1 }).then(response => {
+      this.caseListUrl({ suite_id: suiteId, status: 1, detail: true }).then(response => {
         this.tableLoadingIsShow = false
         this.currentCaseList = response.data.data
         this.defaultClick() // 获取完用例列表过后 ，执行默认选中事件
@@ -700,7 +705,7 @@ export default {
         task_type: 'cron',
         cron: '0 15 10 ? * MON-FRI',
         skip_holiday: true,
-        is_send: '1',
+        is_send: 'on_fail',
         is_async: 1,
         receive_type: 'ding_ding',
         webhook_list: [],
@@ -717,7 +722,7 @@ export default {
           'phone_id': undefined,
           'no_reset': undefined
         },
-        project_id: ''
+        project_id: this.currenProjectId
       }
     },
 
@@ -763,7 +768,7 @@ export default {
       this.postTaskUrl(data).then(response => {
         this.submitButtonIsLoading = false
         if (this.showMessage(this, response)) {
-          this.tempTask.id = response.data.id
+          // this.tempTask.id = response.data.id
           this.busEmit()
         }
       })

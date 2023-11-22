@@ -56,7 +56,7 @@
               :options="tempModuleList"
               :props="{ checkStrictly: true }"
               clearable
-              @change="getCaseList"
+              @change="getApiListByModuleId"
             />
           </el-form-item>
         </el-col>
@@ -78,7 +78,7 @@
       >
         <el-table-column prop="num" align="center" label="序号" min-width="8%">
           <template slot-scope="scope">
-            <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+            <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
@@ -88,15 +88,15 @@
               class="block"
               :class="`block_${scope.row.method.toLowerCase()}`"
               :style="{
-                'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
-                'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+                'backgroundColor': scope.row.status === 0 ? '#ebebeb' : '',
+                'textDecoration': scope.row.status === 0 ? 'line-through' : ''
               }"
             >
               <span
                 class="block-method block_method_color"
                 :class="`block_method_${scope.row.method.toLowerCase()}`"
                 :style="{
-                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                  'backgroundColor': scope.row.status === 0 ? '#ebebeb' : ''
                 }"
               >
                 {{ scope.row.method }}
@@ -118,8 +118,8 @@
       <pagination
         v-show="apiList.total>0"
         :total="apiList.total"
-        :page.sync="pageNum"
-        :limit.sync="pageSize"
+        :page.sync="page_num"
+        :limit.sync="page_size"
         @pagination="getApiList"
       />
 
@@ -173,8 +173,8 @@ export default {
         total: 0,
         data: []
       },
-      pageNum: 0,
-      pageSize: 20,
+      page_num: 0,
+      page_size: 20,
       queryAddr: '',
       marker: 'caseApiList'
     }
@@ -264,19 +264,15 @@ export default {
 
     // 获取服务id对应的模块列表
     getModulesByProjectId(project_id) {
-      moduleList({ 'projectId': project_id }).then(response => {
+      moduleList({ project_id: project_id }).then(response => {
         this.tempModuleList = this.arrayToTree(response.data.data, null)
       })
     },
 
-    getCaseList(selectedModuleList) {
+    getApiListByModuleId(selectedModuleList) {
       if (selectedModuleList.length > 0) {
         this.moduleId = selectedModuleList.slice(-1)[0] // 取列表中的最后一个
-        apiList({
-          'moduleId': this.moduleId,
-          'pageNum': this.pageNum,
-          'pageSize': this.pageSize
-        }).then(response => {
+        apiList({ module_id: this.moduleId, page_num: this.page_num, page_size: this.page_size, detail: true}).then(response => {
           this.apiList.data = response.data.data ? response.data.data : []
           this.apiList.total = response.data.total ? response.data.total : 0
         })
@@ -284,22 +280,13 @@ export default {
     },
 
     // 根据模块id内容获取接口列表
-    getApiListByModuleId() {
+    getApiList() {
       this.tableLoadingIsShow = true
-      apiList({
-        'moduleId': this.moduleId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
+      apiList({ module_id: this.moduleId, page_num: this.page_num, page_size: this.page_size, detail: true}).then(response => {
         this.tableLoadingIsShow = false
         this.apiList.data = response.data.data ? response.data.data : []
         this.apiList.total = response.data.total ? response.data.total : 0
       })
-    },
-
-    // 切换页数
-    getApiList(value) {
-      this.getApiListByModuleId()
     },
 
     // 深拷贝接口，添加到步骤列表

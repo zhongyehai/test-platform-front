@@ -232,7 +232,7 @@
         <span><i style="color: #409EFF" class="el-icon-question" /></span>
       </el-tooltip>
 
-      <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>
+      <!--      <el-button size="mini" @click=" drawerIsShow = false"> {{ '取消' }}</el-button>-->
 
       <el-button size="mini" type="primary" :loading="submitLoadingIsShow" @click="changCase()"> {{ '保存并继续填写' }} </el-button>
 
@@ -274,13 +274,7 @@ import {
 } from '@/apis/appUiTest/case'
 import { getCaseSuite as appUiGetCaseSuite } from '@/apis/appUiTest/suite'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
-import {
-  getConfigByName,
-  getExtractsMapping,
-  getSkipIfDataSourceMapping,
-  getSkipIfTypeMapping
-} from '@/apis/config/config'
-import { getAssertMapping } from '@/apis/apiTest/api'
+import { getConfigByCode, getSkipIfDataSourceMapping } from '@/apis/config/config'
 import { extractMappingList, keyBoardCodeMappingList } from '@/apis/webUiTest/step'
 import { getUiAssertMappingList } from '@/utils/getConfig'
 
@@ -419,8 +413,8 @@ export default {
 
     // 从后端获取数据类型映射
     if (this.$busEvents.data.dataTypeMappingList.length === 0) {
-      getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-        this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
+      getConfigByCode({ code: 'data_type_mapping' }).then(response => {
+        this.$busEvents.data.dataTypeMappingList = response.data
       })
     }
 
@@ -439,7 +433,7 @@ export default {
 
     // 从后端获取跳过方式映射
     if (this.$busEvents.data.skipIfTypeMappingList.length === 0) {
-      getSkipIfTypeMapping().then(response => {
+      getConfigByCode({ code: 'skip_if_type_mapping' }).then(response => {
         this.$busEvents.data.skipIfTypeMappingList = response.data
       })
     }
@@ -456,21 +450,21 @@ export default {
 
     // 从后端获取app键盘code类型映射
     if (this.dataType === 'appUi') {
-      getConfigByName({ 'name': 'app_key_code' }).then(response => {
-        this.$busEvents.data.keyboardKeyCodeList = JSON.parse(response.data)
+      getConfigByCode({ code: 'app_key_code' }).then(response => {
+        this.$busEvents.data.keyboardKeyCodeList = response.data
       })
     }
 
     // 从后端获取响应对象数据源映射
     if (this.$busEvents.data.responseDataSourceMappingList.length === 0) {
-      getExtractsMapping().then(response => {
+      getConfigByCode({ code: 'extracts_mapping' }).then(response => {
         this.$busEvents.data.responseDataSourceMappingList = response.data
       })
     }
 
     // 从后端获取断言数方式映射
     if (this.$busEvents.data.apiTestAssertMappingList.length === 0) {
-      getAssertMapping().then(response => {
+      getConfigByCode({ code: 'assert_mapping_list' }).then(response => {
         this.$busEvents.data.apiTestAssertMappingList = response.data
       })
     }
@@ -595,7 +589,7 @@ export default {
     runCase(caseId, runConf) {
       this.isShowDebugLoading = true
       this.caseRunUrl({
-        caseId: [caseId],
+        case_id_list: [caseId],
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,

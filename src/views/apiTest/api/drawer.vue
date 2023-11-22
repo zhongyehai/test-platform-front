@@ -143,7 +143,7 @@
       <el-tab-pane label="请求体" name="body" :disabled="methodSelectorChoiceMethod === 'GET'">
         <bodyView
           ref="bodyView"
-          :data-type="tempApi.data_type"
+          :data-type="tempApi.body_type"
           :data-json="tempApi.data_json"
           :data-form="tempApi.data_form"
           :data-urlencoded="tempApi.data_urlencoded"
@@ -238,7 +238,7 @@ import validatesView from '@/components/Inputs/validates'
 import pythonScriptIndex from '@/views/assist/script/index.vue'
 import oneColumnRow from '@/components/Inputs/oneColumnRow.vue'
 
-import { postApi, putApi, runApi } from '@/apis/apiTest/api'
+import { getApi, postApi, putApi, runApi } from '@/apis/apiTest/api'
 import { getModule } from '@/apis/apiTest/module'
 import { paramsListToStr } from '@/utils/parseData'
 import { assertStrIsJson } from '@/utils/validate'
@@ -290,7 +290,7 @@ export default {
         time_out: 60,
         headers: [{ key: null, value: null, remark: null }],
         params: [{ key: null, value: null }],
-        data_type: '',
+        body_type: '',
         data_form: [],
         data_json: JSON.stringify({}),
         data_urlencoded: JSON.stringify({}),
@@ -352,24 +352,24 @@ export default {
     })
 
     // 监听 接口编辑框命令事件
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, api, isShowFrom) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, command, api_id, isShowFrom) => {
       if (_type === 'apiInfo') {
         if (command === 'add') {
           this.initNewTempApi() // 新增
-        } else if (command === 'edit') {
-          this.initUpdateTempApi(api) // 修改
-          this.drawerType = 'update'
-        } else if (command === 'copy') {
-          this.initUpdateTempApi(api) // 复制
-          this.drawerType = 'add'
+        } else if (['edit', 'copy'].indexOf(command) !== -1) {
+          getApi({id: api_id}).then(response => {
+            this.tempApi = response.data
+            this.paramsToStr(this.tempApi.params)
+            if (isShowFrom) { // 查看接口详情打开的编辑框
+              this.moduleTree = [{ id: this.tempApi.module_id, name: this.moduleLabel }]
+            }
+            this.drawerType = command === 'edit' ? 'update' : 'add'
+            this.drawerIsShow = true
+          })
         }
-
         this.isShowSubmitLoading = false
         this.isShowDebugLoading = false
 
-        if (isShowFrom) { // 查看接口详情打开的编辑框
-          this.moduleTree = [{ id: api.module_id, name: this.moduleLabel }]
-        }
       }
     })
 
@@ -467,9 +467,8 @@ export default {
     runApis(runConf) {
       this.isShowDebugLoading = true
       runApi({
-        'projectId': this.tempApi.project_id,
-        'apis': [this.tempApi.id],
-        env_list: runConf.runEnv
+        // project_id: this.tempApi.project_id,
+        api_list: [this.tempApi.id], env_list: runConf.runEnv
       }).then(response => {
         this.isShowDebugLoading = false
         if (this.showMessage(this, response)) {
@@ -520,25 +519,18 @@ export default {
       this.tempApi.addr = ''
       this.tempApi.time_out = 60
       this.tempApi.headers = [{ key: null, value: null, remark: null }]
-      this.tempApi.params = [{ key: null, value: null }]
-      this.tempApi.data_type = ''
+      this.tempApi.params = [{ key: null, value: null, remark: null }]
+      this.tempApi.body_type = ''
       this.tempApi.data_form = []
       this.tempApi.data_json = {}
       this.tempApi.data_urlencoded = {}
       this.tempApi.data_text = ''
       this.tempApi.response = {}
-      this.tempApi.extracts = [{ key: null, value: null, remark: null }]
+      this.tempApi.extracts = [{ key: null, value: null, remark: null, update_to_header: null }]
       this.tempApi.validates = [{ key: null, value: null, validate_type: 'data', remark: null }]
       this.tempApi.module_id = this.currentModuleId ? this.currentModuleId : ''
       this.tempApi.project_id = this.currentProjectId || ''
       this.drawerType = 'create'
-      this.drawerIsShow = true
-    },
-
-    // 点击修改接口时，初始化 dialog 数据
-    initUpdateTempApi(api) {
-      this.tempApi = api
-      this.paramsToStr(this.tempApi.params)
       this.drawerIsShow = true
     },
 
@@ -562,7 +554,7 @@ export default {
         extracts: this.$refs.extractsView.tempData,
         validates: this.$refs.validatesView.tempData,
         // response: this.tempApi.response,
-        data_type: this.$refs.bodyView.tempDataType,
+        body_type: this.$refs.bodyView.tempDataType,
         data_form: this.$refs.bodyView.$refs.dataFormView.tempData,
         data_json: json_data ? JSON.parse(json_data) : {},
         data_urlencoded: data_urlencoded ? JSON.parse(data_urlencoded) : {},

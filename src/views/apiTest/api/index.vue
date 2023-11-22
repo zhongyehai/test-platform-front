@@ -37,7 +37,7 @@
         >
           <el-table-column prop="num" label="序号" align="center" min-width="5%">
             <template slot-scope="scope">
-              <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+              <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
@@ -53,15 +53,15 @@
                 class="block"
                 :class="`block_${scope.row.method.toLowerCase()}`"
                 :style="{
-                  'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : '',
-                  'textDecoration': scope.row.deprecated === true ? 'line-through' : ''
+                  'backgroundColor': scope.row.status === 0 ? '#ebebeb' : '',
+                  'textDecoration': scope.row.status === 0 ? 'line-through' : ''
                 }"
               >
                 <span
                   class="block-method block_method_color"
                   :class="`block_method_${scope.row.method.toLowerCase()}`"
                   :style="{
-                    'backgroundColor': scope.row.deprecated === true ? '#ebebeb' : ''
+                    'backgroundColor': scope.row.status === 0 ? '#ebebeb' : ''
                   }"
                 >
                   {{ scope.row.method }}
@@ -129,9 +129,9 @@
             </template>
             <template slot-scope="scope">
               <el-switch
-                v-model="scope.row.deprecated"
-                :inactive-value="true"
-                :active-value="false"
+                v-model="scope.row.status"
+                :inactive-value="0"
+                :active-value="1"
                 @change="changeStatus(scope.row)"
               />
             </template>
@@ -139,7 +139,7 @@
 
           <el-table-column
             show-overflow-tooltip
-            prop="quote_count"
+            prop="use_count"
             align="center"
             min-width="10%"
           >
@@ -161,10 +161,10 @@
             <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" placement="top-start">
                 <div slot="content">
-                  <div>{{ scope.row.quote_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
+                  <div>{{ scope.row.use_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
                 </div>
-                <el-tag v-if="scope.row.quote_count" @click="getApiMsgBelongToStep(scope.row)">
-                  {{ scope.row.quote_count }}
+                <el-tag v-if="scope.row.use_count" @click="getApiMsgBelongToStep(scope.row)">
+                  {{ scope.row.use_count }}
                 </el-tag>
                 <el-tag v-else type="info">0</el-tag>
               </el-tooltip>
@@ -203,7 +203,7 @@
                 <p>复制此接口并生成新的接口?</p>
                 <div style="text-align: right; margin: 0">
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
-                  <el-button type="primary" size="mini" @click="copyApi(scope.row)">确定</el-button>
+                  <el-button type="primary" size="mini" @click="copyApi(scope.row, scope.row.id)">确定</el-button>
                 </div>
                 <el-button
                   slot="reference"
@@ -243,8 +243,8 @@
         <pagination
           v-show="api_total>0"
           :total="api_total"
-          :page.sync="pageNum"
-          :limit.sync="pageSize"
+          :page.sync="page_num"
+          :limit.sync="page_size"
           @pagination="getApiList"
         />
       </el-tab-pane>
@@ -300,8 +300,8 @@ export default {
       currentProjectId: '',
 
       // 接口数据列表
-      pageNum: 1,
-      pageSize: 20,
+      page_num: 1,
+      page_size: 20,
       api_total: 0,
       api_list: [],
 
@@ -393,10 +393,7 @@ export default {
 
     changeStatus(row) {
       this.tableLoadingIsShow = true
-      changeApiStatus({
-        id: row.id,
-        deprecated: row.deprecated
-      }).then(response => {
+      changeApiStatus({id: row.id, status: row.status}).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
       })
@@ -410,10 +407,7 @@ export default {
     // 修改接口的重要等级
     selectApiLevel(row) {
       this.tableLoadingIsShow = true
-      changeApiLevel({
-        id: row.id,
-        level: row.level
-      }).then(response => {
+      changeApiLevel({id: row.id, level: row.level}).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
 
@@ -449,8 +443,7 @@ export default {
 
     // 打开编辑框
     showEditForm(row) {
-      this.tempApi = JSON.parse(JSON.stringify(row))
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', this.tempApi)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', row.id)
     },
 
     // 删除接口
@@ -474,22 +467,15 @@ export default {
     },
 
     // 复制接口
-    copyApi(api) {
-      this.tempApi = api
-      this.tempApi.id = ''
-      this.tempApi.quote_count = 0
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'copy', JSON.parse(JSON.stringify(this.tempApi)))
+    copyApi(api, api_id) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'copy', api_id)
       this.$set(api, 'copyPopoverIsShow', false)
     },
 
     // 根据模块内容获取接口列表
     getApiList(params) {
       this.tableLoadingIsShow = true
-      apiList({
-        'moduleId': this.currentModuleId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
+      apiList({module_id: this.currentModuleId, page_num: this.page_num, page_size: this.page_size, detail: true }).then(response => {
         this.tableLoadingIsShow = false
         this.api_list = response.data.data
         this.api_total = response.data.total
@@ -509,9 +495,7 @@ export default {
     runApis(runConf) {
       this.$set(this.currentApi, 'runButtonIsLoading', true)
       runApi({
-        projectId: this.currentApi.project_id,
-        apis: [this.currentApi.id],
-        env_list: runConf.runEnv
+        project_id: this.currentApi.project_id, api_list: [this.currentApi.id], env_list: runConf.runEnv
       }).then(response => {
         this.$set(this.currentApi, 'runButtonIsLoading', false)
         if (this.showMessage(this, response)) {
@@ -536,13 +520,10 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          apiMsgSort({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
-            this.tableLoadingIsShow = false
+          apiMsgSort({id_list: this.newList, page_num: this.page_num, page_size: this.page_size}).then(response => {
             this.showMessage(this, response)
+            this.getApiList()
+            this.tableLoadingIsShow = false
           })
         }
       })

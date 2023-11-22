@@ -249,7 +249,7 @@ export default {
     // 运行用例
     runCase(runConf) {
       caseRun({
-        caseId: this.runCaseId,
+        case_id_list: this.runCaseId,
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,

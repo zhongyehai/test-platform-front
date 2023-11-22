@@ -72,7 +72,7 @@
     >
       <el-table-column label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -155,8 +155,8 @@
     <pagination
       v-show="scripts.total>0"
       :total="scripts.total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getScriptList"
     />
 
@@ -184,12 +184,13 @@ export default {
   data() {
     return {
       listQuery: {
+        detail:true,
         script_type: undefined,
         file_name: undefined,
         create_user: undefined,
         update_user: undefined,
-        pageNum: 1,
-        pageSize: 20
+        page_num: 1,
+        page_size: 20
       },
 
       scriptTypeDict: {
@@ -292,7 +293,7 @@ export default {
     delScript(row) {
       this.$set(row, 'deletePopoverIsShow', false)
       this.$set(row, 'deleteLoadingIsShow', true)
-      deleteScript({ 'id': row.id }).then(response => {
+      deleteScript({ id: row.id }).then(response => {
         this.$set(row, 'deleteLoadingIsShow', false)
         if (this.showMessage(this, response)) {
           this.getScriptList()
@@ -317,12 +318,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableIsLoading = true
-          scriptSort({
-            List: this.newList,
-            pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize
-          }).then(response => {
+          scriptSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size }).then(response => {
             this.showMessage(this, response)
+            this.getScriptList()
             this.tableIsLoading = false
           })
         }

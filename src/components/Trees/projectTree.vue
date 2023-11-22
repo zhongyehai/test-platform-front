@@ -36,7 +36,7 @@
         <el-pagination
           small
           :current-page="projects.currentPage"
-          :page-size="pageSize"
+          :page-size="page_size"
           layout="prev, pager, next"
           :total="projects.project_total"
           @current-change="getCurrentPageProjectList"
@@ -55,7 +55,7 @@ import { projectList as appUiProjectList } from '@/apis/appUiTest/project'
 import waves from '@/directive/waves' // waves directive
 import { dataTypeTitleMappingContent } from '@/utils/mapping'
 import { phoneList, serverList } from '@/apis/appUiTest/device'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 
 export default {
   name: 'ProjectTree',
@@ -73,8 +73,8 @@ export default {
       defaultProps: { children: 'children', label: 'name' }, // 树的显示规则详见element-ui
 
       // 初始化数据默认的数据
-      pageNum: 1,
-      pageSize: 25,
+      page_num: 1,
+      page_size: 25,
 
       // 服务列表数据
       projects: {
@@ -108,8 +108,8 @@ export default {
       this.projectListUrl = apiProjectList
     } else if (this.dataType === 'webUi') {
       this.projectListUrl = webUiProjectList
-      getConfigByName({ 'name': 'browser_name' }).then(response => {
-        this.$busEvents.data.runBrowserNameDict = JSON.parse(response.data)
+      getConfigByCode({ code: 'browser_name' }).then(response => {
+        this.$busEvents.data.runBrowserNameDict = response.data
       })
     } else {
       this.projectListUrl = appUiProjectList
@@ -122,7 +122,7 @@ export default {
     }
 
     // 初始化服务列表, 取20条数据
-    this.getProjectList({ 'pageNum': this.pageNum, 'pageSize': this.pageSize })
+    this.getProjectList({ page_num: this.page_num, page_size: this.page_size })
   },
 
   methods: {
@@ -153,12 +153,9 @@ export default {
     },
 
     // 获取该分页的服务列表
-    getCurrentPageProjectList(pageNum) {
-      this.projects.currentPage = pageNum
-      this.getProjectList({
-        'pageNum': pageNum,
-        'pageSize': this.pageSize
-      })
+    getCurrentPageProjectList(page_num) {
+      this.projects.currentPage = page_num
+      this.getProjectList({ page_num: page_num, page_size: this.page_size})
     },
 
     // 获取服务列表

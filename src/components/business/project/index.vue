@@ -111,7 +111,7 @@
     >
       <el-table-column prop="num" label="序号" align="center" min-width="8%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -185,6 +185,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column v-if="dataType === 'appUi'" show-overflow-tooltip align="center" label="app_package" min-width="15%">
+        <template slot-scope="scope">
+          <span>{{ scope.row.app_package }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column show-overflow-tooltip align="center" label="最后修改" min-width="10%">
         <template slot-scope="scope">
           <span>{{ parseUser(scope.row.update_user) }}</span>
@@ -251,8 +257,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getProjectList"
     />
 
@@ -301,7 +307,7 @@ import projectDrawer from '@/components/business/project/drawer.vue'
 import pullDrawerView from '@/components/business/project/selectPullOptionsDrawer.vue'
 import projectEnvDrawer from '@/components/business/project/envEditor.vue'
 import showSwaggerPullLog from '@/components/business/project/showSwaggerPullLog.vue'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { businessList } from '@/apis/config/business'
 import { swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType } from '@/utils/mapping'
 
@@ -322,8 +328,9 @@ export default {
       titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
       // 查询对象
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
+        detail: true,
+        page_num: 1,
+        page_size: 20,
         name: undefined, // 服务名
         manager: undefined, // 负责人
         business_id: undefined, // 业务线
@@ -383,8 +390,8 @@ export default {
     })
 
     // 从后端获取数据类型映射
-    getConfigByName({ 'name': 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = JSON.parse(response.data)
+    getConfigByCode({ code: 'data_type_mapping' }).then(response => {
+      this.$busEvents.data.dataTypeMappingList = response.data
     })
   },
 
@@ -494,7 +501,7 @@ export default {
 
     // 触发查询
     handleFilter() {
-      this.listQuery.pageNum = 1
+      this.listQuery.page_num = 1
       this.getProjectList()
     },
 
@@ -506,8 +513,8 @@ export default {
     // 初始化查询数据
     handleInitListQuery() {
       this.listQuery = {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
         projectId: '', // 服务id
         manager: '', // 负责人
         create_user: '' // 创建人
@@ -533,12 +540,11 @@ export default {
           // 发送请求，改变排序
           this.tableIsLoading = true
           this.projectSortUrl({
-            List: this.newList,
-            pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize
+            id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size
           }).then(response => {
             this.tableIsLoading = false
             this.showMessage(this, response)
+            this.getProjectList()
           })
         }
       })

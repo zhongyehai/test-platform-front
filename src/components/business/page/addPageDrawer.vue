@@ -234,10 +234,7 @@ export default {
           this.$bus.$emit(this.$busEvents.drawerIsCommit, 'pageInfo')
           if (this.tempData.length === 1) { // 如果只增加一条用例，则新增完后打开编辑框
             this.$bus.$emit(
-              this.$busEvents.drawerIsShow,
-              'pageInfo',
-              'edit',
-              JSON.parse(JSON.stringify(response.data))
+              this.$busEvents.drawerIsShow, 'pageInfo', 'edit', JSON.parse(JSON.stringify(response.data))
             )
           }
           this.drawerIsShow = false

@@ -110,14 +110,14 @@ export default {
   methods: {
     // 获取业务线
     getRunEnvList() {
-      runEnvList({ getAll: true, pageNum: 1, pageSize: 9999 }).then(response => {
+      runEnvList({ getAll: true, page_num: 1, page_size: 9999 }).then(response => {
         this.runEnvList = response.data.data
       })
     },
 
     // 获取业务线
     getBusinessDataList() {
-      businessList({ getAll: true, pageNum: 1, pageSize: 9999 }).then(response => {
+      businessList({ getAll: true, page_num: 1, page_size: 9999 }).then(response => {
         this.businessDataList = response.data.data
       })
     },

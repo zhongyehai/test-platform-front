@@ -4,7 +4,6 @@
  */
 
 import router from './router'
-import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // 顶部页面加载进度条
 import 'nprogress/nprogress.css' // progress bar style
@@ -15,6 +14,7 @@ NProgress.configure({ showSpinner: false }) // showSpinner: false 隐藏显示�
 // 白名单列表，不需要权限就可访问的路由
 const whiteList = [
   '/login',
+  '/sso/login',
 
   '/apiTest/reportShow',
   '/assist/errorRecord',
@@ -37,17 +37,13 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   // 如果是查看报告，则从 localStorage 中获取token，判断用户是否已登录
-  const hasToken = to.path.indexOf('reportShow') !== -1 ? localStorage.getItem('token') : store.getters.token
+  const hasToken = localStorage.getItem('token')
 
   if (hasToken) {
-    // 如果有token，判断权限
-    if (to.path === '/login' || to.path === '/index' || to.path.indexOf('reportShow') > -1) {
-      // 路由为登录页，直接放行
-      next() // 如果访问的是登录，则直接放行
+    if (whiteList.indexOf(to.path) > -1 || to.path.indexOf('index') > -1 || to.path.indexOf('reportShow') > -1) {
+      next()
       NProgress.done() // 隐藏顶部页面加载进度条
     } else {
-      // 如果访问的不是登录页，判断是否有权限访问此路由
-
       const permissions = JSON.parse(localStorage.getItem('permissions'))
       if (permissions.indexOf('admin') > -1 || permissions.indexOf(to.path) > -1) {
         next()
@@ -58,17 +54,12 @@ router.beforeEach(async(to, from, next) => {
       NProgress.done()
     }
   } else {
-    // 没有获取到token
-
     // 判断当前要访问的路由是否在白名单中
     if (whiteList.indexOf(to.path) !== -1) {
-      // 如果在白名单中，直接放行
       next()
     } else {
-      // 如果不在白名单中，则跳转到/login，将要访问的路由，放在redirect参数上
-      next(`/login?redirect=${to.path}`)
-      // 隐藏顶部页面加载进度条
-      NProgress.done()
+      next(`/login?redirect=${to.path}`) // 如果不在白名单中，则跳转到/login，将要访问的路由，放在redirect参数上
+      NProgress.done() // 隐藏顶部页面加载进度条
     }
   }
 })

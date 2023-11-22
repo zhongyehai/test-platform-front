@@ -47,7 +47,7 @@
             >
               <el-table-column prop="num" label="序号" align="center" min-width="7%">
                 <template slot-scope="scope">
-                  <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+                  <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
@@ -165,8 +165,8 @@
             <pagination
               v-show="taskTotal>0"
               :total="taskTotal"
-              :page.sync="pageNum"
-              :limit.sync="pageSize"
+              :page.sync="page_num"
+              :limit.sync="page_size"
               @pagination="getTaskList"
             />
           </el-tab-pane>
@@ -184,6 +184,7 @@
 
     <taskDrawer
       :data-type="dataType"
+      :curren-project-id="projectId"
     />
   </div>
 </template>
@@ -239,8 +240,8 @@ export default {
       project: '',
       projectId: '',
       taskTotal: 0,
-      pageNum: 0,
-      pageSize: 20,
+      page_num: 0,
+      page_size: 20,
 
       // 拖拽排序参数
       sortable: null,
@@ -341,7 +342,7 @@ export default {
     // 进入编辑
     editTask(row) {
       if (row.status === 0) {
-        this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'update', JSON.parse(JSON.stringify(row)))
+        this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'update', row.id)
       }
     },
 
@@ -357,11 +358,10 @@ export default {
     copy(task) {
       this.$set(task, 'copyPopoverIsShow', false)
       this.tableLoadingIsShow = true
-      this.copyTaskUrl({ 'id': task.id }).then(response => {
+      this.copyTaskUrl({ id: task.id }).then(response => {
         this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
-          this.taskList.push(response.data)
-          this.editTask(response.data)
+          this.getTaskList()
         }
       })
     },
@@ -428,10 +428,7 @@ export default {
     // 获取任务列表
     getTaskList() {
       this.tableLoadingIsShow = true
-      this.taskListUrl({
-        projectId: this.projectId,
-        pageNum: this.pageNum,
-        pageSize: this.pageSize
+      this.taskListUrl({ project_id: this.projectId, page_num: this.page_num, page_size: this.page_size, detail: true
       }).then(response => {
         this.tableLoadingIsShow = false
         this.taskList = response.data.data
@@ -459,11 +456,7 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          this.taskSortUrl({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          this.taskSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
           })

@@ -6,38 +6,51 @@
 
       <!-- 用例管理 -->
       <el-tab-pane label="用例列表" name="case">
+        <template slot="label">
+          <span> 用例列表 </span>
+          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+            <div>点击添加用例</div>
+            <el-button
+              v-show="currentSetId"
+              slot="reference"
+              type="text"
+              style="margin-left: 10px"
+              icon="el-icon-plus"
+              @click="clickAddCase()"
+            />
+          </el-popover>
+        </template>
 
         <el-form label-width="80px" inline>
-          <!-- TODO 批量删除-->
 
-          <!--          <el-popover-->
-          <!--            v-show="selectedList.length > 0"-->
-          <!--            placement="top"-->
-          <!--            popper-class="down-popover"-->
-          <!--            v-model="showBatchDelete"-->
-          <!--          >-->
-          <!--            <p>确定删除所选中的测试用例?</p>-->
-          <!--            <div style="text-align: right; margin: 0">-->
-          <!--              <el-button size="mini" type="text" @click="cancelBatchDeletePopover()">取消</el-button>-->
-          <!--              <el-button type="primary" size="mini" @click="delCase">确定</el-button>-->
-          <!--            </div>-->
-          <!--            <el-button-->
-          <!--              slot="reference"-->
-          <!--              type="primary"-->
-          <!--              size="mini"-->
-          <!--              style="margin-left: 5px"-->
-          <!--            >批量删除-->
-          <!--            </el-button>-->
-          <!--          </el-popover>-->
+          <el-popover
+            placement="top"
+            popper-class="down-popover"
+            v-model="showBatchDelete"
+          >
+            <p>确定删除所选中的测试用例?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="cancelShowBatchButton()">取消</el-button>
+              <el-button type="primary" size="mini" @click="delCase">确定</el-button>
+            </div>
+            <el-button
+              :disabled="selectedList.length < 1"
+              slot="reference"
+              type="primary"
+              size="mini"
+              style="margin-left: 5px"
+            >批量删除
+            </el-button>
+          </el-popover>
 
-          <el-button
-            :disabled="!currentProjectId"
-            type="primary"
-            size="mini"
-            style="margin-left: 5px"
-            @click="clickAddCase"
-          >添加用例
-          </el-button>
+<!--          <el-button-->
+<!--            :disabled="!currentProjectId"-->
+<!--            type="primary"-->
+<!--            size="mini"-->
+<!--            style="margin-left: 5px"-->
+<!--            @click="clickAddCase"-->
+<!--          >添加用例-->
+<!--          </el-button>-->
 
           <el-popover
             v-model="showBatchChangeStatusToNotDebugAndNotRun"
@@ -146,11 +159,11 @@
           @selection-change="clickSelectAll"
           @cell-dblclick="cellDblclick"
         >
-          <el-table-column type="selection" min-width="2%" />
+          <el-table-column type="selection" min-width="2%"/>
 
           <el-table-column prop="num" label="序号" align="left" min-width="8%">
             <template slot-scope="scope">
-              <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+              <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
             </template>
           </el-table-column>
 
@@ -194,7 +207,7 @@
                   <div>1: 批量/定时任务运行时，只有调试结果为 "调试通过-要执行" 的才会执行</div>
                   <div>2: 请务必将用例调试通过后再设为调试通过</div>
                 </div>
-                <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                <span><i style="color: #409EFF" class="el-icon-question"/></span>
               </el-tooltip>
             </template>
             <template slot-scope="scope">
@@ -242,7 +255,7 @@
                   <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
                   <el-button type="primary" size="mini" @click="copyCase(scope.row)">确定</el-button>
                 </div>
-                <el-button slot="reference" type="text" size="mini">复制 </el-button>
+                <el-button slot="reference" type="text" size="mini">复制</el-button>
               </el-popover>
 
               <!-- 删除用例 -->
@@ -257,7 +270,7 @@
                   <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
                   <el-button type="primary" size="mini" @click="delCase(scope.row)">确定</el-button>
                 </div>
-                <el-button slot="reference" style="color: red" type="text" size="mini">删除 </el-button>
+                <el-button slot="reference" style="color: red" type="text" size="mini">删除</el-button>
               </el-popover>
             </template>
           </el-table-column>
@@ -266,8 +279,8 @@
         <pagination
           v-show="case_total>0"
           :total="case_total"
-          :page.sync="pageNum"
-          :limit.sync="pageSize"
+          :page.sync="page_num"
+          :limit.sync="page_size"
           @pagination="getCaseList"
         />
       </el-tab-pane>
@@ -312,7 +325,7 @@ import {
   caseSort as webUiCaseSort,
   copyCase as webUiCopyCase
 } from '@/apis/webUiTest/case'
-import { executeList as webUiExecuteList } from '@/apis/webUiTest/step'
+import {executeList as webUiExecuteList} from '@/apis/webUiTest/step'
 
 import {
   caseList as appUiCaseList,
@@ -322,7 +335,7 @@ import {
   caseSort as appUiCaseSort,
   copyCase as appUiCopyCase
 } from '@/apis/appUiTest/case'
-import { executeList as appUiExecuteList } from '@/apis/appUiTest/step'
+import {executeList as appUiExecuteList} from '@/apis/appUiTest/step'
 
 export default {
   name: 'Index',
@@ -342,8 +355,8 @@ export default {
     return {
 
       // 初始化数据默认的数据
-      pageNum: 1,
-      pageSize: 20,
+      page_num: 1,
+      page_size: 20,
       selectedList: [],
       showBatchDelete: false,
       showBatchChangeStatusToDebugPassAndRun: false,
@@ -389,7 +402,7 @@ export default {
     'case_list': {
       deep: true, // 深度监听
       handler(newVal, oldVal) {
-        this.$nextTick(function() {
+        this.$nextTick(function () {
           newVal.forEach(test_case => {
             this.changeSelectCaseColor(test_case)
           })
@@ -404,8 +417,8 @@ export default {
         if (newVal) {
           this.getCaseList({
             'caseSuiteId': newVal,
-            'pageNum': this.pageNum,
-            'pageSize': this.pageSize
+            'page_num': this.page_num,
+            'page_size': this.page_size
           })
         } else {
           this.case_list = []
@@ -486,7 +499,7 @@ export default {
       const that = this
       const data = row.name
       this.$copyText(data).then(
-        function(e) {
+        function (e) {
           that.$message.success('复制成功')
         }
       )
@@ -524,7 +537,7 @@ export default {
         })
       }
       this.tableLoadingIsShow = true
-      this.deleteCaseUrl({ 'id': selectedIdList }).then(response => {
+      this.deleteCaseUrl({id_list: selectedIdList}).then(response => {
         this.tableLoadingIsShow = false
         if (this.showMessage(this, response)) {
           this.getCaseList()
@@ -549,7 +562,7 @@ export default {
       //
       //
 
-      this.copyCaseUrl({ id: caseData.id }).then(response => {
+      this.copyCaseUrl({id: caseData.id}).then(response => {
         this.tableLoadingIsShow = false
         this.$set(caseData, 'copyPopoverIsShow', false)
 
@@ -611,7 +624,7 @@ export default {
     // 运行用例
     runCase(runConf) {
       this.caseRunUrl({
-        caseId: this.runCaseId,
+        case_id_list: this.runCaseId,
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
@@ -650,7 +663,7 @@ export default {
         changeStatus = row.status
       }
       this.tableLoadingIsShow = true
-      this.putCaseIsRunUrl({ 'id': selectedIdList, status: changeStatus.toString() }).then(response => {
+      this.putCaseIsRunUrl({id_list: selectedIdList, status: changeStatus}).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
         this.getCaseList()
@@ -661,9 +674,10 @@ export default {
     getCaseList(params) {
       this.tableLoadingIsShow = true
       this.caseListUrl({
-        'suiteId': this.currentSetId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
+        suite_id: this.currentSetId,
+        page_num: this.page_num,
+        page_size: this.page_size,
+        detail: true
       }).then(response => {
         this.tableLoadingIsShow = false
 
@@ -680,7 +694,7 @@ export default {
       const el = this.$refs.caseTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
       this.sortable = Sortable.create(el, {
         ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
+        setData: function (dataTransfer) {
           dataTransfer.setData('Text', '')
         },
         onEnd: evt => {
@@ -692,11 +706,7 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          this.caseSortUrl({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          this.caseSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size}).then(response => {
             this.showMessage(this, response)
             this.tableLoadingIsShow = false
           })

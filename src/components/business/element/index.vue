@@ -14,7 +14,7 @@
     >
       <el-table-column prop="num" label="序号" min-width="6%">
         <template slot-scope="scope">
-          <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -68,7 +68,7 @@
             type="text"
             size="mini"
             style="margin-right: 8px"
-            @click="showEditForm(scope.row)"
+            @click="showEditForm(scope.row.id)"
           >修改
           </el-button>
 
@@ -83,7 +83,7 @@
             <p>复制此元素并生成新的元素?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="copyElement(scope.row)">确定</el-button>
+              <el-button type="primary" size="mini" @click="copyElement(scope.row, scope.row.id)">确定</el-button>
             </div>
             <el-button
               slot="reference"
@@ -120,8 +120,8 @@
     <pagination
       v-show="elementTotal>0"
       :total="elementTotal"
-      :page.sync="pageNum"
-      :limit.sync="pageSize"
+      :page.sync="page_num"
+      :limit.sync="page_size"
       @pagination="getElementList"
     />
 
@@ -182,8 +182,8 @@ export default {
       tempElement: {}, // 元素新增/编辑临时数据
 
       // 元素数据列表
-      pageNum: 1,
-      pageSize: 20,
+      page_num: 1,
+      page_size: 20,
       elementTotal: 0,
       elementList: [],
 
@@ -241,7 +241,7 @@ export default {
 
   mounted() {
     if (this.dataType === 'appUi' && this.deviceList.length === 0) {
-      phoneList({ pageNum: 1, pageSize: 9999 }).then(response => {
+      phoneList({ page_num: 1, page_size: 9999 }).then(response => {
         this.deviceList = response.data.data
       })
     }
@@ -272,9 +272,8 @@ export default {
     },
 
     // 打开编辑框
-    showEditForm(row) {
-      this.tempElement = JSON.parse(JSON.stringify(row))
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'edit', this.tempElement)
+    showEditForm(element_id) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'edit', element_id)
     },
 
     // 删除元素
@@ -303,10 +302,8 @@ export default {
     },
 
     // 复制元素
-    copyElement(element) {
-      this.tempElement = element
-      this.tempElement.id = ''
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'copy', JSON.parse(JSON.stringify(this.tempElement)))
+    copyElement(element, element_id) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'copy', element_id)
       this.$set(element, 'copyPopoverIsShow', false)
     },
 
@@ -314,10 +311,7 @@ export default {
     getElementList(params) {
       this.tableLoadingIsShow = true
       if (this.pageId) {
-        this.elementListUrl({
-          'pageId': this.pageId,
-          'pageNum': this.pageNum,
-          'pageSize': this.pageSize
+        this.elementListUrl({ page_id: this.pageId, page_num: this.page_num, page_size: this.page_size, detail: true
         }).then(response => {
           this.elementList = response.data.data
           this.elementTotal = response.data.total
@@ -345,12 +339,9 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          this.elementSortUrl({
-            List: this.newList,
-            pageNum: this.pageNum,
-            pageSize: this.pageSize
-          }).then(response => {
+          this.elementSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
             this.showMessage(this, response)
+            this.getElementList()
             this.tableLoadingIsShow = false
           })
         }

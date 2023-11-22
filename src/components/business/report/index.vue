@@ -42,7 +42,7 @@
 
               <el-form-item label="报告名" size="mini">
                 <el-input
-                  v-model="query.projectName"
+                  v-model="query.project_name"
                   class="input-with-select"
                   placeholder="报告名，模糊查询"
                   size="mini"
@@ -68,10 +68,10 @@
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="单元" size="mini" label-width="50px">
+              <el-form-item label="类型" size="mini" label-width="50px">
                 <el-select
                   v-model="query.run_type"
-                  placeholder="运行单元"
+                  placeholder="运行类型"
                   size="mini"
                   filterable
                   clearable
@@ -133,7 +133,7 @@
 
               <el-table-column prop="id" label="序号" align="center" min-width="5%">
                 <template slot-scope="scope">
-                  <span> {{ (query.pageNum - 1) * query.pageSize + scope.$index + 1 }} </span>
+                  <span> {{ (query.page_num - 1) * query.page_size + scope.$index + 1 }} </span>
                 </template>
               </el-table-column>
 
@@ -141,7 +141,7 @@
 
               <el-table-column show-overflow-tooltip label="生成时间" align="center" min-width="15%">
                 <template slot-scope="scope">
-                  <span> {{ scope.row.created_time }} </span>
+                  <span> {{ scope.row.create_time }} </span>
                 </template>
               </el-table-column>
 
@@ -243,8 +243,8 @@
             <pagination
               v-show="queryTotal>0"
               :total="queryTotal"
-              :page.sync="query.pageNum"
-              :limit.sync="query.pageSize"
+              :page.sync="query.page_num"
+              :limit.sync="query.page_size"
               @pagination="getReportList"
             />
           </el-tab-pane>
@@ -297,7 +297,7 @@ import {
   deleteReport as appUiDeleteReport
 } from '@/apis/appUiTest/report'
 
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { userList } from '@/apis/system/user'
 import { runEnvList } from '@/apis/config/runEnv'
 
@@ -323,9 +323,10 @@ export default {
       reportDataList: [],
       reportTotal: 0,
       query: {
-        pageNum: 0,
-        pageSize: 20,
-        projectName: undefined,
+        detail: true,
+        page_num: 0,
+        page_size: 20,
+        project_name: undefined,
         createUser: undefined,
         env_list: [],
         run_type: undefined
@@ -371,8 +372,8 @@ export default {
           })
         })
 
-        this.query.pageNum = 1
-        this.query.pageSize = 20
+        this.query.page_num = 1
+        this.query.page_size = 20
         this.queryTotal = 0
         this.getReportList()
       }
@@ -385,8 +386,8 @@ export default {
       }
     })
 
-    getConfigByName({ 'name': 'run_type' }).then(response => {
-      this.runTypeDict = JSON.parse(response.data)
+    getConfigByCode({ code: 'run_type' }).then(response => {
+      this.runTypeDict = response.data
     })
   },
 
@@ -442,7 +443,7 @@ export default {
 
     // 获取服务对应的报告列表
     getReportList() {
-      this.query.projectId = this.projectId
+      this.query.project_id = this.projectId
       this.tableIsLoading = true
       this.reportListUrl(this.query).then(response => {
         this.tableIsLoading = false
@@ -474,9 +475,8 @@ export default {
           if (temp_variables) { // 本身就有临时参数
             this.sendReRun(project.business_id, temp_variables)
           } else { // 没有就获取用例的数据
-            const run_id = this.reRunReport.run_id
-            if (run_id.length === 1) {
-              this.getCaseUrl({ id: run_id[0] }).then(response => {
+            if (this.reRunReport.trigger_id.length === 1) {
+              this.getCaseUrl({ id: this.reRunReport.trigger_id[0] }).then(response => {
                 const case_data = response.data
                 this.sendReRun(project.business_id, {
                   skip_if: case_data.skip_if,
@@ -519,9 +519,9 @@ export default {
       const runUrl = this.getRunUrl()
 
       runUrl({
-        apis: this.reRunReport.run_type === 'api' ? this.reRunReport.run_id : undefined,
-        caseId: this.reRunReport.run_type === 'case' ? this.reRunReport.run_id : undefined,
-        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.run_id : undefined,
+        api_list: this.reRunReport.run_type === 'api' ? this.reRunReport.trigger_id : undefined,
+        case_id_list: this.reRunReport.run_type === 'case' ? this.reRunReport.trigger_id : undefined,
+        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.trigger_id : undefined,
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,
@@ -633,7 +633,7 @@ export default {
         })
       }
       this.tableIsLoading = true
-      this.deleteReportUrl({ id: selectedIdList }).then(response => {
+      this.deleteReportUrl({ id_list: selectedIdList }).then(response => {
         this.tableIsLoading = false
         if (this.showMessage(this, response)) {
           this.getReportList()

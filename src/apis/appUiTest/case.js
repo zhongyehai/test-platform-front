@@ -47,10 +47,10 @@ export function caseName(params) {
   return request({ url: currentBaseDir + '/name', method: 'get', params: params })
 }
 
-// 修改用例的引用关系
-export function changeCaseQuote(data) {
-  return request({ url: currentBaseDir + '/quote', method: 'put', data: data })
-}
+// // 修改用例的引用关系
+// export function changeCaseQuote(data) {
+//   return request({ url: currentBaseDir + '/quote', method: 'put', data: data })
+// }
 
 // 复制用例
 export function copyCase(data) {
@@ -59,12 +59,7 @@ export function copyCase(data) {
 
 // 复制用例的步骤
 export function copyCaseStep(data) {
-  return request({ url: currentBaseDir + '/copy/step', method: 'post', data: data })
-}
-
-// 拉取用例的步骤
-export function pullStep(data) {
-  return request({ url: currentBaseDir + '/pull/step', method: 'post', data: data })
+  return request({ url: currentBaseDir + 'copy-step', method: 'post', data: data })
 }
 
 // 修改用例排序

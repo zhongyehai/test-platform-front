@@ -37,11 +37,6 @@ export function executeList() {
   return request({ url: stepDir + '/executeMapping', method: 'get' })
 }
 
-// 数据提取动作映射
-export function extractMappingList() {
-  return request({ url: stepDir + '/extractMapping', method: 'get' })
-}
-
 // 断言动作映射
 export function assertMappingList() {
   return request({ url: stepDir + '/assertMapping', method: 'get' })

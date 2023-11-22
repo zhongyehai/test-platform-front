@@ -59,10 +59,17 @@ import Layout from '@/layout'
 // 没有权限要求的基本页面，所有角色都可访问
 export const constantRoutes = [
 
+  // sso登录
+  {
+    path: '/sso/login',
+    component: () => import('@/views/users/sso_login'),
+    hidden: true
+  },
+
   // 登录
   {
     path: '/login',
-    component: () => import('@/views/users/login/index'),
+    component: () => import('@/views/users/self_login/index'),
     hidden: true
   },
 
@@ -541,7 +548,7 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes // 代表那些不需要动态判断权限的路由，如登录页、404、等通用页面
 })

@@ -245,7 +245,7 @@ export default {
       if (expandIdIndex === -1) {
         // 获取引用用例的步骤列表
         this.sendBus('getExpandData')
-        this.stepListUrl({ caseId: row.quote_case }).then(response => {
+        this.stepListUrl({ case_id: row.quote_case }).then(response => {
           this.sendBus('getExpandData')
           this.expandIds.push(row.id)
           this.$set(row, 'children', response.data.data)
@@ -277,7 +277,7 @@ export default {
         changeStatus = row.status
       }
       this.tableLoadingIsShow = true
-      this.putStepIsRunUrl({ 'id': selectedIdList, 'status': changeStatus }).then(response => {
+      this.putStepIsRunUrl({ id_list: selectedIdList, status: changeStatus }).then(response => {
         this.tableLoadingIsShow = false
         this.showMessage(this, response)
         if (isGetStepList) {
@@ -289,7 +289,7 @@ export default {
     // 获取步骤列表
     getStepList(case_id) {
       this.tableLoadingIsShow = true
-      this.stepListUrl({ 'caseId': case_id || this.currentCaseId }).then(response => {
+      this.stepListUrl({ case_id: case_id || this.currentCaseId }).then(response => {
         this.tableLoadingIsShow = false
         this.stepDataList = response.data.data
       })

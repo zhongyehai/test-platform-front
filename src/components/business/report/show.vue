@@ -3,8 +3,7 @@
     <div class="reportShow" style="line-height: 36px;">
       <!-- 用例列表组件根据条件加载只能用v-show，不能用v-if -->
       <!-- 有测试报告数据 -->
-      <!--      <div v-show="reportData && reportData.stat.testcases.total > 0">-->
-      <div v-show="reportData && reportData.count_step > 0">
+      <div v-show="reportSummary && reportSummary.stat.count.step > 0">
 
         <!-- 第一行，头部信息 -->
         <div class="grid-content" style="background-color: #f5f5f5 !important;">
@@ -51,15 +50,15 @@
 
           <span style="float: right;font-size: 13px;color: #3a8ee6">
             <span v-if="dataType !== 'appUi'" style="margin-right: 10px">环境: {{
-              runEnvDict[reportData.run_env]
+              runEnvDict[reportSummary.env.code]
             }}</span>
-            <span style="margin-right: 10px">模式: {{ reportData.is_async === 1 ? '并行运行' : '串行运行' }}</span>
-            <span style="margin-right: 10px">开始: {{ reportData.time.start_at }}</span>
+            <span style="margin-right: 10px">模式: {{ reportSummary.is_async === 1 ? '并行运行' : '串行运行' }}</span>
+            <span style="margin-right: 10px">开始: {{ reportSummary.time.start_at }}</span>
             <!-- 执行耗时保留3为小数 -->
-            <span style="margin-right: 10px"> 耗时: {{ reportData.time.duration ? reportData.time.duration.toString().slice(0, 5) : '-' }} 秒</span>
+            <span style="margin-right: 10px"> 耗时: {{ reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-' }} 秒</span>
 
             <el-button
-              v-if="!reportData.success"
+              v-if="reportSummary.result !== 'success'"
               type="primary"
               size="mini"
               style="margin-right: 5px"
@@ -76,7 +75,6 @@
 
             <!-- Python脚本 -->
             <el-button
-              v-show="reRunReport.run_type !== 'api'"
               type="primary"
               size="mini"
               style="margin-right: 10px"
@@ -115,11 +113,11 @@
               <ve-pie :data="caseChartData" :settings="caseChartSettings" height="200px" width="400px" />
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
-              <div style="color: #927B8B">总数: {{ reportData.stat.teststeps.total }}</div>
-              <div style="color: #19D4AE">成功: {{ reportData.stat.teststeps.successes }}</div>
-              <div style="color: #FA6E86">失败: {{ reportData.stat.teststeps.failures }}</div>
-              <div style="color: #E87C25">错误: {{ reportData.stat.teststeps.errors }}</div>
-              <div style="color: #60C0DD">跳过: {{ reportData.stat.teststeps.skipped }}</div>
+              <div style="color: #927B8B">总数: {{ reportSummary.stat.test_step.total }}</div>
+              <div style="color: #19D4AE">成功: {{ reportSummary.stat.test_step.success }}</div>
+              <div style="color: #FA6E86">失败: {{ reportSummary.stat.test_step.fail }}</div>
+              <div style="color: #E87C25">错误: {{ reportSummary.stat.test_step.errors }}</div>
+              <div style="color: #60C0DD">跳过: {{ reportSummary.stat.test_step.skipped }}</div>
             </div>
           </el-col>
 
@@ -129,9 +127,9 @@
               <ve-ring :data="suiteChartData" :settings="suiteChartSettings" height="200px" width="350px" />
             </div>
             <div style="margin-top:40px;font-size:14px;line-height:25px;font-weight:600">
-              <div style="color: #927B8B">总数: {{ reportData.stat.testcases.total }}</div>
-              <div style="color: #19D4AE">成功: {{ reportData.stat.testcases.success }}</div>
-              <div style="color: #FA6E86">失败: {{ reportData.stat.testcases.fail }}</div>
+              <div style="color: #927B8B">总数: {{ reportSummary.stat.test_case.total }}</div>
+              <div style="color: #19D4AE">成功: {{ reportSummary.stat.test_case.success }}</div>
+              <div style="color: #FA6E86">失败: {{ reportSummary.stat.test_case.fail }}</div>
             </div>
           </el-col>
         </el-row>
@@ -145,7 +143,7 @@
       </div>
 
       <!-- 无测试报告数据，历史的测试报告没有数据 -->
-      <div v-show="!reportData || reportData.stat.testcases.total === 0" class="str">
+      <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">
         无运行数据或所有运行数据均已跳过
       </div>
 
@@ -354,21 +352,40 @@ export default {
         ]
       },
 
-      reportData: {
-        'details': [{ name: '' }],
+      reportSummary: {
+        'result': 'success',
         'stat': {
-          'testcases': { 'fail': '', 'success': '', 'total': '' },
-          'teststeps': {
-            'total': '',
-            'failures': '',
-            'errors': '',
-            'skipped': '',
-            'successes': '',
-            'expectedFailures': '',
-            'unexpectedSuccesses': ''
+          'test_case': {
+            'fail': 0,
+            'skip': 0,
+            'error': 0,
+            'total': 1,
+            'success': 1
+          },
+          'test_step': {
+            'fail': 0,
+            'skip': 0,
+            'error': 0,
+            'total': 1,
+            'success': 1
+          },
+          'count': {
+            'api': 1,
+            'step': 1,
+            'element': 0
           }
         },
-        'time': { 'start_at': '', 'duration': 1, 'start_datetime': '' }
+        'time': {
+          'end_at': '',
+          'start_at': '2023-09-11 09:47:59.584603',
+          'case_duration': 2.0637,
+          'step_duration': 2063.686,
+          'all_duration': 0
+        },
+        'env': {
+          'code': 'dev_qa',
+          'name': '开发环境'
+        }
       },
       resultMapping: reportStepResultMapping,
       reRunReport: {},
@@ -437,7 +454,7 @@ export default {
     }
 
     // 获取环境列表
-    runEnvList({}).then(response => {
+    runEnvList({ page_num: 1, page_size: 99999 }).then(response => {
       this.envList = response.data.data
       this.envList.forEach(env => {
         this.runEnvDict[env.code] = env.name
@@ -449,7 +466,7 @@ export default {
 
   methods: {
     deleteReport() {
-      this.deleteReportUrl({ id: [this.$route.query.id] }).then(response => {
+      this.deleteReportUrl({ id_list: [this.$route.query.id] }).then(response => {
         if (this.showMessage(this, response)) {
           open(location, '_self').close()
         }
@@ -478,9 +495,9 @@ export default {
         'hit',
         status,
         {
-          date: this.reportData.time.start_at,
-          test_type: this.reportData.run_type,
-          run_env: this.reportData.run_env,
+          date: this.reportSummary.time.start_at,
+          test_type: this.reportSummary.run_type,
+          run_env: this.reportSummary.env.code,
           report_id: this.$route.query.id
         })
     },
@@ -497,18 +514,18 @@ export default {
         loading.close()
         if (this.showMessage(this, response)) {
           this.reRunReport = response.data
-          this.reportData = response.data.summary
+          this.reportSummary = response.data.summary
 
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'showReportCaseList', this.reRunReport.id)
 
           // 渲染饼图需要的数据, 如果是没完成的报告，则饼图统计为0
-          if (this.reportData.stat) {
-            this.caseChartData['rows'][0]['num'] = this.reportData.stat.teststeps.successes
-            this.caseChartData['rows'][1]['num'] = this.reportData.stat.teststeps.failures
-            this.caseChartData['rows'][2]['num'] = this.reportData.stat.teststeps.errors
-            this.caseChartData['rows'][3]['num'] = this.reportData.stat.teststeps.skipped
-            this.suiteChartData['rows'][0]['num'] = this.reportData.stat.testcases.success
-            this.suiteChartData['rows'][1]['num'] = this.reportData.stat.testcases.fail
+          if (this.reportSummary.stat) {
+            this.caseChartData['rows'][0]['num'] = this.reportSummary.stat.test_step.success
+            this.caseChartData['rows'][1]['num'] = this.reportSummary.stat.test_step.fail
+            this.caseChartData['rows'][2]['num'] = this.reportSummary.stat.test_step.errors
+            this.caseChartData['rows'][3]['num'] = this.reportSummary.stat.test_step.skipped
+            this.suiteChartData['rows'][0]['num'] = this.reportSummary.stat.test_case.success
+            this.suiteChartData['rows'][1]['num'] = this.reportSummary.stat.test_case.fail
           }
         }
       }
@@ -520,13 +537,13 @@ export default {
       // 获取运行服务器和设备
       if (this.dataType === 'appUi') {
         if (this.$busEvents.data.runServerList.length < 1) {
-          serverList().then(response => {
+          serverList({ page_num: 1, page_size: 99999 }).then(response => {
             this.$busEvents.data.runServerList = response.data.data
           })
         }
 
         if (this.$busEvents.data.runPhoneList.length < 1) {
-          phoneList().then(response => {
+          phoneList({ page_num: 1, page_size: 99999 }).then(response => {
             this.$busEvents.data.runPhoneList = response.data.data
           })
         }
@@ -545,9 +562,8 @@ export default {
           if (temp_variables) { // 本身就有临时参数
             this.sendReRun(project.business_id, temp_variables)
           } else { // 没有就获取用例的数据
-            const run_id = this.reRunReport.run_id
-            if (run_id.length === 1) {
-              this.getCaseUrl({ id: run_id[0] }).then(response => {
+            if (this.reRunReport.trigger_id.length === 1) {
+              this.getCaseUrl({ id: this.reRunReport.trigger_id[0] }).then(response => {
                 const case_data = response.data
                 this.sendReRun(project.business_id, {
                   skip_if: case_data.skip_if,
@@ -590,9 +606,9 @@ export default {
       const runUrl = this.getRunUrl()
 
       runUrl({
-        apis: this.reRunReport.run_type === 'api' ? this.reRunReport.run_id : undefined,
-        caseId: this.reRunReport.run_type === 'case' ? this.reRunReport.run_id : undefined,
-        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.run_id : undefined,
+        api_list: this.reRunReport.run_type === 'api' ? this.reRunReport.trigger_id : undefined,
+        case_id_list: this.reRunReport.run_type === 'case' ? this.reRunReport.trigger_id : undefined,
+        id: ['task', 'suite'].indexOf(this.reRunReport.run_type) !== -1 ? this.reRunReport.trigger_id : undefined,
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,

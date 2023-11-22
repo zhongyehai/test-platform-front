@@ -486,7 +486,7 @@ export default {
           data_source: this.dataType === 'api' ? this.responseDataSourceMapping[0].value : this.elementList[0].value,
           key: null,
           validate_method: this.dataType === 'api' ? this.validateDataMethodList[0].value : this.validateUiMethodList[0].value,
-          data_type: this.dataTypeMapping[0].value,
+          body_type: this.dataTypeMapping[0].value,
           value: null
         })
       } else {
@@ -497,7 +497,7 @@ export default {
           data_source: null,
           key: null,
           validate_method: null,
-          data_type: null,
+          body_type: null,
           value: null
         }]
       }
@@ -521,7 +521,11 @@ export default {
 
     initValidates(validates) {
       if (validates && validates.length > 0) {
-        this.tempData = this.validates
+        this.tempData = []
+        this.validates.forEach((data, index) => {
+          data['id'] = `${Date.now()}_${index}`
+          this.tempData.push(JSON.parse(JSON.stringify(data)))
+        })
       } else {
         this.addRow()
       }

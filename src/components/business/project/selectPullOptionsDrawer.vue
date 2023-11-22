@@ -85,7 +85,7 @@ export default {
     // 从yapi同步服务信息
     pullByYapi(row) {
       this.pullButtonIsLoading = true
-      yapiPull({ id: row.id, options: this.checkedOptions }).then(response => {
+      yapiPull({ project_id: row.id, options: this.checkedOptions }).then(response => {
         this.pullButtonIsLoading = false
         this.showMessage(this, response)
         this.sendSuccess()
@@ -100,7 +100,7 @@ export default {
     // 从swagger同步服务信息
     pullBySwagger(row) {
       this.pullButtonIsLoading = true
-      swaggerPull({ id: row.id, options: this.checkedOptions }).then(response => {
+      swaggerPull({ project_id: row.id, options: this.checkedOptions }).then(response => {
         this.pullButtonIsLoading = false
         this.showMessage(this, response)
         this.sendSuccess()

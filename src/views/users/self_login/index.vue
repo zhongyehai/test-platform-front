@@ -69,7 +69,7 @@
 import * as types from '@/store/types'
 import { validUsername } from '@/utils/validate'
 import { login } from '@/apis/system/user'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 
 export default {
   name: 'Login',
@@ -106,7 +106,7 @@ export default {
 
   mounted() {
     // 请求测试平台名字
-    getConfigByName({ name: 'platform_name' }).then(response => {
+    getConfigByCode({ code: 'platform_name' }).then(response => {
       this.platformName = response.data
       document.title = this.platformName
       localStorage.setItem('platformName', this.platformName)
@@ -172,7 +172,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../../assets/loginBackground.png);
+  background-image: url(../../../assets/loginBackground.jpg);
   background-size: 100%;
 }
 

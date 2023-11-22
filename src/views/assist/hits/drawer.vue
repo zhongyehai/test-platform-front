@@ -122,8 +122,8 @@
 </template>
 
 <script>
-import { getConfigByName } from '@/apis/config/config'
-import { postHit, putHit, getHitTypeList } from '@/apis/assist/hit'
+import { getConfigByCode } from '@/apis/config/config'
+import { getHit, postHit, putHit, getHitTypeList } from '@/apis/assist/hit'
 import { projectList as apiProjectList } from '@/apis/apiTest/project'
 import { getReport as apiGetReport } from '@/apis/apiTest/report'
 
@@ -131,13 +131,7 @@ export default {
   name: 'Drawer',
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'runTestTypeList',
-    // eslint-disable-next-line vue/require-prop-types
-    'currentHitTypeList',
-    // eslint-disable-next-line vue/require-prop-types
-    'runEnvList',
-    // eslint-disable-next-line vue/require-prop-types
-    'projectList'
+    'runTestTypeList', 'currentHitTypeList', 'runEnvList', 'projectList'
   ],
   data() {
     return {
@@ -235,8 +229,8 @@ export default {
 
         // 获取测试类型列表
         if (!this.runTestType || this.runTestType.length < 1) {
-          getConfigByName({ name: 'test_type' }).then(response => {
-            this.runTestType = JSON.parse(response.data)
+          getConfigByCode({ code: 'test_type' }).then(response => {
+            this.runTestType = response.data
           })
         }
 
@@ -257,15 +251,9 @@ export default {
             })
           }
         } else if (status === 'update') {
-          this.tempHit.id = data.id
-          this.tempHit.date = data.date
-          this.tempHit.hit_type = data.hit_type
-          this.tempHit.hit_detail = data.hit_detail
-          this.tempHit.test_type = data.test_type
-          this.tempHit.project_id = data.project_id
-          this.tempHit.env = data.env
-          this.tempHit.report_id = data.report_id
-          this.tempHit.desc = data.desc
+          getHit({id: data.id}).then(response => {
+            this.tempHit = response.data
+          })
         }
 
         this.drawerIsShow = true

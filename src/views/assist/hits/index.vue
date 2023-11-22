@@ -71,7 +71,7 @@
     >
       <el-table-column label="序号" align="center" min-width="6%">
         <template slot-scope="scope">
-          <span> {{ (queryData.pageNum - 1) * queryData.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (queryData.page_num - 1) * queryData.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -167,8 +167,8 @@
     <pagination
       v-show="hitListTotal>0"
       :total="hitListTotal"
-      :page.sync="queryData.pageNum"
-      :limit.sync="queryData.pageSize"
+      :page.sync="queryData.page_num"
+      :limit.sync="queryData.page_size"
       @pagination="getHitList"
     />
 
@@ -187,7 +187,7 @@ import Pagination from '@/components/Pagination'
 import hitDrawer from '@/views/assist/hits/drawer'
 
 import { deleteHit, getHitTypeList, hitList } from '@/apis/assist/hit'
-import { getConfigByName } from '@/apis/config/config'
+import { getConfigByCode } from '@/apis/config/config'
 import { runEnvList } from '@/apis/config/runEnv'
 import { projectList } from '@/apis/apiTest/project'
 
@@ -217,8 +217,8 @@ export default {
         test_type: undefined,
         hit_type: undefined,
         report_id: undefined,
-        pageSize: 20,
-        pageNum: 1
+        page_size: 20,
+        page_num: 1
       }
     }
   },
@@ -262,8 +262,8 @@ export default {
   methods: {
 
     getRunType() {
-      getConfigByName({ name: 'test_type' }).then(response => {
-        this.runTestTypeList = JSON.parse(response.data)
+      getConfigByCode({ code: 'test_type' }).then(response => {
+        this.runTestTypeList = response.data
         this.runTestTypeList.forEach(rType => {
           this.runTestTypeDict[rType['key']] = rType['label']
         })

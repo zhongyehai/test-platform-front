@@ -18,7 +18,10 @@ import { configTypeList } from '@/apis/config/configType'
 
 export default {
   name: 'Email',
-  props: ['oldEmailServer'],
+  props: [
+    // eslint-disable-next-line vue/require-prop-types
+    'oldEmailServer'
+  ],
   data() {
     return {
       tempEmailServer: '',
@@ -53,7 +56,7 @@ export default {
         })
 
         // 获取对应的配置
-        configList({ 'queryType': configTypeData }).then(response => {
+        configList({ type: configTypeData }).then(response => {
           this.configEmailServerList = response.data.data
         })
       })

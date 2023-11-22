@@ -85,7 +85,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="10%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -198,8 +198,8 @@
     <pagination
       v-show="run_env_total>0"
       :total="run_env_total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getRunEnvList"
     />
   </div>
@@ -209,7 +209,7 @@
 import Sortable from 'sortablejs'
 import Pagination from '@/components/Pagination'
 import runEnvToBusiness from './runEnvToBusiness.vue'
-import { runEnvList, postRunEnv, putRunEnv, runEnvSort, runEnvGroupList } from '@/apis/config/runEnv'
+import { getRunEnv, runEnvList, postRunEnv, putRunEnv, runEnvSort, runEnvGroupList } from '@/apis/config/runEnv'
 
 export default {
   name: 'Index',
@@ -220,12 +220,13 @@ export default {
   data() {
     return {
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
-        create_user: '',
-        name: '',
-        code: '',
-        group: ''
+        page_num: 1,
+        page_size: 20,
+        detail: true,
+        create_user: undefined,
+        name: undefined,
+        code: undefined,
+        group: undefined
       },
       groupList: [],
       // 请求列表等待响应的状态
@@ -283,15 +284,17 @@ export default {
 
     showAddRunEnvDrawer(row) {
       if (row) {
-        this.tempRunEnv = JSON.parse(JSON.stringify(row))
-        this.drawerType = 'edit'
+        getRunEnv({ id: row.id }).then(response => {
+          this.tempRunEnv = response.data
+          this.drawerType = 'edit'
+        })
       } else {
         this.tempRunEnv = {
-          id: '',
-          name: '',
-          code: '',
-          group: '',
-          desc: ''
+          id: undefined,
+          name: undefined,
+          code: undefined,
+          group: undefined,
+          desc: undefined
         }
         this.drawerType = 'add'
       }
@@ -352,11 +355,12 @@ export default {
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
           runEnvSort({
-            List: this.newList,
-            pageNum: this.listQuery.pageNum,
-            pageSize: this.listQuery.pageSize
+            id_list: this.newList,
+            page_num: this.listQuery.page_num,
+            page_size: this.listQuery.page_size
           }).then(response => {
             this.showMessage(this, response)
+            this.getRunEnvList()
             this.tableLoadingIsShow = false
           })
         }

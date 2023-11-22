@@ -80,7 +80,7 @@
       >
         <el-table-column prop="num" label="序号" align="center" min-width="10%">
           <template slot-scope="scope">
-            <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
+            <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
@@ -113,8 +113,8 @@
       <pagination
         v-show="elementList.total>0"
         :total="elementList.total"
-        :page.sync="pageNum"
-        :limit.sync="pageSize"
+        :page.sync="page_num"
+        :limit.sync="page_size"
         @pagination="getElementListByPageId"
       />
 
@@ -162,8 +162,8 @@ export default {
         total: 0,
         data: []
       },
-      pageNum: 0,
-      pageSize: 20,
+      page_num: 0,
+      page_size: 20,
 
       moduleListUrl: '',
       pageListUrl: '',
@@ -256,7 +256,7 @@ export default {
 
     // 获取项目id对应的模块列表
     getModulesByProjectId(project_id) {
-      this.moduleListUrl({ 'projectId': project_id }).then(response => {
+      this.moduleListUrl({ project_id: project_id }).then(response => {
         this.tempModuleList = this.arrayToTree(response.data.data, null)
       })
     },
@@ -265,9 +265,7 @@ export default {
       if (selectedModuleList.length > 0) {
         this.moduleId = selectedModuleList.slice(-1)[0] // 取列表中的最后一个
         this.pageListUrl({
-          'moduleId': this.moduleId,
-          'pageNum': this.pageNum,
-          'pageSize': this.pageSize
+          module_id: this.moduleId, page_num: this.page_num, page_size: this.page_size
         }).then(response => {
           this.tempPageList = response.data.data ? response.data.data : []
         })
@@ -275,22 +273,9 @@ export default {
     },
 
     // 根据模块id内容获取元素列表
-    getPageListByModuleId() {
-      this.pageListUrl({
-        'moduleId': this.moduleId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }).then(response => {
-        this.tempPageList = response.data.data ? response.data.data : []
-      })
-    },
-
-    // 根据模块id内容获取元素列表
     getElementListByPageId() {
       this.elementListUrl({
-        'pageId': this.pageId,
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
+        page_id: this.pageId, page_num: this.page_num, page_size: this.page_size
       }).then(response => {
         this.elementList.data = response.data.data ? response.data.data : []
         this.elementList.total = response.data.total ? response.data.total : 0

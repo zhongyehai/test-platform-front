@@ -6,7 +6,7 @@
 
         <el-form-item :label="'类型'" size="mini">
           <el-select
-            v-model="listQuery.queryType"
+            v-model="listQuery.type"
             :placeholder="'选择配置类型'"
             clearable
             filterable
@@ -79,7 +79,7 @@
     >
       <el-table-column prop="id" label="编号" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -134,8 +134,8 @@
     <pagination
       v-show="mailService.total>0"
       :total="mailService.total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getConfigList"
     />
 
@@ -165,12 +165,13 @@ export default {
     return {
 
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
-        queryType: '',
-        create_user: '',
-        name: '',
-        value: ''
+        page_num: 1,
+        page_size: 20,
+        detail: true,
+        type: undefined,
+        create_user: undefined,
+        name: undefined,
+        value: undefined
       },
 
       // 请求列表等待响应的状态

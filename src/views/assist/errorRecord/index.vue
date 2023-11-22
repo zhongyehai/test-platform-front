@@ -14,25 +14,25 @@
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="5%">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="15%">
+      <el-table-column :label="'创建时间'" prop="create_time" align="center" min-width="15%">
         <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
+          <span>{{ scope.row.create_time }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="'触发 人'" prop="create_user" align="center" min-width="15%">
+        <template slot-scope="scope">
+          <span>{{ scope.row.create_user }}</span>
         </template>
       </el-table-column>
 
       <el-table-column :label="'错误类型'" prop="name" align="center" min-width="20%" show-overflow-tooltip>
         <template slot-scope="scope">
           <span> {{ scope.row.name }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="'错误概览'" prop="detail" align="center" min-width="50%" show-overflow-tooltip>
-        <template slot-scope="scope">
-          <span>{{ scope.row.detail }}</span>
         </template>
       </el-table-column>
 
@@ -54,8 +54,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getErrorRecordList"
     />
 
@@ -76,7 +76,7 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
 
-import { errorRecordList } from '@/apis/assist/errorRecord'
+import {errorRecord, errorRecordList} from '@/apis/assist/errorRecord'
 
 export default {
   name: 'Project',
@@ -88,8 +88,8 @@ export default {
     return {
       // 查询对象
       listQuery: {
-        pageNum: 1,
-        pageSize: 20
+        page_num: 1,
+        page_size: 20
       },
 
       record_list: [],
@@ -130,21 +130,25 @@ export default {
 
     // 查看详情
     showDetail(row) {
-      this.currentRow = row
-      this.drawerIsShow = true
+      errorRecord({id: row.id}).then(response => {
+        if (this.showMessage(this, response)) {
+          this.currentRow = response.data
+          this.drawerIsShow = true
+        }
+      })
     },
 
     // 触发查询
     handleFilter() {
-      this.listQuery.pageNum = 1
+      this.listQuery.page_num = 1
       this.getErrorRecordList()
     },
 
     // 初始化查询数据
     handleInitListQuery() {
       this.listQuery = {
-        pageNum: 1,
-        pageSize: 20
+        page_num: 1,
+        page_size: 20
       }
       this.getErrorRecordList()
     }

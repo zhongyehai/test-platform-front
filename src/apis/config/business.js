@@ -34,5 +34,5 @@ export function businessList(params) {
 
 // 批量修业务线与用户的绑定关系
 export function businessToUser(data) {
-  return request({ url: currentBaseDir + '/toUser', method: 'put', data: data })
+  return request({ url: currentBaseDir + '/user', method: 'put', data: data })
 }

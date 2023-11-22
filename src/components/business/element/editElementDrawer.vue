@@ -127,8 +127,8 @@
 </template>
 
 <script>
-import { postElement as appPostElement, putElement as appPutElement } from '@/apis/appUiTest/element'
-import { postElement as webUiPostElement, putElement as webUiPutElement } from '@/apis/webUiTest/element'
+import { getElement as appGetElement, postElement as appPostElement, putElement as appPutElement } from '@/apis/appUiTest/element'
+import { getElement as webUiGetElement, postElement as webUiPostElement, putElement as webUiPutElement } from '@/apis/webUiTest/element'
 
 export default {
   name: 'Drawer',
@@ -150,6 +150,7 @@ export default {
         element: null,
         template_device: undefined,
         desc: null,
+        page_id: null,
         wait_time_out: 5
       },
       submitButtonIsLoading: false,
@@ -157,6 +158,7 @@ export default {
       isSendForPage: false, // 标记是否发送给页面管理，更新页面地址
 
       element_label: '',
+      getElementUrl: '',
       postElementUrl: '',
       putElementUrl: ''
     }
@@ -178,27 +180,33 @@ export default {
     if (this.dataType === 'webUi') {
       this.putElementUrl = webUiPutElement
       this.postElementUrl = webUiPostElement
+      this.getElementUrl = webUiGetElement
     } else {
       this.putElementUrl = appPutElement
       this.postElementUrl = appPostElement
+      this.getElementUrl = appGetElement
     }
   },
 
   mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, element) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, element_id) => {
       if (_type === 'elementInfo') {
-        if (status === 'edit') { // 修改
-          this.tempElement.id = element.id
-          this.updateTempElement(JSON.parse(JSON.stringify(element)))
-        } else if (status === 'copy') { // 复制
-          this.tempElement.id = ''
-          this.updateTempElement(JSON.parse(JSON.stringify(element)))
+        if (['edit', 'copy'].indexOf(status) !== -1) { // 修改
+          this.getElementUrl({id: element_id}).then(response => {
+            this.tempElement = response.data
+            if (status === 'copy'){
+              this.tempElement.id = ''
+            }
+            if (this.tempElement.by === null) {
+              this.tempElement.by = this.$busEvents.data.findElementOptionList[0].value
+            }
+            this.submitButtonIsShow = true
+            this.submitButtonIsLoading = false
+            this.drawerIsShow = true
+          })
         }
 
-        if (this.tempElement.by === null) {
-          this.tempElement.by = this.$busEvents.data.findElementOptionList[0].value
-        }
-        this.submitButtonIsLoading = false
+
       }
     })
   },
@@ -211,21 +219,6 @@ export default {
   },
 
   methods: {
-
-    // 初始化临时元素数据 (修改)
-    updateTempElement(row) {
-      this.tempElement.name = row.name
-      this.tempElement.by = row.by
-      this.tempElement.element = row.element
-      this.tempElement.template_device = row.template_device
-      this.tempElement.desc = row.desc
-      this.tempElement.wait_time_out = row.wait_time_out
-      this.tempElement.page_id = row.page_id
-      this.tempElement.module_id = row.module_id
-      this.tempElement.project_id = row.project_id
-      this.submitButtonIsShow = true
-      this.drawerIsShow = true
-    },
 
     // 获取数据提交给后端
     getProjectForCommit() {

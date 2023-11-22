@@ -345,7 +345,7 @@ export default {
           this.tempScript.desc = data.desc
           this.tempScript.script_type = data.script_type
           getScript({ id: data.id }).then(res => {
-            this.tempScript.script_data = res.script_data
+            this.tempScript.script_data = res.data.script_data
           })
         }
 

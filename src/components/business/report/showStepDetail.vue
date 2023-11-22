@@ -9,7 +9,8 @@
           <pre class="el-collapse-item-content" style="overflow: auto; color: #FA6E86">{{ stepData.attachment }}</pre>
         </el-collapse-item>
 
-        <el-collapse-item v-show="stepData.validation_results && stepData.validation_results.length > 0" name="validationResults">
+        <el-collapse-item v-show="stepData.validation_results && stepData.validation_results.length > 0"
+                          name="validationResults">
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '断言详情：' }}</div>
           </template>
@@ -58,17 +59,17 @@
 
             <el-descriptions class="margin-top" :column="2" border>
               <el-descriptions-item>
-                <template slot="label"> 请求方法 </template>
+                <template slot="label"> 请求方法</template>
                 {{ stepData.request.method }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 请求地址 </template>
+                <template slot="label"> 请求地址</template>
                 {{ stepData.request.url }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 发送时间 </template>
+                <template slot="label"> 发送时间</template>
                 {{ stepData.stat ? stepData.stat.request_at : '-' }}
               </el-descriptions-item>
             </el-descriptions>
@@ -268,18 +269,18 @@
 
         <el-collapse-item v-if="dataType === 'api'" name="apiTestResponse">
           <template slot="title">
-            <div class="el-collapse-item-title">响应信息: </div>
+            <div class="el-collapse-item-title">响应信息:</div>
           </template>
           <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px; margin-right: 10px">
 
             <el-descriptions class="margin-top" :column="2" border>
               <el-descriptions-item>
-                <template slot="label"> 响应时间 </template>
+                <template slot="label"> 响应时间</template>
                 {{ stepData.stat ? stepData.stat.response_at : '-' }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 响应状态码 </template>
+                <template slot="label"> 响应状态码</template>
                 {{ stepData.response.status_code }}
               </el-descriptions-item>
             </el-descriptions>
@@ -294,7 +295,7 @@
                 class="el-collapse-item-content"
                 style="overflow: auto"
               >{{ stepData.response.text }}</pre>
-              <div v-else class="el-collapse-item-content" v-html="stepData.response.text" />
+              <div v-else class="el-collapse-item-content" v-html="stepData.response.text"/>
             </el-collapse-item>
 
             <el-collapse-item name="response_json">
@@ -336,22 +337,22 @@
           <el-collapse v-model="defaultShowExecuteInFo" style="margin-left: 30px; margin-right: 30px">
             <el-descriptions class="margin-top" :column="2" border>
               <el-descriptions-item>
-                <template slot="label"> 执行方式 </template>
+                <template slot="label"> 执行方式</template>
                 {{ stepData.test_action.execute_name }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 输入内容 </template>
+                <template slot="label"> 输入内容</template>
                 {{ stepData.test_action.text }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 元素定位方式 </template>
+                <template slot="label"> 元素定位方式</template>
                 {{ stepData.test_action.by_type }}
               </el-descriptions-item>
 
               <el-descriptions-item>
-                <template slot="label"> 元素定位表达式 </template>
+                <template slot="label"> 元素定位表达式</template>
                 {{ stepData.test_action.element }}
               </el-descriptions-item>
             </el-descriptions>
@@ -369,8 +370,7 @@
                       :preview-src-list="[
                         'data:image/jpg;base64,' + stepData.before,
                         'data:image/jpg;base64,' + stepData.after
-                      ]"
-                    />
+                      ]"/>
                     <span v-show="!stepData.before">没有截图</span>
                   </div>
                 </el-collapse-item>
@@ -380,16 +380,15 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                   </template>
-                  <div v-loading="afterImgIsLoading">
-                    <el-image
-                      v-show="stepData.after"
-                      :src="'data:image/jpg;base64,' + stepData.after "
-                      :preview-src-list="[
-                        'data:image/jpg;base64,' + stepData.before,
-                        'data:image/jpg;base64,' + stepData.after
-                      ]"
-                    />
-                    <span v-show="!stepData.after">没有截图</span>
+                  <div v-loading="afterImgIsLoading" class="el-collapse-item-content">
+                      <el-image
+                        v-show="stepData.after"
+                        :src="'data:image/jpg;base64,' + stepData.after "
+                        :preview-src-list="[
+                          'data:image/jpg;base64,' + stepData.before,
+                          'data:image/jpg;base64,' + stepData.after
+                        ]"/>
+                      <span v-show="!stepData.after">没有截图</span>
                   </div>
                 </el-collapse-item>
               </el-col>
@@ -534,7 +533,7 @@ export default {
 
     // 获取复制的内容，返回key:value的字符串，方便直接粘贴到postman调试
     getCopyDataAsKV(data) {
-      console.log(data)
+      // console.log(data)
       let str_data = ''
       Object.keys(data).forEach(key => {
         str_data += `${key}:${data[key]}\n`
@@ -576,7 +575,7 @@ export default {
       const data = row[column.property]
       const copy_data = typeof (data) === 'string' ? data : JSON.stringify(data)
       this.$copyText(copy_data).then(
-        function(e) {
+        function (e) {
           that.$message.success('复制成功')
         }
       )
@@ -594,6 +593,7 @@ export default {
   margin-left: 10px;
   color: #409eff
 }
+
 .el-collapse-item-error-title {
   font-weight: 600;
   font-size: 15px;

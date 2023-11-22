@@ -25,13 +25,17 @@ export default {
   data() {
     return {
       userList: [],
-      tempData: ''
+      tempData: undefined
     }
   },
   watch: {
     'user': {
       handler(newVal, oldVal) {
-        this.tempData = newVal
+        if (!newVal){
+          this.tempData = this.userList[0].id
+        }else {
+          this.tempData = newVal
+        }
       }
     }
   },
@@ -46,6 +50,9 @@ export default {
     getUserList() {
       userList().then(response => {
         this.userList = response.data.data
+        if (!this.tempData){
+          this.tempData = this.userList[0].id
+        }
       })
     }
   }

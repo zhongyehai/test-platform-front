@@ -397,7 +397,11 @@ export default {
 
     initExtract(extract) {
       if (extract && extract.length > 0) {
-        this.tempData = this.currentData
+        this.tempData = []
+        this.currentData.forEach((data, index) => {
+          data['id'] = `${Date.now()}_${index}`
+          this.tempData.push(JSON.parse(JSON.stringify(data)))
+        })
       } else {
         this.addRow()
       }

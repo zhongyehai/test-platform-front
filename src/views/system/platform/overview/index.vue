@@ -16,7 +16,7 @@
             <div class="card-panel-text">
               人工触发次数
             </div>
-            <CountTo :start-val="0" :end-val="use_card_res.page_use_count" :duration="1" class="card-panel-num" />
+            <CountTo :start-val="0" :end-val="use_card_res.page_trigger_count" :duration="1" class="card-panel-num" />
           </div>
         </div>
       </el-col>
@@ -33,7 +33,7 @@
             </div>
             <CountTo
               :start-val="0"
-              :end-val="use_card_res.page_use_pass_rate"
+              :end-val="use_card_res.page_trigger_pass_rate"
               :duration="1"
               :decimals="2"
               class="card-panel-num"
@@ -77,11 +77,6 @@
           </div>
         </div>
       </el-col>
-      <!--      <el-card class="card"> 人工触发次数 {{ use_card_res.page_use_count }}</el-card>-->
-      <!--      <el-card class="card"> 人工通过率 {{ (use_card_res.page_use_pass_rate * 100).toFixed(2).toString() }} % </el-card>-->
-      <!--      <el-card class="card"> 巡检次数 {{ use_card_res.patrol_count }}</el-card>-->
-      <!--      <el-card class="card"> 巡检通过率 {{ (use_card_res.patrol_pass_rate * 100).toFixed(2).toString() }} %</el-card>-->
-      <!--      <el-card class="card"> 造数据次数 {{ use_card_res.make_data_count }}</el-card>-->
     </el-row>
 
     <chart :key="use_chart_res.options_list" :chart-data="use_chart_res" />
@@ -112,24 +107,22 @@ export default {
 
       card_is_loading: false,
       use_card_res: {
-        'page_use_count': 0,
+        'page_trigger_count': 0,
         'page_use_pass_count': 0,
-        'page_use_pass_rate': 0,
+        'page_trigger_pass_rate': 0,
         'patrol_count': 0,
         'patrol_pass_count': 0,
         'patrol_pass_rate': 0
-        // 'make_data_count': 0
       },
 
       use_chart_res: {
         'options_list': [],
-        'page_use_count_list': 0,
-        'page_use_pass_count_list': 0,
-        'page_use_pass_rate_list': 0,
-        'patrol_count_list': 0,
-        'patrol_pass_count_list': 0,
-        'patrol_pass_rate_list': 0
-        // 'make_data_count_list': 0
+        'items': [
+          { 'name': '人工触发次数', 'type': 'bar', 'data': 0 },
+          { 'name': '人工通过次数', 'type': 'bar', 'data': 0 },
+          { 'name': '巡检次数', 'type': 'bar', 'data': 0 },
+          { 'name': '巡检通过次数', 'type': 'bar', 'data': 0 }
+        ]
       }
 
     }

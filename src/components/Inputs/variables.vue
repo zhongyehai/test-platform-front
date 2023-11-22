@@ -147,7 +147,11 @@ export default {
 
     initTempData(data) {
       if (data && data.length > 0) {
-        this.tempData = this.currentData
+        this.tempData = []
+        this.currentData.forEach((data, index) => {
+          data['id'] = `${Date.now()}_${index}`
+          this.tempData.push(JSON.parse(JSON.stringify(data)))
+        })
       } else {
         this.addRow()
       }

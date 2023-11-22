@@ -33,7 +33,7 @@
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="10%" size="mini">
         <template slot-scope="scope">
-          <span> {{ (listQuery.pageNum - 1) * listQuery.pageSize + scope.$index + 1 }} </span>
+          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
 
@@ -49,13 +49,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'创建时间'" prop="created_time" align="center" min-width="15%" size="mini">
+      <el-table-column :label="'创建时间'" prop="create_time" align="center" min-width="15%" size="mini">
         <template slot-scope="scope">
-          <span>{{ scope.row.created_time }}</span>
+          <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="'修改时间'" prop="created_time" align="center" min-width="15%" size="mini">
+      <el-table-column :label="'修改时间'" prop="update_time" align="center" min-width="15%" size="mini">
         <template slot-scope="scope">
           <span>{{ scope.row.update_time }}</span>
         </template>
@@ -103,8 +103,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="listQuery.page_num"
+      :limit.sync="listQuery.page_size"
       @pagination="getRoleList"
     />
 
@@ -244,8 +244,9 @@ export default {
       activeName: 'front',
       // 查询对象
       listQuery: {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
+        detail: true,
         name: undefined
       },
       // 临时数据，添加、修改
@@ -341,8 +342,8 @@ export default {
     // 重置查询数据
     handleInitListQuery() {
       this.listQuery = {
-        pageNum: 1,
-        pageSize: 20,
+        page_num: 1,
+        page_size: 20,
         name: undefined
       }
       this.getRoleList()
@@ -396,7 +397,7 @@ export default {
 
     // 条件触发查询
     handleFilter() {
-      this.listQuery.pageNum = 1
+      this.listQuery.page_num = 1
       this.getRoleList()
     }
 
