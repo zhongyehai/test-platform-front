@@ -453,11 +453,13 @@ export default {
         'env': this.runEnv
       }).then(res => {
         this.deBugButtonIsLoading = false
-        this.dialogIsShow = false
-        this.debugResultDetail = res.result
-        this.debugResultMessage = res.message
-        this.activeName = 'debugResult'
-        this.debugResultDrawerIsShow = true
+        if (this.showMessage(this, res)) {
+          this.dialogIsShow = false
+          this.debugResultDetail = res.result
+          this.debugResultMessage = res.message
+          this.activeName = 'debugResult'
+          this.debugResultDrawerIsShow = true
+        }
       })
     },
 

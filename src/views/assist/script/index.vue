@@ -184,7 +184,7 @@ export default {
   data() {
     return {
       listQuery: {
-        detail:true,
+        detail: true,
         script_type: undefined,
         file_name: undefined,
         create_user: undefined,
@@ -244,7 +244,10 @@ export default {
 
     // 解析用户
     parseUser(userId) {
-      return this.userDict[userId].name
+      if (userId in Object.keys(this.userDict)) {
+        return this.userDict[userId].name
+      }
+      return ' - '
     },
 
     getScriptList() {

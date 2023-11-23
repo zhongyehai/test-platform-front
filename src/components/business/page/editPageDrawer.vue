@@ -139,11 +139,11 @@ export default {
 
       // 页面新增/编辑临时数据
       tempPage: {
-        id: '',
-        name: '',
-        desc: '',
-        module_id: '',
-        project_id: ''
+        id: undefined,
+        name: undefined,
+        desc: undefined,
+        module_id: undefined,
+        project_id: undefined
       },
 
       getModuleUrl: '',

@@ -388,7 +388,7 @@ export default {
     getPageList(params) {
       this.tableLoadingIsShow = true
       this.pageListUrl({
-        module_id: this.currentModuleId, page_num: this.page_num, page_size: this.page_size
+        module_id: this.currentModuleId, page_num: this.page_num, page_size: this.page_size, detail: true
       }).then(response => {
         this.pageList = response.data.data
         this.pageTotal = response.data.total

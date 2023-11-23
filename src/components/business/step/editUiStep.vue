@@ -449,7 +449,7 @@ export default {
             this.currentElement = response.data
 
             // 获取当前步骤对应元素所在页面的所有元素
-            this.elementListUrl({ pageId: this.currentElement.page_id }).then(response => {
+            this.elementListUrl({ page_id: this.currentElement.page_id }).then(response => {
               this.tempElementList = response.data.data
             })
           })
