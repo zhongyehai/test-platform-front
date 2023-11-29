@@ -271,7 +271,7 @@ export default {
       if (this.expands.indexOf(row.row_id) === -1) {
         // 获取用例/引用用例的步骤列表
         const request_id = row.quote_case ? row.quote_case : row.id
-        this.stepListUrl({ caseId: request_id }).then(response => {
+        this.stepListUrl({ case_id: request_id }).then(response => {
           this.expands.push(row.row_id)
           const data_list = []
           response.data.data.forEach(step => {

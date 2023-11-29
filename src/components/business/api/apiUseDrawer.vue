@@ -142,7 +142,7 @@ export default {
 
     // 修改用例状态
     changeCaseIsRun(row) {
-      putCaseIsRun({ id: [row.id], status: row.status }).then(response => {
+      putCaseIsRun({ id_list: [row.id], status: row.status }).then(response => {
         this.showMessage(this, response)
         this.changeSelectCaseColor(row)
       })

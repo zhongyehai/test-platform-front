@@ -371,7 +371,7 @@ export default {
     runCase(caseId, runConf) {
       this.isShowDebugLoading = true
       this.caseRunUrl({
-        caseId: [caseId],
+        case_id_list: [caseId],
         env_list: runConf.runEnv,
         is_async: runConf.runType,
         browser: runConf.browser,

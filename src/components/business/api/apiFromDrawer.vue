@@ -92,11 +92,7 @@
         <el-table-column align="center" min-width="5%">
           <template slot="header">
             <span>状态</span>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              placement="top-start"
-            >
+            <el-tooltip class="item" effect="dark" placement="top-start">
               <div slot="content">
                 <div>标识接口是否被废弃</div>
               </div>
@@ -106,8 +102,8 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.status"
-              :inactive-value="true"
-              :active-value="false"
+              :inactive-value="0"
+              :active-value="1"
               @change="changeStatus(scope.row)"
             />
           </template>
@@ -252,7 +248,7 @@ export default {
 
     // 打开编辑框
     showEditForm(row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', JSON.parse(JSON.stringify(row)), 'showFrom')
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiInfo', 'edit', row.id, 'showFrom')
     },
 
     // 深拷贝接口，添加到步骤列表
