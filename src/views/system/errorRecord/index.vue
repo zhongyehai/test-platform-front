@@ -17,6 +17,11 @@
           <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
         </template>
       </el-table-column>
+      <el-table-column :label="'数据id'" prop="id" align="center" min-width="5%">
+        <template slot-scope="scope">
+          <span> {{ scope.row.id }} </span>
+        </template>
+      </el-table-column>
 
       <el-table-column :label="'创建时间'" prop="create_time" align="center" min-width="15%">
         <template slot-scope="scope">
@@ -214,6 +219,10 @@ export default {
     showDetail(row) {
       getErrorRecord({id: row.id}).then(response => {
         this.currentRow = response.data
+        this.currentRow.headers = JSON.stringify(response.data.headers)
+        this.currentRow.params = JSON.stringify(response.data.params)
+        this.currentRow.data_form = JSON.stringify(response.data.data_form)
+        this.currentRow.data_json = JSON.stringify(response.data.data_json)
       })
       this.drawerIsShow = true
     },
