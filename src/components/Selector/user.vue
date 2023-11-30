@@ -4,7 +4,6 @@
     style="width:100%"
     filterable
     default-first-option
-    clearable
     placeholder="请选择用户"
   >
     <el-option

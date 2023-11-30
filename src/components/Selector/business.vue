@@ -5,7 +5,6 @@
       :multiple="isMultiple"
       filterable
       default-first-option
-      clearable
       size="mini"
       :style="selectStyle"
       placeholder="请选择业务线"

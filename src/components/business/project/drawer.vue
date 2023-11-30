@@ -314,9 +314,9 @@ export default {
     // 初始化临时服务数据 (新增)
     initTempProject() {
       this.tempProject = {
-        id: null,
-        name: null,
-        manager: null,
+        id: undefined,
+        name: undefined,
+        manager: undefined,
         swagger: undefined,
         business_id: undefined,
         app_package: undefined,

@@ -160,18 +160,18 @@ export default {
       if (isRow) {
         this.tempData.push({
           id: `${Date.now()}`,
-          key: null,
-          value: null,
-          remark: null,
+          key: undefined,
+          value: undefined,
+          remark: undefined,
           data_type: 'str'
         })
       } else {
         this.tempData = [{
           id: `${Date.now()}`,
-          key: null,
-          value: null,
-          remark: null,
-          data_type: null
+          key: undefined,
+          value: undefined,
+          remark: undefined,
+          data_type: undefined
         }]
       }
     },
@@ -188,10 +188,10 @@ export default {
 
     // 清除数据
     clearData() {
-      this.tempData[0].key = null
-      this.tempData[0].value = null
-      this.tempData[0].remark = null
-      this.tempData[0].data_type = null
+      this.tempData[0].key = undefined
+      this.tempData[0].value = undefined
+      this.tempData[0].remark = undefined
+      this.tempData[0].data_type = undefined
     },
 
     // 拖拽排序
