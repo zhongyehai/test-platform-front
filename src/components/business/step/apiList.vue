@@ -224,7 +224,7 @@ export default {
     // 获取接口归属
     getApiMsgBelongTo() {
       this.queryAddrIsLoading = true
-      apiMsgBelongTo({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongTo({ api_addr: this.queryAddr }).then(response => {
         this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiFromIsShow', this.marker, response.data)
@@ -235,7 +235,7 @@ export default {
     // 获取接口使用情况
     getApiMsgBelongToStep() {
       this.queryAddrIsLoading = true
-      apiMsgBelongToStep({ addr: this.queryAddr }).then(response => {
+      apiMsgBelongToStep({ api_addr: this.queryAddr }).then(response => {
         this.queryAddrIsLoading = false
         if (this.showMessage(this, response)) {
           this.$bus.$emit(this.$busEvents.drawerIsShow, 'apiUseIsShow', this.marker, response.data)
