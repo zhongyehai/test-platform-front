@@ -128,6 +128,7 @@
               :data="reportDataList"
               stripe
               @selection-change="clickSelectAll"
+              @cell-dblclick="cellDblclick"
             >
               <el-table-column type="selection" min-width="2%" />
 
@@ -430,6 +431,19 @@ export default {
     // 全选
     clickSelectAll(val) {
       this.selectedList = val
+    },
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      if (typeof (data) === 'string') {
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
     },
 
     // 获取用户信息，同步请求

@@ -69,6 +69,7 @@
       :data="scripts.list"
       row-key="id"
       stripe
+      @cell-dblclick="cellDblclick"
     >
       <el-table-column label="序号" align="center" min-width="10%">
         <template slot-scope="scope">
@@ -229,6 +230,19 @@ export default {
   },
 
   methods: {
+
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      if (typeof (data) === 'string') {
+        this.$copyText(data).then(
+          function(e) {
+            that.$message.success('复制成功')
+          }
+        )
+      }
+    },
 
     // 获取用户信息，同步请求
     async getUserList(func) {

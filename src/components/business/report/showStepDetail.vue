@@ -281,7 +281,7 @@
 
               <el-descriptions-item>
                 <template slot="label"> 响应状态码</template>
-                {{ stepData.response.status_code }}
+                {{ stepData.response ? stepData.response.status_code : '-' }}
               </el-descriptions-item>
             </el-descriptions>
 
@@ -291,11 +291,11 @@
               </template>
               <!-- 可能返回的是个html文件，<!DOCTYPE 开头-->
               <pre
-                v-if="stepData.response.text && stepData.response.text.startsWith('<!DOCTYPE')"
+                v-if="stepData.response && stepData.response.text && stepData.response.text.startsWith('<!DOCTYPE')"
                 class="el-collapse-item-content"
                 style="overflow: auto"
               >{{ stepData.response.text }}</pre>
-              <div v-else class="el-collapse-item-content" v-html="stepData.response.text"/>
+              <div v-else class="el-collapse-item-content" v-html="stepData.response ? stepData.response.text : '-'"/>
             </el-collapse-item>
 
             <el-collapse-item name="response_json">
@@ -304,7 +304,7 @@
               </template>
               <el-row>
                 <el-col :span="22">
-                  <div v-if="stepData.response.json" style="margin-left: 100px">
+                  <div v-if="stepData.response && stepData.response.json" style="margin-left: 100px">
                     <JsonViewer
                       :value="strToJson(stepData.response.json)"
                       :expand-depth="5"
@@ -314,7 +314,7 @@
                 </el-col>
                 <el-col :span="2">
                   <el-button
-                    v-if="stepData.response.json"
+                    v-if="stepData.response && stepData.response.json"
                     v-clipboard:copy="getCopyData(stepData.response.json)"
                     v-clipboard:success="onCopy"
                     v-clipboard:error="onError"

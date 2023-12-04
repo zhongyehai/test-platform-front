@@ -391,7 +391,7 @@ export default {
           this.showDetail(res)
         } else {
           if (this.showMessage(this, res)) {
-            this.tempScript.id = res.data.id
+            // this.tempScript.id = res.data.id
             this.$bus.$emit(this.$busEvents.drawerIsCommit, 'scriptInfo')
             this.scriptDrawerIsShow = false
           }
