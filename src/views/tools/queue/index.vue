@@ -116,25 +116,25 @@
           </el-button>
 
           <!-- 删除文件 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delete_data(scope.row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-              :loading="scope.row.deleteLoadingIsShow"
-            >删除</el-button>
-          </el-popover>
+          <!--          <el-popover-->
+          <!--            :ref="scope.row.id"-->
+          <!--            v-model="scope.row.deletePopoverIsShow"-->
+          <!--            placement="top"-->
+          <!--            popper-class="down-popover"-->
+          <!--          >-->
+          <!--            <p>确定删除【{{ scope.row.host }}】?</p>-->
+          <!--            <div style="text-align: right; margin: 0">-->
+          <!--              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>-->
+          <!--              <el-button type="primary" size="mini" @click="delete_data(scope.row)">确定</el-button>-->
+          <!--            </div>-->
+          <!--            <el-button-->
+          <!--              slot="reference"-->
+          <!--              style="color: red"-->
+          <!--              type="text"-->
+          <!--              size="mini"-->
+          <!--              :loading="scope.row.deleteLoadingIsShow"-->
+          <!--            >删除</el-button>-->
+          <!--          </el-popover>-->
 
         </template>
       </el-table-column>

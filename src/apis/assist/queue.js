@@ -58,3 +58,8 @@ export function copyQueue(data) {
 export function queueSort(data) {
   return request({ url: queueDir + '/sort', method: 'put', data: data })
 }
+
+// 修改排序
+export function queueLogList(params) {
+  return request({ url: queueDir + '-log/list', method: 'get', params: params })
+}

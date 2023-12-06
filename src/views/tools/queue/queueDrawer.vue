@@ -54,6 +54,14 @@
             <el-button
               type="text"
               size="mini"
+              style="margin-right: 5px"
+              @click="showMsgLogDrawer(scope.row)"
+            >发送记录
+            </el-button>
+
+            <el-button
+              type="text"
+              size="mini"
               @click="changeQueue('update', scope.row)"
             >修改
             </el-button>
@@ -66,25 +74,25 @@
             >复制
             </el-button>
 
-            <el-popover
-              :ref="scope.row.id"
-              v-model="scope.row.deletePopoverIsShow"
-              placement="top"
-              popper-class="down-popover"
-            >
-              <p>确定删除【{{ scope.row.name }}】?</p>
-              <div style="text-align: right; margin: 0">
-                <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-                <el-button type="primary" size="mini" @click="delete_data(scope.row)">确定</el-button>
-              </div>
-              <el-button
-                slot="reference"
-                style="color: red"
-                type="text"
-                size="mini"
-                :loading="scope.row.deleteLoadingIsShow"
-              >删除</el-button>
-            </el-popover>
+            <!--            <el-popover-->
+            <!--              :ref="scope.row.id"-->
+            <!--              v-model="scope.row.deletePopoverIsShow"-->
+            <!--              placement="top"-->
+            <!--              popper-class="down-popover"-->
+            <!--            >-->
+            <!--              <p>确定删除【{{ scope.row.queue_name }}】?</p>-->
+            <!--              <div style="text-align: right; margin: 0">-->
+            <!--                <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>-->
+            <!--                <el-button type="primary" size="mini" @click="delete_data(scope.row)">确定</el-button>-->
+            <!--              </div>-->
+            <!--              <el-button-->
+            <!--                slot="reference"-->
+            <!--                style="color: red"-->
+            <!--                type="text"-->
+            <!--                size="mini"-->
+            <!--                :loading="scope.row.deleteLoadingIsShow"-->
+            <!--              >删除</el-button>-->
+            <!--            </el-popover>-->
 
           </template>
         </el-table-column>
@@ -190,10 +198,14 @@
       </div>
     </el-drawer>
 
+    <queueMessageLogDrawer :user-dict="userDict" />
+
   </el-drawer>
 </template>
 
 <script>
+
+import queueMessageLogDrawer from '@/views/tools/queue/queueMessageLogDrawer'
 
 import {
   queueList,
@@ -206,6 +218,7 @@ import {
 
 export default {
   name: 'Drawer',
+  components: { queueMessageLogDrawer },
   props: [
     // eslint-disable-next-line vue/require-prop-types
     'userDict'
@@ -244,7 +257,6 @@ export default {
   mounted() {
     this.$bus.$on(this.$busEvents.drawerIsShow, (_type, data) => {
       if (_type === 'queueInfo') {
-        console.log(data)
         this.queue_link = data
         this.listQuery.link_id = data.id
         this.tempData.link_id = data.id
@@ -332,12 +344,17 @@ export default {
       })
     },
 
+    showMsgLogDrawer(queue) {
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'queueLogInfo', queue)
+    },
+
     showMsgDrawer(queue) {
+      this.message = ''
       this.tempData = queue
       this.msgDrawerIsShow = true
     },
 
-    sendMsg(row, msg) {
+    sendMsg() {
       this.submitButtonIsLoading = true
       sendMsgToQueue({ id: this.tempData.id, message: this.message }).then(res => {
         this.submitButtonIsLoading = false
