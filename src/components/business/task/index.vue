@@ -63,23 +63,33 @@
                 </template>
               </el-table-column>
 
-              <el-table-column prop="cron" label="节假日/调休日" align="center" min-width="10%">
+              <el-table-column prop="cron" label="节假日/调休日" align="center" min-width="15%">
                 <template slot-scope="scope">
                   <span> {{ scope.row.skip_holiday === true ? "跳过": "不跳过" }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column
-                align="center"
-                min-width="15%"
-              >
+              <el-table-column prop="cron" label="合并通知" align="center" min-width="10%">
+                <template slot="header">
+                  <span>合并通知</span>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <div slot="content">
+                      <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
+                      <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
+                      <div>注：当选择了多个环境时，才会出现此选项</div>
+                    </div>
+                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
+                  </el-tooltip>
+                </template>
+                <template slot-scope="scope">
+                  <span> {{ scope.row.merge_notify === 1 ? "合并": "不合并" }} </span>
+                </template>
+              </el-table-column>
+
+              <el-table-column align="center" min-width="15%">
                 <template slot="header">
                   <span>是否启用</span>
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    placement="top-start"
-                  >
+                  <el-tooltip class="item" effect="dark" placement="top-start">
                     <div slot="content">
                       <div>1: 启用中的任务才会定时执行</div>
                       <div>2: 禁用中的任务才支持修改</div>
@@ -97,7 +107,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column label="操作" align="center" min-width="16%">
+              <el-table-column label="操作" align="center" min-width="20%">
                 <template slot-scope="scope">
 
                   <!-- 运行任务 -->

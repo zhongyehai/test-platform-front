@@ -319,8 +319,14 @@ export const constantRoutes = [
       {
         path: 'makeUserInfo',
         name: 'MakeUserInfo',
-        component: () => import('@/views/tools/makeUserInfo/index.vue'),
+        component: () => import('@/views/tools/makeUserInfo'),
         meta: { title: '生成用户信息', icon: 'el-icon-s-unfold' }
+      },
+      {
+        path: 'queue',
+        name: 'Queue',
+        component: () => import('@/views/tools/queue'),
+        meta: { title: '消息队列', icon: 'el-icon-s-unfold' }
       }
     ]
   },
@@ -363,19 +369,6 @@ export const constantRoutes = [
         component: () => import('@/views/assist/hits'),
         meta: { title: '自动化问题记录', icon: 'el-icon-circle-close' }
       }
-      // {
-      //   path: 'diffRecord',
-      //   name: 'DiffRecord',
-      //   component: () => import('@/views/assist/yapi/diffDecord'),
-      //   meta: { title: 'yapi监控记录', icon: 'el-icon-video-camera-solid' }
-      // },
-      // {
-      //   path: 'diffRecordShow',
-      //   name: 'DiffRecordShow',
-      //   hidden: true,
-      //   component: () => import('@/views/assist/yapi/diffDetailShow'),
-      //   meta: { title: 'yapi对比详情' }
-      // }
     ]
   },
 

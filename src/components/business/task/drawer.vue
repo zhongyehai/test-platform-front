@@ -96,6 +96,17 @@
             <el-radio v-model="tempTask.is_send" label="on_fail">仅有不通过用例时发送</el-radio>
           </el-form-item>
 
+          <el-form-item v-show="tempTask.env_list.length > 1" label="是否合并通知" size="mini" class="is-required">
+            <el-radio v-model="tempTask.merge_notify" :label="0">不合并</el-radio>
+            <el-radio v-model="tempTask.merge_notify" :label="1">合并</el-radio>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover">
+              <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
+              <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
+              <div>注：当选择了多个环境时，才会出现此选项</div>
+              <el-button slot="reference" type="text" icon="el-icon-question" />
+            </el-popover>
+          </el-form-item>
+
           <el-form-item v-show="tempTask.is_send !== 'not_send'" size="mini" class="is-required" label="接收方式">
             <el-radio v-model="tempTask.receive_type" label="ding_ding">钉钉群</el-radio>
             <el-radio v-model="tempTask.receive_type" label="we_chat">企业微信群</el-radio>
@@ -446,6 +457,7 @@ export default {
       ],
       tempTask: {
         skip_holiday: true,
+        env_list: [],
         call_back: [
           {
             'url': 'https://xxx',
@@ -707,6 +719,7 @@ export default {
         skip_holiday: true,
         is_send: 'on_fail',
         is_async: 1,
+        merge_notify: 0,
         receive_type: 'ding_ding',
         webhook_list: [],
         email_server: '',
@@ -741,6 +754,7 @@ export default {
         skip_holiday: this.tempTask.skip_holiday,
         is_send: this.tempTask.is_send,
         is_async: this.tempTask.is_async,
+        merge_notify: this.tempTask.merge_notify,
         receive_type: this.tempTask.receive_type,
         webhook_list: this.$refs.webhookListInput.getData(),
         conf: this.tempTask.conf,
