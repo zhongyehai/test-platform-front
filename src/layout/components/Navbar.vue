@@ -29,13 +29,13 @@
     <el-dialog :title="'修改密码'" :modle="tempPassword" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" label-position="left" label-width="70px" style="min-width: 400px;">
         <el-form-item :label="'旧密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.oldPassword" />
+          <el-input v-model="tempPassword.old_password" />
         </el-form-item>
         <el-form-item :label="'新密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.newPassword" />
+          <el-input v-model="tempPassword.new_password" />
         </el-form-item>
         <el-form-item :label="'确认密码'" prop="name" class="filter-item" size="mini">
-          <el-input v-model="tempPassword.surePassword" />
+          <el-input v-model="tempPassword.sure_password" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -85,9 +85,9 @@ export default {
 
       // 密码修改临时表单
       tempPassword: {
-        oldPassword: '',
-        newPassword: '',
-        surePassword: ''
+        old_password: '',
+        new_password: '',
+        sure_password: ''
       }
     }
   },
@@ -104,9 +104,9 @@ export default {
     // 初始化密码修改框
     initPutPasswordDialog() {
       this.tempPassword = {
-        oldPassword: '',
-        newPassword: '',
-        surePassword: ''
+        old_password: '',
+        new_password: '',
+        sure_password: ''
       }
     },
 

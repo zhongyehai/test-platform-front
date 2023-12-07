@@ -48,6 +48,7 @@
       row-key="id"
       highlight-current-row
       style="width: 100%;"
+      @cell-dblclick="cellDblclick"
     >
       <el-table-column :label="'序号'" prop="id" align="center" min-width="6%" size="mini">
         <template slot-scope="scope">
@@ -55,7 +56,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="'权限类型'" prop="source_addr" align="center" min-width="8%" size="mini">
+      <el-table-column :label="'权限类型'" prop="source_type" align="center" min-width="8%" size="mini">
         <template slot-scope="scope">
           <span>{{ source_type_dict[scope.row.source_type] }}</span>
         </template>
@@ -352,7 +353,7 @@ export default {
     //  初始化临时模板数据，点击修改按钮触发
     handleUpdate(row) {
       this.drawerType = 'edit' // dialog框标识为编辑
-      getPermission({id: row.id}).then(response => {
+      getPermission({ id: row.id }).then(response => {
         this.tempPermission = response.data
       })
       this.drawerIsShow = true
@@ -413,6 +414,17 @@ export default {
       })
     },
 
+    // 双击单元格复制
+    cellDblclick(row, column, cell, event) {
+      const that = this
+      const data = row[column.property]
+      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
+        function(e) {
+          that.$message.success('复制成功')
+        }
+      )
+    },
+
     // 条件触发查询
     handleFilter() {
       this.listQuery.page_num = 1
@@ -435,7 +447,7 @@ export default {
 
           // 发送请求，改变排序
           this.tableLoadingIsShow = true
-          permissionSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size}).then(response => {
+          permissionSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size }).then(response => {
             this.showMessage(this, response)
             this.getPermissionList()
             this.tableLoadingIsShow = false
