@@ -300,7 +300,7 @@ export default {
       } else {
         baseDir = 'appUiTest'
       }
-      window.open(`#/${baseDir}/reportShow?id=${row.report_id}`, '_blank')
+      window.open(`/${baseDir}/reportShow?id=${row.report_id}`, '_blank')
     },
 
     cancelDeletePopover(row) {
