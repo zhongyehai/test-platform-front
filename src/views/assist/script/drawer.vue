@@ -269,7 +269,7 @@ export default {
       scriptPrintLog: '',
       debugResultDetail: '',
       debugResultMessage: '',
-      addTestScriptMsg: '\n# 1、支持python3.9及以下语法 \n' +
+      addTestScriptMsg: '\n# 1、支持python3.11及以下语法 \n' +
         '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
         '# 3、在执行自定义函数的时候，系统会强制在第一行加入一个参数：env \n' +
         '# 4、系统插入的env参数为运行时选择的环境对应的code，详见配置管理-运行环境，默认为debug \n' +
@@ -280,7 +280,7 @@ export default {
         'this = sys.modules[__name__]\n\n' +
         'if hasattr(this, "env") is False:\n' +
         '    setattr(this, "env", "debug")  # 运行环境code\n\n',
-      addMockScriptMsg: '\n# 1、支持python3.9及以下语法 \n' +
+      addMockScriptMsg: '\n# 1、支持python3.11及以下语法 \n' +
         '# 2、若使用了未安装的第三方库，则需联系管理员安装对应的库 \n' +
         '# 3、在执行自定义函数的时候，系统会强制写入请求路径、头部参数、查询字符串参数、body参数 \n' +
         '#     不用再次声明变量，可直接使用，以下是样例： \n' +
