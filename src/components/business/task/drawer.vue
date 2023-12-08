@@ -802,7 +802,7 @@ export default {
 
     // 点击调试按钮
     clickRunDebug() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'taskDrawer', true)
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'taskDrawer', true, this.projectBusinessId)
     },
 
     debugTask(runConf) {
