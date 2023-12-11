@@ -34,7 +34,8 @@ service.interceptors.response.use(
   response => {
     // 如果返回状态码为401，则跳转到登录页面
     if (response.data.status === 401) {
-      if (response.data.data){  // 返回了登录地址，则自动重定向到对应的登录页（OSS）
+      Message.error(response.data.message)
+      if (response.data.data){  // 返回了登录地址，则自动重定向到对应的登录页（SSO）
         window.location.href = response.data.data
       }
       else if (router.history.current.fullPath.indexOf('redirect') !== -1){
