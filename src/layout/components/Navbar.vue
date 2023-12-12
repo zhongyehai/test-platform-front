@@ -39,11 +39,11 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <span v-if="user_name === '管理员'" style="color: red; float: left">*此账号不允许修改密码</span>
+        <span v-if="is_can_change_password === false" style="color: red; float: left">*此账号不允许修改密码</span>
 
         <el-button size="mini" @click="dialogFormVisible = false"> {{ '取消' }}</el-button>
         <el-button
-          :disabled="user_name === '管理员'"
+          :disabled="is_can_change_password === false"
           type="primary"
           size="mini"
           :loading="submitButtonIsLoading"
@@ -63,6 +63,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import * as types from '@/store/types'
 import { userPassword } from '@/apis/system/user'
+import { getConfigByCode } from '@/apis/config/config'
 
 export default {
   components: {
@@ -80,8 +81,9 @@ export default {
 
       // 密码修改框显示状态
       dialogFormVisible: false,
+      is_can_change_password: true,
 
-      user_name: localStorage.getItem('userName'),
+      account: localStorage.getItem('account'),
 
       // 密码修改临时表单
       tempPassword: {
@@ -114,6 +116,11 @@ export default {
     showPutPasswordDialog() {
       this.initPutPasswordDialog()
       this.dialogFormVisible = true
+      if (this.account === 'admin') { // 如果当前账号是admin，从后端拿是否可修改管理员账号密码的配置
+        getConfigByCode({ code: 'change_admin_password' }).then(response => {
+          this.is_can_change_password = [1, '1'].indexOf(response.data) !== -1
+        })
+      }
     },
 
     // 提交修改密码
@@ -129,11 +136,12 @@ export default {
 
     // 退出登录
     async logout() {
+      localStorage.clear()
       // await this.$store.dispatch('user/logout')
-      this.$store.commit(types.token, '')
-      this.$store.commit(types.roles, '')
-      this.$store.commit(types.userName, '')
-      localStorage.setItem('state', '')
+      // this.$store.commit(types.token, '')
+      // this.$store.commit(types.roles, '')
+      // this.$store.commit(types.userName, '')
+      // localStorage.setItem('state', '')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

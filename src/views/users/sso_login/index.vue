@@ -31,6 +31,7 @@ export default {
               this.$store.commit(types.token, response.data.token)
               this.$store.commit(types.userName, response.data.name)
               localStorage.setItem('id', response.data.id)
+              localStorage.setItem('account', response.data.account)
               localStorage.setItem('permissions', JSON.stringify(response.data.front_permissions))
               localStorage.setItem('business', JSON.stringify(response.data.business_list))
               // 重定向到指定路由
