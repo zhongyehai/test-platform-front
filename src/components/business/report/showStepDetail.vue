@@ -9,8 +9,10 @@
           <pre class="el-collapse-item-content" style="overflow: auto; color: #FA6E86">{{ stepData.attachment }}</pre>
         </el-collapse-item>
 
-        <el-collapse-item v-show="stepData.validation_results && stepData.validation_results.length > 0"
-                          name="validationResults">
+        <el-collapse-item
+          v-show="stepData.validation_results && stepData.validation_results.length > 0"
+          name="validationResults"
+        >
           <template slot="title">
             <div class="el-collapse-item-title"> {{ '断言详情：' }}</div>
           </template>
@@ -120,28 +122,24 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                   </template>
-                  <el-row>
-                    <el-col :span="16">
-                      <div v-if="stepData.request.params">
-                        <JsonViewer
-                          :value="strToJson(stepData.request.params)"
-                          :expand-depth="5"
-                          copyable
-                        />
-                      </div>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-button
-                        v-if="stepData.request.params"
-                        v-clipboard:copy="getCopyData(stepData.request.params)"
-                        v-clipboard:success="onCopy"
-                        v-clipboard:error="onError"
-                        size="mini"
-                        type="primary"
-                      >复制json
-                      </el-button>
-                    </el-col>
-                  </el-row>
+                  <div v-if="stepData.request.params">
+                    <JsonViewer
+                      :value="strToJson(stepData.request.params)"
+                      :expand-depth="5"
+                      copyable
+                    >
+                      <template v-slot:copy>
+                        <el-button
+                          v-clipboard:copy="getCopyData(stepData.request.params)"
+                          v-clipboard:success="onCopy"
+                          v-clipboard:error="onError"
+                          size="mini"
+                          type="primary"
+                        >复制
+                        </el-button>
+                      </template>
+                    </JsonViewer>
+                  </div>
                 </el-collapse-item>
               </el-col>
             </el-row>
@@ -210,17 +208,12 @@
                   <template slot="title">
                     <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
                   </template>
-                  <el-row>
-                    <el-col :span="16">
-                      <div v-if="stepData.request.files">
-                        <JsonViewer
-                          :value="strToJson(stepData.request.files)"
-                          :expand-depth="5"
-                          copyable
-                        />
-                      </div>
-                    </el-col>
-                    <el-col :span="8">
+                  <JsonViewer
+                    :value="strToJson(stepData.request.files)"
+                    :expand-depth="5"
+                    copyable
+                  >
+                    <template v-slot:copy>
                       <el-button
                         v-if="stepData.request.files"
                         v-clipboard:copy="getCopyData(stepData.request.files)"
@@ -230,8 +223,8 @@
                         type="primary"
                       >复制
                       </el-button>
-                    </el-col>
-                  </el-row>
+                    </template>
+                  </JsonViewer>
                 </el-collapse-item>
               </el-col>
             </el-row>
@@ -240,28 +233,26 @@
               <template slot="title">
                 <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
               </template>
-              <el-row>
-                <el-col :span="22">
-                  <div v-if="stepData.request.json" style="margin-left: 100px">
-                    <JsonViewer
-                      :value="strToJson(stepData.request.json)"
-                      :expand-depth="5"
-                      copyable
-                    />
-                  </div>
-                </el-col>
-                <el-col :span="2">
-                  <el-button
-                    v-if="stepData.request.json"
-                    v-clipboard:copy="getCopyData(stepData.request.json)"
-                    v-clipboard:success="onCopy"
-                    v-clipboard:error="onError"
-                    size="mini"
-                    type="primary"
-                  >复制
-                  </el-button>
-                </el-col>
-              </el-row>
+              <div v-if="stepData.request.json" style="margin-left: 100px">
+                <JsonViewer
+                  :value="strToJson(stepData.request.json)"
+                  :expand-depth="5"
+                  copyable
+                  :show-array-index="false"
+                >
+                  <template v-slot:copy>
+                    <el-button
+                      v-if="stepData.request.json"
+                      v-clipboard:copy="getCopyData(stepData.request.json)"
+                      v-clipboard:success="onCopy"
+                      v-clipboard:error="onError"
+                      size="mini"
+                      type="primary"
+                    >复制
+                    </el-button>
+                  </template>
+                </JsonViewer>
+              </div>
             </el-collapse-item>
 
           </el-collapse>
@@ -295,35 +286,33 @@
                 class="el-collapse-item-content"
                 style="overflow: auto"
               >{{ stepData.response.text }}</pre>
-              <div v-else class="el-collapse-item-content" v-html="stepData.response ? stepData.response.text : '-'"/>
+              <div v-else class="el-collapse-item-content" v-html="stepData.response ? stepData.response.text : '-'" />
             </el-collapse-item>
 
             <el-collapse-item name="response_json">
               <template slot="title">
                 <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
               </template>
-              <el-row>
-                <el-col :span="22">
-                  <div v-if="stepData.response && stepData.response.json" style="margin-left: 100px">
-                    <JsonViewer
-                      :value="strToJson(stepData.response.json)"
-                      :expand-depth="5"
-                      copyable
-                    />
-                  </div>
-                </el-col>
-                <el-col :span="2">
-                  <el-button
-                    v-if="stepData.response && stepData.response.json"
-                    v-clipboard:copy="getCopyData(stepData.response.json)"
-                    v-clipboard:success="onCopy"
-                    v-clipboard:error="onError"
-                    size="mini"
-                    type="primary"
-                  >复制
-                  </el-button>
-                </el-col>
-              </el-row>
+              <div v-if="stepData.response && stepData.response.json" style="margin-left: 100px">
+                <JsonViewer
+                  :value="strToJson(stepData.response.json)"
+                  :expand-depth="5"
+                  copyable
+                  :show-array-index="false"
+                >
+                  <template v-slot:copy>
+                    <el-button
+                      v-if="stepData.request.json"
+                      v-clipboard:copy="getCopyData(stepData.response.json)"
+                      v-clipboard:success="onCopy"
+                      v-clipboard:error="onError"
+                      size="mini"
+                      type="primary"
+                    >复制
+                    </el-button>
+                  </template>
+                </JsonViewer>
+              </div>
             </el-collapse-item>
           </el-collapse>
 
@@ -370,7 +359,8 @@
                       :preview-src-list="[
                         'data:image/jpg;base64,' + stepData.before,
                         'data:image/jpg;base64,' + stepData.after
-                      ]"/>
+                      ]"
+                    />
                     <span v-show="!stepData.before">没有截图</span>
                   </div>
                 </el-collapse-item>
@@ -381,14 +371,15 @@
                     <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                   </template>
                   <div v-loading="afterImgIsLoading" class="el-collapse-item-content">
-                      <el-image
-                        v-show="stepData.after"
-                        :src="'data:image/jpg;base64,' + stepData.after "
-                        :preview-src-list="[
-                          'data:image/jpg;base64,' + stepData.before,
-                          'data:image/jpg;base64,' + stepData.after
-                        ]"/>
-                      <span v-show="!stepData.after">没有截图</span>
+                    <el-image
+                      v-show="stepData.after"
+                      :src="'data:image/jpg;base64,' + stepData.after "
+                      :preview-src-list="[
+                        'data:image/jpg;base64,' + stepData.before,
+                        'data:image/jpg;base64,' + stepData.after
+                      ]"
+                    />
+                    <span v-show="!stepData.after">没有截图</span>
                   </div>
                 </el-collapse-item>
               </el-col>
@@ -575,7 +566,7 @@ export default {
       const data = row[column.property]
       const copy_data = typeof (data) === 'string' ? data : JSON.stringify(data)
       this.$copyText(copy_data).then(
-        function (e) {
+        function(e) {
           that.$message.success('复制成功')
         }
       )

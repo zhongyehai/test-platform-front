@@ -27,7 +27,13 @@
           <span><span style="color: red">*</span>数据类型</span>
         </template>
         <template slot-scope="scope">
-          <el-select v-model="scope.row.data_type" size="mini" placeholder="选择数据类型" style="width: 100%">
+          <el-select
+            v-model="scope.row.data_type"
+            size="mini"
+            placeholder="选择数据类型"
+            style="width: 100%"
+            @change="changeRowDataType(scope.row)"
+          >
             <el-option v-for="item in formDataTypes" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -205,6 +211,12 @@ export default {
           this.uploadFileToServer(form)
         }
       })
+    },
+
+    changeRowDataType(row) {
+      if (['True', 'False'].indexOf(row.data_type) !== -1) {
+        row.value = row.data_type
+      }
     },
 
     // 获取当前上传文件的数据的索引

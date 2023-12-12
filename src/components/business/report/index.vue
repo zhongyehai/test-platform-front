@@ -246,6 +246,7 @@
               :total="queryTotal"
               :page.sync="query.page_num"
               :limit.sync="query.page_size"
+              :page-sizes="[10, 20, 40, 60, 100, 200]"
               @pagination="getReportList"
             />
           </el-tab-pane>

@@ -327,6 +327,12 @@ export const constantRoutes = [
         name: 'Queue',
         component: () => import('@/views/tools/queue'),
         meta: { title: '消息队列', icon: 'el-icon-s-unfold' }
+      },
+      {
+        path: 'token',
+        name: 'Token',
+        component: () => import('@/views/tools/parseToken'),
+        meta: { title: '解析token', icon: 'el-icon-notebook-2' }
       }
     ]
   },
