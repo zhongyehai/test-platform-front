@@ -5,14 +5,6 @@
       <el-col :span="11" style="float: left">
         <div style="margin-bottom: 20px; text-align: center; font-size: 25px; color: #fb015b">请输入token字符串</div>
         <el-input v-model="tokenStr" size="mini" type="textarea" rows="20" :placeholder="'token字符串'" />
-        <el-button
-          v-loading="buttonIsLoading"
-          style="margin-top: 20px; float:right"
-          size="mini"
-          type="primary"
-          @click.native="getParseToken()"
-        >解析
-        </el-button>
       </el-col>
 
       <el-col :span="11" style="float: right">
@@ -57,31 +49,37 @@
 </template>
 
 <script>
-import { parseToken } from '@/apis/tools/parseToken'
 
 export default {
   name: 'Token',
   data() {
     return {
       tokenStr: undefined,
-      buttonIsLoading: false,
-      parsedToken: {
-        'header': { 'alg': 'HS256', 'typ': 'JWT' },
-        'payload': {}
+      buttonIsLoading: false
+    }
+  },
+
+  computed: {
+    parsedToken: function() {
+      try {
+        const stringList = this.tokenStr.split('.')
+        return {
+          header: this.parseData(stringList[0]),
+          payload: this.parseData(stringList[1])
+        }
+      } catch (e) {
+        return {
+          header: {},
+          payload: {}
+        }
       }
     }
   },
 
   methods: {
-    getParseToken() {
-      this.buttonIsLoading = true
-      parseToken({ token: this.tokenStr }).then(response => {
-        this.buttonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.parsedToken.header = response.data.header
-          this.parsedToken.payload = response.data.payload
-        }
-      })
+
+    parseData(data) {
+      return JSON.parse(decodeURIComponent(escape(window.atob(data.replace(/-/g, '+').replace(/_/g, '/')))))
     },
 
     // 复制成功
