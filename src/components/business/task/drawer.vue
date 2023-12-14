@@ -452,8 +452,8 @@ export default {
       isShowDebugLoading: false,
       tableLoadingIsShow: false,
       skip_holiday_item: [
-        { label: '跳过执行', value: true },
-        { label: '不跳过执行', value: false }
+        { label: '跳过执行', value: 1 },
+        { label: '不跳过执行', value: 0 }
       ],
       tempTask: {
         skip_holiday: true,
