@@ -3,8 +3,11 @@
   <div class="app-container">
     <el-row>
       <el-col :span="11" style="float: left">
-        <div style="margin-bottom: 20px; text-align: center; font-size: 25px; color: #fb015b">请输入token字符串</div>
+        <div style="margin-bottom: 20px; text-align: center; font-size: 25px; color: #fb015b">token字符串</div>
         <el-input v-model="tokenStr" size="mini" type="textarea" rows="20" :placeholder="'token字符串'" />
+        <div v-show="errorMsg" style="padding-top: 10px; color: red">
+          <span> {{ errorMsg }}</span>
+        </div>
       </el-col>
 
       <el-col :span="11" style="float: right">
@@ -54,7 +57,8 @@ export default {
   name: 'Token',
   data() {
     return {
-      tokenStr: undefined,
+      tokenStr: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Ilx1N2JhMVx1NzQwNlx1NTQ1OCIsInJvbGVfbGlzdCI6WzEsMl0sImFwaV9wZXJtaXNzaW9ucyI6WyJhZG1pbiJdLCJidXNpbmVzc19saXN0IjpbMV0sImV4cCI6MTcwMjU1MTk5NS4yOTMzOTN9.lqJk2M-43D6Mqs3izacxwdQdMqE-DMTY1O30U35itZM',
+      errorMsg: undefined,
       buttonIsLoading: false
     }
   },
@@ -63,11 +67,14 @@ export default {
     parsedToken: function() {
       try {
         const stringList = this.tokenStr.split('.')
-        return {
+        const parsed = {
           header: this.parseData(stringList[0]),
           payload: this.parseData(stringList[1])
         }
+        this.errorMsg = undefined
+        return parsed
       } catch (e) {
+        this.errorMsg = ' * 无法解析，请检查token是否正确'
         return {
           header: {},
           payload: {}
