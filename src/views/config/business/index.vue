@@ -148,7 +148,7 @@
         </el-form-item>
 
         <el-form-item :label="'统计通知'" class="is-required" size="mini">
-          <el-radio v-model="tempBusiness.receive_type" label="0">不接收</el-radio>
+          <el-radio v-model="tempBusiness.receive_type" label="not_receive">不接收</el-radio>
           <el-radio v-model="tempBusiness.receive_type" label="ding_ding">钉钉</el-radio>
           <el-radio v-model="tempBusiness.receive_type" label="we_chat">企业微信</el-radio>
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
@@ -158,7 +158,7 @@
           </el-popover>
         </el-form-item>
 
-        <el-form-item v-show="tempBusiness.receive_type !== '0'" :label="'webhook'" class="is-required" size="mini">
+        <el-form-item v-show="tempBusiness.receive_type !== 'not_receive'" :label="'webhook'" class="is-required" size="mini">
           <oneColumnRow
             ref="oneColumnRow"
             :current-data="tempBusiness.webhook_list"
