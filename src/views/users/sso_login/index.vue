@@ -46,7 +46,13 @@ export default {
   },
   mounted() {
     if (!this.$route.query.code) { // 没有带code参数，从后端返回获取登录地址
-      projectList()
+      projectList().then(response => {
+        if (response.status === 200) {
+          // 重定向到首页
+          const redirect = this.$route.query.redirect || '/'
+          this.$router.push({ path: redirect })
+        }
+      })
     } else {
       // 重定向到获取code页面
       this.sso_code = this.$route.query
