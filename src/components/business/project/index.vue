@@ -76,23 +76,23 @@
           {{ '重置' }}
         </el-button>
 
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="从yapi拉取项目列表"
-          placement="top-start"
-        >
-          <el-button
-            v-show="dataType === 'api'"
-            disabled
-            type="primary"
-            size="mini"
-            :loading="pullYapiProjectIsLoading"
-            @click="pullYapiProject"
-          >
-            {{ '从yapi拉取' }}
-          </el-button>
-        </el-tooltip>
+        <!--        <el-tooltip-->
+        <!--          class="item"-->
+        <!--          effect="dark"-->
+        <!--          content="从yapi拉取项目列表"-->
+        <!--          placement="top-start"-->
+        <!--        >-->
+        <!--          <el-button-->
+        <!--            v-show="dataType === 'api'"-->
+        <!--            disabled-->
+        <!--            type="primary"-->
+        <!--            size="mini"-->
+        <!--            :loading="pullYapiProjectIsLoading"-->
+        <!--            @click="pullYapiProject"-->
+        <!--          >-->
+        <!--            {{ '从yapi拉取' }}-->
+        <!--          </el-button>-->
+        <!--        </el-tooltip>-->
       </el-form>
     </div>
 

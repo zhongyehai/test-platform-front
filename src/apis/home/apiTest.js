@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { baseDirHome } from '@/apis/base'
 
-const currentBaseDir = baseDirHome + '/apiTest'
+const currentBaseDir = baseDirHome + '/api-test'
 
 // title统计
 export function getTitleCount() {
