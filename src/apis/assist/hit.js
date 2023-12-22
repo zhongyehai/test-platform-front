@@ -34,6 +34,6 @@ export function hitList(params) {
 
 // 获取所有问题类型
 export function getHitTypeList() {
-  return request({ url: currentBaseDir + '/type/list', method: 'get' })
+  return request({ url: currentBaseDir + '/type-list', method: 'get' })
 }
 

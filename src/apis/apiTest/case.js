@@ -44,7 +44,7 @@ export function caseList(params) {
 
 // 获取用例list
 export function assertCaseList(params) {
-  return request({ url: currentBaseDir + '/assert/list', method: 'get', params: params })
+  return request({ url: currentBaseDir + '/make-data-list', method: 'get', params: params })
 }
 
 // 根据用例id获取用例名

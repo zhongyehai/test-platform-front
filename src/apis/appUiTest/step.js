@@ -34,12 +34,12 @@ export function putStepIsRun(data) {
 
 // 获取步骤执行类型list
 export function executeList() {
-  return request({ url: stepDir + '/executeMapping', method: 'get' })
+  return request({ url: stepDir + '/execute-mapping', method: 'get' })
 }
 
 // 断言动作映射
 export function assertMappingList() {
-  return request({ url: stepDir + '/assertMapping', method: 'get' })
+  return request({ url: stepDir + '/assert-mapping', method: 'get' })
 }
 
 // 获取步骤list

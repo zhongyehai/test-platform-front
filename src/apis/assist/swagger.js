@@ -8,5 +8,5 @@ export function swaggerPull(data) {
 
 // 获取swagger拉取记录
 export function swaggerPullList(params) {
-  return request({ url: baseDirAssist + '/swagger/pull/list', method: 'get', params: params })
+  return request({ url: baseDirAssist + '/swagger/pull-list', method: 'get', params: params })
 }

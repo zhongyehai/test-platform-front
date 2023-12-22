@@ -201,9 +201,8 @@
         <!-- 元素信息，允许修改元素 -->
         <el-tab-pane label="元素信息" name="element">
           <el-form label-width="120px">
-
-            <el-form-item label="元素归属" prop="elementFrom" size="small">
-              <el-input v-model="currentElement.elementFrom" disabled />
+            <el-form-item label="元素归属" prop="element_from" size="small">
+              <el-input v-model="currentElement.element_from" disabled />
             </el-form-item>
 
             <el-form-item :label="'定位方式'" prop="by" size="mini" class="is-required">
@@ -461,7 +460,7 @@ export default {
 
         // 获取元素归属
         this.elementFromUrl({ id: this.currentStep.element_id }).then(response => {
-          this.$set(this.currentElement, 'elementFrom', response.message)
+          this.$set(this.currentElement, 'element_from', response.data)
         })
       }
     })

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { baseDirTestWork } from '@/apis/base' // 加载请求配置文件
 
-const currentBaseDir = baseDirTestWork + '/bugTrack'
+const currentBaseDir = baseDirTestWork + '/bug-track'
 
 // bug列表
 export function bugList(data) {

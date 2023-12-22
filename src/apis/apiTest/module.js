@@ -41,8 +41,3 @@ export function moduleTree(params) {
 export function moduleList(params) {
   return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
-
-// 置顶模块
-export function moduleStick(data) {
-  return request({ url: currentBaseDir + '/stick', method: 'put', data: data })
-}

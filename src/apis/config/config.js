@@ -34,7 +34,7 @@ export function configList(params) {
 
 // 根据配置名获取配置
 export function getConfigByCode(params) {
-  return request({ url: currentBaseDir + '/by/code', method: 'get', params: params })
+  return request({ url: currentBaseDir + '/by-code', method: 'get', params: params })
 }
 
 // 获取跳过条件数据源

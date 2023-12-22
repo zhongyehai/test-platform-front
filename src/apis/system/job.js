@@ -9,7 +9,7 @@ function Func(method, data = null, params = null) {
 
 // 任务方法列表
 export function jobFuncList(data) {
-  return request({ url: baseDir + '/func/list', method: 'get', data: data })
+  return request({ url: baseDir + '/func-list', method: 'get', data: data })
 }
 
 // 任务列表
@@ -24,7 +24,7 @@ export function jobRun(data) {
 
 // 执行任务记录列表
 export function jobRunLogList(params) {
-  return request({ url: baseDir + '/log/list', method: 'get', params: params })
+  return request({ url: baseDir + '/log-list', method: 'get', params: params })
 }
 
 // 执行任务记录

@@ -3,10 +3,10 @@ import { baseDirAssist } from '@/apis/base'
 
 // 获取错误列表
 export function errorRecordList(params) {
-  return request({ url: baseDirAssist + '/errorRecord/list', method: 'get', params: params })
+  return request({ url: baseDirAssist + '/error-record/list', method: 'get', params: params })
 }
 
 // 获取错误列表
 export function errorRecord(params) {
-  return request({ url: baseDirAssist + '/errorRecord', method: 'get', params: params })
+  return request({ url: baseDirAssist + '/error-record', method: 'get', params: params })
 }
