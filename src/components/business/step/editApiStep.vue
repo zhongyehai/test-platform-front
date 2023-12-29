@@ -184,7 +184,7 @@
       <el-tab-pane label="请求体" name="editBody">
         <bodyView
           ref="bodyView"
-          :data-type="currentStep.data_type"
+          :body-type="currentStep.body_type"
           :data-json="currentStep.data_json"
           :data-form="currentStep.data_form"
           :data-urlencoded="currentStep.data_urlencoded"
@@ -321,7 +321,7 @@ export default {
           data_source: null,
           expect: null,
           comparator: null,
-          data_type: null,
+          body_type: null,
           check_value: null
         },
         'skip_on_fail': 1,
@@ -421,7 +421,7 @@ export default {
         'params': this.$refs.paramsView.tempData,
         'extracts': this.$refs.extractsView.tempData,
         'validates': this.$refs.validatesView.tempData,
-        'body_type': this.$refs.bodyView.tempDataType,
+        'body_type': this.$refs.bodyView.tempBodyType,
         'data_form': this.$refs.bodyView.$refs.dataFormView.tempData,
         'data_json': json_data ? JSON.parse(json_data) : {},
         'data_urlencoded': data_urlencoded ? JSON.parse(data_urlencoded) : {},

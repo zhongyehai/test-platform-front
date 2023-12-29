@@ -143,7 +143,7 @@
       <el-tab-pane label="请求体" name="body" :disabled="methodSelectorChoiceMethod === 'GET'">
         <bodyView
           ref="bodyView"
-          :data-type="tempApi.body_type"
+          :body-type="tempApi.body_type"
           :data-json="tempApi.data_json"
           :data-form="tempApi.data_form"
           :data-urlencoded="tempApi.data_urlencoded"
@@ -357,7 +357,7 @@ export default {
         if (command === 'add') {
           this.initNewTempApi() // 新增
         } else if (['edit', 'copy'].indexOf(command) !== -1) {
-          getApi({id: api_id}).then(response => {
+          getApi({ id: api_id }).then(response => {
             this.tempApi = response.data
             this.paramsToStr(this.tempApi.params)
             if (isShowFrom) { // 查看接口详情打开的编辑框
@@ -369,7 +369,6 @@ export default {
         }
         this.isShowSubmitLoading = false
         this.isShowDebugLoading = false
-
       }
     })
 
@@ -554,7 +553,7 @@ export default {
         extracts: this.$refs.extractsView.tempData,
         validates: this.$refs.validatesView.tempData,
         // response: this.tempApi.response,
-        body_type: this.$refs.bodyView.tempDataType,
+        body_type: this.$refs.bodyView.tempBodyType,
         data_form: this.$refs.bodyView.$refs.dataFormView.tempData,
         data_json: json_data ? JSON.parse(json_data) : {},
         data_urlencoded: data_urlencoded ? JSON.parse(data_urlencoded) : {},

@@ -1,24 +1,24 @@
 <template>
   <div>
     <div style="text-align: center">
-      <el-radio v-model="tempDataType" label="form">form-data</el-radio>
-      <el-radio v-model="tempDataType" label="urlencoded">form-urlencoded</el-radio>
-      <el-radio v-model="tempDataType" label="json">json</el-radio>
-      <el-radio v-model="tempDataType" label="text">xml / 文本</el-radio>
+      <el-radio v-model="tempBodyType" label="form">form-data</el-radio>
+      <el-radio v-model="tempBodyType" label="urlencoded">form-urlencoded</el-radio>
+      <el-radio v-model="tempBodyType" label="json">json</el-radio>
+      <el-radio v-model="tempBodyType" label="text">xml / 文本</el-radio>
       <el-popover class="el_popover_class" placement="top-start" trigger="hover">
         <div>发送请求时会使用此处选择的数据类型</div>
         <el-button slot="reference" type="text" icon="el-icon-question" />
       </el-popover>
     </div>
 
-    <div v-show="tempDataType === 'form'">
+    <div v-show="tempBodyType === 'form'">
       <dataFormView
         ref="dataFormView"
         :data-form="tempDataForm"
       />
     </div>
 
-    <div v-show="tempDataType === 'urlencoded'">
+    <div v-show="tempBodyType === 'urlencoded'">
       <!-- 使用示例 -->
       <el-collapse accordion>
         <el-collapse-item>
@@ -50,7 +50,7 @@
       />
     </div>
 
-    <div v-show="tempDataType === 'json'">
+    <div v-show="tempBodyType === 'json'">
       <!-- 使用示例 -->
       <el-collapse accordion>
         <el-collapse-item>
@@ -82,7 +82,7 @@
       />
     </div>
 
-    <div v-show="tempDataType === 'text'">
+    <div v-show="tempBodyType === 'text'">
       <el-input v-model="tempDataText" type="textarea" :rows="17" />
     </div>
 
@@ -102,11 +102,11 @@ export default {
   },
   props: [
     // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'
+    'bodyType', 'dataJson', 'dataForm', 'dataText', 'dataUrlencoded'
   ],
   data() {
     return {
-      tempDataType: 'json',
+      tempBodyType: 'json',
       tempDataJson: {},
       tempDataForm: [],
       tempDataUrlencoded: {},
@@ -115,9 +115,9 @@ export default {
   },
   watch: {
 
-    'dataType': {
+    'bodyType': {
       handler(newVal, oldVal) {
-        this.tempDataType = newVal || 'json'
+        this.tempBodyType = newVal || 'json'
       }
     },
 
@@ -148,7 +148,7 @@ export default {
   },
 
   created() {
-    this.tempDataType = this.dataType || 'json'
+    this.tempBodyType = this.bodyType || 'json'
     this.tempDataJson = JSON.stringify(this.dataJson) || JSON.stringify({})
     this.tempDataUrlencoded = JSON.stringify(this.dataUrlencoded) || JSON.stringify({})
     this.tempDataForm = this.dataForm

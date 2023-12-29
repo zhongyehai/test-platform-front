@@ -568,7 +568,8 @@ export default {
         false,
         null,
         {
-          variables: JSON.parse(JSON.stringify(this.tempCase.variables)),
+          // variables: JSON.parse(JSON.stringify(this.tempCase.variables)),
+          variables: JSON.parse(JSON.stringify(this.$refs.variablesView.tempData)),
           headers: this.tempCase.headers ? JSON.parse(JSON.stringify(this.tempCase.headers)) : undefined,
           skip_if: JSON.parse(JSON.stringify(this.tempCase.skip_if)),
           run_times: this.tempCase.run_times
