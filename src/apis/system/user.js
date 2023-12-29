@@ -32,6 +32,11 @@ export function userPassword(data) {
   return request({ url: currentBaseDir + '/password', method: 'put', data: data })
 }
 
+// 重置密码
+export function resetPassword(data) {
+  return request({ url: currentBaseDir + '/reset-password', method: 'put', data: data })
+}
+
 // 获取用户的角色
 export function userRoles(params) {
   return request({ url: currentBaseDir + '/role', method: 'get', params: params })

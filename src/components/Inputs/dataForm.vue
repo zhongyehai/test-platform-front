@@ -51,15 +51,7 @@
                 <el-input v-model="scope.row.value" size="mini" :disabled="true" placeholder="请上传文件" />
               </el-col>
               <el-col :span="2" style="padding-left:10px;">
-                <el-upload
-                  class="upload-demo"
-                  :action="uploadAddr"
-                  :auto-upload="false"
-                  :show-file-list="false"
-                  :on-change="onChange"
-                >
-                  <el-button size="mini" type="primary" @click="changPageFileName(scope.$index)">选择文件</el-button>
-                </el-upload>
+                <el-button size="mini" type="primary" @click="clickChangFile(scope.$index)">选择文件</el-button>
               </el-col>
             </el-row>
           </div>
@@ -71,7 +63,9 @@
               v-model="scope.row.value"
               :disabled="['True', 'False'].indexOf(scope.row.data_type) !== -1"
               :placeholder="
-                scope.row.data_type === 'True' ? 'True' : scope.row.data_type === 'False' ? 'False' : 'value'"
+                scope.row.data_type === 'True'
+                  ? 'True' : scope.row.data_type === 'False'
+                    ? 'False' : '请输入'"
               type="textarea"
               :rows="1"
               size="mini"
@@ -120,6 +114,7 @@
         </template>
       </el-table-column>
 
+      <selectStepFileView />
     </el-table>
   </div>
 
@@ -128,13 +123,16 @@
 <script>
 import { fileCheck, fileUpload, uploadAddr } from '@/apis/assist/file'
 import Sortable from 'sortablejs'
+import selectStepFileView from '@/components/business/step/selectStepFile.vue'
 
 export default {
   name: 'DataForm',
+  components: { selectStepFileView },
   props: [
     // eslint-disable-next-line vue/require-prop-types
     'dataForm'
   ],
+
   data() {
     return {
       formDataTypes: [{ label: '', value: '' }],
@@ -154,6 +152,13 @@ export default {
   },
 
   mounted() {
+    // 监听文件上传提交事件
+    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, fileName) => {
+      if (_type === 'selectStepFile') {
+        this.tempData[this.currentTempApiDataFormIndex]['value'] = fileName
+      }
+    })
+
     this.formDataTypes = this.$busEvents.data.dataTypeMappingList // 从缓存获取数据类型映射
     // this.formDataTypes.push({ label: '文件', value: 'file' })
 
@@ -163,6 +168,11 @@ export default {
     this.$nextTick(() => {
       this.setSort()
     })
+  },
+
+  // 组件销毁前，关闭bus监听事件
+  beforeDestroy() {
+    this.$bus.$off(this.$busEvents.drawerIsCommit)
   },
 
   methods: {
@@ -216,12 +226,15 @@ export default {
     changeRowDataType(row) {
       if (['True', 'False'].indexOf(row.data_type) !== -1) {
         row.value = row.data_type
+      } else {
+        row.value = ''
       }
     },
 
     // 获取当前上传文件的数据的索引
-    changPageFileName(index) {
+    clickChangFile(index) {
       this.currentTempApiDataFormIndex = index
+      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectStepFile')
     },
 
     // 是否显示删除按钮

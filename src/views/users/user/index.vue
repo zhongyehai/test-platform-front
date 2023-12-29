@@ -110,7 +110,17 @@
 
           <!--编辑用户-->
           <el-button
-            :disabled="!isAdmin"
+            v-show="isAdmin && row.account !== 'admin'"
+            type="text"
+            size="mini"
+            style="margin-right: 10px"
+            @click="clickResetPassword(row)"
+          >重置密码
+          </el-button>
+
+          <!--编辑用户-->
+          <el-button
+            v-show="isAdmin"
             type="text"
             size="mini"
             style="margin-right: 10px"
@@ -167,7 +177,7 @@ import Pagination from '@/components/Pagination'
 import addUserDrawer from '@/views/users/user/addUserDrawer.vue'
 import editUserDrawer from '@/views/users/user/editUserDrawer.vue'
 
-import { userList, deleteUser, userStatus } from '@/apis/system/user'
+import { userList, deleteUser, userStatus, resetPassword } from '@/apis/system/user'
 import { roleList } from '@/apis/system/role'
 import { businessList } from '@/apis/config/business'
 
@@ -325,6 +335,13 @@ export default {
         this.$set(row, 'changStatusIsDisabled', false)
         this.showMessage(this, response)
         this.getUserList()
+      })
+    },
+
+    // 重置密码
+    clickResetPassword(row) {
+      resetPassword({ id: row.id }).then(response => {
+        this.showMessage(this, response)
       })
     },
 

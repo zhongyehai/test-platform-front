@@ -122,12 +122,8 @@ export default {
   components: { Pagination, uploadFileView },
   data() {
     return {
-      // 加载状态
-      listLoading: false,
-
-      // 文件列类型
-      fileType: 'case',
-
+      listLoading: false, // 加载状态
+      fileType: 'case', // 文件列类型
       // 文件类型列表
       fileTypeList: [
         { 'key': 'case', 'value': '用例文件' },
@@ -136,10 +132,7 @@ export default {
         { 'key': 'temp', 'value': '临时文件' },
         { 'key': 'driver', 'value': '浏览器驱动文件' }
       ],
-
-      // 文件列表
-      fileList: [],
-
+      fileList: [], // 文件列表
       total: 0,
       page_num: 1,
       page_size: 20
@@ -147,7 +140,7 @@ export default {
   },
 
   mounted() {
-    // 监听 Dialog 打开事件
+    // 监听文件上传提交事件
     this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
       if (_type === 'uploadFile') {
         this.getFileList()

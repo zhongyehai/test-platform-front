@@ -40,17 +40,9 @@ export default {
   name: 'UploadFile',
   data() {
     return {
-
-      // 缓存文件列表
       tempFileList: [],
-
-      // 上传接口
       uploadUrl: uploadApi,
-
-      // 上传文件窗口
       fileUploadDialogIsShow: false,
-
-      // 文件类型
       fileType: 'case'
     }
   },
@@ -112,7 +104,9 @@ export default {
       })
 
       // 上传form到服务器
+      const loading = this.$loading({ lock: true, text: '文件上传中', spinner: 'el-icon-loading', background: 'rgba(0, 0, 0, 0.7)' })
       filePost(form).then((response) => {
+        loading.close()
         this.closeDialog(response)
       }
       )

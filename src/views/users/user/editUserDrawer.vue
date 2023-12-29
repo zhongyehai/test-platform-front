@@ -21,11 +21,7 @@
         </el-form-item>
 
         <el-form-item :label="'账号'" prop="name" class="is-required" size="mini">
-          <el-input v-model="tempUser.account" placeholder="2~12位" />
-        </el-form-item>
-
-        <el-form-item :label="'密码'" prop="name" size="mini">
-          <el-input v-model="tempUser.password" placeholder="4~50位，若填写，则会修改为此密码，若不填写，则不修改" />
+          <el-input v-model="tempUser.account" disabled placeholder="2~12位" />
         </el-form-item>
 
         <el-form-item :label="'业务线'" class="is-required" size="mini">
@@ -95,8 +91,7 @@ export default {
         name: undefined,
         account: undefined,
         role_list: [],
-        business_list: [],
-        password: undefined
+        business_list: []
       },
 
       submitButtonIsLoading: false,
@@ -128,7 +123,6 @@ export default {
       this.tempUser.id = row.id
       this.tempUser.name = row.name
       this.tempUser.account = row.account
-      this.tempUser.password = row.password
       this.tempUser.business_list = row.business_list
       userRoles({ id: row.id }).then(response => {
         this.tempUser.role_list = response.data
