@@ -215,7 +215,7 @@ export default {
       userList().then(response => {
         this.currentUserList = response.data.data
         response.data.data.forEach(user => {
-          this.userDict[user.id] = user
+          this.userDict[user.id] = user.name
         })
         if (func) {
           func()
@@ -225,7 +225,7 @@ export default {
 
     // 解析用户
     parseUser(userId) {
-      return this.userDict[userId].name
+      return this.userDict[userId]
     },
 
     // 解析配置类型

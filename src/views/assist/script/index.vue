@@ -249,7 +249,7 @@ export default {
       const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
-        this.userDict[user.id] = user
+        this.userDict[user.id] = user.name
       })
       if (func) {
         func()
@@ -258,10 +258,7 @@ export default {
 
     // 解析用户
     parseUser(userId) {
-      if (userId in Object.keys(this.userDict)) {
-        return this.userDict[userId].name
-      }
-      return ' - '
+      return this.userDict[userId] || ' - '
     },
 
     getScriptList() {

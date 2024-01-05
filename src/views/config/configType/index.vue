@@ -148,7 +148,7 @@ export default {
       listQuery: {
         page_num: 1,
         page_size: 20,
-        detail:true,
+        detail: true,
         create_user: undefined,
         name: undefined
       },
@@ -183,7 +183,7 @@ export default {
       const response = await userList()
       this.currentUserList = response.data.data
       response.data.data.forEach(user => {
-        this.userDict[user.id] = user
+        this.userDict[user.id] = user.name
       })
       if (func) {
         func()
@@ -192,7 +192,7 @@ export default {
 
     // 解析用户
     parseUser(userId) {
-      return this.userDict[userId].name
+      return this.userDict[userId]
     },
 
     showAddConfigTypeDialog(row) {
