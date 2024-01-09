@@ -419,15 +419,15 @@ export default {
 
   mounted() {
     // 新增步骤（把元素转为步骤）
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType, step) => {
+    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, drawerType, stepOrElement) => {
       if (_type === 'stepInfo') {
-        this.currentElement = step
+        this.currentElement = stepOrElement
 
         if (drawerType === 'add') { // 新增步骤
           this.currentStep.id = ''
           this.currentStep.status = 1
-          this.currentStep.name = step.name
-          this.currentStep.wait_time_out = step.wait_time_out
+          this.currentStep.name = stepOrElement.name
+          this.currentStep.wait_time_out = stepOrElement.wait_time_out
           this.currentStep.up_func = []
           this.currentStep.down_func = []
           this.currentStep.execute_type = this.$busEvents.data.executeTypeList[1].value
@@ -438,25 +438,25 @@ export default {
           this.currentStep.validates = []
           this.currentStep.data_driver = []
           this.currentStep.case_id = this.caseId
-          this.currentStep.page_id = this.currentElement.page_id
-          this.currentStep.element_id = this.currentElement.id
           this.submitButtonIsLoading = false
           this.drawerIsShow = true
         } else if (drawerType === 'edit') { // 修改步骤
-          // 获取元素信息
-          this.getElementUrl({ id: step.element_id }).then(response => {
-            this.currentElement = response.data
-
-            // 获取当前步骤对应元素所在页面的所有元素
-            this.elementListUrl({ page_id: this.currentElement.page_id }).then(response => {
-              this.tempElementList = response.data.data
-            })
-          })
-          this.currentStep = step
-          this.currentStepCopy = JSON.parse(JSON.stringify(step)) // 深拷贝
+          this.currentStep = stepOrElement
+          this.currentStepCopy = JSON.parse(JSON.stringify(stepOrElement)) // 深拷贝
           this.submitButtonIsLoading = false
           this.drawerIsShow = true
         }
+
+        // 获取元素信息, step 变量可能是元素，可能是步骤
+        this.getElementUrl({ id: stepOrElement.element_id || stepOrElement.id }).then(response => {
+          this.currentElement = response.data
+          this.currentStep.page_id = this.currentElement.page_id
+          this.currentStep.element_id = this.currentElement.id
+          // 获取当前步骤对应元素所在页面的所有元素
+          this.elementListUrl({ page_id: this.currentElement.page_id }).then(response => {
+            this.tempElementList = response.data.data
+          })
+        })
 
         // 获取元素归属
         this.elementFromUrl({ id: this.currentStep.element_id }).then(response => {
