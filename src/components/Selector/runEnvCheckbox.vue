@@ -37,9 +37,7 @@ export default {
   ],
   data() {
     return {
-      dialogIsShow: false,
 
-      envGroupList: [], // ['qa', 'dev']
       allEnvItemList: [], // 全选数据，根据传入的要获取的项判断
       selectedEnvDataList: [], // ['envCode1', 'envCode2']
       envGroupDataDict: {
