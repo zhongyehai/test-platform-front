@@ -198,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import skipIfView from '@/components/Input/skip-if.vue'
+import skipIfView from '@/components/input/skip-if.vue'
 
 const props = defineProps({
   testType: {
