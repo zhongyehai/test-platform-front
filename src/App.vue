@@ -34,7 +34,7 @@ export default defineComponent({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  //text-align: center;
+  /*text-align: center;*/
   color: #2c3e50;
   width: 100%;
   height: 100vh;
@@ -64,7 +64,7 @@ dialog上下左右在视口居中、内容高度过高过开启dialog内滚动�
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  //overflow-y: scroll !important;
+  /*//overflow-y: scroll !important;*/
   max-height: 100vh !important;
 }
 

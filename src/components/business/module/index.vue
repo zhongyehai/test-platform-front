@@ -83,6 +83,7 @@
                     :filter-node-method="filterNode"
                     node-key="id"
                     @node-click="clickTree"
+                    highlight-current
                 >
                   <template #default="{ node, data }">
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
