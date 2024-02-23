@@ -9,7 +9,7 @@
     <!-- 有数据 -->
     <div v-show="reportSummary && reportSummary.stat.count.step > 0">
       <!-- 第一行，头部信息 -->
-      <div class="grid-content" style="background-color: #f5f5f5 !important;">
+      <div class="report-header">
 
         <el-select
             v-model="showCaseResultType"
@@ -389,8 +389,8 @@ const showCaseEditor = (message: any) => {
   margin-top: 10%;
 }
 
-.grid-content {
-  min-height: 36px;
+.report-header {
+  margin-top: 10px;
 }
 
 </style>
