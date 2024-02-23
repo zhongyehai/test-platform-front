@@ -1,156 +1,422 @@
 <template>
-
-  <!-- 步骤管理组件 -->
   <div>
+    <div>
+      <el-popconfirm width="250px" title="确定删除所选中的测试用例?" @confirm="deleteData(null)">
+        <template #reference>
+          <el-button
+              :disabled="selectedList.length < 1"
+              type="primary"
+              size="small">批量删除</el-button>
+        </template>
+      </el-popconfirm>
 
-    <!-- 步骤列表 -->
-    <stepListView
-      ref="stepListView"
-      :data-type="dataType"
-      :project-id="projectId"
+      <el-popconfirm width="280px" title="确定把所选步骤状态改为【要执行】?" @confirm="changeStatus(null, 1)">
+        <template #reference>
+          <el-button
+              :disabled="selectedList.length < 1"
+              type="primary"
+              size="small">批量改为要执行</el-button>
+        </template>
+      </el-popconfirm>
+
+      <el-popconfirm width="280px" title="确定把所选步骤状态改为【不执行】?" @confirm="changeStatus(null, 0)">
+        <template #reference>
+          <el-button
+              :disabled="selectedList.length < 1"
+              type="primary"
+              size="small">批量改为不执行</el-button>
+        </template>
+      </el-popconfirm>
+
+      <el-table
+          ref="stepTableRef"
+          class="stepTable"
+          row-key="id"
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          stripe
+          :height="tableHeight"
+          :row-class-name="hiddenExpandRowIcon"
+          :expand-row-keys="expandIdList"
+          @expand-change="changeExpandStatus"
+          @selection-change="clickSelectAll"
+          @row-dblclick="rowDblclick">
+
+        <el-table-column type="selection" min-width="2%" />
+
+        <el-table-column type="expand">
+          <template #default="scope">
+            <expandStep
+                :ref="`${scope.row.id}_${scope.$index}_${scope.row.quote_case}`"
+                :test-type="testType"
+                :current-case-id="caseId"
+                :case-id="scope.row.quote_case"
+                :step-list="scope.row.stepList"
+            />
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="id" label="序号" align="center" min-width="5%">
+          <template #default="scope">
+            <span>{{ scope.$index + 1 }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="status" label="状态" min-width="5%">
+          <template #header>
+            <span>状态</span>
+            <el-tooltip class="item" effect="dark" placement="top-start" content="若此处设置为不运行，则执行测试时将不会运行此步骤">
+              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <el-switch
+                v-model="scope.row.status"
+                size="small"
+                :inactive-value="0"
+                :active-value="1"
+                @change="changeStatus(scope.row, null)"
+            />
+          </template>
+        </el-table-column>
+
+        <el-table-column align="left" prop="name" label="步骤名称" min-width="45%">
+          <template #default="scope">
+            <el-tag size="small" :type="scope.row.quote_case ? 'warning' : 'success'">
+              {{ scope.row.quote_case ? '引用' : '步骤' }}
+            </el-tag>
+            <span style="margin-left: 5px"> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column v-if="testType !== 'api'" align="right" prop="execute_type" label="执行事件" min-width="15%">
+          <template #default="scope">
+            <span>{{ busEvent.data.executeTypeDict[scope.row.execute_type] }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="desc" align="right" min-width="17%">
+          <template #header>
+            <span>详情</span>
+            <el-tooltip class="item" effect="dark" placement="top-start" content="引用用例的详情">
+              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <el-popover
+                v-if="scope.row.quote_case"
+                :ref="scope.row.id"
+                trigger="hover"
+                placement="bottom-start"
+                style="margin-right: 10px"
+                popper-class="down-popover"
+                width="1300px"
+            >
+              <showCaseDesc
+                  :test-type="testType"
+                  :case-desc="scope.row.desc"
+                  :case-skip-if="scope.row.skip_if"
+                  :case-variables="scope.row.variables"
+                  :case-extracts="scope.row.output"
+                  :case-id="scope.row.quote_case"
+              />
+              <template #reference>
+                <span> {{ scope.row.desc || '-' }} </span>
+              </template>
+            </el-popover>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+          <template #default="scope">
+            <el-button v-if="scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditNameDrawer(scope.row)">改名</el-button>
+            <el-button v-if="!scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">修改</el-button>
+
+            <el-popconfirm width="250px" :title="`复制用例【${scope.row.name}】下的所有步骤，并在【当前用例】下生成对应的步骤?`" @confirm="copyCaseStepToCurrentCase(scope.row)">
+              <template #reference>
+                <el-button v-if="scope.row.quote_case" style="margin: 0; padding: 2px" type="text" size="small">拉取</el-button>
+              </template>
+            </el-popconfirm>
+
+            <el-popconfirm width="250px" :title="`复制步骤【${scope.row.name}】，并在【当前用例】下生成新的步骤?`" @confirm="copyData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px" type="text" size="small">复制</el-button>
+              </template>
+            </el-popconfirm>
+
+            <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+    </div>
+
+    <EditApiStepDrawer
+      v-if="testType === 'api'"
       :case-id="caseId"
-    />
-
-    <!-- 添加步骤/引用用例 -->
-    <el-drawer
-      title="新增步骤"
-      size="85%"
-      :append-to-body="true"
-      :visible.sync="drawerIsShow"
-      :direction="direction"
-    >
-      <el-tabs v-model="activeName" style="margin-left: 20px">
-
-        <!-- 接口列表 -->
-        <el-tab-pane v-if="dataType === 'api'" label="接口列表" name="apiList">
-          <apiListView
-            ref="apiListView"
-            :project-id="projectId"
-            :current-case-id="caseId"
-          />
-        </el-tab-pane>
-
-        <!-- 元素列表 -->
-        <el-tab-pane v-if="dataType !== 'api'" label="元素列表" name="apiList">
-          <elementListView
-            ref="elementList"
-            :data-type="dataType"
-            :project-id="projectId"
-            :current-case-id="caseId"
-          />
-        </el-tab-pane>
-
-        <!-- 引用用例 -->
-        <el-tab-pane label="引用用例" name="quoteCase">
-          <quoteCaseView
-            ref="quoteCase"
-            :data-type="dataType"
-            :project-id="projectId"
-            :case-id="caseId"
-          />
-        </el-tab-pane>
-
-      </el-tabs>
-    </el-drawer>
-
-    <!-- api步骤编辑 -->
-    <editApiStepView
-      v-if="dataType === 'api'"
-      ref="editStepView"
-      :data-type="dataType"
-      :case-id="caseId"
+      :test-type="testType"
       :project-id="projectId"
-    />
+    ></EditApiStepDrawer>
 
-    <!-- ui步骤编辑 -->
-    <editUiStepView
-      v-else
-      ref="editStepView"
-      :data-type="dataType"
-      :case-id="caseId"
-      :project-id="projectId"
-    />
+    <EditUiStepDrawer
+        v-if="testType !== 'api'"
+        :case-id="caseId"
+        :test-type="testType"
+        :project-id="projectId"
+    ></EditUiStepDrawer>
+
+    <AddStepDrawer :test-type="testType" :case-id="caseId" :project-id="projectId"></AddStepDrawer>
+    <editQuoteCaseNameDrawer :test-type="testType"></editQuoteCaseNameDrawer>
   </div>
-
 </template>
 
-<script>
+<script setup lang="ts">
+import {onMounted, ref, computed, onBeforeUnmount, watch} from "vue";
+import Pagination from '@/components/pagination.vue'
+import EditApiStepDrawer from './api-test/edit-api-step.vue'
+import EditUiStepDrawer from './ui-test/edit-ui-step.vue'
+import AddStepDrawer from './add-step-drawer.vue'
+import editQuoteCaseNameDrawer from './edit-quote-case-name.vue'
+import expandStep from './expand-step.vue'
+import showCaseDesc from '../case/show-desc.vue'
 
-import stepListView from './stepList'
-import apiListView from './apiList'
-import elementListView from './elementList.vue'
-import editApiStepView from './editApiStep.vue'
-import editUiStepView from './editUiStep.vue'
-import quoteCaseView from './quoteCase'
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage} from "element-plus";
+import toClipboard from "@/utils/copy-to-memory";
+import {ChangeStepStatus, DeleteStep, ChangeStepSort, GetStepList, CopyStep} from "@/api/business-api/step";
+import Sortable from "sortablejs";
+import {CopyCaseStep} from "@/api/business-api/case";
 
-import { postStep as apiPostStep } from '@/apis/apiTest/step'
-import { postStep as appUiPostStep } from '@/apis/appUiTest/step'
-import { postStep as webUiPostStep } from '@/apis/webUiTest/step'
-
-export default {
-  name: 'Index',
-  components: {
-    stepListView,
-    apiListView,
-    elementListView,
-    editApiStepView,
-    editUiStepView,
-    quoteCaseView
+const props = defineProps({
+  testType: {
+    default: '',
+    type: String
   },
-  props: [
-    // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'projectId', 'caseId'
-  ],
-  data() {
-    return {
-      direction: 'rtl', // 抽屉打开方式
-      drawerIsShow: false,
-      activeName: 'apiList',
-      postStepUrl: ''
-    }
+  projectId: {
+    default: '',
+    type: Number,
   },
+  caseId: {
+    default: '',
+    type: Number,
+  }
+})
 
-  created() {
-    if (this.dataType === 'api') {
-      this.postStepUrl = apiPostStep
-    } else if (this.dataType === 'webUi') {
-      this.postStepUrl = webUiPostStep
-    } else {
-      this.postStepUrl = appUiPostStep
-    }
-  },
+watch(() => props.caseId, (newValue, oldValue) => {
+  if (newValue){
+    queryItems.value.case_id = newValue
+    getTableDataList()
+  }
+})
 
-  mounted() {
-    // 打开添加步骤抽屉
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, caseId) => {
-      if (_type === 'showAddStepDrawer') {
-        this.drawerIsShow = true
-      }
-    })
+const tableIsLoading = ref(false)
+const stepTableRef = ref(null)
+const tableDataList = ref([])
+const expandIdList = ref([])
+const userList = ref([])
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  case_id: undefined
+})
 
-    // 引用用例
-    this.$bus.$on(this.$busEvents.quoteCaseToStep, (testCase, status) => {
-      if (testCase) {
-        this.postStepUrl(testCase).then(response => {
-          if (this.showMessage(this, response)) {
-            this.$bus.$emit(this.$busEvents.drawerIsCommit, 'stepInfo') // 重新请求步骤列表
-            this.$bus.$emit(this.$busEvents.quoteCaseToStep, null, 'quoteCaseToStepSuccess') // 重新请求步骤列表
-          }
-        })
-      }
-    })
-  },
+const selectedList = ref([])
+const oldIdList = ref([])
+const newIdList = ref([])
 
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-    this.$bus.$off(this.$busEvents.quoteCaseToStep)
-  },
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.59}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.73}px`
+  }
+})
 
-  methods: {}
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
+  }
 }
+
+const clickSelectAll = (val: never[]) => {
+  selectedList.value = val
+}
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+const hiddenExpandRowIcon = (row: { row: { quote_case: any; }; }) => {
+  const canNotSort = expandIdList.value.length > 0 ? 'canNotSort' : '' // 是否能拖动
+  const hiddenRowIcon = row.row.quote_case ? '' : 'hiddenRowIcon' // 是否展示展开/收起icon
+  return `${canNotSort} ${hiddenRowIcon}`
+}
+
+const changeExpandStatus = (row: { id: any; quote_case: any; stepList: any; }, expandedRows: any) => {
+  const expandIdIndex = expandIdList.value.indexOf(row.id)
+  if (expandIdIndex === -1) {
+    // 获取引用用例的步骤列表
+    tableIsLoading.value = true
+    GetStepList(props.testType, { case_id: row.quote_case }).then(response => {
+      tableIsLoading.value = false
+      expandIdList.value.push(row.id)
+      row.stepList = response.data.data
+    })
+  } else {
+    expandIdList.value.splice(expandIdIndex, 1)
+  }
+}
+
+const changeStatus = (row: { id: any; status: number; } | null, status: number) => {
+  const changeStatus = row ? row.status : status
+  tableIsLoading.value = true
+  ChangeStepStatus(props.testType, {id_list: getSubmitId(row), status: changeStatus}).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const deleteData = (row: any) => {
+  tableIsLoading.value = true
+  DeleteStep(props.testType,{id_list: getSubmitId(row)}).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const copyData = (row: { id: any; }) =>{
+  tableIsLoading.value = true
+  CopyStep(props.testType,{ id: row.id, case_id: props.caseId }).then(response => {
+    tableIsLoading.value = false
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const getSubmitId = (row: any) => {
+  let selectedIdList: any[] = []
+  if (row){
+    selectedIdList = [row.id]
+  }else {
+    selectedList.value.forEach(item => { selectedIdList.push(item.id) })
+  }
+  return selectedIdList
+}
+
+const showEditNameDrawer = (row: object | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-step-name', content: row});
+}
+
+const showEditDrawer = (row: object | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'step-editor', content: row});
+}
+
+const copyCaseStepToCurrentCase = (row: { quote_case: any; isLoading: boolean; id: any; }) => {
+  CopyCaseStep(props.testType,{ from_case: row.quote_case, to_case: props.caseId }).then(response => {
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const getTableDataList = () => {
+  tableIsLoading.value = true
+  GetStepList(props.testType, queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+
+    oldIdList.value = tableDataList.value.map(item => item.id)
+    newIdList.value = oldIdList.value.slice()
+  })
+}
+
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ChangeStepSort(props.testType, {
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const setSort = () => {
+  let tbody = stepTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
+  Sortable.create(tbody, {
+    group: { // 相同的组之间可以相互拖拽
+      name: "table",
+      pull: true,
+      put: true,
+    },
+    filter: '.canNotSort', // 不可拖动的class
+    animation: 150, // ms, number 单位：ms，定义排序动画的时间
+    onEnd(e: any) {
+      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
+      tableDataList.value.splice(e.newIndex, 0, targetRow)
+      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
+      newIdList.value.splice(e.newIndex, 0, tempIndex)
+      sortTable()
+    },
+  });
+}
+
+onMounted(() => {
+  setSort()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'step-editor') {
+    getTableDataList()
+  }
+}
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+.stepTable :deep(.hiddenRowIcon) .el-table__expand-icon {
+  display: none;
+}
+
+.stepTable :deep(.el-table__expand-icon) .cell {
+  padding: 0 !important;
+  margin: 0 !important;
+}
 
 </style>

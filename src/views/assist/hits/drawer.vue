@@ -1,299 +1,327 @@
 <template>
-  <!-- 新增/修改命中问题表单 -->
-  <el-drawer
-    :title="tempHit.id ? '修改命中问题' : '新增命中问题'"
-    size="60%"
-    :visible.sync="drawerIsShow"
-    :direction="direction"
-  >
-    <el-form
-      ref="hitForm"
-      label-position="center"
-      label-width="100px"
-      style="min-width: 400px;margin-left: 20px;margin-right: 20px"
-    >
+  <div>
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改问题记录' : '新增问题记录'" size="60%">
+      <el-form
+          ref="ruleFormRef"
+          :model="formData"
+          :rules="formRules"
+          label-width="80px">
 
-      <el-form-item :label="'选择服务'" prop="project_id" class="is-required" size="mini">
-        <el-select
-          v-model="tempHit.project_id"
-          :placeholder="`选择服务`"
-          size="mini"
-          style="width: 100%"
-          filterable
-          default-first-option
-        >
-          <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="所属服务" prop="project_id" class="is-required" size="small">
+          <el-select
+              v-model="formData.project_id"
+              placeholder="选择服务"
+              size="small"
+              style="width: 100%"
+              filterable
+              default-first-option
+          >
+            <el-option v-for="item in projectListData" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item :label="'运行环境'" prop="env" class="is-required" size="mini">
-        <el-select
-          v-model="tempHit.env"
-          filterable
-          default-first-option
-          placeholder="运行环境"
-          size="mini"
-          style="width:100%"
-        >
-          <el-option
-            v-for="item in runEnvList"
-            :key="item.code"
-            :label="item.name"
-            :value="item.code"
+        <el-form-item label="运行环境" prop="env" class="is-required" size="small">
+          <el-select
+              v-model="formData.env"
+              filterable
+              default-first-option
+              placeholder="运行环境"
+              size="small"
+              style="width:100%"
+          >
+            <el-option v-for="item in runEnvListData" :key="item.code" :label="item.name" :value="item.code" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="报告id" prop="report_id" class="is-required" size="small">
+          <el-input v-model="formData.report_id" size="small" />
+        </el-form-item>
+
+        <el-form-item label="触发时间" prop="date" class="is-required" size="small">
+          <el-date-picker
+              v-model="formData.date"
+              type="date"
+              placeholder="选择日期"
+              style="width: 100%"
+              value-format="YYYY-MM-DD"
           />
-        </el-select>
-      </el-form-item>
+        </el-form-item>
 
-      <el-form-item :label="'报告id'" prop="report_id" class="is-required" size="mini">
-        <el-input v-model="tempHit.report_id" size="mini" />
-      </el-form-item>
+        <el-form-item label="测试类型" prop="test_type" class="is-required" size="small">
+          <el-select
+              v-model="formData.test_type"
+              style="width: 100%"
+              placeholder="选择测试类型"
+              size="small"
+              filterable
+              default-first-option
+          >
+            <el-option v-for="item in runTestTypeListData" :key="item.key" :label="item.label" :value="item.key" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item :label="'触发时间'" prop="date" class="is-required" size="mini">
-        <el-date-picker
-          v-model="tempHit.date"
-          align="right"
-          type="date"
-          placeholder="选择日期"
-          style="width: 100%"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
+        <el-form-item label="问题类型" prop="hit_type" class="is-required" size="small">
+          <el-select
+              v-model="formData.hit_type"
+              filterable
+              allow-create
+              default-first-option
+              placeholder="问题类型，可手动输入"
+              size="small"
+              style="width:100%"
+          >
+            <el-option v-for="item in hitTypeListData" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item :label="'测试类型'" prop="test_type" class="is-required" size="mini">
-        <el-select
-          v-model="tempHit.test_type"
-          style="width: 100%"
-          placeholder="测试类型"
-          size="mini"
-          filterable
-          default-first-option
-        >
-          <el-option
-            v-for="item in runTestType"
-            :key="item.key"
-            :label="item.label"
-            :value="item.key"
-          />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="问题内容" prop="hit_detail" class="is-required" size="small">
+          <el-input v-model="formData.hit_detail" size="small" type="textarea" :placeholder="'问题内容'" />
+        </el-form-item>
 
-      <el-form-item :label="'问题类型'" prop="hit_type" class="is-required" size="mini">
-        <el-select
-          v-model="tempHit.hit_type"
-          filterable
-          allow-create
-          default-first-option
-          placeholder="问题类型，可手动输入"
-          size="mini"
-          style="width:100%"
-        >
-          <el-option
-            v-for="item in hitTypeList"
-            :key="item.key"
-            :label="item.value"
-            :value="item.key"
-          />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="备注" prop="desc" size="small">
+          <el-input v-model="formData.desc" size="small" type="textarea" :placeholder="'备注'" />
+        </el-form-item>
 
-      <el-form-item :label="'问题内容'" prop="hit_detail" class="is-required" size="mini">
-        <el-input v-model="tempHit.hit_detail" size="mini" type="textarea" :placeholder="'问题内容'" />
-      </el-form-item>
+      </el-form>
 
-      <el-form-item :label="'备注'" prop="desc" size="mini">
-        <el-input v-model="tempHit.desc" size="mini" type="textarea" :placeholder="'备注'" />
-      </el-form-item>
+      <template #footer>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="small" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
+          <el-button
+              type="primary"
+              size="small"
+              :loading="submitButtonIsLoading"
+              @click="submitForm"
+          >
+            {{ '保存' }}
+          </el-button>
+        </div>
+      </template>
 
-    </el-form>
-
-    <div class="demo-drawer__footer">
-      <el-button size="mini" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
-      <el-button
-        type="primary"
-        size="mini"
-        :loading="submitButtonIsLoading"
-        @click="tempHit.id ? editHit(): creteHit()"
-      >
-        {{ '保存' }}
-      </el-button>
-    </div>
-
-  </el-drawer>
+    </el-drawer>
+  </div>
 </template>
 
-<script>
-import { getConfigByCode } from '@/apis/config/config'
-import { getHit, postHit, putHit, getHitTypeList } from '@/apis/assist/hit'
-import { projectList as apiProjectList } from '@/apis/apiTest/project'
-import { getReport as apiGetReport } from '@/apis/apiTest/report'
+<script lang="ts" setup>
+import {onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {bus, busEvent} from "@/utils/bus-events";
+import {GetProjectList} from "@/api/business-api/project";
+import {GetHit, GetHitTypeList, PostHit, PutHit} from "@/api/assist/hit";
+import {GetConfigByCode} from "@/api/config/config-value";
+import {GetRunEnvList} from "@/api/config/run-env";
 
-export default {
-  name: 'Drawer',
-  props: [
-    // eslint-disable-next-line vue/require-prop-types
-    'runTestTypeList', 'currentHitTypeList', 'runEnvList', 'projectList'
-  ],
-  data() {
-    return {
-      direction: 'rtl', // 抽屉打开方式
-      submitButtonIsLoading: false,
-      drawerIsShow: false,
-      hitTypeList: this.currentHitTypeList,
-      runTestType: this.runTestTypeList,
-      projectListData: [], // 项目列表
-      tempHit: {
-        id: '',
-        date: '',
-        hit_type: '',
-        hit_detail: '',
-        test_type: '',
-        project_id: '',
-        env: '',
-        report_id: '',
-        desc: ''
-      },
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick(picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick(picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }]
-      },
-      projectListUrl: '',
-      getReportUrl: ''
-    }
+const props = defineProps({
+  runEnvList: {
+    default: [],
+    type: Array
   },
-
-  watch: {
-    'runTestTypeList': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.runTestType = newVal
-        }
-      }
-    },
-
-    'currentHitTypeList': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.hitTypeList = newVal
-        }
-      }
-    },
-
-    'projectList': {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.projectListData = newVal
-        }
-      }
-    }
+  projectList: {
+    default: [],
+    type: Array
   },
-
-  created() {
-    this.projectListData = this.projectList
-    this.projectListUrl = apiProjectList
-    this.getReportUrl = apiGetReport
+  runTestTypeList: {
+    default: [],
+    type: Array
   },
+  hitTypeList: {
+    default: [],
+    type: Array
+  },
+})
 
-  mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsShow, (_type, status, data) => {
-      if (_type === 'hit') {
-        // 获取服务列表
-        if (!this.projectListData || this.projectListData.length < 1) {
-          this.projectListUrl().then(response => {
-            this.projectListData = response.data.data
-          })
-        }
+watch(() => props.projectList, (newValue, oldValue) => {
+  if (newValue){
+    projectListData.value = newValue
+  }
+})
 
-        // 获取问题类型列表
-        if (!this.hitTypeList || this.hitTypeList.length < 1) {
-          getHitTypeList().then(response => {
-            this.hitTypeList = response.data
-          })
-        }
+watch(() => props.hitTypeList, (newValue, oldValue) => {
+  if (newValue){
+    hitTypeListData.value = newValue
+  }
+})
 
-        // 获取测试类型列表
-        if (!this.runTestType || this.runTestType.length < 1) {
-          getConfigByCode({ code: 'test_type' }).then(response => {
-            this.runTestType = response.data
-          })
-        }
+watch(() => props.runTestTypeList, (newValue, oldValue) => {
+  if (newValue){
+    runTestTypeListData.value = newValue
+  }
+})
 
-        if (status === 'add') {
-          this.tempHit.id = ''
-          this.tempHit.date = data ? data.date : ''
-          this.tempHit.hit_type = ''
-          this.tempHit.hit_detail = ''
-          this.tempHit.test_type = data ? data.test_type : ''
-          this.tempHit.project_id = data ? data.project_id : ''
-          this.tempHit.env = data ? data.run_env : ''
-          this.tempHit.report_id = data ? data.report_id : ''
-          this.tempHit.desc = ''
-          // 新增时，如果接收到了报告id，则获取报告对应的服务id
-          if (this.tempHit.report_id) {
-            this.getReportUrl({ id: this.tempHit.report_id }).then(response => {
-              this.tempHit.project_id = response.data.project_id
-            })
-          }
-        } else if (status === 'update') {
-          getHit({id: data.id}).then(response => {
-            this.tempHit = response.data
-          })
-        }
+onMounted(() => {
+  runEnvListData.value = props.runEnvList
+  projectListData.value = props.projectList
+  hitTypeListData.value = props.hitTypeList
+  runTestTypeListData.value = props.runTestTypeList
 
-        this.drawerIsShow = true
-      }
+  bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+})
+
+const getProjectList = () => {
+  if (!projectListData.value || projectListData.value.length < 1) {
+    GetProjectList('api', {page_num: 1, page_size: 99999}).then(response => {
+      projectListData.value = response.data.data
     })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsShow)
-  },
-
-  methods: {
-    // 新增命中问题
-    creteHit() {
-      this.submitButtonIsLoading = true
-      postHit(this.tempHit).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsCommit)
-          this.drawerIsShow = false
-        }
-      })
-    },
-
-    // 修改命中问题
-    editHit() {
-      this.submitButtonIsLoading = true
-      putHit(this.tempHit).then(response => {
-        this.submitButtonIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsCommit)
-          this.drawerIsShow = false
-        }
-      })
-    }
   }
 }
+
+const getHitTypeList = () => {
+  if (!hitTypeListData.value || hitTypeListData.value.length < 1) {
+    GetHitTypeList().then(response => {
+      hitTypeListData.value = response.data
+    })
+  }
+}
+
+const getRunTestType = () => {
+  if (!runTestTypeListData.value || runTestTypeListData.value.length < 1) {
+    GetConfigByCode({ code: 'test_type' }).then(response => {
+      runTestTypeListData.value = response.data
+    })
+  }
+}
+
+const getRunEnvList = () => {
+  if (!runEnvListData.value || runEnvListData.value.length < 1){
+    GetRunEnvList({}).then(response => {
+      runEnvListData.value = response.data.data
+    })
+  }
+}
+
+const onShowDrawerEvent = (message: any) => {
+  if (message.eventType === 'hit') {
+    resetForm()
+    if (message.content){
+      if (message.content.id){  // 修改记录
+        getHit(message.content.id)
+      }else {  // 测试报告详情过来的新增记录
+        formData.value.date = message.content.date
+        formData.value.test_type = message.content.test_type
+        formData.value.env = message.content.run_env
+        formData.value.report_id = message.content.report_id
+        formData.value.project_id = message.content.project_id
+      }
+    }
+    drawerIsShow.value = true
+  }
+}
+
+const getHit = (dataId: number) => {
+  GetHit({id: dataId}).then(response => {
+      formData.value = response.data
+  })
+}
+
+const sendEvent = () => {
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'hit'});
+};
+
+const drawerIsShow = ref(false)
+const projectListData = ref([])
+const hitTypeListData = ref([])
+const runTestTypeListData = ref([])
+const runEnvListData = ref([])
+const submitButtonIsLoading = ref(false)
+const formData = ref({
+  id: undefined,
+  date: undefined,
+  hit_type: undefined,
+  hit_detail: undefined,
+  test_type: undefined,
+  project_id: undefined,
+  env: undefined,
+  report_id: undefined,
+  desc: undefined
+})
+
+const formRules = {
+  project_id: [
+    {required: true, message: '请选择服务', trigger: 'blur'}
+  ],
+  env: [
+    {required: true, message: '请选择运行环境', trigger: 'blur'}
+  ],
+  report_id: [
+    {required: true, message: '请输入报告id', trigger: 'blur'}
+  ],
+  date: [
+    {required: true, message: '请选择触发时间', trigger: 'blur'}
+  ],
+  test_type: [
+    {required: true, message: '请选择测试类型', trigger: 'blur'}
+  ],
+  hit_type: [
+    {required: true, message: '请选择问题类型', trigger: 'blur'}
+  ],
+  hit_detail: [
+    {required: true, message: '请输入问题内容', trigger: 'blur'}
+  ]
+}
+const ruleFormRef = ref(null)
+
+const resetForm = () => {
+  formData.value = {
+    id: undefined,
+    date: undefined,
+    hit_type: undefined,
+    hit_detail: undefined,
+    test_type: undefined,
+    project_id: undefined,
+    env: undefined,
+    report_id: undefined,
+    desc: undefined
+  }
+  ruleFormRef.value && ruleFormRef.value.resetFields()
+  getProjectList()
+  getHitTypeList()
+  getRunTestType()
+  getRunEnvList()
+}
+
+const submitForm = () => {
+  if (formData.value.id) {
+    changeData()
+  } else {
+    addData()
+  }
+}
+
+const addData = () => {
+  ruleFormRef.value.validate((valid) => {
+    if (valid) {
+      submitButtonIsLoading.value = true
+      PostHit(formData.value).then(response => {
+        submitButtonIsLoading.value = false
+        if (response) {
+          sendEvent()
+          drawerIsShow.value = false
+        }
+      })
+    }
+  })
+}
+const changeData = () => {
+  ruleFormRef.value.validate((valid) => {
+    if (valid) {
+      submitButtonIsLoading.value = true
+      PutHit(formData.value).then(response => {
+        submitButtonIsLoading.value = false
+        if (response) {
+          sendEvent()
+          drawerIsShow.value = false
+        }
+      })
+    }
+  })
+}
+
 </script>
 
-<style scoped>
+
+<style scoped lang="scss">
 
 </style>

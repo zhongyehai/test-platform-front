@@ -1,357 +1,235 @@
 <template>
+    <div>
+      <el-table
+          ref="elementTableRef"
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          :header-cell-style="{'text-align':'center'}"
+          stripe
+          row-key="id"
+          :height="tableHeight"
+          @row-dblclick="rowDblclick">
 
-  <div>
-    <el-table
-      ref="elementListTable"
-      v-loading="tableLoadingIsShow"
-      size="mini"
-      element-loading-text="正在排序中"
-      element-loading-spinner="el-icon-loading"
-      :data="elementList"
-      row-key="id"
-      stripe
-      @cell-dblclick="cellDblclick"
-    >
-      <el-table-column prop="num" label="序号" min-width="6%">
-        <template slot-scope="scope">
-          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column prop="id" label="序号" align="center" min-width="6%">
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="name" label="元素名称" min-width="15%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.name }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip prop="name" label="元素名称" min-width="15%">
+          <template #default="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="by" align="center" min-width="12%">
-        <template slot="header">
-          <span>定位方式</span>
-          <el-tooltip class="item" effect="dark" placement="top-start">
-            <div slot="content">
-              <div>在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <span> {{ parseFindElementOption(scope.row.by) }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip prop="by" align="center" min-width="12%">
+          <template #header>
+            <span>定位方式</span>
+            <el-tooltip class="item" effect="dark" placement="top-start" content="在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址">
+              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <span> {{ busEvent.data.findElementOptionDict[scope.row.by] }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="element" align="center" label="元素表达式" min-width="42%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.element }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip prop="element" align="center" label="元素表达式" min-width="42%">
+          <template #default="scope">
+            <span> {{ scope.row.element }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="wait_time_out" align="center" min-width="10%">
-        <template slot="header">
-          <span>等待时间(秒)</span>
-          <el-tooltip class="item" effect="dark" placement="top-start">
-            <div slot="content">
-              <div>预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待(秒)</div>
-            </div>
-            <span><i style="color: #409EFF" class="el-icon-question" /></span>
-          </el-tooltip>
-        </template>
-        <template slot-scope="scope">
-          <span> {{ scope.row.wait_time_out }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip prop="wait_time_out" align="center" min-width="10%">
+          <template #header>
+            <span>等待时间(秒)</span>
+            <el-tooltip class="item" effect="dark" placement="top-start" content="预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待(秒)">
+              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <span> {{ scope.row.wait_time_out }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column align="center" label="操作" min-width="15%">
-        <template slot-scope="scope">
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+          <template #default="scope">
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>
+            <el-popconfirm width="250px" title="复制此元素并生成新的元素?" @confirm="showEditDrawer('copy', scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px" type="text" size="small">复制</el-button>
+              </template>
+            </el-popconfirm>
+            <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+        <EditDrawer :test-type="testType" :device-list="deviceList"></EditDrawer>
+        <AddDrawer :test-type="testType" :device-list="deviceList"></AddDrawer>
+    </div>
 
-          <!--修改元素-->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 8px"
-            @click="showEditForm(scope.row.id)"
-          >修改
-          </el-button>
-
-          <!-- 复制元素 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.copyPopoverIsShow"
-            placement="top"
-            style="margin-right: 10px"
-            popper-class="down-popover"
-          >
-            <p>复制此元素并生成新的元素?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="copyElement(scope.row, scope.row.id)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              type="text"
-              size="mini"
-            >复制</el-button>
-          </el-popover>
-
-          <!-- 删除元素 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delElement(scope.row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-              :loading="scope.row.isShowDeleteLoading"
-            >删除</el-button>
-          </el-popover>
-        </template>
-      </el-table-column>
-
-    </el-table>
-
-    <pagination
-      v-show="elementTotal>0"
-      :total="elementTotal"
-      :page.sync="page_num"
-      :limit.sync="page_size"
-      @pagination="getElementList"
-    />
-
-    <elementDrawer
-      :data-type="dataType"
-      :device-list="deviceList"
-      :current-project-id="currentProjectId"
-      :current-module-id="currentModuleId"
-      :current-page-id="pageId"
-    />
-
-    <addElementDrawer
-      :data-type="dataType"
-      :device-list="deviceList"
-      :current-project="currentProject"
-      :current-project-id="currentProjectId"
-      :current-module-id="currentModuleId"
-      :current-page-id="pageId"
-    />
-  </div>
 </template>
 
-<script>
-import Sortable from 'sortablejs'
-import Pagination from '@/components/Pagination'
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount, watch} from "vue";
+import Pagination from '@/components/pagination.vue'
+import EditDrawer from './edit-drawer.vue'
+import AddDrawer from './add-drawer.vue'
 
-import elementDrawer from '@/components/business/element/editElementDrawer.vue'
-import addElementDrawer from '@/components/business/element/addElementDrawer.vue'
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage} from "element-plus";
+import toClipboard from "@/utils/copy-to-memory";
+import {GetElementList, DeleteElement, ChangeElementSort, CopyElement} from "@/api/business-api/element";
+import Sortable from "sortablejs";
+import {GetPhoneList} from "@/api/business-api/device-phone";
 
-import {
-  elementList as webUiElementList,
-  deleteElement as webUiDeleteElement,
-  elementSort as webUiElementSort
-} from '@/apis/webUiTest/element'
-import {
-  elementList as appElementList,
-  deleteElement as appDeleteElement,
-  elementSort as appElementSort
-} from '@/apis/appUiTest/element'
-import { phoneList } from '@/apis/appUiTest/device'
-
-export default {
-  name: 'Index',
-  components: {
-    Pagination,
-    elementDrawer,
-    addElementDrawer
+const props = defineProps({
+  testType: {
+    default: '',
+    type: String
   },
+  pageId: {
+    default: undefined,
+    type: Number
+  }
+})
 
-  // 接收父组件传参的key
-  props: [
-    // eslint-disable-next-line vue/require-prop-types
-    'dataType', 'currentProject', 'currentProjectId', 'currentModuleId', 'currentPageId'
-  ],
-  data() {
-    return {
-      tableLoadingIsShow: false, // 请求列表等待响应的状态
-      tempElement: {}, // 元素新增/编辑临时数据
+watch(() => props.pageId, (newValue, oldValue) => {
+  if (newValue){
+    queryItems.value.page_id = newValue
+    getTableDataList()
+  }
+})
 
-      // 元素数据列表
-      page_num: 1,
-      page_size: 20,
-      elementTotal: 0,
-      elementList: [],
+const elementTableRef = ref(null)
+const tableIsLoading = ref(false)
+const deviceList = ref([])
+const oldIdList = ref([])
+const newIdList = ref([])
+const tableDataList = ref([])
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  page_id: undefined
+})
+const tableHeight = localStorage.getItem('tableHeight')
 
-      deviceList: [],
-      // 拖拽排序参数
-      sortable: null,
-      oldList: [],
-      newList: [],
-      pageId: '',
-
-      elementListUrl: '',
-      deleteElementUrl: '',
-      elementSortUrl: ''
-    }
-  },
-
-  watch: {
-
-    // 监听父组件传过来的当前选中的页面，获取对应的元素列表
-    'currentPageId': {
-      deep: true, // 深度监听
-      handler(newVal, oldVal) {
-        if (newVal) {
-          this.pageId = newVal
-          this.getElementList()
-        } else {
-          this.elementList = []
-        }
-      }
-    }
-  },
-
-  created() {
-    if (this.dataType === 'webUi') {
-      this.elementListUrl = webUiElementList
-      this.deleteElementUrl = webUiDeleteElement
-      this.elementSortUrl = webUiElementSort
-    } else {
-      this.elementListUrl = appElementList
-      this.deleteElementUrl = appDeleteElement
-      this.elementSortUrl = appElementSort
-    }
-
-    this.oldList = this.elementList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-
-    this.pageId = this.currentPageId
-    if (this.currentPageId) {
-      this.getElementList()
-    }
-  },
-
-  mounted() {
-    if (this.dataType === 'appUi' && this.deviceList.length === 0) {
-      phoneList({ page_num: 1, page_size: 9999 }).then(response => {
-        this.deviceList = response.data.data
-      })
-    }
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (_type === 'elementInfo') {
-        this.getElementList()
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  methods: {
-
-    // 双击单元格复制
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
-        function(e) {
-          that.$message.success('复制成功')
-        }
-      )
-    },
-
-    // 打开编辑框
-    showEditForm(element_id) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'edit', element_id)
-    },
-
-    // 删除元素
-    delElement(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'isShowDeleteLoading', true)
-      this.deleteElementUrl({ 'id': row.id }).then(response => {
-        this.$set(row, 'isShowDeleteLoading', false)
-        if (this.showMessage(this, response)) {
-          this.getElementList()
-        }
-      })
-    },
-
-    // 解析定位方式
-    parseFindElementOption(option) {
-      return this.$busEvents.data.findElementOptionDict[option]
-    },
-
-    cancelDeletePopover(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-    },
-
-    cancelCopyPopover(row) {
-      this.$set(row, 'copyPopoverIsShow', false)
-    },
-
-    // 复制元素
-    copyElement(element, element_id) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'elementInfo', 'copy', element_id)
-      this.$set(element, 'copyPopoverIsShow', false)
-    },
-
-    // 根据页面获取元素列表
-    getElementList(params) {
-      this.tableLoadingIsShow = true
-      if (this.pageId) {
-        this.elementListUrl({ page_id: this.pageId, page_num: this.page_num, page_size: this.page_size, detail: true
-        }).then(response => {
-          this.elementList = response.data.data
-          this.elementTotal = response.data.total
-
-          this.oldList = this.elementList.map(v => v.id)
-          this.newList = this.oldList.slice()
-        })
-      }
-      this.tableLoadingIsShow = false
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.elementListTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.elementList.splice(evt.oldIndex, 1)[0]
-          this.elementList.splice(evt.newIndex, 0, targetRow)
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableLoadingIsShow = true
-          this.elementSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
-            this.showMessage(this, response)
-            this.getElementList()
-            this.tableLoadingIsShow = false
-          })
-        }
-      })
-    }
-
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
   }
 }
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+const deleteData = (row: { id: any; }) => {
+  DeleteElement(props.testType, {id: row.id}).then(response => {
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const showEditDrawer = (command: string, row: any) => {
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: command === 'add' ? 'add-element' : 'edit-element',
+    content: row,
+    command: command,
+    page_id: queryItems.value.page_id
+  })
+}
+
+const getTableDataList = () => {
+  tableIsLoading.value = true
+  GetElementList(props.testType, queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+
+    oldIdList.value = tableDataList.value.map(item => item.id)
+    newIdList.value = oldIdList.value.slice()
+  })
+}
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ChangeElementSort(props.testType, {
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const setSort = () => {
+  let tbody = elementTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
+  Sortable.create(tbody, {
+    group: { // 相同的组之间可以相互拖拽
+      name: "table",
+      pull: true,
+      put: true,
+    },
+    animation: 150, // ms, number 单位：ms，定义排序动画的时间
+    onEnd(e: any) {
+      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
+      tableDataList.value.splice(e.newIndex, 0, targetRow)
+      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
+      newIdList.value.splice(e.newIndex, 0, tempIndex)
+      sortTable()
+    },
+  });
+}
+
+onMounted(() => {
+  if (props.testType === 'app' && deviceList.value.length === 0) {
+    GetPhoneList({ page_num: 1, page_size: 99999 }).then(response => {
+      deviceList.value = response.data.data
+    })
+  }
+  setSort()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'element-editor') {
+    getTableDataList()
+  }
+}
+
 </script>
 
-<style>
+<style scoped lang="scss">
 
 </style>

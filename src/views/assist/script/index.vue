@@ -1,351 +1,258 @@
 <template>
-  <div class="app-container">
+  <div class="layout-container">
 
-    <el-form label-width="100px" :inline="true">
+    <div class="layout-container-form flex space-between">
+      <div class="layout-container-form-handle">
+        <el-button type="primary" @click="showEditDrawer('add', undefined)"> 新增脚本</el-button>
+      </div>
 
-      <el-form-item :label="'脚本类型：'" size="mini">
+      <div class="layout-container-form-search">
         <el-select
-          v-model="listQuery.script_type"
-          :placeholder="'选择脚本类型'"
-          filterable
-          default-first-option
-          clearable
-          size="mini"
-          class="filter-item"
+            style="margin-right: 10px; width: 100%"
+            v-model="queryItems.script_type"
+            placeholder="选择脚本类型"
+            filterable
+            default-first-option
+            clearable
+            size="small"
         >
           <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key" />
         </el-select>
-      </el-form-item>
 
-      <el-form-item :label="'脚本文件名：'" size="mini">
         <el-input
-          v-model="listQuery.file_name"
-          class="input-with-select"
-          placeholder="脚本名，支持模糊搜索"
-          size="mini"
-          clearable
-          style="width: 100%"
+            style="margin-right: 10px"
+            v-model="queryItems.file_name"
+            class="input-with-select"
+            placeholder="脚本名，支持模糊搜索"
+            size="small"
+            clearable
         />
-      </el-form-item>
 
-      <el-form-item :label="'创建人：'" size="mini">
         <el-select
-          v-model="listQuery.create_user"
-          :placeholder="'选择创建人'"
-          filterable
-          default-first-option
-          clearable
-          size="mini"
-          class="filter-item"
+            style="margin-right: 10px; width: 100%"
+            v-model="queryItems.create_user"
+            :placeholder="'选择创建人'"
+            filterable
+            default-first-option
+            clearable
+            size="small"
+            class="filter-item"
         >
-          <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
+          <el-option v-for="user in userList" :key="user.name" :label="user.name" :value="user.id" />
         </el-select>
-      </el-form-item>
 
-      <el-button
-        type="primary"
-        size="mini"
-        @click="getScriptList()"
-      >
-        搜索
-      </el-button>
+        <el-button type="primary" @click="getTableDataList()"> 搜索</el-button>
+      </div>
+    </div>
 
-      <el-button
-        type="primary"
-        size="mini"
-        style="margin-left: 10px"
-        @click.native="sendEditEmit('add')"
-      >新增脚本
-      </el-button>
+    <div style="margin: 10px">
+      <el-table
+          v-loading="tableIsLoading"
+          row-key="id"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          stripe
+          :height="tableHeight"
+          @cell-dblclick="cellDblclick">
 
-    </el-form>
+        <el-table-column prop="id" label="序号" align="center" min-width="10%">
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-    <el-table
-      ref="scriptTable"
-      v-loading="tableIsLoading"
-      size="mini"
-      element-loading-text="正在排序中"
-      element-loading-spinner="el-icon-loading"
-      :data="scripts.list"
-      row-key="id"
-      stripe
-      @cell-dblclick="cellDblclick"
-    >
-      <el-table-column label="序号" align="center" min-width="10%">
-        <template slot-scope="scope">
-          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="脚本类型" prop="script_type" align="center" min-width="10%">
+          <template #default="scope">
+            <span> {{ scriptTypeDict[scope.row.script_type] }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="name" label="脚本类型" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ scriptTypeDict[scope.row.script_type] }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="脚本文件名" prop="name" align="center" min-width="30%">
+          <template #default="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="name" label="脚本文件名" min-width="30%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="备注" prop="desc" align="center"  min-width="15%">
+          <template #default="scope">
+            <span> {{ scope.row.desc }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="desc" label="备注" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.desc }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="创建人" prop="create_user" align="center" min-width="10%">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.create_user] }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="create_user" label="创建者" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="最后修改人" prop="update_user" align="center" min-width="10%">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.update_user] }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="update_user" label="最后修改人" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+          <template #default="scope">
+            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer('edit', scope.row)">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer('copy', scope.row)">复制</el-button>
+            <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 5px; color: red" type="text" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
 
-      <el-table-column label="操作" align="center" min-width="15%">
-        <template slot-scope="scope">
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+    </div>
 
-          <!--修改文件信息-->
-          <el-button
-            type="text"
-            size="mini"
-            @click="sendEditEmit('update', scope.row)"
-          >修改
-          </el-button>
-
-          <!-- 复制 -->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 5px"
-            @click="sendEditEmit('add', scope.row)"
-          >复制
-          </el-button>
-
-          <!-- 删除文件 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delScript(scope.row)">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-              :loading="scope.row.deleteLoadingIsShow"
-            >删除</el-button>
-          </el-popover>
-
-        </template>
-      </el-table-column>
-
-    </el-table>
-
-    <pagination
-      v-show="scripts.total>0"
-      :total="scripts.total"
-      :page.sync="listQuery.page_num"
-      :limit.sync="listQuery.page_size"
-      @pagination="getScriptList"
-    />
-
-    <ScriptDrawer
-      :script-type-dict="scriptTypeDict"
-    />
-
+    <EditDrawer :script-type-dict="scriptTypeDict"></EditDrawer>
   </div>
 </template>
 
-<script>
-import Sortable from 'sortablejs'
-import ScriptDrawer from './drawer'
-import Pagination from '@/components/Pagination'
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount} from "vue";
+import Pagination from '@/components/pagination.vue'
+import EditDrawer from './edit-drawer.vue'
 
-import { scriptList, deleteScript, scriptSort, copyScript } from '@/apis/assist/script'
-import { userList } from '@/apis/system/user'
+import {bus, busEvent} from "@/utils/bus-events";
+import {GetUserList} from "@/api/system/user";
+import toClipboard from "@/utils/copy-to-memory";
+import {ElMessage} from "element-plus";
+import {DeleteScript, GetScriptList, ScriptSort} from "@/api/assist/script";
+import Sortable from "sortablejs";
 
-export default {
-  name: 'Script',
-  components: {
-    Pagination,
-    ScriptDrawer
-  },
-  data() {
-    return {
-      listQuery: {
-        detail: true,
-        script_type: undefined,
-        file_name: undefined,
-        create_user: undefined,
-        update_user: undefined,
-        page_num: 1,
-        page_size: 20
-      },
+const tableIsLoading = ref(false)
+const tableDataList = ref([])
+const tableDataTotal = ref(0)
+const userList = ref([])
+const userDict = ref({})
+const oldIdList = ref([])
+const newIdList = ref([])
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  script_type: undefined,
+  file_name: undefined,
+  create_user: undefined
+})
+const tableHeight = localStorage.getItem('tableHeight')
+const scriptTypeDict = {test: '执行测试', mock: 'mock脚本', encryption: '加密脚本', decryption: '解密脚本'}
 
-      scriptTypeDict: {
-        test: '执行测试', mock: 'mock脚本', encryption: '加密脚本', decryption: '解密脚本'
-      },
-
-      // 拖拽排序参数
-      sortable: null,
-      oldList: [],
-      newList: [],
-      currentUserList: [],
-      userDict: {},
-      funcDebugData: '',
-      scripts: {
-        list: [],
-        total: 0
-      },
-      tableIsLoading: false
-    }
-  },
-
-  mounted() {
-    this.getUserList(this.getScriptList)
-
-    // 修改脚本成功，重新请求列表
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
-      if (_type === 'scriptInfo') {
-        this.getScriptList()
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  methods: {
-
-    // 双击单元格复制
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      if (typeof (data) === 'string') {
-        this.$copyText(data).then(
-          function(e) {
-            that.$message.success('复制成功')
-          }
-        )
-      }
-    },
-
-    // 获取用户信息，同步请求
-    async getUserList(func) {
-      const response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user.name
-      })
-      if (func) {
-        func()
-      }
-    },
-
-    // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId] || ' - '
-    },
-
-    getScriptList() {
-      this.tableIsLoading = true
-      scriptList(this.listQuery).then(response => {
-        this.tableIsLoading = false
-
-        this.scripts.list = response.data.data
-        this.scripts.total = response.data.total
-
-        this.oldList = this.scripts.list.map(v => v.id)
-        this.newList = this.oldList.slice()
-        this.$nextTick(() => {
-          this.setSort()
-        })
-      })
-    },
-
-    // 新增脚本
-    // showAddScriptDrawer() {
-    //   this.$bus.$emit(this.$busEvents.drawerIsShow, 'scriptInfo', 'add')
-    // },
-
-    // 复制脚本
-    copyFile(row) {
-      this.$set(row, 'copyPopoverIsShow', false)
-      copyScript({ id: row.id }).then(response => {
-        if (this.showMessage(this, response)) {
-          this.getScriptList()
-        }
-      })
-    },
-
-    sendEditEmit(_type, row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'scriptInfo', _type, row)
-    },
-
-    cancelCopyPopover(row) {
-      this.$set(row, 'copyPopoverIsShow', false)
-    },
-
-    cancelDeletePopover(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-    },
-
-    delScript(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'deleteLoadingIsShow', true)
-      deleteScript({ id: row.id }).then(response => {
-        this.$set(row, 'deleteLoadingIsShow', false)
-        if (this.showMessage(this, response)) {
-          this.getScriptList()
-        }
-      })
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.scriptTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.scripts.list.splice(evt.oldIndex, 1)[0]
-          this.scripts.list.splice(evt.newIndex, 0, targetRow)
-
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableIsLoading = true
-          scriptSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size }).then(response => {
-            this.showMessage(this, response)
-            this.getScriptList()
-            this.tableIsLoading = false
-          })
-        }
-      })
-    }
-
-  }
-
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
 }
+
+const cellDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+const showEditDrawer = (command: string, row: object | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'script', command: command, content: row})
+}
+
+const deleteData = (row: object) => {
+  DeleteScript({ 'id': row.id }).then(response => {
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const setSort = () => {
+  let tbody = document.querySelector(".el-table__body-wrapper tbody");
+  Sortable.create(tbody, {
+    group: { // 相同的组之间可以相互拖拽
+      name: "table",
+      pull: true,
+      put: true,
+    },
+    animation: 150, // ms, number 单位：ms，定义排序动画的时间
+    onEnd(e: any) {
+      // 结束拖拽
+      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
+      tableDataList.value.splice(e.newIndex, 0, targetRow)
+      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
+      newIdList.value.splice(e.newIndex, 0, tempIndex)
+      sortTable()
+    },
+  });
+}
+
+const getTableDataList = () => {
+  queryItems.value.script_type = queryItems.value.script_type ? queryItems.value.script_type : undefined
+  queryItems.value.file_name = queryItems.value.file_name ? queryItems.value.file_name : undefined
+  queryItems.value.create_user = queryItems.value.create_user ? queryItems.value.create_user : undefined
+  tableIsLoading.value = true
+  GetScriptList(queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+
+    oldIdList.value = tableDataList.value.map(item => item.id)
+    newIdList.value = oldIdList.value.slice()
+  })
+}
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ScriptSort({
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
+    response.data.data.forEach((user: { id: string | number; name: any; }) => {
+      userDict.value[user.id] = user.name
+    })
+  })
+}
+
+onMounted(() => {
+  getUserList()
+  getTableDataList()
+  setSort()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'script') {
+    getTableDataList()
+  }
+}
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

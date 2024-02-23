@@ -1,559 +1,371 @@
 <template>
-  <div class="app-container">
-    <!-- 搜索、添加栏 -->
-    <div class="filter-container">
+  <div class="layout-container">
 
-      <!-- inline="true"，el-form-item不自动换行 -->
-      <el-form label-width="60px" :inline="true">
+    <div class="layout-container-form flex space-between">
+      <div class="layout-container-form-handle">
+        <el-button type="primary" @click="showEditDrawer(undefined, 'project')"> 添加 </el-button>
+      </div>
 
-        <el-form-item :label="`${titleType}`" size="mini">
-          <el-input
-            v-model="listQuery.name"
-            class="input-with-select"
-            :placeholder="`${titleType}名，支持关键字查询`"
-            size="mini"
+      <div class="layout-container-form-search">
+        <el-input
+            v-model="queryItems.name"
+            :placeholder="`${testType === 'api' ? '服务' : testType === 'ui' ? '项目' : 'app'}名，支持关键字查询`"
+            size="small"
             clearable
-            style="width: 200px"
-          />
-        </el-form-item>
+            style="width: 200px; margin-right: 10px"
+        />
 
-        <el-form-item label="业务线" size="mini">
-          <el-select
-            v-model="listQuery.business_id"
-            :placeholder="'选择业务线'"
+        <el-select
+            v-model="queryItems.business_id"
+            placeholder="选择业务线"
             filterable
             default-first-option
             clearable
-            size="mini"
-            class="filter-item"
+            size="small"
             @clear="clearBusinessId"
-          >
-            <el-option
-              v-for="business in $busEvents.data.businessList"
+            style="width: 200px; margin-right: 10px"
+        >
+          <el-option
+              v-for="business in businessList"
               :key="business.id"
               :label="business.name"
               :value="business.id"
-            />
-          </el-select>
-        </el-form-item>
+          />
+        </el-select>
 
-        <el-form-item label="负责人" size="mini">
-          <el-select
-            v-model="listQuery.manager"
+        <el-select
+            v-model="queryItems.manager"
             :placeholder="'选择负责人'"
             filterable
             default-first-option
             clearable
-            size="mini"
-            class="filter-item"
-          >
-            <el-option v-for="user in currentUserList" :key="user.name" :label="user.name" :value="user.id" />
-          </el-select>
-        </el-form-item>
-
-        <el-button
-          v-waves
-          type="primary"
-          size="mini"
-          @click="handleFilter"
+            style="width: 200px; margin-right: 10px"
+            size="small"
         >
-          {{ '搜索' }}
-        </el-button>
+          <el-option v-for="user in userList" :key="user.name" :label="user.name" :value="user.id" />
+        </el-select>
 
-        <el-button
-          type="primary"
-          size="mini"
-          @click="addProject"
-        >
-          {{ '添加' }}
-        </el-button>
-
-        <el-button
-          type="primary"
-          size="mini"
-          @click="handleInitListQuery"
-        >
-          {{ '重置' }}
-        </el-button>
-
-        <!--        <el-tooltip-->
-        <!--          class="item"-->
-        <!--          effect="dark"-->
-        <!--          content="从yapi拉取项目列表"-->
-        <!--          placement="top-start"-->
-        <!--        >-->
-        <!--          <el-button-->
-        <!--            v-show="dataType === 'api'"-->
-        <!--            disabled-->
-        <!--            type="primary"-->
-        <!--            size="mini"-->
-        <!--            :loading="pullYapiProjectIsLoading"-->
-        <!--            @click="pullYapiProject"-->
-        <!--          >-->
-        <!--            {{ '从yapi拉取' }}-->
-        <!--          </el-button>-->
-        <!--        </el-tooltip>-->
-      </el-form>
+        <el-button type="primary" @click="getTableDataList"> 搜索</el-button>
+      </div>
     </div>
 
-    <!-- 表格栏 -->
-    <el-table
-      ref="projectTable"
-      v-loading="tableIsLoading"
-      size="mini"
-      element-loading-text="数据获取中"
-      element-loading-spinner="el-icon-loading"
-      :data="project_list"
-      row-key="id"
-      stripe
-      style="width: 100%;"
-      @cell-dblclick="cellDblclick"
-    >
-      <el-table-column prop="num" label="序号" align="center" min-width="8%">
-        <template slot-scope="scope">
-          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+    <div style="margin: 10px">
+      <el-table
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          stripe
+          :height="tableHeight"
+          @row-dblclick="rowDblclick"
+          row-key="id">
 
-      <el-table-column show-overflow-tooltip prop="name" align="center" :label="`${titleType}名称`" min-width="20%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.name }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column prop="id" label="序号" align="center" min-width="8%">
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column
-        v-if="dataType === 'api'"
-        show-overflow-tooltip
-        align="center"
-        label="swagger"
-        prop="swagger"
-        min-width="35%"
-      >
-        <template slot-scope="scope">
-          <div v-if="scope.row.swagger">
-            <span>{{ scope.row.swagger }}</span>
-          </div>
-          <div v-else>
-            <el-tag type="warning">未设置</el-tag>
-          </div>
-        </template>
-      </el-table-column>
+        <el-table-column
+            show-overflow-tooltip
+            prop="name"
+            align="center"
+            :label="`${testType === 'api' ? '服务' : testType === 'ui' ? '项目' : 'app'}名称`"
+            min-width="20%">
+          <template #default="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column
-        v-if="dataType === 'api'"
-        show-overflow-tooltip
-        align="center"
-        label="拉取状态"
-        min-width="10%"
-      >
-        <template slot-scope="scope">
-          <el-tooltip
-            v-if="scope.row.last_pull_status !== 1"
-            content="点击查看详情"
-            class="item"
-            effect="dark"
-            placement="top-start"
-          >
-            <el-tag
-              :type="pullStatusTagType[scope.row.last_pull_status]"
-              @click="getSwaggerPullLog(scope.row)"
-            >
-              {{ pullStatusContent[scope.row.last_pull_status] }}
-            </el-tag>
-          </el-tooltip>
-
-          <el-tag
-            v-else
-            :type="pullStatusTagType[scope.row.last_pull_status]"
-            @click="getSwaggerPullLog(scope.row)"
-          >
-            {{ pullStatusContent[scope.row.last_pull_status] }}
-          </el-tag>
-
-        </template>
-      </el-table-column>
-
-      <el-table-column show-overflow-tooltip align="center" label="业务线" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ $busEvents.data.businessDict[scope.row.business_id] }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column show-overflow-tooltip align="center" label="负责人" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.manager) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column v-if="dataType === 'appUi'" show-overflow-tooltip align="center" label="app_package" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.app_package }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column show-overflow-tooltip align="center" label="最后修改" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.update_user) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="'操作'" align="center" min-width="20%" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-
-          <!-- 从yapi拉取此服务下的模块、接口信息 -->
-          <el-button
-            v-show="row.yapi_id || row.swagger"
-            slot="reference"
-            type="text"
-            size="mini"
-            @click="clickPullButton(row)"
-          >拉取
-          </el-button>
-
-          <!-- 编辑服务 -->
-          <el-button
-            type="text"
-            size="mini"
-            @click="showEditForm(row)"
-          >修改
-          </el-button>
-
-          <!-- 编辑服务环境 -->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 10px"
-            @click="showEditEnvForm(row)"
-          >环境
-          </el-button>
-
-          <!--删除服务-->
-          <el-popover
-            :ref="row.id"
-            v-model="row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delProject(row)">确定</el-button>
+        <el-table-column
+            v-if="testType === 'api'"
+            show-overflow-tooltip
+            align="center"
+            label="swagger"
+            prop="swagger"
+            min-width="35%"
+        >
+          <template #default="scope">
+            <div v-if="scope.row.swagger">
+              <span>{{ scope.row.swagger }}</span>
             </div>
-            <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-            >删除
-            </el-button>
-          </el-popover>
+            <div v-else>
+              <el-tag type="warning">未设置</el-tag>
+            </div>
+          </template>
+        </el-table-column>
 
-        </template>
-      </el-table-column>
+        <el-table-column
+            v-if="testType === 'api'"
+            show-overflow-tooltip
+            align="center"
+            label="拉取状态"
+            min-width="10%"
+        >
+          <template #default="scope">
+            <el-tooltip
+                v-if="scope.row.last_pull_status !== 1"
+                content="点击查看详情"
+                class="item"
+                effect="dark"
+                placement="top-start"
+            >
+              <el-tag
+                  :type="swaggerPullStatusMappingTagType[scope.row.last_pull_status]"
+                  @click="showSwaggerPullLog(scope.row)"
+              >
+                {{ swaggerPullStatusMappingContent[scope.row.last_pull_status] }}
+              </el-tag>
+            </el-tooltip>
 
-    </el-table>
+            <el-tag
+                v-else
+                :type="swaggerPullStatusMappingTagType[scope.row.last_pull_status]"
+                @click="showSwaggerPullLog(scope.row)"
+            >
+              {{ swaggerPullStatusMappingContent[scope.row.last_pull_status] }}
+            </el-tag>
 
-    <!-- 分页 -->
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page_num"
-      :limit.sync="listQuery.page_size"
-      @pagination="getProjectList"
-    />
+          </template>
+        </el-table-column>
 
-    <!-- 接口拉取参数选择 -->
-    <pullDrawerView />
+        <el-table-column show-overflow-tooltip prop="business_id" align="center" label="业务线" min-width="10%">
+          <template #default="scope">
+            <span> {{ businessDict[scope.row.business_id] }} </span>
+          </template>
+        </el-table-column>
 
-    <!-- 服务信息抽屉 -->
-    <projectDrawer
-      :data-type="dataType"
-      :current-project="currentProject"
-      :current-user-list="currentUserList"
-    />
+        <el-table-column show-overflow-tooltip prop="manager" align="center" label="负责人" min-width="10%">
+          <template #default="scope">
+            <span> {{ userDict[scope.row.manager] }} </span>
+          </template>
+        </el-table-column>
 
-    <!-- 服务环境抽屉 -->
-    <projectEnvDrawer
-      :data-type="dataType"
-    />
+        <el-table-column v-if="testType === 'app'" show-overflow-tooltip align="center" label="app_package" min-width="15%">
+          <template #default="scope">
+            <span>{{ scope.row.app_package }}</span>
+          </template>
+        </el-table-column>
 
-    <!-- swagger拉取记录 -->
-    <showSwaggerPullLog />
+        <el-table-column show-overflow-tooltip prop="update_user" align="center" label="最后修改" min-width="10%">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.update_user] }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="20%">
+          <template #default="scope">
+            <el-button v-show="scope.row.swagger" style="margin: 0; padding: 2px" type="text" size="small" @click.native="showPullSwaggerDrawer(scope.row)">拉取</el-button>
+            <el-button style="margin: 0; padding: 2px" type="text" size="small" @click.native="showEditDrawer(scope.row, 'project')">修改</el-button>
+            <el-button style="margin: 0; padding: 2px" type="text" size="small" @click.native="showEditDrawer(scope.row, 'env')">环境</el-button>
+            <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row.id)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+    </div>
+
+    <EditProjectDrawer
+        :test-type="testType"
+        :user-list="userList"
+        :business-list="businessList"
+    ></EditProjectDrawer>
+
+    <EditEnvDrawer :test-type="testType"></EditEnvDrawer>
+
+    <selectPullOptionDialog></selectPullOptionDialog>
+    <showSwaggerPullLogDrawer :user-dict="userDict"></showSwaggerPullLogDrawer>
   </div>
 </template>
 
-<script>
-import {
-  deleteProject as apiDeleteProject,
-  projectList as apiProjectList,
-  projectSort as apiProjectSort
-} from '@/apis/apiTest/project'
-import {
-  deleteProject as webUiDeleteProject,
-  projectList as webUiProjectList,
-  projectSort as webUiProjectSort
-} from '@/apis/webUiTest/project'
-import {
-  deleteProject as appUiDeleteProject,
-  projectList as appUiProjectList,
-  projectSort as appUiProjectSort
-} from '@/apis/appUiTest/project'
-import { yapiPullProject } from '@/apis/assist/yapi'
-import { userList } from '@/apis/system/user'
-import Sortable from 'sortablejs'
-import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination/index.vue'
-import projectDrawer from '@/components/business/project/drawer.vue'
-import pullDrawerView from '@/components/business/project/selectPullOptionsDrawer.vue'
-import projectEnvDrawer from '@/components/business/project/envEditor.vue'
-import showSwaggerPullLog from '@/components/business/project/showSwaggerPullLog.vue'
-import { getConfigByCode } from '@/apis/config/config'
-import { businessList } from '@/apis/config/business'
-import { swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType } from '@/utils/mapping'
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount, computed, watch} from "vue";
+import Sortable from "sortablejs"
+import Pagination from '@/components/pagination.vue'
+import EditProjectDrawer from './edit-project-drawer.vue'
+import EditEnvDrawer from './edit-env-drawer.vue'
+import selectPullOptionDialog from './select-pull-option-dialog.vue'
+import showSwaggerPullLogDrawer from './show-swagger-pull-log.vue'
 
-export default {
-  name: 'Project',
-  components: {
-    Pagination,
-    projectDrawer,
-    pullDrawerView,
-    projectEnvDrawer,
-    showSwaggerPullLog
-  },
-  directives: { waves },
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['dataType'],
-  data() {
-    return {
-      titleType: this.dataType === 'api' ? '服务' : this.dataType === 'webUi' ? '项目' : 'APP',
-      // 查询对象
-      listQuery: {
-        detail: true,
-        page_num: 1,
-        page_size: 20,
-        name: undefined, // 服务名
-        manager: undefined, // 负责人
-        business_id: undefined, // 业务线
-        create_user: undefined // 创建人
-      },
-      currentProject: {}, // 当前选中的服务
-      project_list: [], // 服务列表
-      total: 0, // 服务数据表格总条数
-      tableIsLoading: false, // 请求加载状态
-      pullYapiProjectIsLoading: false,
-      currentUserList: [],
-      userDict: {},
-      sortable: null,
-      oldList: [],
-      newList: [],
-      pullStatusContent: swaggerPullStatusMappingContent,
-      pullStatusTagType: swaggerPullStatusMappingTagType,
-      deleteProjectUrl: '',
-      projectListUrl: '',
-      projectSortUrl: ''
-    }
-  },
+import {GetUserList} from "@/api/system/user";
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage} from "element-plus";
+import toClipboard from "@/utils/copy-to-memory";
+import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "@/components/business/mapping";
+import {GetBusinessList} from "@/api/config/business";
+import {ChangeProjectSort, DeleteProject, GetProjectList} from "@/api/business-api/project";
 
-  created() {
-    if (this.dataType === 'api') {
-      this.deleteProjectUrl = apiDeleteProject
-      this.projectListUrl = apiProjectList
-      this.projectSortUrl = apiProjectSort
-    } else if (this.dataType === 'webUi') {
-      this.deleteProjectUrl = webUiDeleteProject
-      this.projectListUrl = webUiProjectList
-      this.projectSortUrl = webUiProjectSort
-    } else {
-      this.deleteProjectUrl = appUiDeleteProject
-      this.projectListUrl = appUiProjectList
-      this.projectSortUrl = appUiProjectSort
-    }
-
-    this.getUserList(this.getProjectList) // 先获取用户数据
-  },
-  mounted() {
-    // 获取业务线
-    if (this.$busEvents.data.businessList.length < 1) {
-      businessList().then(response => {
-        this.$busEvents.data.businessList = response.data.data
-        this.$busEvents.data.businessDict = {}
-        this.$busEvents.data.businessList.forEach(business => {
-          this.$busEvents.data.businessDict[business.id] = business.name
-        })
-      })
-    }
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (['projectInfo', 'pullProjectData'].indexOf(_type) !== -1) {
-        this.getProjectList()
-      }
-    })
-
-    // 从后端获取数据类型映射
-    getConfigByCode({ code: 'data_type_mapping' }).then(response => {
-      this.$busEvents.data.dataTypeMappingList = response.data
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  methods: {
-    // 获取用户信息，同步请求
-    async getUserList(func) {
-      const response = await userList()
-      this.currentUserList = response.data.data
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-      if (func) {
-        func()
-      }
-    },
-
-    clearBusinessId() {
-      this.listQuery.business_id = undefined
-    },
-
-    // 解析用户
-    parseUser(userId) {
-      return this.userDict[userId].name
-    },
-
-    // 获取服务的拉取日志
-    getSwaggerPullLog(project) {
-      if (project.last_pull_status !== 1) {
-        this.$bus.$emit(this.$busEvents.drawerIsShow, 'showSwaggerPullLog', project, this.userDict)
-      }
-    },
-
-    // 编辑按钮
-    showEditForm(row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'projectInfo', 'edit', row)
-    },
-
-    // 编辑环境
-    showEditEnvForm(row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'env', row)
-    },
-
-    // 双击单元格复制
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      if (typeof (data) === 'string') {
-        this.$copyText(data).then(
-          function(e) {
-            that.$message.success('复制成功')
-          }
-        )
-      }
-    },
-
-    clickPullButton(row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'pullProjectData', row)
-    },
-
-    // 从yapi拉取服务列表
-    pullYapiProject(row) {
-      this.pullYapiProjectIsLoading = true
-      yapiPullProject({}).then(response => {
-        this.pullYapiProjectIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.getProjectList()
-        }
-      })
-    },
-
-    // 获取服务列表
-    getProjectList() {
-      this.tableIsLoading = true
-      this.projectListUrl(this.listQuery).then(response => {
-        this.tableIsLoading = false
-        this.project_list = response.data.data
-        this.total = response.data.total
-
-        this.oldList = this.project_list.map(v => v.id)
-        this.newList = this.oldList.slice()
-        this.$nextTick(() => {
-          this.setSort()
-        })
-      })
-    },
-
-    // 删除服务
-    delProject(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-      this.tableIsLoading = true
-      this.deleteProjectUrl({ 'id': row.id }).then(response => {
-        this.tableIsLoading = false
-        if (this.showMessage(this, response)) {
-          this.getProjectList() // 重新从后台获取服务列表
-        }
-      })
-    },
-
-    cancelDeletePopover(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-    },
-
-    // 触发查询
-    handleFilter() {
-      this.listQuery.page_num = 1
-      this.getProjectList()
-    },
-
-    // 点击添加服务
-    addProject() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'projectInfo', 'add')
-    },
-
-    // 初始化查询数据
-    handleInitListQuery() {
-      this.listQuery = {
-        page_num: 1,
-        page_size: 20,
-        projectId: '', // 服务id
-        manager: '', // 负责人
-        create_user: '' // 创建人
-      }
-      this.getProjectList()
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.projectTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.project_list.splice(evt.oldIndex, 1)[0]
-          this.project_list.splice(evt.newIndex, 0, targetRow)
-
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableIsLoading = true
-          this.projectSortUrl({
-            id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size
-          }).then(response => {
-            this.tableIsLoading = false
-            this.showMessage(this, response)
-            this.getProjectList()
-          })
-        }
-      })
-    }
+const props = defineProps({
+  testType: {
+    default: 'api',
+    type: String
   }
+})
+
+const tableIsLoading = ref(false)
+const businessList = ref([])
+const businessDict = ref({})
+const tableDataList = ref([])
+const oldIdList = ref([])
+const newIdList = ref([])
+const userList = ref([])
+const userDict = ref({})
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  name: undefined,
+  manager: undefined,
+  business_id: undefined,
+  create_user: undefined
+})
+const tableHeight = localStorage.getItem('tableHeight')
+
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+
+// 表格行拖拽
+const setSort = () => {
+  let tbody = document.querySelector(".el-table__body-wrapper tbody");
+  Sortable.create(tbody, {
+    group: { // 相同的组之间可以相互拖拽
+      name: "table",
+      pull: true,
+      put: true,
+    },
+    animation: 150, // ms, number 单位：ms，定义排序动画的时间
+    onEnd(e: any) {
+      // 结束拖拽
+      console.log("结束表格拖拽", e);
+      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
+      tableDataList.value.splice(e.newIndex, 0, targetRow)
+      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
+      newIdList.value.splice(e.newIndex, 0, tempIndex)
+      sortTable()
+    },
+  });
+}
+
+const clearBusinessId = () => {
 
 }
+
+const showSwaggerPullLog = (row: object) => {
+  console.log('row: ', row)
+  if (row.last_pull_status !== 1) {
+    console.log('show-swagger-pull-log')
+    bus.emit(busEvent.drawerIsShow, {eventType: 'show-swagger-pull-log', content: row})
+  }
+}
+
+const getBusinessList = () => {
+  GetBusinessList({page_num: 1, page_size: 99999}).then(response => {
+    businessList.value = response.data.data
+    businessList.value.forEach(business => {
+      businessDict.value[business.id] = business.name
+    })
+  })
+}
+
+const showEditDrawer = (row: object | undefined, type: string | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: type === 'project' ? 'project-editor' : 'project-env-editor', content: row});
+}
+const showPullSwaggerDrawer = (row: object | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'pull-from-swagger', content: row});
+}
+
+const getTableDataList = () => {
+  queryItems.value.manager = queryItems.value.manager ? queryItems.value.manager : undefined
+  queryItems.value.name = queryItems.value.name ? queryItems.value.name : undefined
+  queryItems.value.business_id = queryItems.value.business_id ? queryItems.value.business_id : undefined
+  queryItems.value.create_user = queryItems.value.create_user ? queryItems.value.create_user : undefined
+  tableIsLoading.value = true
+  GetProjectList(props.testType, queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+
+    oldIdList.value = tableDataList.value.map(item => item.id)
+    newIdList.value = oldIdList.value.slice()
+  })
+}
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ChangeProjectSort(props.testType, {
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const deleteData = (dataId: number) => {
+  DeleteProject(props.testType, {id: dataId}).then(response => {
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
+    userList.value.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
+}
+
+onMounted(() => {
+  getUserList()
+  getBusinessList()
+  getTableDataList()
+  setSort()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'project-editor') {
+    getTableDataList()
+  }
+}
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

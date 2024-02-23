@@ -1,219 +1,149 @@
 <template>
-  <div class="dashboard-editor-container">
-    <el-form label-width="80px" :inline="true">
+  <div class="layout-container">
 
-      <el-form-item :label="'业务线'" size="mini">
-        <el-select
-          v-model="query_form.business_id"
-          filterable
-          placeholder="业务线"
-          size="mini"
-        >
-          <el-option
-            v-for="business in $busEvents.data.businessList"
-            :key="business.id"
-            :label="business.name"
-            :value="business.id"
-          />
+    <div class="layout-container-form flex space-between">
+      <div class="layout-container-form-handle">
+        <el-select v-model="queryItems.business_id" filterable placeholder="选择业务线" size="small" style="margin-right: 10px">
+          <el-option v-for="item in businessList" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
-      </el-form-item>
 
-      <el-form-item :label="'触发方式'" size="mini">
-        <el-select
-          v-model="query_form.trigger_type"
-          filterable
-          placeholder="业务线"
-          size="mini"
-          clearable
-        >
-          <el-option
-            v-for="trigger_type in trigger_type_list"
-            :key="trigger_type.value"
-            :label="trigger_type.label"
-            :value="trigger_type.value"
-          />
+        <el-select v-model="queryItems.trigger_type" filterable placeholder="选择触发方式" size="small" clearable style="margin-right: 10px">
+          <el-option v-for="item in triggerTypeList" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
-      </el-form-item>
 
-      <el-form-item :label="'生成时间'" size="mini">
         <el-date-picker
-          v-model="time_list"
-          type="daterange"
-          align="right"
-          unlink-panels
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd"
-          :picker-options="pickerOptions"
+            style="margin-right: 10px"
+            v-model="timeList"
+            type="daterange"
+            unlink-panels
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :shortcuts="pickerOptions"
+            value-format="YYYY-MM-DD"
+            size="small"
         />
-      </el-form-item>
 
-      <el-button type="primary" size="mini" @click.native="get_analyse_chart()">查询</el-button>
-    </el-form>
+        <el-button type="primary" @click="getAnalyseChart()"> 查询</el-button>
+      </div>
+    </div>
 
-    <el-row style="margin-top: 10px">
+    <el-row style="margin-top: 20px;margin-left: 20px">
 
       <el-col :span="12">
-        <count_chart :key="analyse_chart_res.use_count.stat" :chart-data="analyse_chart_res.use_count.stat" />
+        <count-chart :key="analyseChartRes.use_count.stat" :chart-data="analyseChartRes.use_count.stat" />
         <div style="text-align: center; color: #409EFF">
-          报告总计{{ analyse_chart_res.use_count.detail.all_count }}条，执行通过{{ analyse_chart_res.use_count.detail.pass_count }}
-          条，执行失败{{ analyse_chart_res.use_count.detail.fail_count }}条，执行通过率
-          {{ ((analyse_chart_res.use_count.detail.pass_count / analyse_chart_res.use_count.detail.all_count) * 100).toFixed(3).toString() }}%
+          报告总计{{ analyseChartRes.use_count.detail.all_count }}条，执行通过{{ analyseChartRes.use_count.detail.pass_count }}
+          条，执行失败{{ analyseChartRes.use_count.detail.fail_count }}条，执行通过率
+          {{ ((analyseChartRes.use_count.detail.pass_count / analyseChartRes.use_count.detail.all_count) * 100).toFixed(3).toString() }}%
         </div>
       </el-col>
 
       <el-col :span="12">
-        <count_chart :key="analyse_chart_res.create.stat" :chart-data="analyse_chart_res.create.stat" />
-
+        <count-chart :key="analyseChartRes.create.stat" :chart-data="analyseChartRes.create.stat" />
       </el-col>
     </el-row>
+
 
   </div>
 </template>
 
-<script>
-import waves from '@/directive/waves'
-import { analyseChart } from '@/apis/apiTest/stat'
-import { businessList } from '@/apis/config/business'
-import count_chart from './count_chart.vue'
+<script setup lang="ts">
+import {onMounted, ref } from "vue";
+import countChart from './chart.vue'
+import {GetAnalyseChart} from "@/api/business-api/stat";
+import {GetBusinessList} from "@/api/config/business";
 
-export default {
-  name: 'Index',
-  components: { count_chart },
 
-  directives: { waves },
-  data() {
-    return {
-      pickerOptions: {
-        shortcuts: [{
-          text: '近7天',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', [start, end])
-          }
-        }, {
-          text: '近30天',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-            picker.$emit('pick', [start, end])
-          }
-        }, {
-          text: '近90天',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-            picker.$emit('pick', [start, end])
-          }
-        }]
-      },
-
-      trigger_type_list: [
-        { label: '页面', value: 'page' },
-        { label: '流水线', value: 'pipeline' },
-        { label: '定时任务', value: 'cron' }
-      ],
-
-      time_list: [],
-      query_form: {
-        business_id: '',
-        trigger_type: undefined,
-        start_time: '',
-        end_time: ''
-      },
-
-      analyse_chart_res: {
-        'use_count': {
-          'stat': {
-            'title': '执行次数统计',
-            'stat_list': [
-              { 'name': '通过数量', 'value': 0 },
-              { 'name': '不通过数量', 'value': 0 }
-            ]
-          },
-          'detail': { 'all_count': 0, 'pass_count': 0, 'fail_count': 0 }
-        },
-        'create': {
-          'stat': {
-            'title': '执行人员统计',
-            'stat_list': [{ 'name': '', 'value': 0 }]
-          }
-        }
-      }
-
-    }
+const queryItems = ref({
+  business_id: undefined,
+  trigger_type: undefined,
+  start_time: undefined,
+  end_time: undefined
+})
+const timeList = ref([])
+const triggerTypeList = ref([
+    { label: '页面', value: 'page' },
+    { label: '流水线', value: 'pipeline' },
+    { label: '定时任务', value: 'cron' }
+  ])
+const pickerOptions = [
+  {
+    text: '7天内',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+      return [start, end]
+    },
   },
-  computed: {},
-
-  watch: {},
-
-  mounted() {
-    // 获取业务线
-    if (this.$busEvents.data.businessList.length < 1) {
-      businessList().then(response => {
-        this.$busEvents.data.businessList = response.data.data
-        this.$busEvents.data.businessDict = {}
-        this.$busEvents.data.businessList.forEach(business => {
-          this.$busEvents.data.businessDict[business.id] = business.name
-        })
-        if (this.$busEvents.data.businessList.length > 0) {
-          this.query_form.business_id = this.$busEvents.data.businessList[0].id
-          this.get_analyse_chart()
-        }
-      })
-    } else {
-      this.query_form.business_id = this.$busEvents.data.businessList[0].id
-      this.get_analyse_chart()
-    }
+  {
+    text: '30天内',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+      return [start, end]
+    },
   },
-
-  methods: {
-
-    get_analyse_chart() {
-      if (this.time_list && this.time_list.length > 0) {
-        this.query_form.start_time = this.time_list[0]
-        this.query_form.end_time = this.time_list[1]
-      } else {
-        this.query_form.start_time = undefined
-        this.query_form.end_time = undefined
-      }
-      analyseChart(this.query_form).then(response => {
-        this.analyse_chart_res = response.data
-      })
+  {
+    text: '90天内',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+]
+const analyseChartRes = ref({
+  'use_count': {
+    'stat': {
+      'title': '执行次数统计',
+      'stat_list': [
+        { 'name': '通过数量', 'value': 0 },
+        { 'name': '不通过数量', 'value': 0 }
+      ]
+    },
+    'detail': { 'all_count': 0, 'pass_count': 0, 'fail_count': 0 }
+  },
+  'create': {
+    'stat': {
+      'title': '执行人员统计',
+      'stat_list': [{ 'name': '', 'value': 0 }]
     }
   }
-
+})
+const businessList = ref([])
+const getBusinessList = () => {
+  if (businessList.value.length < 1){
+    GetBusinessList({page_num: 1, page_size: 99999}).then(response => {
+      businessList.value = response.data.data
+      queryItems.value.business_id = businessList.value[0].id
+      getAnalyseChart()
+    })
+  }
 }
+
+const getAnalyseChart = () => {
+  if (timeList.value && timeList.value.length > 0) {
+    queryItems.value.start_time = timeList.value[0]
+    queryItems.value.end_time = timeList.value[1]
+  } else {
+    queryItems.value.start_time = undefined
+    queryItems.value.end_time = undefined
+  }
+  GetAnalyseChart(queryItems.value).then(response => {
+    analyseChartRes.value = response.data
+  })
+}
+
+onMounted(() => {
+  getBusinessList()
+})
+
 </script>
 
-<style lang="scss" scoped>
-.dashboard-editor-container {
-  padding: 32px;
-  background-color: rgb(240, 242, 245);
-  position: relative;
+<style scoped lang="scss">
 
-  .github-corner {
-    position: absolute;
-    top: 0;
-    border: 0;
-    right: 0;
-  }
-
-  .chart-wrapper {
-    background: #fff;
-    padding: 16px 16px 0;
-    margin-bottom: 32px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .chart-wrapper {
-    padding: 8px;
-  }
-}
 </style>

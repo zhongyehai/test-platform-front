@@ -1,219 +1,217 @@
 <template>
-  <div class="app-container">
+  <div class="layout-container">
 
-    <el-form label-width="120px">
-      <el-form-item :label="'选择文件类型：'" size="mini">
+    <div class="layout-container-form flex space-between">
+      <div class="layout-container-form-handle">
+        <el-button type="primary" @click="showUploadFileDialog"> 上传文件</el-button>
+      </div>
+
+      <div v-show="!isSelectStepFile" class="layout-container-form-search">
         <el-select
-          v-model="fileType"
-          placeholder="请选择文件类型"
-          size="mini"
-          filterable
-          default-first-option
-          @change="selectType"
+            style="margin-right: 10px"
+            v-model="queryItems.file_type"
+            placeholder="请选择文件类型"
+            size="small"
+            filterable
+            @change="changeFileType"
         >
-          <el-option
-            v-for="item in fileTypeList"
-            :key="item.key"
-            :label="item.value"
-            :value="item.key"
-          />
+          <el-option v-for="item in fileTypeList" :key="item.key" :label="item.value" :value="item.key"/>
         </el-select>
 
-        <el-tooltip class="item" effect="dark" content="可覆盖已存在的文件" placement="right-end" style="margin-left: 20px">
-          <el-button type="primary" size="mini" @click.native="openFileUploadDialog">上传文件</el-button>
-        </el-tooltip>
+        <el-button type="primary" @click="getTableDataList()"> 搜索</el-button>
+      </div>
+    </div>
 
-      </el-form-item>
-    </el-form>
+    <div style="margin: 10px">
+      <el-table
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          stripe
+          :height="tableHeight">
+        <el-table-column prop="id" label="序号" align="center" min-width="5%">
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-    <el-table
-      ref="apiTree"
-      v-loading="listLoading"
-      size="mini"
-      :data="fileList"
-      stripe
-    >
-      <el-table-column prop="id" label="编号" align="center" min-width="5%">
-        <template slot-scope="scope">
-          <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="文件名" prop="name" align="center" min-width="40%">
+          <template #default="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="name" align="center" label="文件名" min-width="40%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.name }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="文件大小" prop="size" align="center" min-width="10%">
+          <template #default="scope">
+            <span> {{ scope.row.size }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="size" align="center" label="文件大小" min-width="10%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.size }} 字节</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="最近一次使用时间" prop="lastVisitTime" align="center" min-width="15%">
+          <template #default="scope">
+            <span>{{ scope.row.lastVisitTime }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="lastVisitTime" label="最近一次使用时间" min-width="15%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.lastVisitTime }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="最后一次更新时间" prop="LastModifiedTime" align="center" min-width="15%">
+          <template #default="scope">
+            <span>{{ scope.row.LastModifiedTime }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="LastModifiedTime" label="最后一次更新时间" min-width="15%">
-        <template slot-scope="scope">
-          <span> {{ scope.row.LastModifiedTime }} </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="操作" align="center" min-width="10%">
-        <template slot-scope="scope">
-          <!-- 下载文件 -->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 10px"
-            :loading="scope.row.downloadLoadingIsShow"
-            @click.native="downloadFile(scope.row)"
-          >下载</el-button>
-
-          <!-- 删除文件 -->
-          <el-popover
-            :ref="scope.row.id"
-            v-model="scope.row.deletePopoverIsShow"
-            placement="top"
-            popper-class="down-popover"
-          >
-            <p>确定删除【{{ scope.row.name }}】?</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-              <el-button type="primary" size="mini" @click="delFile(scope.row)">确定</el-button>
-            </div>
+        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+          <template #default="scope">
             <el-button
-              slot="reference"
-              style="color: red"
-              type="text"
-              size="mini"
-              :loading="scope.row.deleteLoadingIsShow"
-            >删除</el-button>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
+                v-show="isSelectStepFile"
+                type="text"
+                size="small"
+                style="margin: 0; padding: 5px"
+                :loading="scope.row.downloadLoading"
+                @click.native="selectFile(scope.row.name)">选择</el-button>
 
-    <!-- 分页组件 -->
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="page_num"
-      :limit.sync="page_size"
-      @pagination="getFileList"
-    />
+            <el-button
+                v-show="!isSelectStepFile"
+                type="text"
+                size="small"
+                style="margin: 0; padding: 5px"
+                :loading="scope.row.downloadLoading"
+                @click.native="downloadFile(scope.row)">下载</el-button>
 
-    <uploadFileView />
+            <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+              <template #reference>
+                <el-button
+                    v-show="!isSelectStepFile"
+                    style="margin: 0; padding: 5px;color: red"
+                    :loading="scope.row.deleteLoading"
+                    type="text"
+                    size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
 
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+    </div>
+
+    <uploadFileDialog></uploadFileDialog>
   </div>
 </template>
 
-<script>
-import Pagination from '@/components/Pagination'
-import uploadFileView from '@/components/file/uploadFile'
-import { fileList, fileDelete, fileDownload } from '@/apis/assist/file'
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount} from "vue";
+import Pagination from '@/components/pagination.vue'
 
-export default {
-  name: 'Index',
-  components: { Pagination, uploadFileView },
-  data() {
-    return {
-      listLoading: false, // 加载状态
-      fileType: 'case', // 文件列类型
-      // 文件类型列表
-      fileTypeList: [
-        { 'key': 'case', 'value': '用例文件' },
-        { 'key': 'callBack', 'value': '回调文件' },
-        { 'key': 'temp', 'value': '临时文件' },
-        { 'key': 'driver', 'value': '浏览器驱动文件' }
-      ],
-      fileList: [], // 文件列表
-      total: 0,
-      page_num: 1,
-      page_size: 20
+import uploadFileDialog from '@/components/file/upload.vue'
+
+import {bus, busEvent} from "@/utils/bus-events";
+import {DeleteFile, DownloadFile, GetFileList} from "@/api/assist/file";
+
+const props = defineProps({
+  isSelectStepFile:{
+    default: false,
+    type: Boolean
+  }
+})
+
+const tableIsLoading = ref(false)
+const tableDataList = ref([])
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  file_type: 'case'
+})
+
+const fileTypeList = ref([
+  { 'key': 'case', 'value': '用例文件' },
+  { 'key': 'callBack', 'value': '回调文件' },
+  { 'key': 'temp', 'value': '临时文件' },
+  { 'key': 'driver', 'value': '浏览器驱动文件' }
+])
+
+const tableHeight = localStorage.getItem('tableHeight')
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+const showUploadFileDialog = () => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'uploadFile', content: queryItems.value.file_type});
+}
+
+const deleteData = (row) => {
+  row.deleteLoading = true
+  DeleteFile({file_name: row.name, file_type: queryItems.value.file_type}).then(response => {
+    row.deleteLoading = false
+    if (response){
+      getTableDataList()
     }
-  },
+  })
+}
 
-  mounted() {
-    // 监听文件上传提交事件
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type) => {
-      if (_type === 'uploadFile') {
-        this.getFileList()
-      }
+const downloadFile = (row) => {
+  row.downloadLoading = true
+  DownloadFile({ file_name: row.name, file_type: queryItems.value.file_type }).then(response => {
+    row.downloadLoading = false
+    const blob = new Blob([response], {
+      type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
     })
+    // 保存文件到本地
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob) // 生成一个url
+    a.download = row.name
+    a.click()
+  })
+}
 
-    this.getFileList()
-  },
+const selectFile = (fileName: string) => {
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'select-step-file', content: fileName});
+}
 
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
+const changeFileType = () => {
+  queryItems.value.page_num = 1
+  queryItems.value.page_size = 20
+  getTableDataList()
+}
+const getTableDataList = () => {
+  queryItems.value.file_type = queryItems.value.file_type ? queryItems.value.file_type : 'case'
+  tableIsLoading.value = true
+  GetFileList(queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+  })
+}
 
-  methods: {
+onMounted(() => {
+  getTableDataList()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
 
-    // 获取文件列表
-    getFileList() {
-      fileList({ page_num: this.page_num, page_size: this.page_size, file_type: this.fileType }).then(response => {
-        this.fileList = response.data.data
-        this.total = response.data.total
-      })
-    },
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
 
-    // 选中事件
-    selectType(value) {
-      this.page_num = 1
-      this.page_size = 20
-      this.getFileList()
-    },
-
-    // 下载文件
-    downloadFile(row) {
-      this.$set(row, 'downloadLoadingIsShow', true)
-      fileDownload({ file_name: row.name, file_type: this.fileType }).then(response => {
-        this.$set(row, 'downloadLoadingIsShow', false)
-        const blob = new Blob([response], {
-          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
-        })
-        // 保存文件到本地
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob) // 生成一个url
-        a.download = row.name
-        a.click()
-      })
-    },
-
-    cancelDeletePopover(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-    },
-
-    // 删除文件
-    delFile(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'deleteLoadingIsShow', true)
-      fileDelete({ file_name: row.name, file_type: this.fileType }).then(response => {
-        this.$set(row, 'deleteLoadingIsShow', false)
-        if (this.showMessage(this, response)) {
-          this.getFileList()
-        }
-      })
-    },
-
-    // 打开文件上传窗口
-    openFileUploadDialog() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'uploadFile', this.fileType)
-    }
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'uploadFile') {
+    getTableDataList()
   }
 }
+
 </script>
 
-<style>
+<style scoped lang="scss">
 
-.list {
-  max-height: 200px;
-}
 </style>

@@ -1,0 +1,237 @@
+<template>
+    <div>
+      <el-table
+          ref="serverTableRef"
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          :header-cell-style="{'text-align':'center'}"
+          stripe
+          row-key="id"
+          :height="tableHeight"
+          @row-dblclick="rowDblclick">
+
+        <el-table-column prop="id" label="序号" align="center" min-width="10%">
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="name" align="center" label="服务器名称" min-width="25%">
+          <template #default="scope">
+            <span> {{ scope.row.name }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="os" align="center" label="服务器系统类型" min-width="10%">
+          <template #default="scope">
+            <span> {{ scope.row.os }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="ip" align="center" label="服务器ip地址" min-width="15%">
+          <template #default="scope">
+            <span> {{ scope.row.ip }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="port" align="center" label="服务器端口" min-width="10%">
+          <template #default="scope">
+            <span> {{ scope.row.port }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="status" align="center" label="最近一次访问状态" min-width="15%">
+          <template #default="scope">
+            <el-tag size="small" :type="appiumServerRequestStatusMappingTagType[scope.row.status]">
+              {{ appiumServerRequestStatusMappingContent[scope.row.status] }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+          <template #default="scope">
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="runServer(scope.row)">访问</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">修改</el-button>
+            <el-popconfirm width="250px" title="复制此服务器并生成新的服务器?" @confirm="copyData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px" type="text" :loading="scope.row.copyIsLoading" size="small">复制</el-button>
+              </template>
+            </el-popconfirm>
+            <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+        <EditDrawer></EditDrawer>
+        <AddDrawer></AddDrawer>
+    </div>
+
+</template>
+
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import Pagination from '@/components/pagination.vue'
+import EditDrawer from './edit-drawer.vue'
+import AddDrawer from './add-drawer.vue'
+
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage} from "element-plus";
+import toClipboard from "@/utils/copy-to-memory";
+import Sortable from "sortablejs";
+import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/components/business/mapping";
+import {ChangeServerSort, CopyServer, DeleteServer, GetServerList, RunServer} from "@/api/business-api/device-server";
+import {GetConfigByCode} from "@/api/config/config-value";
+
+const serverTableRef = ref(null)
+const tableIsLoading = ref(false)
+const oldIdList = ref([])
+const newIdList = ref([])
+const tableDataList = ref([])
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true
+})
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.71}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
+
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+const deleteData = (row: { id: any; }) => {
+  DeleteServer({id: row.id}).then(response => {
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const showEditDrawer = (row: any) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-server', content: row})
+}
+
+const runServer = (row: { id: any; }) => {
+  tableIsLoading.value = true
+  RunServer({ 'id': row.id }).then(response => {
+    tableIsLoading.value = false
+    getTableDataList()
+  })
+}
+
+const copyData = (row: { copyIsLoading: boolean; id: any; }) => {
+  row.copyIsLoading = true
+  CopyServer({ 'id': row.id }).then(response => {
+    row.copyIsLoading = false
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const getTableDataList = () => {
+  tableIsLoading.value = true
+  GetServerList(queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+
+    oldIdList.value = tableDataList.value.map(item => item.id)
+    newIdList.value = oldIdList.value.slice()
+  })
+}
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ChangeServerSort({
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
+const setSort = () => {
+  let tbody = serverTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
+  Sortable.create(tbody, {
+    group: { // 相同的组之间可以相互拖拽
+      name: "table",
+      pull: true,
+      put: true,
+    },
+    animation: 150, // ms, number 单位：ms，定义排序动画的时间
+    onEnd(e: any) {
+      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
+      tableDataList.value.splice(e.newIndex, 0, targetRow)
+      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
+      newIdList.value.splice(e.newIndex, 0, tempIndex)
+      sortTable()
+    },
+  });
+}
+
+const getConfigByCode = () => {
+  if (busEvent.data.serverOsMapping.length < 1){
+    GetConfigByCode({ code: 'server_os_mapping' }).then(response => {
+      busEvent.data.serverOsMapping = response.data
+    })
+  }
+}
+
+onMounted(() => {
+  getTableDataList()
+  getConfigByCode()
+  setSort()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'server-editor') {
+    getTableDataList()
+  }
+}
+
+</script>
+
+<style scoped lang="scss">
+
+</style>

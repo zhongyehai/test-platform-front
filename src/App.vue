@@ -1,86 +1,71 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <el-config-provider :size="size">
+    <router-view></router-view>
+  </el-config-provider>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, computed } from 'vue'
+import { useStore } from 'vuex'
+export default defineComponent({
   name: 'App',
+  setup() {
+    const store = useStore()
+    const size = computed(() => store.state.app.elementSize)
 
-  // 解决因页面刷新，vuex中状态丢失的问题，刷新时将vuex的值保存在 localStorage , 刷新完成读取出来，
-
-  // 方案一：配合store.index.state的赋值
-  mounted() {
-    // 页面加载完毕时添加刷新页面的监听事件
-    // window.addEventListener('unload', this.saveState)
-    window.addEventListener('beforeunload', this.saveState)
-    window.addEventListener('load', ev => this.getPermissions())
-  },
-  methods: {
-    saveState() {
-      // 把this.$store.state保存到localStorage.state
-      localStorage.setItem('state', JSON.stringify(this.$store.state))
-      localStorage.setItem('permissions', JSON.stringify(this.$busEvents.data.permissions))
-    },
-
-    getPermissions() {
-      const permissions = localStorage.getItem('permissions')
-      this.$busEvents.data.permissions = permissions ? JSON.parse(permissions) : []
-
-      // 根据权限更新菜单，自动收缩一下侧边栏，展示效果，否则需要手动进行收缩才会展示
-      this.$store.dispatch('app/toggleSideBar') // 先收起/关闭
-      const that = this
-      setTimeout(function() {
-        that.$store.dispatch('app/toggleSideBar') // 等100毫秒再关闭/收起
-      }, 100)
+    // 统一设定表格的高度
+    const innerHeight = window.innerHeight
+    if (innerHeight < 800){  // 小屏
+      localStorage.setItem('tableHeight', `${innerHeight * 0.738}px`)
+      localStorage.setItem('treeHeight', `${innerHeight * 0.67}px`)
+    }else {  // 大屏
+      localStorage.setItem('tableHeight', `${innerHeight * 0.86}px`)
+      localStorage.setItem('treeHeight', `${innerHeight * 0.80}px`)
+    }
+    return {
+      size,
     }
   }
-
-  // 方案二：从监听事件解决，参考：https://www.cnblogs.com/attacking-cabbage/p/10846211.html
-  // created() {
-  //   // 刷新时将vuex的值保存在 localStorage ,刷新完成读取出来
-  //   let storeKey = 'state'
-  //   // 保存 vuex中的状态到 localStorage.state
-  //   window.addEventListener("beforeunload",()=>{
-  //     window.localStorage.setItem(storeKey, JSON.stringify(this.$store.state))
-  //   })
-  //    // 如果 localStorage.state 有值，则取出来赋给vuex.state
-  //   if (window.localStorage.getItem(storeKey) ) {
-  //     this.$store.replaceState(Object.assign({}, this.$store.state,JSON.parse(window.localStorage.getItem(storeKey))))
-  //   }
-  // }
-}
+})
 </script>
 
 <style>
-
-/*抽屉body*/
-.el-drawer__body {
-  overflow-y: scroll;
-  margin-bottom: 50px;
-}
-
-/*抽屉footer固定到底部*/
-.demo-drawer__footer {
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  //text-align: center;
+  color: #2c3e50;
   width: 100%;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  border-top: 1px solid #e8e8e8;
-  padding: 10px 16px;
-  text-align: right;
-  background-color: white;
+  height: 100vh;
 }
 
-/* el-popconfirm - title 换行*/
-.el-popconfirm__main {
-  white-space: pre-line;
-  margin: -14px 0 4px;
+.app-container {
+  padding: 5px;
 }
 
-.el-popconfirm__main > i {
-  margin-top: 22px;
-  margin-bottom: auto;
+.table-query-form {
+  margin-top: 5px;
+
+  .form-item {
+    display: flex;
+    align-items: center;
+  }
 }
+
+/*
+dialog上下左右在视口居中、内容高度过高过开启dialog内滚动（dialog最高100vh）
+*/
+.el-dialog {
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  //overflow-y: scroll !important;
+  max-height: 100vh !important;
+}
+
 </style>

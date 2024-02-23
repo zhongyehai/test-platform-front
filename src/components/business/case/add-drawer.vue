@@ -1,0 +1,187 @@
+<template>
+  <div>
+    <el-drawer v-model="drawerIsShow" title="新增用例" size="95%">
+
+      <el-table ref="dataTable" :data="formData.case_list" stripe size="small" row-key="id">
+
+        <el-table-column label="序号" header-align="center" min-width="4%">
+          <template #default="scope">
+            <div>{{ scope.$index + 1 }}</div>
+          </template>
+        </el-table-column>
+
+        <el-table-column header-align="center" min-width="20%">
+          <template #header>
+            <span><span style="color: red">*</span>用例名字</span>
+          </template>
+          <template #default="scope">
+            <el-input v-model="scope.row.name" size="small" type="textarea" :rows="1" />
+          </template>
+        </el-table-column>
+
+        <el-table-column header-align="center" min-width="30%">
+          <template #header>
+            <span><span style="color: red">*</span>用例描述</span>
+          </template>
+          <template #default="scope">
+            <el-input v-model="scope.row.desc" size="small" type="textarea" :rows="1" />
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right"  align="center" label="操作" min-width="8%">
+          <template #default="scope">
+            <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
+              <el-button
+                  v-show="scope.$index === 0 || scope.$index === formData.case_list.length - 1"
+                  type="text"
+                  size="small"
+                  style="margin: 0; padding: 0"
+                  @click.native="addRow"
+              ><i class="iconfont icon-testadd"></i></el-button>
+            </el-tooltip>
+
+            <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
+              <el-button
+                  v-show="isShowDelButton(scope.$index)"
+                  type="text"
+                  size="small"
+                  style="color: red;margin: 0; padding: 0"
+                  @click.native="delRow(scope.$index)"
+              ><i class="iconfont icon-testreduce"></i></el-button>
+            </el-tooltip>
+
+            <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
+              <el-button
+                  v-show="formData.case_list.length === 1"
+                  type="text"
+                  size="small"
+                  style="color: red;margin: 0; padding: 0"
+                  @click.native="clearData()"
+              ><i class="iconfont icon-testdelete1"></i></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+
+      </el-table>
+
+      <template #footer>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="small" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
+          <el-button
+              type="primary"
+              size="small"
+              :loading="submitButtonIsLoading"
+              @click="addData"
+          >保存</el-button>
+        </div>
+      </template>
+
+    </el-drawer>
+  </div>
+</template>
+
+<script lang="ts" setup>
+
+import {onBeforeUnmount, onMounted, ref} from "vue";
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage} from "element-plus";
+import {PostCase} from "@/api/business-api/case";
+
+const props = defineProps({
+  testType: {
+    default: '',
+    type: String
+  }
+})
+
+onMounted(() => {
+  bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+})
+
+const onShowDrawerEvent = (message: any) => {
+  if (message.eventType === 'add-case') {
+    resetForm()
+    formData.value.suite_id = message.suite_id
+    drawerIsShow.value = true
+  }
+}
+
+
+
+const drawerIsShow = ref(false)
+const submitButtonIsLoading = ref(false)
+const ruleFormRef = ref(null)
+const formData = ref({
+  suite_id: undefined,
+  case_list: [{id: `${Date.now()}`, name: null, desc: null}]
+})
+const formRules = {}
+const resetForm = () => {
+  formData.value = {
+    suite_id: undefined,
+    case_list: [{id: `${Date.now()}`, name: null, desc: null}]
+  }
+  ruleFormRef.value && ruleFormRef.value.resetFields();
+}
+
+const sendEvent = () => {
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'case-editor'});
+}
+
+const getNewData = () => {
+  return { id: `${Date.now()}`, name: null, desc: null }
+}
+
+const addRow = () => {
+  formData.value.case_list.push(getNewData())
+}
+const isShowDelButton = (index: number) => {
+  return !(formData.value.case_list.length === 1 && index === 0)
+}
+
+// 删除一行
+const delRow = (index: number) => {
+  formData.value.case_list.splice(index, 1)
+}
+
+const clearData = () => {
+  formData.value.case_list[0] = getNewData()
+}
+
+const validateDataList = () => {
+  if (formData.value.case_list.length < 1){
+    ElMessage.warning('请填写用例信息')
+    throw new Error('请填写用例信息')
+  }
+  formData.value.case_list.forEach((item, index) => {
+    if (!item.name|| !item.desc){
+      ElMessage.warning(`第 ${index + 1} 行, 请完善数据`)
+      throw new Error(`第 ${index + 1} 行, 请完善数据`);
+    }
+  })
+}
+
+
+const addData = () => {
+  validateDataList()
+  submitButtonIsLoading.value = true
+  PostCase(props.testType, formData.value).then(response => {
+    submitButtonIsLoading.value = false
+    if (response) {
+      sendEvent()
+      drawerIsShow.value = false
+    }
+  })
+}
+
+
+</script>
+
+
+<style scoped lang="scss">
+
+</style>

@@ -1,482 +1,390 @@
 <template>
-  <div class="app-container">
-    <el-row>
+  <div class="layout-container">
+    <div>
+      <el-row>
+        <el-col :xs="4" :sm="3" :md="4" :lg="5" :xl="5" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+          <el-tabs v-model="projectTab" style="margin-left: 10px">
+            <el-tab-pane name="project">
+              <template #label>
+                <span> {{ `${testType === 'api' ? '服务' : testType === 'ui' ? '项目' : 'app'}列表` }} </span>
+              </template>
+              <el-input v-model="filterText" placeholder="输入关键字进行过滤"/>
+              <el-scrollbar :style="{height: treeHeight}">
+                <el-tree
+                    ref="projectTreeRef"
+                    :data="projectDataList"
+                    :props="defaultProps"
+                    :filter-node-method="filterNode"
+                    node-key="id"
+                    @node-click="clickTree"
+                >
+                  <template #default="{ node, data }">
+                    <div class="custom-tree-node">
+                      <span>{{ node.label }}</span>
+                    </div>
+                  </template>
+                </el-tree>
+              </el-scrollbar>
+            </el-tab-pane>
+          </el-tabs>
+        </el-col>
 
-      <!-- 服务树 -->
-      <el-col style="width: 15%; border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
-        <!-- 服务列表树组件 -->
-        <projectTreeView
-          ref="projectTree"
-          :data-type="dataType"
-          :label-width="5"
-        />
-        <!--        :menu-name="'添加任务'"-->
-      </el-col>
+        <el-col :xs="20" :sm="21" :md="20" :lg="19" :xl="19">
+          <div style="margin-left: 5px">
+            <el-tabs v-model="taskTab">
+              <el-tab-pane name="task">
+                <template #label>
+                  <span> 任务列表 </span>
+                  <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="添加任务">
+                    <template #reference>
+                      <el-button
+                          v-show="queryItems.project_id"
+                          type="text"
+                          style="margin-left: 10px"
+                          @click="showEditDrawer(undefined)"
+                      ><i style="color: #409EFF" class="iconfont icon-testadd"/></el-button>
+                    </template>
+                  </el-popover>
+                </template>
 
-      <!-- 定时任务 -->
-      <el-col style="width: 85%">
-        <!-- 定时任务列表 -->
-        <el-tabs v-model="taskTab" class="table_padding" style="margin-left: 5px">
-          <!--          <el-tab-pane label="定时任务列表" :name="taskTab">-->
-          <el-tab-pane name="taskTab">
-            <template slot="label">
-              <span> 定时任务列表 </span>
-              <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                <div>点击添加定时任务</div>
-                <el-button
-                  v-show="projectId"
-                  slot="reference"
-                  type="text"
-                  style="margin-left: 10px"
-                  icon="el-icon-plus"
-                  @click="showAddTaskDrawer()"
+                <el-table
+                    v-loading="tableIsLoading"
+                    element-loading-text="正在获取数据"
+                    element-loading-spinner="el-icon-loading"
+                    :data="tableDataList"
+                    stripe
+                    :height="tableHeight"
+                    @row-dblclick="rowDblclick">
+
+                  <el-table-column prop="id" label="序号" align="center" min-width="7%">
+                    <template #default="scope">
+                      <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column show-overflow-tooltip prop="name" align="center" label="任务名称" min-width="25%">
+                    <template #default="scope">
+                      <span> {{ scope.row.name }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column show-overflow-tooltip prop="cron" label="cron表达式" align="center" min-width="30%">
+                    <template #default="scope">
+                      <span> {{ scope.row.cron }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column show-overflow-tooltip prop="skip_holiday" label="节假日/调休日" align="center"
+                                   min-width="15%">
+                    <template #default="scope">
+                      <span> {{ scope.row.skip_holiday === 1 ? "跳过" : "不跳过" }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column prop="merge_notify" label="合并通知" align="center" min-width="15%">
+                    <template #header>
+                      <span>合并通知</span>
+                      <el-tooltip class="item" effect="dark" placement="top-start">
+                        <template #content>
+                          <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
+                          <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
+                          <div>注：当选择了多个环境时，才会出现此选项</div>
+                        </template>
+                        <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                      </el-tooltip>
+                    </template>
+                    <template #default="scope">
+                      <span> {{ scope.row.merge_notify === 1 ? "合并" : "不合并" }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column prop="status" align="center" min-width="15%">
+                    <template #header>
+                      <span>是否启用</span>
+                      <el-tooltip class="item" effect="dark" placement="top-start">
+                        <template #content>
+                          <div>1: 启用中的任务才会定时执行</div>
+                          <div>2: 禁用中的任务才支持修改</div>
+                        </template>
+                        <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                      </el-tooltip>
+                    </template>
+                    <template #default="scope">
+                      <el-switch
+                          v-model="scope.row.status"
+                          :inactive-value="0"
+                          :active-value="1"
+                          @change="changeStatus(scope.row)"
+                      />
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作"
+                                   min-width="20%">
+                    <template #default="scope">
+                      <el-button
+                          style="margin: 0; padding: 2px"
+                          type="text"
+                          size="small"
+                          @click.native="clickRun(scope.row)">运行
+                      </el-button>
+
+<!--                      :disabled="scope.row.status === 1"-->
+                      <el-button
+                          style="margin: 0; padding: 2px"
+                          type="text"
+                          size="small"
+                          @click.native="showEditDrawer(scope.row)">修改
+                      </el-button>
+
+                      <el-popconfirm width="250px" title="复制此任务并生成新的任务?" @confirm="copyData(scope.row)">
+                        <template #reference>
+                          <el-button style="margin: 0; padding: 2px" type="text" size="small">复制</el-button>
+                        </template>
+                      </el-popconfirm>
+
+                      <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
+                        <template #reference>
+<!--                          :disabled="scope.row.status === 1"-->
+                          <el-button
+                              :loading="scope.row.isLoading"
+                              style="margin: 0; padding: 2px;color: red"
+                              type="text"
+                              size="small"
+                          >删除
+                          </el-button>
+                        </template>
+                      </el-popconfirm>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <pagination
+                    v-show="tableDataTotal > 0"
+                    :pageNum="queryItems.page_num"
+                    :pageSize="queryItems.page_size"
+                    :total="tableDataTotal"
+                    @pageFunc="changePagination"
                 />
-              </el-popover>
-            </template>
+              </el-tab-pane>
+            </el-tabs>
 
-            <el-table
-              ref="taskTable"
-              v-loading="tableLoadingIsShow"
-              size="mini"
-              element-loading-text="正在获取数据..."
-              element-loading-spinner="el-icon-loading"
-              :data="taskList"
-              row-key="id"
-              stripe
-              @cell-dblclick="cellDblclick"
-            >
-              <el-table-column prop="num" label="序号" align="center" min-width="7%">
-                <template slot-scope="scope">
-                  <span> {{ (page_num - 1) * page_size + scope.$index + 1 }} </span>
-                </template>
-              </el-table-column>
-
-              <el-table-column show-overflow-tooltip prop="name" align="center" label="任务名称" min-width="25%">
-                <template slot-scope="scope">
-                  <span> {{ scope.row.name }} </span>
-                </template>
-              </el-table-column>
-
-              <el-table-column prop="cron" label="cron表达式" align="center" min-width="35%">
-                <template slot-scope="scope">
-                  <span> {{ scope.row.cron }} </span>
-                </template>
-              </el-table-column>
-
-              <el-table-column prop="cron" label="节假日/调休日" align="center" min-width="15%">
-                <template slot-scope="scope">
-                  <span> {{ scope.row.skip_holiday === 1 ? "跳过": "不跳过" }} </span>
-                </template>
-              </el-table-column>
-
-              <el-table-column prop="cron" label="合并通知" align="center" min-width="10%">
-                <template slot="header">
-                  <span>合并通知</span>
-                  <el-tooltip class="item" effect="dark" placement="top-start">
-                    <div slot="content">
-                      <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
-                      <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
-                      <div>注：当选择了多个环境时，才会出现此选项</div>
-                    </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
-                  </el-tooltip>
-                </template>
-                <template slot-scope="scope">
-                  <span> {{ scope.row.merge_notify === 1 ? "合并": "不合并" }} </span>
-                </template>
-              </el-table-column>
-
-              <el-table-column align="center" min-width="15%">
-                <template slot="header">
-                  <span>是否启用</span>
-                  <el-tooltip class="item" effect="dark" placement="top-start">
-                    <div slot="content">
-                      <div>1: 启用中的任务才会定时执行</div>
-                      <div>2: 禁用中的任务才支持修改</div>
-                    </div>
-                    <span><i style="color: #409EFF" class="el-icon-question" /></span>
-                  </el-tooltip>
-                </template>
-                <template slot-scope="scope">
-                  <el-switch
-                    v-model="scope.row.status"
-                    :inactive-value="0"
-                    :active-value="1"
-                    @change="changeStatus(scope.row)"
-                  />
-                </template>
-              </el-table-column>
-
-              <el-table-column label="操作" align="center" min-width="20%">
-                <template slot-scope="scope">
-
-                  <!-- 运行任务 -->
-                  <el-button
-                    slot="reference"
-                    type="text"
-                    size="mini"
-                    :loading="scope.row.runButtonIsLoading"
-                    @click="clickRunTask(scope.row)"
-                  >运行</el-button>
-
-                  <!-- 修改任务 -->
-                  <el-button
-                    type="text"
-                    size="mini"
-                    style="margin-right: 10px"
-                    :disabled="scope.row.status === 1"
-                    @click.native="editTask(scope.row)"
-                  >修改</el-button>
-
-                  <!-- 复制任务 -->
-                  <el-popover
-                    :ref="scope.row.id"
-                    v-model="scope.row.copyPopoverIsShow"
-                    placement="top"
-                    style="margin-right: 10px"
-                    popper-class="down-popover"
-                  >
-                    <p>复制此任务并生成新的任务?</p>
-                    <div style="text-align: right; margin: 0">
-                      <el-button size="mini" type="text" @click="cancelCopyPopover(scope.row)">取消</el-button>
-                      <el-button type="primary" size="mini" @click="copy(scope.row)">确定</el-button>
-                    </div>
-                    <el-button
-                      slot="reference"
-                      type="text"
-                      size="mini"
-                    >复制</el-button>
-                  </el-popover>
-
-                  <!-- 删除任务 -->
-                  <el-popover
-                    :ref="scope.row.id"
-                    v-model="scope.row.deletePopoverIsShow"
-                    placement="top"
-                    popper-class="down-popover"
-                  >
-                    <p>确定删除【{{ scope.row.name }}】?</p>
-                    <div style="text-align: right; margin: 0">
-                      <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>
-                      <el-button type="primary" size="mini" @click="delTask(scope.row)">确定</el-button>
-                    </div>
-                    <el-button
-                      slot="reference"
-                      style="color: red"
-                      type="text"
-                      size="mini"
-                      :disabled="scope.row.status === 1"
-                    >删除</el-button>
-                  </el-popover>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <pagination
-              v-show="taskTotal>0"
-              :total="taskTotal"
-              :page.sync="page_num"
-              :limit.sync="page_size"
-              @pagination="getTaskList"
-            />
-          </el-tab-pane>
-        </el-tabs>
-      </el-col>
-    </el-row>
-
-    <selectRunEnv
-      :data-type="dataType"
-    />
-
-    <runProcess
-      :data-type="dataType"
-    />
-
-    <taskDrawer
-      :data-type="dataType"
-      :curren-project-id="projectId"
-    />
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <EditDrawer :test-type="testType"></EditDrawer>
+    <selectRunEnv :test-type="testType"></selectRunEnv>
+    <showRunProcess :test-type="testType"></showRunProcess>
   </div>
 </template>
 
-<script>
-import Sortable from 'sortablejs'
-import projectTreeView from '@/components/Trees/projectTree.vue'
-import Pagination from '@/components/Pagination/index.vue'
-import taskDrawer from '@/components/business/task/drawer.vue'
-import selectRunEnv from '@/components/selectRunEnv.vue' // 环境选择组件
-import runProcess from '@/components/runProcess.vue' // 测试执行进度组件
+<script setup lang="ts">
+import {onMounted, ref, onBeforeUnmount, watch, nextTick} from "vue";
+import Pagination from '@/components/pagination.vue'
+import EditDrawer from './drawer.vue'
 
-import {
-  taskList as apiTaskList,
-  disableTask as apiDisableTask,
-  enableTask as apiEnableTask,
-  runTask as apiRunTask,
-  deleteTask as apiDeleteTask,
-  copyTask as apiCopyTask,
-  taskSort as apiTaskSort
-} from '@/apis/apiTest/task'
+import {GetProjectList} from "@/api/business-api/project";
+import {bus, busEvent} from "@/utils/bus-events";
+import {ElMessage, ElTree} from "element-plus";
+import toClipboard from "@/utils/copy-to-memory";
+import {CopyTask, DeleteTask, DisableTask, EnableTask, GetTaskList, RunTask} from "@/api/business-api/task";
+import {RunCase} from "@/api/business-api/case";
+import SelectRunEnv from "@/components/select-run-env.vue";
+import ShowRunProcess from "@/components/show-run-process.vue";
 
-import {
-  taskList as webUiTaskList,
-  disableTask as webUiDisableTask,
-  enableTask as webUiEnableTask,
-  runTask as webUiRunTask,
-  deleteTask as webUiDeleteTask,
-  copyTask as webUiCopyTask,
-  taskSort as webUiTaskSort
-} from '@/apis/webUiTest/task'
+const props = defineProps({
+  testType: {
+    default: '',
+    type: String
+  }
+})
 
-import {
-  taskList as appUiTaskList,
-  disableTask as appUiDisableTask,
-  enableTask as appUiEnableTask,
-  runTask as appUiRunTask,
-  deleteTask as appUiDeleteTask,
-  copyTask as appUiCopyTask,
-  taskSort as appUiTaskSort
-} from '@/apis/appUiTest/task'
+interface Tree {
+  [key: string]: any
+}
 
-export default {
-  name: 'Index',
-  components: { Pagination, projectTreeView, taskDrawer, selectRunEnv, runProcess },
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['dataType'],
-  data() {
-    return {
-      tableLoadingIsShow: false,
-      taskTab: 'taskTab',
-      taskList: [],
-      project: '',
-      projectId: '',
-      taskTotal: 0,
-      page_num: 0,
-      page_size: 20,
+let treeHeight = localStorage.getItem('treeHeight')
+const treeRef = ref<InstanceType<typeof ElTree>>()
+const filterText = ref('')
+watch(filterText, (val) => {
+  treeRef.value!.filter(val)
+})
+const defaultProps = {children: 'children', label: 'name'}
+const projectTab = ref('project')
+const taskTab = ref('task')
+const projectTreeRef = ref(null)
+const tableIsLoading = ref(false)
+const projectDataList = ref([])
+const tableDataList = ref([])
+const tableDataTotal = ref(0)
+const queryItems = ref({
+  page_num: 1,
+  page_size: 20,
+  detail: true,
+  project_id: undefined
+})
+const tableHeight = localStorage.getItem('tableHeight')
+const currentProject = ref()
+const triggerFrom = 'task-index'
+const runTaskId = ref()
 
-      // 拖拽排序参数
-      sortable: null,
-      oldList: [],
-      newList: [],
-      projectBusinessId: '',
-      currentTask: {},
-      runEvent: 'runTaskEventOnIndex',
-      callBackEvent: 'runTaskOnIndex',
-
-      taskListUrl: '',
-      disableTaskUrl: '',
-      enableTaskUrl: '',
-      runTaskUrl: '',
-      deleteTaskUrl: '',
-      copyTaskUrl: '',
-      taskSortUrl: ''
-    }
-  },
-
-  created() {
-    if (this.dataType === 'api') {
-      this.taskListUrl = apiTaskList
-      this.disableTaskUrl = apiDisableTask
-      this.enableTaskUrl = apiEnableTask
-      this.runTaskUrl = apiRunTask
-      this.deleteTaskUrl = apiDeleteTask
-      this.copyTaskUrl = apiCopyTask
-      this.taskSortUrl = apiTaskSort
-    } else if (this.dataType === 'webUi') {
-      this.taskListUrl = webUiTaskList
-      this.disableTaskUrl = webUiDisableTask
-      this.enableTaskUrl = webUiEnableTask
-      this.runTaskUrl = webUiRunTask
-      this.deleteTaskUrl = webUiDeleteTask
-      this.copyTaskUrl = webUiCopyTask
-      this.taskSortUrl = webUiTaskSort
-    } else {
-      this.taskListUrl = appUiTaskList
-      this.disableTaskUrl = appUiDisableTask
-      this.enableTaskUrl = appUiEnableTask
-      this.runTaskUrl = appUiRunTask
-      this.deleteTaskUrl = appUiDeleteTask
-      this.copyTaskUrl = appUiCopyTask
-      this.taskSortUrl = appUiTaskSort
-    }
-
-    this.oldList = this.taskList.map(v => v.id)
-    this.newList = this.oldList.slice()
-    this.$nextTick(() => {
-      this.setSort()
-    })
-  },
-
-  mounted() {
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, _runUnit, runDict) => {
-      if (_type === 'taskInfo') {
-        this.getTaskList()
-      } else if (_type === 'selectRunEnv' && _runUnit === 'taskIndex') {
-        this.run(runDict)
-      }
-    })
-
-    // 服务树选中项事件
-    this.$bus.$on(this.$busEvents.treeIsChoice, (_type, project) => {
-      if (_type === 'project') {
-        this.project = project
-        this.projectId = project.id
-        this.projectBusinessId = project.business_id
-        this.getTaskList()
-      }
-    })
-  },
-
-  // 页面销毁前，关闭bus监听服务选中事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-    this.$bus.$off(this.$busEvents.treeIsChoice)
-  },
-
-  methods: {
-
-    showAddTaskDrawer() {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'add', this.project)
-    },
-
-    // 双击单元格复制
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      this.$copyText(typeof (data) === 'string' ? data : JSON.stringify(data)).then(
-        function(e) {
-          that.$message.success('复制成功')
-        }
-      )
-    },
-
-    // 进入编辑
-    editTask(row) {
-      if (row.status === 0) {
-        this.$bus.$emit(this.$busEvents.drawerIsShow, 'taskInfo', 'update', row.id)
-      }
-    },
-
-    cancelCopyPopover(task) {
-      this.$set(task, 'copyPopoverIsShow', false)
-    },
-
-    cancelDeletePopover(task) {
-      this.$set(task, 'deletePopoverIsShow', false)
-    },
-
-    // 复制任务
-    copy(task) {
-      this.$set(task, 'copyPopoverIsShow', false)
-      this.tableLoadingIsShow = true
-      this.copyTaskUrl({ id: task.id }).then(response => {
-        this.tableLoadingIsShow = false
-        if (this.showMessage(this, response)) {
-          this.getTaskList()
-        }
-      })
-    },
-
-    // 点击运行任务
-    clickRunTask(task) {
-      this.currentTask = task
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'selectRunEnv', 'taskIndex', true, this.projectBusinessId)
-    },
-
-    // 运行任务
-    run(runConf) {
-      this.$set(this.currentTask, 'runButtonIsLoading', true)
-      this.runTaskUrl({
-        id: this.currentTask.id,
-        env_list: runConf.runEnv,
-        is_async: runConf.runType,
-        server_id: runConf.runServer,
-        phone_id: runConf.runPhone,
-        browser: runConf.browser,
-        no_reset: runConf.noReset,
-        'trigger_type': 'page'
-      }).then(response => {
-        this.$set(this.currentTask, 'runButtonIsLoading', false)
-        if (this.showMessage(this, response)) {
-          this.$bus.$emit(this.$busEvents.drawerIsShow, 'process', response.data.batch_id, response.data.report_id)
-        }
-      })
-    },
-
-    // 删除任务
-    delTask(task) {
-      this.$set(task, 'deletePopoverIsShow', false)
-      this.tableLoadingIsShow = true
-      this.deleteTaskUrl({ id: task.id }).then(response => {
-        this.tableLoadingIsShow = false
-        if (this.showMessage(this, response)) {
-          this.getTaskList()
-        }
-      })
-    },
-
-    // 修改定时任务状态，el-switch组件是先改变状态，再发送请求
-    changeStatus(task) {
-      if (task.status === 1) {
-        this.tableLoadingIsShow = true
-        this.enableTaskUrl({ id: task.id }).then(response => {
-          this.tableLoadingIsShow = false
-          if (this.showMessage(this, response)) {
-            this.getTaskList()
-          }
-        })
-      } else {
-        this.tableLoadingIsShow = true
-        this.disableTaskUrl({ id: task.id }).then(response => {
-          this.tableLoadingIsShow = false
-          if (this.showMessage(this, response)) {
-            this.getTaskList()
-          }
-        })
-      }
-    },
-
-    // 获取任务列表
-    getTaskList() {
-      this.tableLoadingIsShow = true
-      this.taskListUrl({ project_id: this.projectId, page_num: this.page_num, page_size: this.page_size, detail: true
-      }).then(response => {
-        this.tableLoadingIsShow = false
-        this.taskList = response.data.data
-        this.taskTotal = response.data.total
-
-        this.oldList = this.taskList.map(v => v.id)
-        this.newList = this.oldList.slice()
-      })
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.taskTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.taskList.splice(evt.oldIndex, 1)[0]
-          this.taskList.splice(evt.newIndex, 0, targetRow)
-
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableLoadingIsShow = true
-          this.taskSortUrl({ id_list: this.newList, page_num: this.page_num, page_size: this.page_size }).then(response => {
-            this.showMessage(this, response)
-            this.tableLoadingIsShow = false
-          })
-        }
-      })
-    }
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
   }
 }
+
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.label.includes(value)
+}
+
+const clickTree = (row) => {
+  queryItems.value.project_id = row.id
+  currentProject.value = row
+  getTableDataList()
+  bus.emit(busEvent.treeIsChoice, {eventType: 'project-tree', content: row})
+}
+
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
+}
+
+const showEditDrawer = (row: object | undefined) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-task', content: row});
+}
+
+const clickRun = (row) => {
+  runTaskId.value = row.id
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'select-run-env',
+    triggerFrom: triggerFrom,
+    showSelectRunModel: true,
+    business_id: currentProject.value.business_id,
+    runArgs: undefined
+  })
+}
+
+const runTask = (runConf) => {
+  RunTask(props.testType, {
+    id: runTaskId.value,
+    env_list: runConf.runEnv,
+    is_async: runConf.runType,
+    browser: runConf.browser,
+    server_id: runConf.runServer,
+    phone_id: runConf.runPhone,
+    no_reset: runConf.noReset,
+    temp_variables: runConf.temp_variables,
+    'trigger_type': 'page'
+  }).then(response => {
+    if (response) {
+      bus.emit(busEvent.drawerIsShow, {
+        eventType: 'run-process',
+        batch_id: response.data.batch_id,
+        report_id: response.data.report_id
+      })
+    }
+  })
+}
+
+const copyData = (row: { id: any; }) => {
+  tableIsLoading.value = true
+  CopyTask(props.testType, {id: row.id}).then(response => {
+    tableIsLoading.value = false
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const deleteData = (row: { id: any, isLoading: boolean; }) => {
+  row.isLoading = true
+  DeleteTask(props.testType, {id: row.id}).then(response => {
+    row.isLoading = false
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const getTableDataList = () => {
+  tableIsLoading.value = true
+  GetTaskList(props.testType, queryItems.value).then((response: object) => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+  })
+}
+
+const changeStatus = (row: { status?: any; id?: any; }) => {
+  if (row.status === 1) {
+    enableTask(row.id)
+  } else {
+    disableTask(row.id)
+  }
+}
+
+const enableTask = (taskId: number) => {
+  tableIsLoading.value = true
+  EnableTask(props.testType, {id: taskId}).then(response => {
+    tableIsLoading.value = true
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const disableTask = (taskId: number) => {
+  tableIsLoading.value = true
+  DisableTask(props.testType, {id: taskId}).then(response => {
+    tableIsLoading.value = true
+    if (response) {
+      getTableDataList()
+    }
+  })
+}
+
+const getProjectList = () => {
+  GetProjectList(props.testType, {page_num: 1, page_size: 99999}).then(response => {
+    projectDataList.value = response.data.data
+    if (tableDataList.value.length < 1) {
+      nextTick(() => {
+        projectTreeRef.value.$el.querySelector(".el-tree-node__content").click()
+      })
+    }
+  })
+}
+onMounted(() => {
+  getProjectList()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'task-editor') {
+    getTableDataList()
+  } else if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
+    runTask(message)
+  }
+}
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.first-col {
+  width: 20% !important;
+}
+
+.second-col {
+  width: 79% !important;
+}
 
 </style>

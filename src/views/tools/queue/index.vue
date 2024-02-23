@@ -1,332 +1,213 @@
 <template>
-  <div class="app-container">
+  <div class="layout-container">
 
-    <el-form label-width="100px" :inline="true">
+    <div class="layout-container-form flex space-between">
+      <div class="layout-container-form-handle">
+        <el-button
+            type="primary"
+            size="small"
+            style="margin-left: 10px"
+            @click.native="showEditDrawer('add', null)"
+        >新增链接
+        </el-button>
+      </div>
 
-      <el-form-item :label="'队列类型：'" size="mini">
+      <div class="layout-container-form-search">
         <el-select
-          v-model="listQuery.queue_type"
-          :placeholder="'队列类型'"
-          filterable
-          default-first-option
-          clearable
-          size="mini"
-          class="filter-item"
+            style="margin-right: 10px"
+            v-model="queryItems.queue_type"
+            placeholder="队列类型"
+            filterable
+            default-first-option
+            clearable
+            size="small"
+            class="filter-item"
         >
-          <el-option v-for="(value, key) in queue_type_dict" :key="key" :label="value" :value="key" />
+          <el-option v-for="(value, key) in queueTypeDict" :key="key" :label="value" :value="key" />
         </el-select>
-      </el-form-item>
 
-      <el-form-item label="链接地址" size="mini">
         <el-input
-          v-model="listQuery.host"
-          class="input-with-select"
-          placeholder="队列链接地址，支持模糊搜索"
-          size="mini"
-          clearable
-          style="width: 100%"
+            style="margin-right: 10px"
+            v-model="queryItems.host"
+            placeholder="队列链接地址，支持模糊搜索"
+            size="small"
+            clearable
         />
-      </el-form-item>
 
-      <el-button type="primary" size="mini" @click="getQueueLinkList()">搜索</el-button>
+        <el-button type="primary" @click="getTableDataList()"> 搜索</el-button>
+      </div>
+    </div>
 
-      <el-button
-        type="primary"
-        size="mini"
-        style="margin-left: 10px"
-        @click.native="sendEditEmit('add')"
-      >新增链接
-      </el-button>
+    <div style="margin: 10px">
+      <el-table
+          v-loading="tableIsLoading"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="tableDataList"
+          style="width: 100%"
+          stripe
+          :height="tableHeight"
+          row-key="id"
+          @cell-dblclick="rowDblclick">
+        <el-table-column prop="id" label="序号" align="center" min-width="5%" >
+          <template #default="scope">
+            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+          </template>
+        </el-table-column>
 
-    </el-form>
+        <el-table-column show-overflow-tooltip label="类型" prop="queue_type" align="center" min-width="5%">
+          <template #default="scope">
+            <span> {{ queueTypeDict[scope.row.queue_type] }} </span>
+          </template>
+        </el-table-column>
 
-    <el-table
-      ref="scriptTable"
-      v-loading="tableIsLoading"
-      size="mini"
-      element-loading-text="正在排序中"
-      element-loading-spinner="el-icon-loading"
-      :data="queue_link_list.list"
-      row-key="id"
-      stripe
-      @cell-dblclick="cellDblclick"
-    >
-      <el-table-column label="序号" align="center" min-width="5%">
-        <template slot-scope="scope">
-          <span> {{ (listQuery.page_num - 1) * listQuery.page_size + scope.$index + 1 }} </span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="地址" prop="host" align="center" min-width="20%">
+          <template #default="scope">
+            <span> {{ scope.row.host }} </span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="queue_type" label="类型" min-width="5%">
-        <template slot-scope="scope">
-          <span>{{ queue_type_dict[scope.row.queue_type] }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="端口" prop="port" align="center" min-width="15%">
+          <template #default="scope">
+            <span>{{ scope.row.port }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="host" label="地址" min-width="20%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.host }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="备注" prop="desc" align="center" min-width="10%">
+          <template #default="scope">
+            <span>{{ scope.row.desc }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="port" label="端口" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.port }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip label="创建者" prop="create_user" align="center" min-width="10%">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.create_user] }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column show-overflow-tooltip align="center" prop="desc" label="备注" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ scope.row.desc }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+          <template #default="scope">
+            <el-button
+                type="text"
+                size="small" style="margin: 0; padding: 5px"
+                @click="showQueueList(scope.row)"
+            >队列列表
+            </el-button>
 
-      <el-table-column show-overflow-tooltip align="center" prop="create_user" label="创建者" min-width="10%">
-        <template slot-scope="scope">
-          <span>{{ parseUser(scope.row.create_user) }}</span>
-        </template>
-      </el-table-column>
+            <!--修改文件信息-->
+            <el-button
+                type="text"
+                size="small" style="margin: 0; padding: 5px"
+                @click="showEditDrawer('edit', scope.row)"
+            >修改
+            </el-button>
 
-      <el-table-column label="操作" align="center" min-width="15%">
-        <template slot-scope="scope">
+            <!-- 复制 -->
+            <el-button
+                type="text"
+                size="small" style="margin: 0; padding: 5px"
+                @click="showEditDrawer('copy', scope.row)"
+            >复制
+            </el-button>
 
-          <!--修改文件信息-->
-          <el-button
-            type="text"
-            size="mini"
-            @click="showQueueManage(scope.row)"
-          >队列列表
-          </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-          <!--修改文件信息-->
-          <el-button
-            type="text"
-            size="mini"
-            @click="sendEditEmit('update', scope.row)"
-          >修改
-          </el-button>
+      <pagination
+          v-show="tableDataTotal > 0"
+          :pageNum="queryItems.page_num"
+          :pageSize="queryItems.page_size"
+          :total="tableDataTotal"
+          @pageFunc="changePagination"
+      />
+    </div>
 
-          <!-- 复制 -->
-          <el-button
-            type="text"
-            size="mini"
-            style="margin-right: 5px"
-            @click="sendEditEmit('copy', scope.row)"
-          >复制
-          </el-button>
-
-          <!-- 删除文件 -->
-          <!--          <el-popover-->
-          <!--            :ref="scope.row.id"-->
-          <!--            v-model="scope.row.deletePopoverIsShow"-->
-          <!--            placement="top"-->
-          <!--            popper-class="down-popover"-->
-          <!--          >-->
-          <!--            <p>确定删除【{{ scope.row.host }}】?</p>-->
-          <!--            <div style="text-align: right; margin: 0">-->
-          <!--              <el-button size="mini" type="text" @click="cancelDeletePopover(scope.row)">取消</el-button>-->
-          <!--              <el-button type="primary" size="mini" @click="delete_data(scope.row)">确定</el-button>-->
-          <!--            </div>-->
-          <!--            <el-button-->
-          <!--              slot="reference"-->
-          <!--              style="color: red"-->
-          <!--              type="text"-->
-          <!--              size="mini"-->
-          <!--              :loading="scope.row.deleteLoadingIsShow"-->
-          <!--            >删除</el-button>-->
-          <!--          </el-popover>-->
-
-        </template>
-      </el-table-column>
-
-    </el-table>
-
-    <pagination
-      v-show="queue_link_list.total>0"
-      :total="queue_link_list.total"
-      :page.sync="listQuery.page_num"
-      :limit.sync="listQuery.page_size"
-      @pagination="getQueueLinkList"
-    />
-
-    <QueueLinkDrawer :queue-type-dict="queue_type_dict" />
-    <queueDrawer :user-dict="userDict" />
-
+    <queueLinkEditDrawer :queue-type-dict="queueTypeDict"></queueLinkEditDrawer>
+    <queueListDrawer :user-dict="userDict"></queueListDrawer>
   </div>
 </template>
 
-<script>
-import Sortable from 'sortablejs'
-import QueueLinkDrawer from './queueLinkDrawer.vue'
-import queueDrawer from './queueDrawer.vue'
-import Pagination from '@/components/Pagination/index.vue'
+<script setup lang="ts">
+import {onBeforeUnmount, onMounted, ref} from "vue";
+import queueListDrawer from './queue-list-drawer.vue'
+import queueLinkEditDrawer from './queue-link-edit-drawer.vue'
 
-import { userList } from '@/apis/system/user'
-import { queueLinkList, copyQueue, deleteQueue, queueSort } from '@/apis/assist/queue'
+import {bus, busEvent} from "@/utils/bus-events";
+import {GetQueueLinkList} from "@/api/tools/queue";
+import Pagination from "@/components/pagination.vue";
+import {GetUserList} from "@/api/system/user";
+import toClipboard from "@/utils/copy-to-memory";
+import {ElMessage} from "element-plus";
 
-export default {
-  name: 'Script',
-  components: {
-    Pagination,
-    QueueLinkDrawer,
-    queueDrawer
-  },
-  data() {
-    return {
-      listQuery: {
-        host: undefined,
-        queue_type: undefined,
-        page_num: 1,
-        page_size: 20
-      },
+const tableIsLoading = ref(false)
+const tableDataList = ref([])
+const tableHeight = localStorage.getItem('tableHeight')
+const tableDataTotal = ref(0)
+const queryItems = ref({page_num: 1, page_size:20, host: undefined, queue_type: undefined})
+const userDict = ref({})
+const queueTypeDict =  { 'rocket_mq': 'rocketmq', 'rabbit_mq': 'rabbitmq', 'redis': 'redis' }
 
-      queue_type_dict: { 'rocket_mq': 'MQ', 'redis': 'redis' },
-
-      // 拖拽排序参数
-      sortable: null,
-      oldList: [],
-      newList: [],
-      userDict: {},
-      queue_link_list: {
-        list: [],
-        total: 0
-      },
-      tableIsLoading: false
-    }
-  },
-
-  mounted() {
-    this.getUserList(this.getQueueLinkList)
-
-    this.$bus.$on(this.$busEvents.drawerIsCommit, (_type, status) => {
-      if (_type === 'queueLinkInfo') {
-        this.getQueueLinkList()
-      }
-    })
-  },
-
-  // 组件销毁前，关闭bus监听事件
-  beforeDestroy() {
-    this.$bus.$off(this.$busEvents.drawerIsCommit)
-  },
-
-  methods: {
-
-    // 双击单元格复制
-    cellDblclick(row, column, cell, event) {
-      const that = this
-      const data = row[column.property]
-      if (typeof (data) === 'string') {
-        this.$copyText(data).then(
-          function(e) {
-            that.$message.success('复制成功')
-          }
-        )
-      }
-    },
-
-    // 获取用户信息，同步请求
-    async getUserList(func) {
-      const response = await userList()
-      response.data.data.forEach(user => {
-        this.userDict[user.id] = user
-      })
-      if (func) {
-        func()
-      }
-    },
-
-    // 解析用户
-    parseUser(userId) {
-      if (userId in Object.keys(this.userDict)) {
-        return this.userDict[userId].name
-      }
-      return ' - '
-    },
-
-    getQueueLinkList() {
-      this.tableIsLoading = true
-      queueLinkList(this.listQuery).then(response => {
-        this.tableIsLoading = false
-
-        this.queue_link_list.list = response.data.data
-        this.queue_link_list.total = response.data.total
-
-        this.oldList = this.queue_link_list.list.map(v => v.id)
-        this.newList = this.oldList.slice()
-        this.$nextTick(() => {
-          this.setSort()
-        })
-      })
-    },
-
-    copyFile(row) {
-      this.$set(row, 'copyPopoverIsShow', false)
-      copyQueue({ id: row.id }).then(response => {
-        if (this.showMessage(this, response)) {
-          this.getQueueLinkList()
-        }
-      })
-    },
-
-    showQueueManage(row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'queueInfo', row)
-    },
-
-    sendEditEmit(status, row) {
-      this.$bus.$emit(this.$busEvents.drawerIsShow, 'queueLinkInfo', status, row)
-    },
-
-    cancelCopyPopover(row) {
-      this.$set(row, 'copyPopoverIsShow', false)
-    },
-
-    cancelDeletePopover(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-    },
-
-    delete_data(row) {
-      this.$set(row, 'deletePopoverIsShow', false)
-      this.$set(row, 'deleteLoadingIsShow', true)
-      deleteQueue({ id: row.id }).then(response => {
-        this.$set(row, 'deleteLoadingIsShow', false)
-        if (this.showMessage(this, response)) {
-          this.getQueueLinkList()
-        }
-      })
-    },
-
-    // 拖拽排序
-    setSort() {
-      const el = this.$refs.scriptTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost',
-        setData: function(dataTransfer) {
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.queue_link_list.list.splice(evt.oldIndex, 1)[0]
-          this.queue_link_list.list.splice(evt.newIndex, 0, targetRow)
-
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-
-          // 发送请求，改变排序
-          this.tableIsLoading = true
-          queueSort({ id_list: this.newList, page_num: this.listQuery.page_num, page_size: this.listQuery.page_size }).then(response => {
-            this.showMessage(this, response)
-            this.getQueueLinkList()
-            this.tableIsLoading = false
-          })
-        }
-      })
-    }
-
-  }
-
+const changePagination = (pagination: any) => {
+  queryItems.value.page_num = pagination.pageNum
+  queryItems.value.page_size = pagination.pageSize
+  getTableDataList()
 }
+
+const showEditDrawer = (command: string, row: object | null) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-link-info', command: command, content: row});
+}
+
+const showQueueList = (row: any) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-list-info', content: row})
+}
+
+const rowDblclick = async (row: any, column: any, event: any) => {
+  try {
+    await toClipboard(row[column.property]);
+    ElMessage.success("已复制到粘贴板")
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+const getUserList = () => {
+  GetUserList({page_num: 1, page_size: 99999}).then(response => {
+    response.data.data.forEach(user => {
+      userDict.value[user.id] = user.name
+    })
+  })
+}
+
+const getTableDataList = () => {
+  queryItems.value.host = queryItems.value.host ? queryItems.value.host : undefined
+  queryItems.value.queue_type = queryItems.value.queue_type ? queryItems.value.queue_type : undefined
+  tableIsLoading.value = true
+  GetQueueLinkList(queryItems.value).then(response => {
+    tableIsLoading.value = false
+    tableDataList.value = response.data.data
+    tableDataTotal.value = response.data.total
+  })
+}
+
+onMounted(() => {
+  getUserList()
+  getTableDataList()
+  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+})
+
+const drawerIsCommit = (message: any) => {
+  if (message.eventType === 'queue-link-info') {
+    getTableDataList()
+  }
+}
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>
