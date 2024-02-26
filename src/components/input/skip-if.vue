@@ -56,7 +56,6 @@
                 clearable
                 default-first-option
                 size="small"
-                @change="getDataSource(scope.row.data_source)"
             >
               <el-option
                   v-for="(item) in useType === 'step' ? busEvent.data.stepSkipIfDataSourceMapping : busEvent.data.caseSkipIfDataSourceMapping"
@@ -302,13 +301,11 @@ const initTempData = (data: string | any[] | undefined) => {
   newList.value = oldList.value.slice()
 }
 
-const getDataSource = (dataSource: string) => {
-  if (props.testType === 'app' && dataSource === 'run_server') {
+const getDataSource = () => {
+  getProjectRunEnv()
+  if (props.testType === 'app') {
     getRunServerList()
-  } else if (props.testType === 'app' && dataSource === 'run_device') {
     getRunDeviceList()
-  } else if (props.testType !== 'app' && dataSource === 'run_env') {
-    getProjectRunEnv()
   }
 }
 
@@ -362,47 +359,6 @@ const selectValidateType = (data: string, row: any) => {
     row.data_type = 'str'
     row.value = 'False'
     return true
-  }
-}
-
-const selectValidateMethod = (data: string | string[], row: any) => {
-  if (['值为真', '值为true'].indexOf(data) !== -1) {
-    row.data_type = 'str'
-    row.value = 'True'
-    return true
-  } else if (['值为假', '值为false'].indexOf(data) !== -1) {
-    row.data_type = 'str'
-    row.value = 'False'
-    return true
-  } else if (data === '值为null') {
-    row.data_type = 'str'
-    row.value = 'null'
-    return true
-  } else if (data === '值不为null') {
-    row.data_type = 'str'
-    row.value = 'not null'
-    return true
-  } else if (data === '值不为true') {
-    row.data_type = 'str'
-    row.value = 'not true'
-    return true
-  } else if (data === '值不为false') {
-    row.data_type = 'str'
-    row.value = 'not false'
-    return true
-  } else if (data.indexOf('批量') !== -1) {
-    row.data_type = 'list'
-    row.value = '["key1", "key2"]'
-    return true
-  }
-}
-
-const selectDataType = (data: string | string[], row: any) => {
-  if (['True', 'False'].indexOf(data) > 0){
-    row.value = data
-    row.disabled = true
-  }else {
-    row.disabled = false
   }
 }
 
@@ -461,6 +417,7 @@ const clearData = () => {
 
 onMounted(() => {
   getConfigByCode()
+  getDataSource()
   initTempData(props.currentData)
   setSort()
 })
