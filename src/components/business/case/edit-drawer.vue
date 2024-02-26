@@ -77,8 +77,8 @@
                 </template>
                 <skipIfView
                     ref="skipIfViewRef"
-                    :data-type="testType"
-                    :skip-if-data="formData.skip_if"
+                    :test-type="testType"
+                    :current-data="formData.skip_if"
                     :project-id="projectId"
                     :use-type="'case'"
                 />

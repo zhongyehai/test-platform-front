@@ -187,8 +187,8 @@
         <el-tab-pane label="跳过条件" name="editSkipIf">
           <skipIfView
             ref="skipIfViewRef"
-            :data-type="testType"
-            :skip-if-data="formData.skip_if"
+            :test-type="testType"
+            :current-data="formData.skip_if"
             :project-id="projectId"
             :use-type="'step'"
           />
@@ -314,7 +314,6 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {GetApi, GetApiFrom} from "@/api/business-api/api";
 import {bus, busEvent} from "@/utils/bus-events";
 import OneColumnRow from "@/components/input/one-column-row.vue";
 import skipIfView from '@/components/input/skip-if.vue'
@@ -322,9 +321,8 @@ import uiExtractorView from '@/components/input/ui-extractor.vue'
 import validatesView from '@/components/input/validates.vue'
 import jsonEditorView from '@/components/editor/json-editor.vue'
 
-import {ElMessage} from "element-plus";
-import {ChangeElementById, GetElement, GetElementFrom, GetElementList, PutElement} from "@/api/business-api/element";
-import {GetExecuteMappingList, GetKeyBoardCodeMappingList, GetStep, PostStep, PutStep} from "@/api/business-api/step";
+import {ChangeElementById, GetElement, GetElementFrom, GetElementList} from "@/api/business-api/element";
+import {GetKeyBoardCodeMappingList, GetStep, PostStep, PutStep} from "@/api/business-api/step";
 import {GetConfigByCode} from "@/api/config/config-value";
 
 const props = defineProps({

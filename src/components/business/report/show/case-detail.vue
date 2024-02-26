@@ -187,7 +187,7 @@
         <skipIfView
             ref="skipIfView"
             :test-type="testType"
-            :skip-if-data="reportCaseData.case_data.skip_if"
+            :current-data="reportCaseData.case_data.skip_if"
             :env-list="[]"
             :use-type="'case'"
         />
