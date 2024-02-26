@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改权限' : '新增权限'" size="60%">
-      {{ formData }}
+
       <el-form
           ref="ruleFormRef"
           :model="formData"

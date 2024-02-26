@@ -49,7 +49,7 @@
         </el-table-column>
 
 
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="15%">
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="90">
           <template #default="scope">
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="添加一行">
@@ -57,8 +57,18 @@
                   v-show="scope.$index === 0 || scope.$index === tableDataList.length - 1"
                   type="text"
                   size="small"
+                  style="margin: 2px; padding: 0"
                   @click.native="addRow(true)"
               ><i class="iconfont icon-testadd"></i></el-button>
+            </el-tooltip>
+
+            <el-tooltip class="item" effect="dark" placement="top-end" content="复制当前行">
+              <el-button
+                  type="text"
+                  size="small"
+                  style="margin: 2px; padding: 0"
+                  @click.native="copyRow(scope.row)"
+              ><i class="iconfont icon-testjingdianwanfa"></i></el-button>
             </el-tooltip>
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
@@ -66,9 +76,9 @@
                   v-show="isShowDelButton(scope.$index)"
                   type="text"
                   size="small"
-                  style="color: red"
+                  style="color: red;margin: 2px; padding: 0"
                   @click.native="delRow(scope.$index)"
-              ><i class="iconfont icon-testreduce"></i></el-button>
+              ><i class="iconfont icon-testdelete1"></i></el-button>
             </el-tooltip>
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
@@ -76,9 +86,9 @@
                   v-show="tableDataList.length === 1"
                   type="text"
                   size="small"
-                  style="color: red"
+                  style="color: red;margin: 2px; padding: 0"
                   @click.native="clearData()"
-              ><i class="iconfont icon-testdelete1"></i></el-button>
+              ><i class="iconfont icon-testshibai"></i></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -108,6 +118,12 @@ const addRow = (isRow: undefined) => {
   } else {
     tableDataList.value = [{ id: `${Date.now()}`, name: null, value: null, password: null, desc: null }]
   }
+}
+
+const copyRow = (row: {id: string, key: null, value: null, remark: null, data_type: null}) => {
+  let newData = JSON.parse(JSON.stringify(row))
+  newData.id = `${Date.now()}`
+  tableDataList.value.push(newData)
 }
 
 const isShowDelButton = (index: number) => {
