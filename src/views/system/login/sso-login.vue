@@ -26,9 +26,11 @@ watch(() => ssoCode, (newValue, oldValue) => {
 onMounted(() => {
   if (!ssoCode.value) { // 没有带code参数，从后端返回获取登录地址
     GetSSORedirectUri().then(response => {
-      if (response.status === 200) {
+      if (response.data) {
         const redirect_path = route.query.redirect
         router.push(typeof redirect_path === 'string' ? redirect_path : '/')
+      }else {
+        window.location.href = '/self/login'
       }
     })
   } else {
@@ -42,7 +44,8 @@ const getTokenBySSOCode = () => {
     if (response) {
       userInfo.value = response.data
       localStorage.setItem('id', response.data.id)
-      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('accessToken', response.data.access_token)
+      localStorage.setItem('refreshToken', response.data.refresh_token)
       localStorage.setItem('userName', response.data.name)
       localStorage.setItem('account', response.data.account)
       localStorage.setItem('permissions', JSON.stringify(response.data.front_permissions))

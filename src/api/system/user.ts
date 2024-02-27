@@ -1,6 +1,7 @@
 import request from '@/utils/system/request'
 import {baseDirSystemURL} from '../base-url'
 const currentBaseDir = baseDirSystemURL + '/user'
+export const refreshTokenDir = currentBaseDir + '/refresh'
 
 // 从后端获取重定向到oauth2验证的地址
 export function GetSSORedirectUri() {
@@ -15,6 +16,11 @@ export function GetTokenBySSOCode(data: any) {
 // 登录
 export function LoginApi(data: object) {
   return request({ url: currentBaseDir + '/login', method: 'post', data })
+}
+
+// 刷新token
+export function RefreshToken() {
+  return request({ url: refreshTokenDir, method: 'get' })
 }
 
 // 修改密码

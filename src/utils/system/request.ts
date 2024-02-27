@@ -2,6 +2,27 @@ import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} fro
 import store from '@/store'
 import router from '@/router/index'
 import {ElMessage} from 'element-plus'
+import {refreshTokenDir} from "@/api/system/user";
+
+// 是否正在刷新的标记
+let isRefreshing = false
+
+// 重试队列，每一项将是一个待执行的函数形式
+let retryRequestList: any[] = []
+
+// 当access-token过期时，用refresh-token获取新的token
+const refreshToken = () => {
+    const newService: AxiosInstance = axios.create({baseURL: '', timeout: 500})
+    newService.interceptors.request.use(
+        // @ts-ignore
+        (config: AxiosRequestConfig) => {
+            // @ts-ignore
+            config.headers['refresh-token'] = localStorage.getItem('refreshToken')
+            return config
+        }
+    )
+    return newService.get(refreshTokenDir)
+}
 
 const service: AxiosInstance = axios.create({
     baseURL: '', //baseURL,
@@ -10,12 +31,10 @@ const service: AxiosInstance = axios.create({
 
 // 请求拦截
 service.interceptors.request.use(
+    // @ts-ignore
     (config: AxiosRequestConfig) => {
-        const token = localStorage.getItem('token')
-        if (token) {
-            // @ts-ignore
-            config.headers['X-Token'] = token
-        }
+        // @ts-ignore
+        config.headers['access-token'] = localStorage.getItem('accessToken')
         return config
     },
     (error: AxiosError) => {
@@ -28,34 +47,79 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     (response: AxiosResponse) => {
         const responseBody = response.data
-        // 身份验证相关
-        if (responseBody.status === 401) { // 如果返回状态码为401，则跳转到登录页面
-            // ElMessage.error(responseBody.message)
-            let fullPath = router.currentRoute.value.fullPath
-            if (responseBody.data) {  // 返回了登录地址，则自动重定向到对应的登录页（SSO）
-                window.location.href = responseBody.data
-            } else {
-                // window.location.href = fullPath.indexOf('redirect') !== -1 ? fullPath : `/self/login?redirect=${fullPath}`
-                window.location.href = fullPath.indexOf('redirect') !== -1 ? fullPath : `/self/login`
-            }
-        } else if (responseBody.status === 403) {
-            ElMessage.error(responseBody.message)
-        } else {
-            // 业务逻辑相关
-            // @ts-ignore
-            // if (response.config.url.indexOf('list') === -1) {  // 非获取list的接口，显示响应信息
-            if (response.config.method !== 'get') {  // 非获取的接口，显示响应信息
-                if (responseBody.status >= 500) {
-                    ElMessage.error(responseBody.message)
-                    return
-                } else if (responseBody.status >= 400) {
-                    ElMessage.warning(responseBody.message)
-                    return
+
+        // @ts-ignore
+        if (response.config.url.indexOf('redirect-uri') === -1) { // 获取sso登录地址，直接返回
+            // 身份验证相关
+            if (responseBody.status === 401) { // 如果返回状态码为401，则跳转到登录页面
+                const config = response.config
+
+                if (!isRefreshing) {
+                    isRefreshing = true
+                    return refreshToken().then(refreshRes => {
+                        const refreshResBody = refreshRes.data
+
+                        // refreshToken失效
+                        if (refreshResBody.status === 401) {
+                            if (refreshResBody.data) { // 返回了登录地址，则自动重定向到对应的登录页（SSO）
+                                window.location.href = refreshResBody.data
+                            } else {  // 没有返回登录地址，则重定向测试平台登录页
+                                let fullPath = router.currentRoute.value.fullPath
+                                window.location.href = fullPath.indexOf('redirect') !== -1 ? fullPath : `/self/login`
+                            }
+                        } else {
+                            const access_token = refreshResBody.data.access_token
+                            service.defaults.headers['access-token'] = access_token
+                            localStorage.setItem('accessToken', access_token)
+                            localStorage.setItem('userName', refreshResBody.data.name)
+                            localStorage.setItem('account', refreshResBody.data.account)
+                            localStorage.setItem('permissions', JSON.stringify(refreshResBody.data.front_permissions))
+                            localStorage.setItem('business', JSON.stringify(refreshResBody.data.business_list))
+                            localStorage.setItem('isAdmin', refreshResBody.data.front_permissions.indexOf('admin') !== -1 ? '1' : '0')
+
+                            config.headers['access-token'] = access_token
+                            config.baseURL = '' // url已经带上了/api，避免出现/api/api的情况
+
+                            // 已经刷新了token，将所有队列中的请求进行重试
+                            retryRequestList.forEach(retryRequest => retryRequest(access_token))
+                            retryRequestList = []
+                            return service(config)
+                        }
+                    }).catch(() => {
+
+                    }).finally(() => {
+                        isRefreshing = false
+                    })
                 } else {
-                    if (response.config.url.indexOf('download') === -1){
-                        ElMessage.success(responseBody.message)
+                    // 正在刷新token，返回一个未执行resolve的promise
+                    return new Promise((resolve) => {
+                        // 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
+                        retryRequestList.push((access_token: any) => {
+                            config.baseURL = ''
+                            config.headers['access-token'] = access_token
+                            resolve(service(config))
+                        })
+                    })
+                }
+            } else if (responseBody.status === 403) {
+                ElMessage.error(responseBody.message)
+            } else {
+                // 业务逻辑相关
+                // @ts-ignore
+                if (response.config.method !== 'get') {  // 非获取的接口，显示响应信息
+                    if (responseBody.status >= 500) {
+                        ElMessage.error(responseBody.message)
+                        return
+                    } else if (responseBody.status >= 400) {
+                        ElMessage.warning(responseBody.message)
+                        return
+                    } else {
+                        // @ts-ignore
+                        if (response.config.url.indexOf('download') === -1) {
+                            ElMessage.success(responseBody.message)
+                        }
+                        return responseBody
                     }
-                    return responseBody
                 }
             }
         }

@@ -88,7 +88,8 @@ const submit = () => {
     LoginApi({account: form.account, password: form.password}).then(response => {
       form.loading = false
       localStorage.setItem('id', response.data.id)
-      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('accessToken', response.data.access_token)
+      localStorage.setItem('refreshToken', response.data.refresh_token)
       localStorage.setItem('userName', response.data.name)
       localStorage.setItem('account', response.data.account)
       localStorage.setItem('permissions', JSON.stringify(response.data.front_permissions))

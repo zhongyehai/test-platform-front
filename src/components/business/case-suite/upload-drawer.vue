@@ -63,7 +63,7 @@ const props = defineProps({
   }
 })
 
-const uploadHeaders =  { 'X-Token': localStorage.getItem('token') }
+const uploadHeaders =  { 'access-token': localStorage.getItem('access-token') }
 const uploadFailList = ref([])
 const uploadFailTotal = ref(0)
 const projectId = ref()

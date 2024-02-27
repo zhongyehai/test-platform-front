@@ -69,7 +69,7 @@ router.beforeEach((to, _from, next) => {
     if (whiteList.indexOf(to.path) !== -1 || to.path.indexOf('index') > -1 || to.path.indexOf('report-show') > -1) {
         next()
     } else {
-        const hasToken = localStorage.getItem('token')
+        const hasToken = localStorage.getItem('accessToken')
         if (hasToken) {
             // 判断权限
             // @ts-ignore
