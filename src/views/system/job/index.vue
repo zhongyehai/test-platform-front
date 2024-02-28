@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import ShowLogDrawer from './show-log.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
@@ -73,7 +73,13 @@ import {GetJobFuncList, DeleteJob, PostJob, JobRun} from "@/api/system/job";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.84}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.89}px`
+  }
+})
 
 const showEditDrawer = (funcName: string) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'job', content: funcName});

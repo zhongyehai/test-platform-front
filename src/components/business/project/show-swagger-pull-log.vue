@@ -94,7 +94,7 @@
 
 <script lang="ts" setup>
 
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {bus, busEvent} from "@/utils/bus-events";
 import showJson from "@/components/show-json.vue";
 import { GetSwaggerPullLogList, GetSwaggerPullLog } from '@/api/assist/swagger'
@@ -130,7 +130,13 @@ const pullLogDetailData = ref({})
 const pullLogDetailIsShow = ref(false)
 const drawerIsShow = ref(false)
 const tableIsLoading = ref(false)
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.78}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.85}px`
+  }
+})
 const tableDataList = ref([])
 const tableDataTotal = ref(0)
 const queryItems = ref({

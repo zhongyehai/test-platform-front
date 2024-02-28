@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 
@@ -146,7 +146,13 @@ const queryItems = ref({
   file_name: undefined,
   create_user: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 const scriptTypeDict = {test: '执行测试', mock: 'mock脚本', encryption: '加密脚本', decryption: '解密脚本'}
 
 const changePagination = (pagination: any) => {

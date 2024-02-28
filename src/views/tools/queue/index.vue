@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import queueListDrawer from './queue-list-drawer.vue'
 import queueLinkEditDrawer from './queue-link-edit-drawer.vue'
 
@@ -142,7 +142,13 @@ import {ElMessage} from "element-plus";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, host: undefined, queue_type: undefined})
 const userDict = ref({})

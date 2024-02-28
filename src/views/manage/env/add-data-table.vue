@@ -100,11 +100,17 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 
 import {bus, busEvent} from "@/utils/bus-events";
 const tableDataList = ref([{ id: `${Date.now()}`, name: null, value: null, password: null, desc: null }])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.64}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.77}px`
+  }
+})
 const props = defineProps({
   addType: {
     default: '',

@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import {ElMessage} from "element-plus";
 import Sortable from "sortablejs"
 
@@ -131,7 +131,13 @@ const queryItems = ref({
   name: undefined,
   code: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {

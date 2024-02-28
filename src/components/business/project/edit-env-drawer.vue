@@ -35,7 +35,7 @@
           <div style="margin-left: 15px">
             <el-tabs v-model="envDetailTabActiveName">
               <el-tab-pane label="环境属性" name="envDetail">
-                <el-scrollbar class="aside_scroll" :style="{height: tableHeight}">
+
                   <el-form
                       ref="ruleFormRef"
                       :model="formData"
@@ -68,6 +68,7 @@
                             <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
                           </el-tooltip>
                         </template>
+                        <el-scrollbar class="aside_scroll" :style="{height: attrHeight}">
                         <variablesView
                             ref="variablesViewRef"
                             :current-data="formData.variables"
@@ -75,6 +76,7 @@
                             :placeholder-value="'value'"
                             :placeholder-desc="'备注'"
                         />
+                        </el-scrollbar>
                       </el-tab-pane>
 
                       <!-- 头部信息 -->
@@ -91,7 +93,7 @@
                             <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
                           </el-tooltip>
                         </template>
-
+                        <el-scrollbar class="aside_scroll" :style="{height: attrHeight}">
                         <headersView
                             ref="headersViewRef"
                             :current-data="formData.headers"
@@ -100,11 +102,12 @@
                             :placeholder-desc="'备注'"
                             :remark-is-required="false"
                         />
+                        </el-scrollbar>
                       </el-tab-pane>
                     </el-tabs>
                   </el-form>
 
-                </el-scrollbar>
+
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -135,7 +138,7 @@
 
 <script lang="ts" setup>
 
-import {onBeforeUnmount, onMounted, ref, nextTick} from "vue";
+import {onBeforeUnmount, onMounted, ref, nextTick, computed} from "vue";
 import synchronizeEnvView from "./synchronize-env.vue";
 import {bus, busEvent} from "@/utils/bus-events";
 import variablesView from '@/components/input/variables.vue'
@@ -167,7 +170,21 @@ const onShowDrawerEvent = (message: any) => {
   }
 }
 
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.68}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.78}px`
+  }
+})
+
+const attrHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.54}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.7}px`
+  }
+})
 const drawerIsShow = ref(false)
 const drawerIsLoading = ref(true)
 const variablesViewRef = ref(null)

@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import showDetailDrawer from './show-detail.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
@@ -77,7 +77,13 @@ import {GetUserList} from "@/api/system/user";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.77}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.86}px`
+  }
+})
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20})
 const userDict = ref({})

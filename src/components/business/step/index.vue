@@ -392,6 +392,7 @@ const setSort = () => {
 }
 
 onMounted(() => {
+  queryItems.value.case_id = props.caseId
   setSort()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
 })
@@ -401,11 +402,10 @@ onBeforeUnmount(() => {
 })
 
 const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'step-editor') {
+  if (message.eventType === 'step-editor' || message.eventType === 'step-is-copy-to-case') {
     getTableDataList()
   }
 }
-
 </script>
 
 <style scoped lang="scss">

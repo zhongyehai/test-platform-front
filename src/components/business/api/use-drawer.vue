@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
@@ -80,7 +80,13 @@ const drawerIsShow = ref(false)
 const showApiUseRef = ref(null)
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.83}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.88}px`
+  }
+})
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {

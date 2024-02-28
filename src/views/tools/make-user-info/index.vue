@@ -118,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {MakeUser, ExportAsContact} from '@/api/tools/make-user'
 import {GetConfigByCode} from '@/api/config/config-value'
 import toClipboard from "@/utils/copy-to-memory";
@@ -140,7 +140,13 @@ const count = ref(1)
 const downloadAsContactIsLoading = ref(false)
 const showDownloadAsContactOption = ref(false)
 const downloadAsContactCount = ref(0)
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 
 onMounted(() => {
   getMakeUserInfoMapping()

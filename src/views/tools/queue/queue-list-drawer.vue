@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import queueEditDrawer from './queue-edit-drawer.vue'
 import msgLogDrawer from './msg-log-drawer.vue'
 
@@ -126,7 +126,13 @@ const props = defineProps({
 const queueDrawerIsShow = ref(false)
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, link_id: undefined})
 

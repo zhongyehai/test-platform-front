@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
 })
 
 const onDrawerIsCommit = (message: any) => {
-  if (message.eventType === 'select-step-file' && props.useType === 'data-form') {
+  if (message.eventType === 'select-step-file' && props.useFrom === 'data-form') {
     tempData.value[itemIndex.value].value = message.content
   }
 }

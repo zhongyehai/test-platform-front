@@ -100,7 +100,8 @@
         <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
           <template #default="scope">
             <el-button v-if="scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditNameDrawer(scope.row)">改名</el-button>
-            <el-button v-if="!scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">修改</el-button>
+
+            <el-button v-if="caseId === currentCaseId && !scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">修改</el-button>
 
             <el-popconfirm width="250px" :title="`复制用例【${scope.row.name}】下的所有步骤，并在【当前用例】下生成对应的步骤?`" @confirm="copyCaseStepToCurrentCase(scope.row)">
               <template #reference>
@@ -116,7 +117,7 @@
 
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
               <template #reference>
-                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
+                <el-button v-if="caseId === currentCaseId" style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
               </template>
             </el-popconfirm>
           </template>
@@ -240,9 +241,10 @@ const copyData = (row: { id: any; }) =>{
   tableIsLoading.value = true
   CopyStep(props.testType,{ id: row.id, case_id: props.currentCaseId }).then(response => {
     tableIsLoading.value = false
-    if (response) {
-      getTableDataList()
-    }
+    bus.emit(busEvent.drawerIsCommit, {eventType: 'step-is-copy-to-case'});
+    // if (response) {
+    //   getTableDataList()
+    // }
   })
 }
 

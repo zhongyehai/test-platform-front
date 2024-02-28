@@ -8,6 +8,10 @@ export function GetEnvList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
 
+export function CopyEnv(data: object) {
+    return request({url: currentBaseDir + '/copy', method: 'post', data: data})
+}
+
 export function GetEnv(params: object) {
     return request({url: currentBaseDir, method: 'get', params: params})
 }

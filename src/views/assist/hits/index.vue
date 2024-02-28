@@ -137,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 
@@ -157,7 +157,13 @@ const queryItems = ref({
   hit_type: undefined,
   report_id: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 
 const runTestTypeList = ref([])
 const runTestTypeDict = ref({})

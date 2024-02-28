@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 
 import Pagination from '@/components/pagination.vue'
 import {bus, busEvent} from "@/utils/bus-events";
@@ -92,7 +92,13 @@ const queryItems = ref({
   func_name: '',
   detail: true
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.75}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.83}px`
+  }
+})
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum

@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount, watch} from "vue";
+import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'
@@ -128,7 +128,13 @@ const queryItems = ref({
   detail: true,
   page_id: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.63}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.76}px`
+  }
+})
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {

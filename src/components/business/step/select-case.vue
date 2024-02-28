@@ -114,13 +114,7 @@
 
             <el-popconfirm width="250px" :title="`复制用例【${scope.row.name}】下的所有步骤，并在【当前用例】下生成对应的步骤?`" @confirm="copyCaseStepToCurrentCase(scope.row)">
               <template #reference>
-                <el-button v-if="scope.row.quote_case" style="margin: 0; padding: 2px" :loading="scope.row.loading" type="text" size="small">拉取</el-button>
-              </template>
-            </el-popconfirm>
-
-            <el-popconfirm :title="`复制步骤【${scope.row.name}】，并在【当前用例】下生成新的步骤?`" @confirm="copyData(scope.row)">
-              <template #reference>
-                <el-button style="margin: 0; padding: 2px" :loading="scope.row.loading" type="text" size="small">复制</el-button>
+                <el-button style="margin: 0; padding: 2px" :loading="scope.row.loading" type="text" size="small">拉取</el-button>
               </template>
             </el-popconfirm>
 

@@ -180,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount, watch, nextTick} from "vue";
+import {onMounted, ref, onBeforeUnmount, watch, nextTick, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 
@@ -224,7 +224,13 @@ const queryItems = ref({
   detail: true,
   project_id: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.83}px`
+  }
+})
 const currentProject = ref()
 const triggerFrom = 'task-index'
 const runTaskId = ref()

@@ -1,6 +1,5 @@
 <template>
-  <div class="layout-container">
-
+  <div>
     <el-drawer v-model="drawerIsShow" title="账号管理" size="80%">
 
     <div class="layout-container-form flex space-between">
@@ -74,6 +73,7 @@
         <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="15%">
           <template #default="scope">
             <el-button style="margin: 0; padding: 5px" type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
+            <el-button style="margin: 0; padding: 5px" type="text" size="small" @click.native="copyData(scope.row)">复制</el-button>
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row.id)">
               <template #reference>
                 <el-button style="margin: 0; padding: 5px;color: red" type="text" size="small">删除</el-button>
@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import editAccountDrawer from './edit-account-drawer.vue'
 
@@ -105,8 +105,7 @@ import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
 
-import {GetBusinessList} from "@/api/config/business";
-import {GetAccountList, DeleteAccount} from "@/api/manage/env";
+import {GetAccountList, DeleteAccount, CopyEnv} from "@/api/manage/env";
 
 const drawerIsShow = ref(false)
 const tableIsLoading = ref(false)
@@ -120,9 +119,13 @@ const queryItems = ref({
   name: undefined,
   value: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
-const businessList = ref([])
-const businessDict = ref({})
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.7}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.8}px`
+  }
+})
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -140,15 +143,18 @@ const changePagination = (pagination: any) => {
 }
 
 const showEditDrawer = (row: object | undefined) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'account', parent_id: queryItems.value.parent_id, content: row});
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'account',
+    parent_id: queryItems.value.parent_id,
+    content: row
+  });
 }
 
-const getBusinessList = () => {
-  GetBusinessList({page_num: 1, page_size: 99999}).then(response => {
-    businessList.value = response.data.data
-    businessList.value.forEach(business => {
-      businessDict.value[business.id] = business.name
-    })
+const copyData = (row) => {
+  CopyEnv({id: row.id}).then((response: object) => {
+    if (response){
+      getTableDataList()
+    }
   })
 }
 

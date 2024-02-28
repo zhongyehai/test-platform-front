@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Pagination from '@/components/pagination.vue'
 
 import {GetRunEnvList} from "@/api/config/run-env";
@@ -112,7 +112,13 @@ const queryItems = ref({
   page_size: 20,
   env: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 const envList = ref([])
 const envDict = ref({})
 

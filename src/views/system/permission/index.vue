@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 
@@ -123,7 +123,13 @@ const queryItems = ref({
   name: undefined,
   source_type: 'front'
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.66}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.77}px`
+  }
+})
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum

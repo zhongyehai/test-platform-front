@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import editEnvDrawer from './edit-env-drawer.vue'
 import accountListDrawer from './account-list-drawer.vue'
@@ -132,7 +132,13 @@ const queryItems = ref({
   addr: undefined,
   business_list: undefined
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.73}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.82}px`
+  }
+})
 const businessList = ref([])
 const businessDict = ref({})
 

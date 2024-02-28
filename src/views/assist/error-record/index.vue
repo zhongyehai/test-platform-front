@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Pagination from '@/components/pagination.vue'
 
 import {GetUserList} from "@/api/system/user";
@@ -77,7 +77,13 @@ const queryItems = ref({
   page_size: 20,
   detail: true
 })
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.79}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.86}px`
+  }
+})
 const drawerIsShow = ref(false)
 const currentRow = ref()
 

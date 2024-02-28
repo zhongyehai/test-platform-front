@@ -2,7 +2,6 @@
   <el-dialog
       title="上传文件"
       v-loading="dialogIsLoading"
-      :append-to-body="true"
       v-model="dialogIsShow"
       :close-on-click-modal="false"
       width="30%"
@@ -61,8 +60,6 @@ onBeforeUnmount(() => {
 
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'uploadFile') {
-    console.log(222222)
-    console.log(message)
     resetForm()
     fileType.value = message.content
     dialogIsShow.value = true

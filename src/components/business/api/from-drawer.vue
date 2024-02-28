@@ -122,7 +122,7 @@
     <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
       <template #default="scope">
         <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">查看</el-button>
-        <el-button v-if="caseId" type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">转步骤</el-button>
+        <el-button v-if="caseId" type="text" size="small" style="margin: 0; padding: 2px" @click="apiToStep(scope.row)">转步骤</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
@@ -148,7 +148,13 @@ const drawerIsShow = ref(false)
 const showApiFromRef = ref(null)
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.83}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.88}px`
+  }
+})
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -185,6 +191,13 @@ const changeStatus = (row: { id: any; status: any; }) => {
 
 const showEditDrawer = (row: any) => {
   bus.emit(busEvent.drawerIsShow, { eventType: 'api-editor', content: row, command: 'edit' })
+}
+
+const apiToStep = (row: any) => {
+  const step = JSON.parse(JSON.stringify(row));
+  step.api_id = step.id
+  step.id = undefined
+  bus.emit(busEvent.drawerIsShow, {eventType: 'step-editor', content: step})
 }
 
 onMounted(() => {
