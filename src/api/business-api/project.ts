@@ -44,6 +44,6 @@ export function PostProjectEnv(testType: string, data: object) {
 }
 
 export function SynchronizationProjectEnv(testType: string, data: object) {
-    return request({url: getEnvBaseDir(testType) + '/synchronization', method: 'post', data: data})
+    return request({url: getEnvBaseDir(testType) + '/synchronization', method: 'put', data: data})
 }
 
