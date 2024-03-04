@@ -277,11 +277,11 @@ const getTableDataList = () => {
 
 <style scoped lang="scss">
 
-.stepTable :deep(.hiddenRowIcon) .el-table__expand-icon {
+.expandStepTable :deep(.hiddenRowIcon) .el-table__expand-icon {
   display: none;
 }
 
-.stepTable :deep(.el-table__expand-icon) .cell {
+.expandStepTable :deep(.el-table__expand-icon) .cell {
   padding: 0 !important;
   margin: 0 !important;
 }
