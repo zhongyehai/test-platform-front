@@ -12,7 +12,7 @@
         </el-form-item>
 
         <el-form-item label="账号" prop="account" class="is-required" size="small">
-          <el-input v-model="formData.account" disabled size="small"/>
+          <el-input v-model="formData.account" :disabled="formData.id && !formData.sso_user_id" size="small"/>
         </el-form-item>
 
         <el-form-item label="角色" prop="role_list" class="is-required" size="small">
