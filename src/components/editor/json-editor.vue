@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, watch} from 'vue'
+import {computed, reactive, ref, watch} from 'vue'
 import {VAceEditor} from "vue3-ace-editor";
 import 'ace-builds/src-noconflict/mode-json5';
 import 'ace-builds/src-noconflict/theme-chrome';
@@ -50,7 +50,13 @@ const props = defineProps({
   }
 })
 const jsonEditorRef = ref(null)
-const tableHeight = localStorage.getItem('tableHeight')
+const tableHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.738}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.86}px`
+  }
+})
 watch(() => props.jsonData, (newValue, oldValue) => {
   tempData.value = JSON.stringify(newValue, null, 4)
 })

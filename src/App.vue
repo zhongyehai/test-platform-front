@@ -13,15 +13,6 @@ export default defineComponent({
     const store = useStore()
     const size = computed(() => store.state.app.elementSize)
 
-    // 统一设定表格的高度
-    const innerHeight = window.innerHeight
-    if (innerHeight < 800){  // 小屏
-      localStorage.setItem('tableHeight', `${innerHeight * 0.738}px`)
-      localStorage.setItem('treeHeight', `${innerHeight * 0.67}px`)
-    }else {  // 大屏
-      localStorage.setItem('tableHeight', `${innerHeight * 0.86}px`)
-      localStorage.setItem('treeHeight', `${innerHeight * 0.80}px`)
-    }
     return {
       size,
     }

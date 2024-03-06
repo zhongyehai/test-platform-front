@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 
-import {onMounted, ref, onBeforeUnmount, watch} from "vue";
+import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import editDrawer from "./edit-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
 import caseIndex from "@/components/business/case/index.vue";
@@ -180,7 +180,13 @@ const props = defineProps({
   }
 })
 interface Tree {[key: string]: any}
-let treeHeight = localStorage.getItem('treeHeight')
+let treeHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.67}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.80}px`
+  }
+})
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const filterText = ref('')
 watch(filterText, (val) => {treeRef.value!.filter(val)})

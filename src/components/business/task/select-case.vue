@@ -101,7 +101,7 @@
 
 <script lang="ts" setup>
 
-import {ref, watch, nextTick} from "vue";
+import {ref, watch, nextTick, computed} from "vue";
 import showCaseDesc from '@/components/business/case/show-desc.vue'
 import {GetCaseList} from "@/api/business-api/case";
 
@@ -156,7 +156,13 @@ const tableDataList = ref([])
 const suiteTreeRef = ref(null)
 const caseTableRef = ref(null)
 const tableIsLoading = ref(false)
-let treeHeight = localStorage.getItem('treeHeight')
+let treeHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.6}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.74}px`
+  }
+})
 
 const clickTree = (data: { id: any; }, node: any, element: any) => {
   if (currentTreeDataId.value !== data.id) {

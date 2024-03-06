@@ -166,6 +166,7 @@ onBeforeUnmount(() => {
 
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'project-env-editor') {
+    businessId.value = message.content.business_id
     resetForm(message.content.id)
     getRunEnvList()
     drawerIsShow.value = true
@@ -200,6 +201,7 @@ const attrHeight = computed(() =>{
     return `${innerHeight * 0.7}px`
   }
 })
+const businessId = ref()
 const drawerIsShow = ref(false)
 const drawerIsLoading = ref(true)
 const variablesViewRef = ref(null)
@@ -288,7 +290,7 @@ const getProjectEnv = () => {
 }
 
 const getRunEnvList = () => {
-  GetRunEnvList({page_num: 1, page_size: 99999}).then(response => {
+  GetRunEnvList({page_num: 1, page_size: 99999, business_id: businessId.value}).then(response => {
     runEnvList.value = response.data.data
     formData.value.env_id = runEnvList.value[0].id
     nextTick(() => {
