@@ -507,11 +507,7 @@ const delRow = (index: number) => {
 }
 
 const clearData = () => {
-  tempData.value[0].status = 0
-  tempData.value[0].key = null
-  tempData.value[0].extract_type = null
-  tempData.value[0].value = null
-  tempData.value[0].remark = null
+  tempData.value[0] = getNewData()
 }
 
 onMounted(() => {

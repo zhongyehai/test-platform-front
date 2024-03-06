@@ -494,12 +494,7 @@ const delRow = (index: number) => {
 }
 
 const clearData = () => {
-  tempData.value[0].status = 0
-  tempData.value[0].key = null
-  tempData.value[0].data_source = null
-  tempData.value[0].value = null
-  tempData.value[0].remark = null
-  tempData.value[0].update_to_header = null
+  tempData.value[0] = getNewData()
 }
 
 const getPlaceholder = (_type: string) => {

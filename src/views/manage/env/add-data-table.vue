@@ -118,11 +118,15 @@ const props = defineProps({
   }
 })
 
+const getNewData = () => {
+  return { id: `${Date.now()}`, name: null, value: null, password: null, desc: null }
+}
+
 const addRow = (isRow: undefined) => {
   if (isRow) {
-    tableDataList.value.push({ id: `${Date.now()}`, name: null, value: null, password: null, desc: null })
+    tableDataList.value.push(getNewData())
   } else {
-    tableDataList.value = [{ id: `${Date.now()}`, name: null, value: null, password: null, desc: null }]
+    tableDataList.value = [getNewData()]
   }
 }
 
@@ -141,7 +145,7 @@ const delRow = (index: number) => {
 }
 
 const clearData = () => {
-  tableDataList.value[0].key = null
+  tableDataList.value[0] = getNewData()
 }
 
 defineExpose({

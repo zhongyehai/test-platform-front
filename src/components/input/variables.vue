@@ -186,7 +186,7 @@ const delRow = (index: number) => {
 }
 
 const clearData = () => {
-  tempData.value[0].key = null
+  tempData.value[0] = getNewData()
 }
 
 const getDataTypeMappingList = () => {
