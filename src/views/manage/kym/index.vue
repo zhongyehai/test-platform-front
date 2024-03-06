@@ -121,6 +121,7 @@ const formRules = {
 const resetForm = () => {
   formData.value = {project: undefined}
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const getKYMProjectList = () => {

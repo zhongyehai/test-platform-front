@@ -12,6 +12,7 @@
               <el-scrollbar :style="{height: treeHeight}">
                 <el-tree
                     ref="projectTreeRef"
+                    class="filter-tree"
                     :data="projectDataList"
                     :props="defaultProps"
                     :filter-node-method="filterNode"
@@ -204,16 +205,26 @@ interface Tree {
   [key: string]: any
 }
 
-let treeHeight = localStorage.getItem('treeHeight')
-const treeRef = ref<InstanceType<typeof ElTree>>()
+let treeHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.7}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.81}px`
+  }
+})
+const projectTreeRef = ref<InstanceType<typeof ElTree>>()
 const filterText = ref('')
 watch(filterText, (val) => {
-  treeRef.value!.filter(val)
+  projectTreeRef.value!.filter(val)
 })
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+
 const defaultProps = {children: 'children', label: 'name'}
 const projectTab = ref('project')
 const taskTab = ref('task')
-const projectTreeRef = ref(null)
 const tableIsLoading = ref(false)
 const projectDataList = ref([])
 const tableDataList = ref([])
@@ -242,11 +253,6 @@ const rowDblclick = async (row: any, column: any, event: any) => {
   } catch (e) {
     console.error(e);
   }
-}
-
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.label.includes(value)
 }
 
 const clickTree = (row) => {

@@ -221,6 +221,7 @@ const resetForm = () => {
     desc: undefined
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const handleCheckAllChange = (val: any) => {

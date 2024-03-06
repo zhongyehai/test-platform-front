@@ -161,6 +161,7 @@ const resetForm = () => {
     api_list: [{id: `${Date.now()}`, name: null, method: null, addr: null}]
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const sendEvent = () => {

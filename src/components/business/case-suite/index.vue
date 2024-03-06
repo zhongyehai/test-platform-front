@@ -184,6 +184,11 @@ let treeHeight = localStorage.getItem('treeHeight')
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const filterText = ref('')
 watch(filterText, (val) => {treeRef.value!.filter(val)})
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+
 const defaultProps = {children: 'children', label: 'name'}
 const tempLabel = ref()
 const currentNode = ref({id: undefined})
@@ -254,11 +259,6 @@ const clickTree = (data: any) => {
     eventType: 'case-suite',
     content: {id: data.id, data: data, project_id: project.value.id, project: project.value}
   })
-}
-
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.label.includes(value)
 }
 
 const showApiFrom = () => {

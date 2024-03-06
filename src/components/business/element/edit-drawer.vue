@@ -185,6 +185,7 @@ const resetForm = () => {
     wait_time_out: 5
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'element-editor'});

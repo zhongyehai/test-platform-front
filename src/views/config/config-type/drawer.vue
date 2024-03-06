@@ -71,6 +71,7 @@ const formRules = {
 const ruleFormRef = ref(null)
 const resetForm = () => {
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const submitForm = () =>{

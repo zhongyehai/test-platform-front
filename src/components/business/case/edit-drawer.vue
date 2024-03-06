@@ -369,6 +369,7 @@ const resetForm = () => {
     suite_id: undefined
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = (content: any, command: string) => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'case-editor', content: content, command: command});

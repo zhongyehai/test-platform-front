@@ -13,6 +13,7 @@
           <div>
             <el-tabs v-model="envListTabActiveName">
               <el-tab-pane label="环境列表" name="envList">
+                <el-input v-model="filterText" placeholder="输入关键字进行过滤"/>
                 <el-scrollbar class="aside_scroll" :style="{height: tableHeight}">
                   <el-tree
                       ref="runEnvTreeRef"
@@ -23,6 +24,7 @@
                       :data="runEnvList"
                       :props="defaultProps"
                       @node-click="clickTable"
+                      :filter-node-method="filterNode"
                   >
                   </el-tree>
                 </el-scrollbar>
@@ -138,14 +140,14 @@
 
 <script lang="ts" setup>
 
-import {onBeforeUnmount, onMounted, ref, nextTick, computed} from "vue";
+import {onBeforeUnmount, onMounted, ref, nextTick, computed, watch} from "vue";
 import synchronizeEnvView from "./synchronize-env.vue";
 import {bus, busEvent} from "@/utils/bus-events";
 import variablesView from '@/components/input/variables.vue'
 import headersView from '@/components/input/key-value-row.vue'
 import {GetProjectEnv, PutProjectEnv} from "@/api/business-api/project";
 import {GetRunEnvList} from "@/api/config/run-env";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElTree} from "element-plus";
 
 const props = defineProps({
   testType: {
@@ -170,6 +172,19 @@ const onShowDrawerEvent = (message: any) => {
   }
 }
 
+interface Tree {
+  [key: string]: any
+}
+const runEnvTreeRef = ref<InstanceType<typeof ElTree>>()
+const filterText = ref('')
+watch(filterText, (val) => {
+  runEnvTreeRef.value!.filter(val)
+})
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+
 const tableHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
     return `${innerHeight * 0.68}px`
@@ -189,7 +204,6 @@ const drawerIsShow = ref(false)
 const drawerIsLoading = ref(true)
 const variablesViewRef = ref(null)
 const headersViewRef = ref(null)
-const runEnvTreeRef = ref(null)
 const envDataActiveName = ref('variables')
 const envListTabActiveName = ref('envList')
 const envDetailTabActiveName = ref('envDetail')
@@ -255,6 +269,7 @@ const resetForm = (project_id: number) => {
     variables: [{ 'key': '', 'value': '', 'remark': '' }]
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const clickTable = (env: { id: number; }) => {

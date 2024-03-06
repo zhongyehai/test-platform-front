@@ -119,6 +119,7 @@ const resetForm = () => {
     port: '4723'
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'server-editor'});

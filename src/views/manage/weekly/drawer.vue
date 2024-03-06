@@ -161,6 +161,7 @@ const resetForm = () => {
     business_order_no: undefined
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'data-pool'});

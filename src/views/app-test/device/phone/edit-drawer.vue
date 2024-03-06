@@ -152,6 +152,7 @@ const resetForm = () => {
     extends: {}
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'phone-editor'});

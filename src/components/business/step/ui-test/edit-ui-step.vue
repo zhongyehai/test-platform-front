@@ -449,6 +449,7 @@ const resetForm = () => {
     case_id: props.caseId
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const element = ref({})

@@ -119,6 +119,7 @@ const formRules = {
 
 const resetForm = () => {
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const submitForm = (command: string) => {

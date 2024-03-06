@@ -95,6 +95,7 @@ const resetForm = () => {
     controller: undefined
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 const sendEvent = (content: any, command: string) => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'edit-module', content: content, command: command});

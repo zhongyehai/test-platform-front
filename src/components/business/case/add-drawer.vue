@@ -135,6 +135,7 @@ const resetForm = () => {
     case_list: [{id: `${Date.now()}`, name: null, desc: null}]
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const sendEvent = () => {

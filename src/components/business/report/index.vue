@@ -2,7 +2,8 @@
   <div class="layout-container">
     <div>
       <el-row>
-        <el-col :xs="4" :sm="3" :md="4" :lg="5" :xl="5" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+        <el-col :xs="4" :sm="3" :md="4" :lg="5" :xl="5"
+                style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
           <el-tabs v-model="projectTab" style="margin-left: 10px">
             <el-tab-pane name="project">
               <template #label>
@@ -12,6 +13,7 @@
               <el-scrollbar :style="{height: treeHeight}">
                 <el-tree
                     ref="projectTreeRef"
+                    class="filter-tree"
                     :data="projectDataList"
                     :props="defaultProps"
                     :filter-node-method="filterNode"
@@ -35,73 +37,73 @@
             <el-tabs v-model="reportTab">
               <el-tab-pane name="report" label="报告列表">
 
-                    <el-select
-                        v-model="queryItems.env_list"
-                        style="margin-right: 10px"
-                        placeholder="运行环境"
+                <el-select
+                    v-model="queryItems.env_list"
+                    style="margin-right: 10px"
+                    placeholder="运行环境"
+                    size="small"
+                    multiple
+                    clearable
+                    default-first-option
+                >
+                  <el-option v-for="item in eventList" :key="item.code" :label="item.name" :value="item.code"/>
+                </el-select>
+
+                <el-input
+                    v-model="queryItems.name"
+                    placeholder="报告名，模糊查询"
+                    size="small"
+                    clearable
+                    style="width: 200px; margin-right: 10px"
+                />
+
+                <el-select
+                    v-model="queryItems.create_user"
+                    placeholder="创建人"
+                    filterable
+                    default-first-option
+                    clearable
+                    size="small"
+                    style="width: 200px; margin-right: 10px"
+                >
+                  <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"/>
+                </el-select>
+
+                <el-select
+                    v-model="queryItems.run_type"
+                    placeholder="运行类型"
+                    size="small"
+                    filterable
+                    clearable
+                    style="margin-right: 10px"
+                    default-first-option
+                >
+                  <el-option v-for="(value, key) in runTypeDict" :key="key" :label="value" :value="key"/>
+                </el-select>
+
+                <el-popover :visible="checkDeleteIsShow" placement="top" popper-class="down-popover" width="450px">
+                  确定删除所选中的测试报告?
+                  <div style="color: red">
+                    1、关联了问题记录的测试报告不会被删除 <br>
+                    2、触发方式为【定时任务】或者【流水线】的，只有管理员能删除
+                  </div>
+                  <div style="text-align: right; margin-top: 10px">
+                    <el-button size="small" type="text" @click="checkDeleteIsShow = false">取消</el-button>
+                    <el-button type="primary" size="small" @click="deleteData(null)">确定</el-button>
+                  </div>
+                  <template #reference>
+                    <el-button
+                        :disabled="selectedList.length === 0"
+                        type="primary"
                         size="small"
-                        multiple
-                        clearable
-                        default-first-option
-                    >
-                      <el-option v-for="item in eventList" :key="item.code" :label="item.name" :value="item.code" />
-                    </el-select>
+                        style="margin-left: 5px"
+                        @click="checkDeleteIsShow = true"
+                    >批量删除
+                    </el-button>
+                  </template>
+                </el-popover>
 
-                    <el-input
-                        v-model="queryItems.name"
-                        placeholder="报告名，模糊查询"
-                        size="small"
-                        clearable
-                        style="width: 200px; margin-right: 10px"
-                    />
-
-                    <el-select
-                        v-model="queryItems.create_user"
-                        placeholder="创建人"
-                        filterable
-                        default-first-option
-                        clearable
-                        size="small"
-                        style="width: 200px; margin-right: 10px"
-                    >
-                      <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"/>
-                    </el-select>
-
-                    <el-select
-                        v-model="queryItems.run_type"
-                        placeholder="运行类型"
-                        size="small"
-                        filterable
-                        clearable
-                        style="margin-right: 10px"
-                        default-first-option
-                    >
-                      <el-option v-for="(value, key) in runTypeDict" :key="key" :label="value" :value="key"/>
-                    </el-select>
-
-                    <el-popover :visible="checkDeleteIsShow" placement="top" popper-class="down-popover" width="450px">
-                      确定删除所选中的测试报告?
-                      <div style="color: red">
-                        1、关联了问题记录的测试报告不会被删除 <br>
-                        2、触发方式为【定时任务】或者【流水线】的，只有管理员能删除
-                      </div>
-                      <div style="text-align: right; margin-top: 10px">
-                        <el-button size="small" type="text" @click="checkDeleteIsShow = false">取消</el-button>
-                        <el-button type="primary" size="small" @click="deleteData(null)">确定</el-button>
-                      </div>
-                      <template #reference>
-                        <el-button
-                            :disabled="selectedList.length === 0"
-                            type="primary"
-                            size="small"
-                            style="margin-left: 5px"
-                            @click="checkDeleteIsShow = true"
-                        >批量删除
-                        </el-button>
-                      </template>
-                    </el-popover>
-
-                    <el-button type="primary" @click="getTableDataList">查询</el-button>
+                <el-button type="primary" @click="getTableDataList">查询</el-button>
 
                 <el-table
                     v-loading="tableIsLoading"
@@ -113,7 +115,7 @@
                     :height="tableHeight"
                     @row-dblclick="rowDblclick">
 
-                  <el-table-column type="selection" min-width="2%" />
+                  <el-table-column type="selection" min-width="2%"/>
 
                   <el-table-column prop="id" label="序号" align="center" min-width="5%">
                     <template #default="scope">
@@ -121,27 +123,31 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="18%" />
+                  <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="18%"/>
 
-                  <el-table-column show-overflow-tooltip prop="create_time" align="center" label="生成时间" min-width="15%">
+                  <el-table-column show-overflow-tooltip prop="create_time" align="center" label="生成时间"
+                                   min-width="15%">
                     <template #default="scope">
                       <span> {{ scope.row.create_time }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="trigger_type" label="触发方式" align="center" min-width="8%">
+                  <el-table-column show-overflow-tooltip prop="trigger_type" label="触发方式" align="center"
+                                   min-width="8%">
                     <template #default="scope">
                       <span> {{ reportTriggerTypeMappingContent[scope.row.trigger_type] }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column v-if="testType !== 'app'" show-overflow-tooltip prop="env"  label="运行环境" align="center" min-width="10%">
+                  <el-table-column v-if="testType !== 'app'" show-overflow-tooltip prop="env" label="运行环境"
+                                   align="center" min-width="10%">
                     <template #default="scope">
                       <span> {{ eventDict[scope.row.env] }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="is_passed"  label="是否通过" align="center" min-width="10%">
+                  <el-table-column show-overflow-tooltip prop="is_passed" label="是否通过" align="center"
+                                   min-width="10%">
                     <template #default="scope">
                       <el-tag size="small" :type="reportStatusMappingTagType[scope.row.is_passed]">
                         {{ reportStatusMappingContent[scope.row.is_passed] }}
@@ -160,7 +166,8 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="create_user" label="创建人" align="center" min-width="8%">
+                  <el-table-column show-overflow-tooltip prop="create_user" label="创建人" align="center"
+                                   min-width="8%">
                     <template #default="scope">
                       <span> {{ userDict[scope.row.create_user] }} </span>
                     </template>
@@ -258,16 +265,26 @@ interface Tree {
   [key: string]: any
 }
 
-let treeHeight = localStorage.getItem('treeHeight')
-const treeRef = ref<InstanceType<typeof ElTree>>()
 const filterText = ref('')
+const projectTreeRef = ref<InstanceType<typeof ElTree>>()
 watch(filterText, (val) => {
-  treeRef.value!.filter(val)
+  projectTreeRef.value!.filter(val)
+})
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+
+let treeHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.7}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.81}px`
+  }
 })
 const defaultProps = {children: 'children', label: 'name'}
 const projectTab = ref('project')
 const reportTab = ref('report')
-const projectTreeRef = ref(null)
 const tableIsLoading = ref(false)
 const checkDeleteIsShow = ref(false)
 const project = ref({})
@@ -292,10 +309,10 @@ const queryItems = ref({
   run_type: undefined
 })
 
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
+const tableHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
     return `${innerHeight * 0.7}px`
-  }else {  // 大屏
+  } else {  // 大屏
     return `${innerHeight * 0.81}px`
   }
 })
@@ -311,10 +328,6 @@ const rowDblclick = async (row: any, column: any, event: any) => {
   }
 }
 
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.label.includes(value)
-}
 
 const clickTree = (row) => {
   project.value = row
@@ -339,7 +352,7 @@ const getReportAndSendEvent = () => {
         sendReRun(tempVariables)
       } else { // 没有就获取用例的数据
         if (report.value.trigger_id.length === 1) {
-          GetCase(props.testType, { id: report.value.trigger_id[0] }).then(response => {
+          GetCase(props.testType, {id: report.value.trigger_id[0]}).then(response => {
             const case_data = response.data
             sendReRun({
               skip_if: case_data.skip_if, variables: case_data.variables,
@@ -350,7 +363,7 @@ const getReportAndSendEvent = () => {
           sendReRun(null)
         }
       }
-    }else {
+    } else {
       sendReRun(null)
     }
   })
@@ -370,13 +383,13 @@ const clickReRun = (row: {}) => {
   report.value = row
   if (props.testType === 'app') {
     if (busEvent.data.runServerList.length < 1) {
-      GetServerList({ page_num: 1, page_size: 99999 }).then(response => {
+      GetServerList({page_num: 1, page_size: 99999}).then(response => {
         busEvent.data.runServerList = response.data.data
       })
     }
 
     if (busEvent.data.runPhoneList.length < 1) {
-      GetPhoneList({ page_num: 1, page_size: 99999 }).then(response => {
+      GetPhoneList({page_num: 1, page_size: 99999}).then(response => {
         busEvent.data.runPhoneList = response.data.data
       })
     }
@@ -429,10 +442,12 @@ const clickSelectAll = (val: never[]) => {
 
 const getSubmitId = (row: any) => {
   let selectedIdList: any[] = []
-  if (row){
+  if (row) {
     selectedIdList = [row.id]
-  }else {
-    selectedList.value.forEach(item => { selectedIdList.push(item.id) })
+  } else {
+    selectedList.value.forEach(item => {
+      selectedIdList.push(item.id)
+    })
   }
   return selectedIdList
 }
@@ -469,7 +484,7 @@ const getProjectList = () => {
 }
 
 const getRunEnvList = () => {
-  GetRunEnvList({ business_id: project.value.business_id }).then(response => {
+  GetRunEnvList({business_id: project.value.business_id}).then(response => {
     eventList.value = response.data.data
     eventList.value.forEach(env => {
       eventDict.value[env.code] = env.name
@@ -478,7 +493,7 @@ const getRunEnvList = () => {
 }
 
 const getUserList = () => {
-  GetUserList({ business_id: project.value.business_id }).then(response => {
+  GetUserList({business_id: project.value.business_id}).then(response => {
     userList.value = response.data.data
     userList.value.forEach(env => {
       userDict.value[env.id] = env.name
@@ -487,7 +502,7 @@ const getUserList = () => {
 }
 
 const getRunTypeDict = () => {
-  GetConfigByCode({ code: 'run_type' }).then(response => {
+  GetConfigByCode({code: 'run_type'}).then(response => {
     runTypeDict.value = response.data
   })
 }

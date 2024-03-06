@@ -120,6 +120,7 @@ const resetForm = () => {
     case_list: []
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
+  submitButtonIsLoading.value = false
 }
 
 const sendEvent = () => {
