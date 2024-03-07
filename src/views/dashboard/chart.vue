@@ -22,8 +22,8 @@ const option = ref({
     }
   },
   legend: {},
-  toolbox: {
-    show: true,
+  toolbox: {  // 图表右侧的 刷新、下载 按钮
+    show: false,
     feature: {
       dataView: { readOnly: false },
       restore: {},
@@ -111,8 +111,8 @@ const option = ref({
 
 const charSize = computed(() => {
   return {
-    width: `${window.innerWidth * 0.8}px`,
-    height: `${window.innerHeight * 0.70}px`
+    width: innerWidth > 1600 ? `${innerWidth * 0.9}px` : `${innerWidth * 0.86}px`,
+    height: innerHeight > 800 ? `${innerHeight * 0.79}px` : `${innerHeight * 0.69}px`
   }
 })
 

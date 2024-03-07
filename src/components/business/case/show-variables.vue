@@ -48,9 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
 import {busEvent} from "@/utils/bus-events";
-import {GetCaseFrom} from "@/api/business-api/case";
 
 const props = defineProps({
   testType: {

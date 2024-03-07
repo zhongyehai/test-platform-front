@@ -16,11 +16,12 @@ const props = defineProps({
   },
   width: {
     type: String,
-    default: '100%'
+    default: '99%'
   },
   height: {
     type: String,
-    default: `${window.innerHeight * 0.9}px` // '500px'
+    default: innerHeight > 800 ? `${innerHeight * 0.83}px` : `${innerHeight * 0.74}px`
+
   }
 })
 const chart = ref()

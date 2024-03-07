@@ -16,11 +16,11 @@ const props = defineProps({
   },
   width: {
     type: String,
-    default: '100%'
+    default: '98%'
   },
   height: {
     type: String,
-    default: `${window.innerHeight * 0.9}px` // '500px'
+    default: innerHeight > 800 ? `${innerHeight * 0.68}px` : `${innerHeight * 0.6}px`
   }
 })
 const chart = ref()
@@ -50,6 +50,9 @@ const  initChart = () => {
     },
     yAxis: {
       type: 'category',
+      axisLabel: {
+        interval: 0
+      },
       data: props.chartData.options_list // ['公共业务线', 'xx业务线']
     },
     series: props.chartData.items
