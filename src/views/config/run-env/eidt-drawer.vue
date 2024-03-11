@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改环境' : '新增环境'" size="60%">
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改环境' : '复制环境'" size="60%">
 
       <el-form
           ref="ruleFormRef"
@@ -23,11 +23,11 @@
         </el-form-item>
 
         <el-form-item label="环境名字" prop="name" class="is-required" size="small">
-          <el-input v-model="formData.name" :disabled="formData.id" size="small"/>
+          <el-input v-model="formData.name"  size="small"/>
         </el-form-item>
 
         <el-form-item label="环境code" prop="code" size="small">
-          <el-input v-model="formData.code" size="small" placeholder="环境code，保存后不可更改" style="width: 94%"/>
+          <el-input v-model="formData.code" size="small" :disabled="formData.id" placeholder="环境code，保存后不可更改" style="width: 94%"/>
           <el-tooltip class="item" effect="dark" placement="top-start">
             <template #content>
               <div>环境code不可更改</div>
@@ -82,7 +82,7 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'run-env') {
+  if (message.eventType === 'edit-run-env') {
     resetForm()
     formData.value = message.content
     drawerIsShow.value = true
@@ -125,7 +125,7 @@ const addRunEnv = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       submitButtonIsLoading.value = true
-      PostRunEnv(formData.value).then(response => {
+      PostRunEnv({env_list: [formData.value]}).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()

@@ -3,7 +3,7 @@
 
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
-        <el-button type="primary" @click="showEditDrawer(undefined)"> 添加类型</el-button>
+        <el-button type="primary" @click="showEditDrawer(undefined, 'add')"> 添加类型</el-button>
       </div>
 
       <div class="layout-container-form-search">
@@ -42,7 +42,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip prop="name" align="center" label="参数类型" min-width="35%">
+        <el-table-column show-overflow-tooltip prop="name" align="center" label="配置类型" min-width="35%">
           <template #default="scope">
             <span> {{ scope.row.name }} </span>
           </template>
@@ -61,7 +61,8 @@
         </el-table-column>
         <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="10%">
           <template #default="scope">
-            <el-button type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row, 'copy')">复制</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -75,13 +76,15 @@
     </div>
 
     <EditDrawer></EditDrawer>
+    <AddDrawer></AddDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref, Ref, computed, onBeforeUnmount} from "vue";
 import Pagination from '@/components/pagination.vue'
-import EditDrawer from './drawer.vue'
+import EditDrawer from './edit-drawer.vue'
+import AddDrawer from './add-drawer.vue'
 
 import {GetConfigTypeList} from "@/api/config/config-type";
 import {GetUserList} from "@/api/system/user";
@@ -113,9 +116,18 @@ const changePagination = (pagination: any) => {
   getTableDataList()
 }
 
-const showEditDrawer = (row: object | undefined) => {
-  const content = row ? row : {id: undefined, name: undefined, desc: undefined}
-  bus.emit(busEvent.drawerIsShow, {eventType: 'config-type', content: content});
+const showEditDrawer = (row: object | undefined, command: string) => {
+  let eventType = 'edit-config-type'
+  let content = undefined
+  if (command == 'edit'){
+    content = row
+  }else if (command == 'copy'){
+    content = JSON.parse(JSON.stringify(row))
+    content.id = undefined
+  }else {
+    eventType = 'add-config-type'
+  }
+  bus.emit(busEvent.drawerIsShow, {eventType: eventType, content: content});
 }
 
 // 解析用户

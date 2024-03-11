@@ -78,11 +78,11 @@
 
         <el-table-column show-overflow-tooltip align="center" label="操作" min-width="10%">
           <template #default="scope">
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer(scope.row, 'copy')">复制</el-button>
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'copy')">复制</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row.id)">
               <template #reference>
-                <el-button style="margin: 0; padding: 5px;color: red" type="text" size="small">删除</el-button>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
               </template>
             </el-popconfirm>
           </template>
@@ -99,13 +99,15 @@
     </div>
 
     <EditDrawer :source-type-dict="sourceTypeDict" :active-name="activeName"></EditDrawer>
+    <AddDrawer :source-type-dict="sourceTypeDict" :active-name="activeName"></AddDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
-import EditDrawer from './drawer.vue'
+import EditDrawer from './edit-drawer.vue'
+import AddDrawer from './add-drawer.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {DeletePermission, GetPermissionList, GetPermissionType} from "@/api/system/permission";
@@ -138,7 +140,8 @@ const changePagination = (pagination: any) => {
 }
 
 const showEditDrawer = (row: object | undefined, command: string) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'permission', content: row, 'command': command});
+  let eventType = command == 'add' ? 'add-permission' : 'edit-permission'
+  bus.emit(busEvent.drawerIsShow, {eventType: eventType, content: row, 'command': command});
 }
 
 const deleteData = (dataId: number) => {

@@ -76,7 +76,7 @@
               <div>
                 <el-input v-model="filterText" placeholder="输入关键字进行过滤" />
                 <el-scrollbar :style="{height: treeHeight}">
-                <el-tree
+                  <el-tree
                     ref="treeRef"
                     :data="moduleTreeData"
                     :props="defaultProps"

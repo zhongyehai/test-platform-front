@@ -13,12 +13,12 @@ const route: Route[] = [
       {
         path: 'type',
         component: createNameComponent(() => import('@/views/config/config-type/index.vue')),
-        meta: { title: '类型管理', icon: 'iconfont icon-testsetting' }
+        meta: { title: '配置类型', icon: 'iconfont icon-testsetting' }
       },
       {
         path: 'value',
         component: createNameComponent(() => import('@/views/config/config-value/index.vue')),
-        meta: { title: '参数管理', icon: 'iconfont icon-testsetting-fill' }
+        meta: { title: '配置参数', icon: 'iconfont icon-testsetting-fill' }
       },
       {
         path: 'run-env',

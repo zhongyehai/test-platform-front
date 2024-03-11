@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改配置类型' : '新增配置类型'" size="60%">
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改配置类型' : '复制配置类型'" size="60%">
       <el-form
           ref="ruleFormRef"
           :model="formData"
@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'config-type') {
+  if (message.eventType === 'edit-config-type') {
     resetForm()
     formData.value = message.content
     drawerIsShow.value = true
@@ -86,7 +86,7 @@ const addConfigType = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       submitButtonIsLoading.value = true
-      PostConfigType(formData.value).then(response => {
+      PostConfigType({data_list: [formData.value]}).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()

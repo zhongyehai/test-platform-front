@@ -14,41 +14,69 @@
       </div>
 
       <el-row>
-        <el-col :span="3">
+        <el-col :span="4" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
           <el-tabs v-model="businessListTab">
             <el-tab-pane :label="businessListTab" :name="businessListTab">
-              <el-scrollbar class="aside_scroll" :style="{height: `${scrollHeight}`}">
-                <el-tabs v-model="businessActiveId" tab-position="left" :before-leave="getProjectList">
-                  <el-tab-pane
-                      v-for="(business) in busEvent.data.businessList"
-                      :key="business.id"
-                      :name="business.id.toString()"
-                      :label="business.name"
-                  />
-                </el-tabs>
-              </el-scrollbar>
+                <el-input v-model="businessTreeFilterText" placeholder="输入关键字进行过滤" />
+                <el-scrollbar :style="{height: treeHeight}">
+                  <el-tree
+                      ref="businessTreeRef"
+                      class="filter-tree"
+                      :data="businessList"
+                      :props="defaultProps"
+                      :filter-node-method="filterNode"
+                      node-key="id"
+                      @node-click="getProjectList"
+                      highlight-current
+                  >
+                    <template #default="{ node, data }">
+                      <div class="custom-tree-node">
+                        <span>{{ node.label }}</span>
+                      </div>
+                    </template>
+                  </el-tree>
+                </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
         </el-col>
 
-        <el-col :span="4">
+        <el-col :span="4" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
           <el-tabs v-model="projectListTab">
             <el-tab-pane :label="projectListTab" :name="projectListTab">
-              <el-scrollbar class="aside_scroll" :style="{height: `${scrollHeight}`}">
-                <el-tabs v-model="projectActiveId" tab-position="left" :before-leave="getCaseList">
-                  <el-tab-pane
-                      v-for="(project) in projectList"
-                      :key="project.id"
-                      :name="project.id.toString()"
-                      :label="project.name"
-                  />
-                </el-tabs>
+<!--              <el-scrollbar class="aside_scroll" :style="{height: `${scrollHeight}`}">-->
+<!--                <el-tabs v-model="projectActiveId" tab-position="left" :before-leave="getCaseList">-->
+<!--                  <el-tab-pane-->
+<!--                      v-for="(project) in projectList"-->
+<!--                      :key="project.id"-->
+<!--                      :name="project.id.toString()"-->
+<!--                      :label="project.name"-->
+<!--                  />-->
+<!--                </el-tabs>-->
+<!--              </el-scrollbar>-->
+              <el-input v-model="projectTreeFilterText" placeholder="输入关键字进行过滤" />
+              <el-scrollbar :style="{height: treeHeight}">
+                <el-tree
+                    ref="projectTreeRef"
+                    class="filter-tree"
+                    :data="projectList"
+                    :props="defaultProps"
+                    :filter-node-method="filterNode"
+                    node-key="id"
+                    @node-click="getCaseList"
+                    highlight-current
+                >
+                  <template #default="{ node, data }">
+                    <div class="custom-tree-node">
+                      <span>{{ node.label }}</span>
+                    </div>
+                  </template>
+                </el-tree>
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
         </el-col>
 
-        <el-col :span="17">
+        <el-col :span="16">
           <el-tabs v-model="caseListTab">
             <el-tab-pane :label="caseListTab" :name="caseListTab">
               <div style="margin-left: 10px; margin-right: 10px">
@@ -87,7 +115,7 @@
                             :case-skip-if="scope.row.skip_if"
                             :case-variables="scope.row.variables"
                             :case-extracts="scope.row.output"
-                            :project-id="projectActiveId"
+                            :project-id="selectProjectId"
                         />
                         <template #reference>
                           <span> {{ scope.row.desc || '-' }} </span>
@@ -113,17 +141,17 @@
         </el-col>
       </el-row>
 
-      <selectRunEnv :test-type="'api'" :project-business-id="businessActiveId"></selectRunEnv>
+      <selectRunEnv :test-type="'api'" :project-business-id="selectBusinessId"></selectRunEnv>
       <showRunProcess :test-type="'api'"></showRunProcess>
 
-      <editCaseDrawer :test-type="'api'" :project-id="projectActiveId"/>
+      <editCaseDrawer :test-type="'api'" :project-id="selectProjectId"/>
 
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import SelectRunEnv from "@/components/select-run-env.vue";
 import ShowRunProcess from "@/components/show-run-process.vue";
 import showCaseDesc from '@/components/business/case/show-desc.vue'
@@ -132,13 +160,36 @@ import {bus, busEvent} from "@/utils/bus-events";
 import {GetBusinessList} from "@/api/config/business";
 import {GetProjectList} from "@/api/business-api/project";
 import {GetMakeDataCaseList, RunCase} from "@/api/business-api/case";
+import {ElTree} from "element-plus";
 
 const isLoading = ref(false)
 const businessListTab = ref('业务线列表')
 const projectListTab = ref('服务列表')
 const caseListTab = ref('用例列表')
-const businessActiveId = ref()
-const projectActiveId = ref()
+
+interface Tree {[key: string]: any}
+let treeHeight = computed(() => {
+  if (innerHeight < 800) {  // 小屏
+    return `${innerHeight * 0.67}px`
+  } else {  // 大屏
+    return `${innerHeight * 0.80}px`
+  }
+})
+const businessTreeRef = ref<InstanceType<typeof ElTree>>()
+const businessTreeFilterText = ref('')
+watch(businessTreeFilterText, (val) => {businessTreeRef.value!.filter(val)})
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+const projectTreeRef = ref<InstanceType<typeof ElTree>>()
+const projectTreeFilterText = ref('')
+watch(projectTreeFilterText, (val) => {projectTreeRef.value!.filter(val)})
+const defaultProps = {children: 'children', label: 'name'}
+
+const businessList = ref([])
+const selectBusinessId = ref()
+const selectProjectId = ref()
 const projectList = ref([])
 const caseList = ref([])
 const runCaseId = ref([])
@@ -152,28 +203,28 @@ const scrollHeight = computed(() =>{
   }
 })
 
-const getProjectList = (activeName: string, oldActiveName: any) => {
-  if (activeName && activeName !== '0') {
-    caseList.value = []
-    isLoading.value = true
-    GetProjectList(testType,{ business_id: parseInt(activeName) }).then(response => {
-      isLoading.value = false
-      if (response.data.total > 0) {
-        projectList.value = response.data.data
-        projectActiveId.value = response.data.data[0].id.toString()
-      }
-    })
-  }
+const getProjectList = (row: { id: any; }) => {
+  caseList.value = []
+  isLoading.value = true
+  GetProjectList(testType,{ business_id: row.id }).then(response => {
+    isLoading.value = false
+    projectList.value = response.data.data
+    if (response.data.total > 0){
+      selectProjectId.value = response.data.data[0].id
+      nextTick(() => {
+        projectTreeRef.value.$el.querySelector(".el-tree-node__content").click()
+      })
+    }
+  })
 }
 
-const getCaseList = (activeName: string, oldActiveName: any) => {
-  if (activeName && activeName !== '0') {
+const getCaseList = (row: { id: any; } | undefined) => {
+    selectProjectId.value = row ? row.id : selectProjectId.value
     isLoading.value = true
-    GetMakeDataCaseList(testType,{ project_id: parseInt(activeName) }).then(response => {
+    GetMakeDataCaseList(testType,{ project_id: selectProjectId.value }).then(response => {
       isLoading.value = false
       caseList.value = response.data.data
     })
-  }
 }
 
 // 编辑用例
@@ -190,7 +241,7 @@ const clickRunCase = (row) => {
     eventType: 'select-run-env',
     triggerFrom: triggerFrom,
     showSelectRunModel: false,
-    business_id: businessActiveId.value,
+    business_id: selectBusinessId.value,
     runArgs:       {
       variables: JSON.parse(JSON.stringify(row.variables)),
       headers: row.headers ? JSON.parse(JSON.stringify(row.headers)) : undefined,
@@ -225,14 +276,13 @@ const runCase = (runConf) => {
 
 const getBusinessList = () => {
   GetBusinessList({page_num: 1, page_size: 99999}).then(response => {
-    busEvent.data.businessList = response.data.data
-
-    businessActiveId.value = response.data.data[0].id.toString()
-
-    busEvent.data.businessDict = {}
-    busEvent.data.businessList.forEach(business => {
-      busEvent.data.businessDict[business.id] = business.name
-    })
+    businessList.value = response.data.data
+    if (response.data.total > 0){
+      selectBusinessId.value = response.data.data[0].id
+      nextTick(() => {
+        businessTreeRef.value.$el.querySelector(".el-tree-node__content").click()
+      })
+    }
   })
 }
 
@@ -247,7 +297,7 @@ onBeforeUnmount(() => {
 
 const drawerIsCommit = (message: any) => {
   if (message.eventType === 'case-editor') {
-    getCaseList(projectActiveId.value, undefined)
+    getCaseList(undefined)
   } else if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
     runCase(message)
   }

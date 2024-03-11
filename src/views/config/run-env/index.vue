@@ -3,7 +3,7 @@
 
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
-        <el-button type="primary" @click="showEditDrawer(undefined)"> 添加环境</el-button>
+        <el-button type="primary" @click="showEditDrawer(undefined, 'add')"> 添加环境</el-button>
         <el-button type="primary" @click="showToBusinessDrawer(undefined)">运行环境与业务线绑定管理</el-button>
       </div>
 
@@ -85,7 +85,8 @@
 
           <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="10%">
             <template #default="scope">
-              <el-button type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
+              <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>
+              <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row, 'copy')">复制</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -100,6 +101,7 @@
     </div>
 
     <EditDrawer :runEnvGroupList="runEnvGroupList"></EditDrawer>
+    <AddDrawer :runEnvGroupList="runEnvGroupList"></AddDrawer>
     <ToBusinessDrawer></ToBusinessDrawer>
   </div>
 </template>
@@ -110,7 +112,8 @@ import {ElMessage} from "element-plus";
 import Sortable from "sortablejs"
 
 import Pagination from '@/components/pagination.vue'
-import EditDrawer from './drawer.vue'
+import EditDrawer from './eidt-drawer.vue'
+import AddDrawer from './add-drawer.vue'
 import ToBusinessDrawer from './to-business.vue'
 
 import {RunEnvGroupList, GetRunEnvList, RunEnvSort} from "@/api/config/run-env";
@@ -196,10 +199,20 @@ const setSort = () => {
   });
 }
 
-const showEditDrawer = (row: object | undefined) => {
-  const content = row ? row : {id: undefined, type: undefined, name: undefined, value: undefined, desc: undefined}
-  bus.emit(busEvent.drawerIsShow, {eventType: 'run-env', content: content});
+const showEditDrawer = (row: object | undefined, command: string) => {
+  let eventType = 'edit-run-env'
+  let content = undefined
+  if (command == 'edit'){
+    content = row
+  }else if (command == 'copy'){
+    content = JSON.parse(JSON.stringify(row))
+    content.id = undefined
+  }else {
+    eventType = 'add-run-env'
+  }
+  bus.emit(busEvent.drawerIsShow, {eventType: eventType, content: content});
 }
+
 const showToBusinessDrawer = (row: object | undefined) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'run-env-to-business'});
 }

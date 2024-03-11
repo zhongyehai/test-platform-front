@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改权限' : '新增权限'" size="60%">
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改权限' : '复制权限'" size="60%">
 
       <el-form
           ref="ruleFormRef"
@@ -81,12 +81,10 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'permission') {
+  if (message.eventType === 'edit-permission') {
     resetForm()
     initSourceType()
-    if (message.command !== 'add'){
-      getPermission(message.content.id, message.command)
-    }
+    getPermission(message.content.id, message.command)
     drawerIsShow.value = true
   }
 }
@@ -177,7 +175,7 @@ const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       submitButtonIsLoading.value = true
-      PostPermission(formData.value).then(response => {
+      PostPermission({data_list: [formData.value]}).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()
