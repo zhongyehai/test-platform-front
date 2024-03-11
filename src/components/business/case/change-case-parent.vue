@@ -65,6 +65,10 @@ const props = defineProps({
     default: '',
     type: String
   },
+  projectId: {
+    default: undefined,
+    type: Number
+  },
   projectList: {
     default: [],
     type: Array
@@ -88,6 +92,7 @@ onBeforeUnmount(() => {
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'change-case-parent') {
     resetForm()
+    formData.value.project_id = props.projectId
     formData.value.case_list = message.content
     drawerIsShow.value = true
   }

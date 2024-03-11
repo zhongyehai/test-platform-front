@@ -1,6 +1,6 @@
 <template>
   <div>
-
+{{ tempData }}
     <!-- 使用示例 -->
     <el-collapse accordion>
       <el-collapse-item>
@@ -357,6 +357,8 @@ const props = defineProps({
 })
 
 watch(() => props.currentData, (newValue, oldValue) => {
+  console.log('validate.props.currentData: ', newValue)
+  console.log('validate.props.oldValue: ', oldValue)
   initTempData(newValue)
 })
 
@@ -534,7 +536,7 @@ const getValidates = () => {
   tempData.value.forEach( (item: { status: any; key: any; value: any; validate_method: any; data_source: any; data_type: any; validate_type: any; }, index: any) => {
     if (item.status){
       if (item.data_source || item.validate_method || item.value || item.data_type || (item.validate_type === 'data' && item.key)){
-        if (!item.data_source || !item.validate_method|| !item.value || !item.data_type || (item.validate_type === 'data' && !item.key)){
+        if (!item.data_source || !item.validate_method|| !item.value || !item.data_type){
           ElMessage.warning(`断言，第 ${index + 1} 行，请完善数据`)
           throw new Error(`断言，第 ${index + 1} 行，请完善数据: ${JSON.stringify(item)}`);
         }

@@ -183,7 +183,10 @@
 
         <addCaseDrawer :test-type="testType"></addCaseDrawer>
         <EditCaseDrawer :test-type="testType" :project-id="projectId"></EditCaseDrawer>
-        <ChangeCaseParentDrawer :test-type="testType" :project-list="projectList"></ChangeCaseParentDrawer>
+        <ChangeCaseParentDrawer
+            :test-type="testType"
+            :project-id="projectId"
+            :project-list="projectList"></ChangeCaseParentDrawer>
       </el-tabs>
     </div>
 

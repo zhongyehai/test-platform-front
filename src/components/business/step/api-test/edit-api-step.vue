@@ -200,9 +200,9 @@
         <el-tab-pane label="断言" name="editAssert">
           <validatesView
               ref="validatesViewRef"
-              :data-type="'api'"
+              :test-type="'api'"
               :element-list="[]"
-              :validates="formData.validates"
+              :current-data="formData.validates"
           />
         </el-tab-pane>
 
