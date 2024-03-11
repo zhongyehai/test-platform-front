@@ -1,6 +1,6 @@
 <template>
   <div>
-{{ tempData }}
+
     <!-- 使用示例 -->
     <el-collapse accordion>
       <el-collapse-item>
