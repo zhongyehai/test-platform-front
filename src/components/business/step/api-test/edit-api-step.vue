@@ -238,14 +238,6 @@
 
       <template #footer>
         <div slot="footer" class="dialog-footer">
-          <el-button
-              size="small"
-              type="primary"
-              style="float: left"
-              :loading="formData.loading"
-              @click="debugApi"
-          >运行</el-button>
-
           <el-button size="small" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
           <el-button
               type="primary"

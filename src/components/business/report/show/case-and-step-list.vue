@@ -215,7 +215,7 @@ const tableHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
     return `${innerHeight * 0.70}px`
   }else {  // 大屏
-    return `${innerHeight * 0.83}px`
+    return `${innerHeight * 0.82}px`
   }
 })
 const scrollHeight = computed(() =>{
