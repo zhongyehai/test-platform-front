@@ -1,42 +1,39 @@
 <template>
   <div>
-      <el-drawer title="错误详情" size="70%" v-model="drawerIsShow">
-        <div style="margin: 10px">
-          <div>
-            <label class="label-style">请求方法：</label>
-            <el-input :value="detailData.method" size="small" disabled />
-          </div>
+    <el-drawer title="错误详情" size="70%" v-model="drawerIsShow">
+      <el-input
+          v-model="detailData.url"
+          class="label-style"
+          size="small"
+          disabled
+      >
+        <template #prepend>{{ detailData.method }}</template>
+      </el-input>
 
-          <div style="margin-top: 20px">
-            <label class="label-style">接口地址：</label>
-            <el-input :value="detailData.url" size="small" disabled />
-          </div>
+      <div style="margin-top: 20px">
+        <label class="label-style">头部信息：</label>
+        <showJson :json-data="detailData.headers"/>
+      </div>
 
-          <div style="margin-top: 20px">
-            <label class="label-style">头部信息：</label>
-            <showJson :json-data="detailData.headers"/>
-          </div>
+      <div style="margin-top: 20px">
+        <label class="label-style">url参数：</label>
+        <showJson :json-data="detailData.params"/>
+      </div>
 
-          <div style="margin-top: 20px">
-            <label class="label-style">url参数：</label>
-            <showJson :json-data="detailData.params"/>
-          </div>
+      <div style="margin-top: 20px">
+        <label class="label-style">form参数：</label>
+        <showJson :json-data="detailData.data_form"/>
+      </div>
 
-          <div style="margin-top: 20px">
-            <label class="label-style">form参数：</label>
-            <showJson :json-data="detailData.data_form"/>
-          </div>
+      <div style="margin-top: 20px">
+        <label class="label-style">json参数：</label>
+        <showJson :json-data="detailData.data_json"/>
+      </div>
 
-          <div style="margin-top: 20px">
-            <label class="label-style">json参数：</label>
-            <showJson :json-data="detailData.data_json"/>
-          </div>
-
-          <div style="margin-top: 30px">
-            <label class="label-style">错误详情：</label>
-            <pre class="el-collapse-item-content" style="overflow: auto">{{ detailData.detail }}</pre>
-          </div>
-        </div>
+      <div style="margin-top: 30px">
+        <label class="label-style">错误详情：</label>
+        <pre class="el-collapse-item-content" style="overflow: auto">{{ detailData.detail }}</pre>
+      </div>
     </el-drawer>
   </div>
 </template>
@@ -74,7 +71,6 @@ const onShowDrawerEvent = (message: any) => {
     drawerIsShow.value = true
   }
 }
-
 
 
 </script>

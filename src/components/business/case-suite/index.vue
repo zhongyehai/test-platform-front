@@ -99,34 +99,12 @@
                   <template #default="{ node, data }">
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span>{{ node.label }}</span>
-                      <el-dropdown placement="top-start">
-                        <i
-                            class="iconfont icon-testgengduo"
-                            style="padding-left: 5px;color: #409EFF;transform: rotate(90deg)"
-                        ></i>
-                        <template #dropdown>
-                          <el-dropdown-menu>
-
-<!--                            <el-dropdown-item-->
-<!--                                @click.native.stop="showEditDrawer('edit', node, data)"-->
-<!--                            >运行</el-dropdown-item>-->
-
-                            <el-dropdown-item
-                                @click.native.stop="showEditDrawer('edit', node, data)"
-                            >修改</el-dropdown-item>
-
-                            <el-dropdown-item
-                                @click.native.stop="clickDeleteModule(node, data)"
-                            >删除</el-dropdown-item>
-
-                            <el-dropdown-item
-                                @click.native.stop="showEditDrawer('add', node, data)"
-                            >添加下级</el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
+                      <div v-show="data.id === currentNode.id">
+                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testadd" @click.stop="showEditDrawer('add', node, data)"/>
+                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testedit" @click.stop="showEditDrawer('edit', node, data)"/>
+                        <i style="margin: 0; padding: 1px;color: red" class="iconfont icon-testdelete1" @click.stop="clickDeleteModule(node, data)"/>
+                      </div>
                     </div>
-
                   </template>
                 </el-tree>
                 </el-scrollbar>
@@ -214,7 +192,7 @@ const queryItems = ref({
 const mouseenter = (data: { name: string; showDropdownMenu: boolean; }) => {
   currentNode.value = data
   tempLabel.value = JSON.parse(JSON.stringify(data.name))
-  data.name = ellipsis(data.name, 10)
+  data.name = ellipsis(data.name, 8)
 }
 
 // 鼠标滑出
