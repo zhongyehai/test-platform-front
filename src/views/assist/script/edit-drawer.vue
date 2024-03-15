@@ -335,6 +335,7 @@ const getScript = (scriptId: number, command: string) => {
 }
 
 const submitForm = (isDebug) => {
+  formData.value.script_data = pythonEditorRef.value.tempData
   if (formData.value.id){
     changeData(isDebug)
   }else {
