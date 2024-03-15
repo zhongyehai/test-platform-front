@@ -109,7 +109,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="center" label="操作" min-width="10%">
+        <el-table-column align="center" label="操作" width="80">
           <template #default="scope">
 
             <el-popconfirm width="250px" :title="`复制用例【${scope.row.name}】下的所有步骤，并在【当前用例】下生成对应的步骤?`" @confirm="copyCaseStepToCurrentCase(scope.row)">
@@ -240,7 +240,7 @@ const getProjectList = () => {
 }
 
 const selectProject = (projectId: any) => {
-  GetCaseSuiteList(props.testType, { project_id: projectId, page_num: 1, page_size: 99999 }).then(response => {
+  GetCaseSuiteList(props.testType, { project_id: projectId, suite_type: 'base,quote', page_num: 1, page_size: 99999 }).then(response => {
     caseSuiteTree.value = arrayToTree(response.data.data, null)
   })
 }
@@ -253,30 +253,32 @@ const selectCaseSuite = (suiteList: any) => {
   }
 }
 
-const sendEvent = () => {
+const sendEvent = (isReloadCase: boolean) => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'step-editor'});
+  if (isReloadCase){
+    bus.emit(busEvent.drawerIsCommit, {eventType: 'quote-case'}); // 引用用例，会合并用例的变量和头信息，需要重新获取用例的详情
+  }
 };
 
 const copyCaseStepToCurrentCase = (row: { suite_id: any; isLoading: boolean; id: any; }) => {
-
   row.isLoading = true
   CopyCaseStep(props.testType,{ from_case: row.id, to_case: props.caseId }).then(response => {
     row.isLoading = false
     if (response) {
-      sendEvent()
+      sendEvent(false)
     }
   })
 }
 
-const copyData = (row: { isLoading: boolean; id: any; }) => {
-  row.isLoading = true
-  CopyStep(props.testType, { id: row.id, case_id: props.caseId }).then(response => {
-    row.isLoading = false
-    if (response) {
-      sendEvent()
-    }
-  })
-}
+// const copyData = (row: { isLoading: boolean; id: any; }) => {
+//   row.isLoading = true
+//   CopyStep(props.testType, { id: row.id, case_id: props.caseId }).then(response => {
+//     row.isLoading = false
+//     if (response) {
+//       sendEvent(false)
+//     }
+//   })
+// }
 
 const quoteCaseAsStep = (row: { id: number; name: any; isLoading: boolean}) =>  {
   if (row.id === props.caseId){
@@ -305,7 +307,7 @@ const quoteCaseAsStep = (row: { id: number; name: any; isLoading: boolean}) =>  
     PostStep(props.testType, step).then(response => {
       row.isLoading = false
       if (response) {
-        sendEvent()
+        sendEvent(true)
       }
     })
 

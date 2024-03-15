@@ -67,7 +67,7 @@
                     <el-button
                         v-show="queryItems.project_id"
                         type="text"
-                        style="margin-left: 10px"
+                        style="margin: 0; padding: 5px"
                         @click="addParentCaseSuite"
                     ><i class="iconfont icon-testadd"></i></el-button>
                   </template>
@@ -77,7 +77,7 @@
                     <el-button
                         v-show="queryItems.project_id"
                         type="text"
-                        style="margin-left: 10px"
+                        style="margin: 0; padding: 5px"
                         @click="uploadCaseSuite"
                     ><i class="iconfont icon-testtotop"></i></el-button>
                   </template>

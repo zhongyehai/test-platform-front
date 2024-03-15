@@ -46,14 +46,14 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="140">
           <template #default="scope">
             <el-popconfirm title="确定执行一次?" @confirm="runJob(scope.row)">
               <template #reference>
-                <el-button style="margin: 0; padding: 5px;" type="text" size="small">触发执行</el-button>
+                <el-button style="margin: 0; padding: 2px;" type="text" size="small">触发执行</el-button>
               </template>
             </el-popconfirm>
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer(scope.row.func_name)">查看记录</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row.func_name)">查看记录</el-button>
           </template>
         </el-table-column>
       </el-table>

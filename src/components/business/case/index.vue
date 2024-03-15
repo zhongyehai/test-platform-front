@@ -73,6 +73,8 @@
           <el-button :disabled="selectedList.length < 1" type="primary" size="small" @click="showChangeCaseParent">修改归属</el-button>
 
           <el-table
+              ref="caseTableRef"
+              row-key="id"
               v-loading="tableIsLoading"
               element-loading-text="正在获取数据"
               element-loading-spinner="el-icon-loading"
@@ -80,14 +82,13 @@
               style="width: 100%"
               :header-cell-style="{'text-align':'center'}"
               stripe
-              row-key="id"
               :height="tableHeight"
               @selection-change="clickSelectAll"
               @row-dblclick="rowDblclick">
 
             <el-table-column type="selection" min-width="2%"/>
 
-            <el-table-column prop="id" label="序号" align="left" min-width="8%">
+            <el-table-column prop="id" label="序号" align="center" min-width="5%">
               <template #default="scope">
                 <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
               </template>
@@ -154,7 +155,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
               <template #default="scope">
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="clickRun(scope.row)">运行</el-button>
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>
@@ -224,6 +225,7 @@ const props = defineProps({
 const triggerFrom = 'case-index'
 const tableIsLoading = ref(false)
 const drawerIsLoading = ref(false)
+const caseTableRef = ref(null)
 const activeTab = ref('case')
 const oldIdList = ref([])
 const newIdList = ref([])
@@ -393,7 +395,8 @@ const sortTable = () => {
 }
 
 const setSort = () => {
-  let tbody = document.querySelector(".el-table__body-wrapper tbody");
+  // let tbody = document.querySelector(".el-table__body-wrapper tbody");
+  let tbody = caseTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
   Sortable.create(tbody, {
     group: { // 相同的组之间可以相互拖拽
       name: "table",
@@ -458,6 +461,5 @@ const treeIsChoice = (message: any) => {
 .case-status-3 :deep(.el-input__wrapper){
   background-color: #F56C6C;
 }
-
 
 </style>

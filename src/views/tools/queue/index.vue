@@ -85,11 +85,11 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="140">
           <template #default="scope">
             <el-button
                 type="text"
-                size="small" style="margin: 0; padding: 5px"
+                size="small" style="margin: 0; padding: 2px"
                 @click="showQueueList(scope.row)"
             >队列列表
             </el-button>
@@ -97,7 +97,7 @@
             <!--修改文件信息-->
             <el-button
                 type="text"
-                size="small" style="margin: 0; padding: 5px"
+                size="small" style="margin: 0; padding: 2px"
                 @click="showEditDrawer('edit', scope.row)"
             >修改
             </el-button>
@@ -105,7 +105,7 @@
             <!-- 复制 -->
             <el-button
                 type="text"
-                size="small" style="margin: 0; padding: 5px"
+                size="small" style="margin: 0; padding: 2px"
                 @click="showEditDrawer('copy', scope.row)"
             >复制
             </el-button>

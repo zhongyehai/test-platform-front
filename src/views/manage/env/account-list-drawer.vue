@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div style="margin: 10px">
+    <div style="margin-top: 10px">
       <el-table
           v-loading="tableIsLoading"
           element-loading-text="正在获取数据"
@@ -70,13 +70,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="15%">
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="110">
           <template #default="scope">
-            <el-button style="margin: 0; padding: 5px" type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
-            <el-button style="margin: 0; padding: 5px" type="text" size="small" @click.native="copyData(scope.row)">复制</el-button>
+            <el-button style="margin: 0; padding: 2px" type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
+            <el-button style="margin: 0; padding: 2px" type="text" size="small" @click.native="copyData(scope.row)">复制</el-button>
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row.id)">
               <template #reference>
-                <el-button style="margin: 0; padding: 5px;color: red" type="text" size="small">删除</el-button>
+                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
               </template>
             </el-popconfirm>
           </template>

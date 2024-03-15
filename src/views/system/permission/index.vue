@@ -76,7 +76,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="10%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="110">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'copy')">复制</el-button>
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>

@@ -119,7 +119,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+    <el-table-column fixed="right" prop="desc" align="center" label="操作" width="80">
       <template #default="scope">
         <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">查看</el-button>
         <el-button v-if="caseId" type="text" size="small" style="margin: 0; padding: 2px" @click="apiToStep(scope.row)">转步骤</el-button>

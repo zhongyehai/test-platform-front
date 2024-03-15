@@ -51,7 +51,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="runServer(scope.row)">访问</el-button>
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row)">修改</el-button>
@@ -110,7 +110,7 @@ const tableHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
     return `${innerHeight * 0.71}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    return `${innerHeight * 0.81}px`
   }
 })
 

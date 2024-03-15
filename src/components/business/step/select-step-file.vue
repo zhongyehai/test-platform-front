@@ -5,33 +5,19 @@
       :close-on-click-modal="false"
       width="70%"
   >
-
-    <el-scrollbar class="aside_scroll" :style="{height: `${scrollHeight}`}">
+    <el-scrollbar class="aside_scroll">
       <fileSelector :is-select-step-file="true"></fileSelector>
     </el-scrollbar>
-
-    <div slot="footer" class="dialog-footer">
-      <el-button size="small" @click="selectDialogIsShow = false">关闭</el-button>
-    </div>
-
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
 
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 import fileSelector from '@/views/assist/files/index.vue'
 import {bus, busEvent} from "@/utils/bus-events";
 
 const selectDialogIsShow = ref(false)
-
-const scrollHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.85}px`
-  }else {  // 大屏
-    return `${innerHeight * 0.7}px`
-  }
-})
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawer);

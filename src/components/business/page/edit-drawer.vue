@@ -2,7 +2,7 @@
   <div>
     <el-drawer v-model="drawerIsShow" title="修改页面" size="85%">
 
-      <el-tabs v-model="dataActiveName" style="margin: 0 20px 0 20px;">
+      <el-tabs v-model="dataActiveName" >
 
         <el-tab-pane label="页面信息" name="pageInfo">
           <el-form ref="ruleFormRef" :model="formData" :rules="formRules" label-width="90px">
@@ -17,17 +17,27 @@
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane name="elementInfo">
+        <el-tab-pane name="elementList">
           <template #label>
             <span> 元素列表 </span>
             <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="点击添加元素">
               <template #reference>
                 <el-button
-                    v-show="dataActiveName === 'elementInfo'"
+                    v-show="dataActiveName === 'elementList'"
                     type="text"
-                    style="margin-left: 10px"
+                    style="margin: 0; padding: 5px"
                     @click="showAddElement()"
                 ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+              </template>
+            </el-popover>
+            <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="点击导入元素">
+              <template #reference>
+                <el-button
+                    v-show="dataActiveName === 'elementList'"
+                    type="text"
+                    style="margin: 0; padding: 5px"
+                    @click="showUploadDrawer()"
+                ><i style="color: #409EFF" class="iconfont icon-testtotop" /></el-button>
               </template>
             </el-popover>
           </template>
@@ -76,6 +86,7 @@ onBeforeUnmount(() => {
 
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'edit-page') {
+    dataActiveName.value = message.command === 'edit' ? 'pageInfo' : 'elementList'
     resetForm()
     getData(message.content.id)
     drawerIsShow.value = true
@@ -143,6 +154,10 @@ const showAddElement = () => {
     module_id: formData.value.module_id,
     page_id: formData.value.id
   });
+}
+
+const showUploadDrawer = () => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'upload-element', content: formData.value.id})
 }
 
 </script>

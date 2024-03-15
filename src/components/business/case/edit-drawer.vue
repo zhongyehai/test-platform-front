@@ -308,6 +308,8 @@ const onShowDrawerEvent = (message: any) => {
 const drawerIsCommit = (message: any) => {
   if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
     runCase(message)
+  }else if (message.eventType === 'quote-case'){ // 引用用例，会合并用例的变量和头信息，需要重新获取用例的详情
+    getData(formData.value.id)
   }
 }
 

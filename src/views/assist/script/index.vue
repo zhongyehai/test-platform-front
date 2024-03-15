@@ -93,13 +93,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="110">
           <template #default="scope">
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer('edit', scope.row)">修改</el-button>
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer('copy', scope.row)">复制</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer('edit', scope.row)">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer('copy', scope.row)">复制</el-button>
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
               <template #reference>
-                <el-button style="margin: 0; padding: 5px; color: red" type="text" size="small">删除</el-button>
+                <el-button style="margin: 0; padding: 2px; color: red" type="text" size="small">删除</el-button>
               </template>
             </el-popconfirm>
           </template>

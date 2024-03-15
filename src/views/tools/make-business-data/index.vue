@@ -124,7 +124,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column label="操作" align="left" min-width="10%">
+                  <el-table-column label="操作" align="left" width="80">
                     <template #default="scope">
 
                       <!-- 运行用例 -->

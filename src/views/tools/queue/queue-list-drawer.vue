@@ -41,10 +41,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+            <el-table-column show-overflow-tooltip align="center" label="操作" width="180">
               <template #default="scope">
                 <el-button
-                    style="margin: 0; padding: 5px"
+                    style="margin: 0; padding: 2px"
                     type="text"
                     size="small"
                     @click="showEditQueueDrawer('update', scope.row)"
@@ -54,13 +54,13 @@
                 <el-button
                     type="text"
                     size="small"
-                    style="margin: 0; padding: 5px"
+                    style="margin: 0; padding: 2px"
                     @click="showEditQueueDrawer('copy', scope.row)"
                 >复制
                 </el-button>
 
                 <el-button
-                    style="margin: 0; padding: 5px"
+                    style="margin: 0; padding: 2px"
                     type="text"
                     size="small"
                     @click="showEditQueueDrawer('sendMsg', scope.row)"
@@ -70,7 +70,7 @@
                 <el-button
                     type="text"
                     size="small"
-                    style="margin: 0; padding: 5px"
+                    style="margin: 0; padding: 2px"
                     @click="showMsgLogDrawer(scope.row)"
                 >发送记录
                 </el-button>

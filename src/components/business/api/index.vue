@@ -128,7 +128,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
               <template #default="scope">
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEnvSelector(scope.row)">运行</el-button>
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>

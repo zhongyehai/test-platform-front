@@ -55,7 +55,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" width="120">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>
             <el-popconfirm width="250px" title="复制此元素并生成新的元素?" @confirm="showEditDrawer('copy', scope.row)">

@@ -64,12 +64,12 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="110">
           <template #default="scope">
-            <el-button type="text" size="small" style="margin: 0; padding: 5px" @click.native="showEditDrawer(scope.row)">修改</el-button>
+            <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row)">修改</el-button>
             <el-popconfirm :title="`确定重置【${ scope.row.name }】的密码?`" @confirm="resetPassword(scope.row.id)">
               <template #reference>
-                <el-button style="margin: 0; padding: 5px" type="text" size="small">重置密码</el-button>
+                <el-button style="margin: 0; padding: 2px" type="text" size="small">重置密码</el-button>
               </template>
             </el-popconfirm>
           </template>

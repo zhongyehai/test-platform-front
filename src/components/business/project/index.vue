@@ -154,7 +154,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="20%">
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="140">
           <template #default="scope">
             <el-button v-show="scope.row.swagger" style="margin: 0; padding: 2px" type="text" size="small" @click.native="showPullSwaggerDrawer(scope.row)">拉取</el-button>
             <el-button style="margin: 0; padding: 2px" type="text" size="small" @click.native="showEditDrawer(scope.row, 'project')">修改</el-button>

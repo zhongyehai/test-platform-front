@@ -97,7 +97,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="15%">
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" width="160">
           <template #default="scope">
             <el-button v-if="scope.row.quote_case" type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditNameDrawer(scope.row)">改名</el-button>
 
@@ -127,18 +127,13 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, computed, onBeforeUnmount, watch} from "vue";
-import Pagination from '@/components/pagination.vue'
-import EditApiStepDrawer from './api-test/edit-api-step.vue'
-import EditUiStepDrawer from './ui-test/edit-ui-step.vue'
-import AddStepDrawer from './add-step-drawer.vue'
-import editQuoteCaseNameDrawer from './edit-quote-case-name.vue'
+import {ref,  watch} from "vue";
 import showCaseDesc from '../case/show-desc.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
-import {ChangeStepStatus, DeleteStep, ChangeStepSort, GetStepList, CopyStep} from "@/api/business-api/step";
+import {ChangeStepStatus, DeleteStep, GetStepList, CopyStep} from "@/api/business-api/step";
 import {CopyCaseStep} from "@/api/business-api/case";
 
 const props = defineProps({

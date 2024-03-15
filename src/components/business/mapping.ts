@@ -43,5 +43,5 @@ export const reportStatusMappingTagType = {
 
 // 测试报告触发类型
 export const reportTriggerTypeMappingContent = {
-    'page': '页面', 'cron': '定时任务', 'pipeline': '流水线'
+    'page': '页面', 'cron': '任务', 'pipeline': '流水线'
 }

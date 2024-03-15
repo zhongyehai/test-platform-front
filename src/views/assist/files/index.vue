@@ -61,13 +61,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" min-width="15%">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="100">
           <template #default="scope">
             <el-button
                 v-show="isSelectStepFile"
                 type="text"
                 size="small"
-                style="margin: 0; padding: 5px"
+                style="margin: 0; padding: 2px"
                 :loading="scope.row.downloadLoading"
                 @click.native="selectFile(scope.row.name)">选择</el-button>
 
@@ -75,7 +75,7 @@
                 v-show="!isSelectStepFile"
                 type="text"
                 size="small"
-                style="margin: 0; padding: 5px"
+                style="margin: 0; padding: 2px"
                 :loading="scope.row.downloadLoading"
                 @click.native="downloadFile(scope.row)">下载</el-button>
 
@@ -83,7 +83,7 @@
               <template #reference>
                 <el-button
                     v-show="!isSelectStepFile"
-                    style="margin: 0; padding: 5px;color: red"
+                    style="margin: 0; padding: 2px;color: red"
                     :loading="scope.row.deleteLoading"
                     type="text"
                     size="small">删除</el-button>

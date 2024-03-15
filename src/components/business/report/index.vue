@@ -36,22 +36,9 @@
           <div style="margin-left: 5px">
             <el-tabs v-model="reportTab">
               <el-tab-pane name="report" label="报告列表">
-
-                <el-select
-                    v-model="queryItems.env_list"
-                    style="margin-right: 10px"
-                    placeholder="运行环境"
-                    size="small"
-                    multiple
-                    clearable
-                    default-first-option
-                >
-                  <el-option v-for="item in eventList" :key="item.code" :label="item.name" :value="item.code"/>
-                </el-select>
-
                 <el-input
                     v-model="queryItems.name"
-                    placeholder="报告名，模糊查询"
+                    placeholder="报告名，支持模糊查询"
                     size="small"
                     clearable
                     style="width: 200px; margin-right: 10px"
@@ -64,21 +51,45 @@
                     default-first-option
                     clearable
                     size="small"
-                    style="width: 200px; margin-right: 10px"
+                    style="width: 150px; margin-right: 10px"
                 >
                   <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"/>
                 </el-select>
 
                 <el-select
+                    v-model="queryItems.env_list"
+                    style="width: 150px; margin-right: 10px"
+                    placeholder="运行环境"
+                    size="small"
+                    multiple
+                    clearable
+                    default-first-option
+                >
+                  <el-option v-for="item in eventList" :key="item.code" :label="item.name" :value="item.code"/>
+                </el-select>
+
+                <el-select
                     v-model="queryItems.run_type"
-                    placeholder="运行类型"
+                    placeholder="运行维度"
                     size="small"
                     filterable
                     clearable
-                    style="margin-right: 10px"
+                    style="width: 100px;margin-right: 10px"
                     default-first-option
                 >
                   <el-option v-for="(value, key) in runTypeDict" :key="key" :label="value" :value="key"/>
+                </el-select>
+
+                <el-select
+                    v-model="queryItems.trigger_type"
+                    placeholder="触发类型"
+                    size="small"
+                    filterable
+                    clearable
+                    style="width: 100px;margin-right: 10px"
+                    default-first-option
+                >
+                  <el-option v-for="(value, key) in reportTriggerTypeMappingContent" :key="key" :label="value" :value="key"/>
                 </el-select>
 
                 <el-popover :visible="checkDeleteIsShow" placement="top" popper-class="down-popover" width="450px">
@@ -123,31 +134,42 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="18%"/>
+                  <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="27%"/>
 
                   <el-table-column show-overflow-tooltip prop="create_time" align="center" label="生成时间"
-                                   min-width="15%">
+                                   min-width="13%">
                     <template #default="scope">
                       <span> {{ scope.row.create_time }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="trigger_type" label="触发方式" align="center"
-                                   min-width="8%">
+                  <el-table-column show-overflow-tooltip prop="env" label="维度" align="center"
+                                   min-width="4%">
+                    <template #default="scope">
+                      <span> {{
+                          scope.row.run_type === 'api' ? '接口' :
+                              scope.row.run_type === 'case' ? '用例' :
+                                  scope.row.run_type === 'suite' ? '用例集' : '任务'
+                        }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column show-overflow-tooltip prop="trigger_type" label="触发" align="center"
+                                   min-width="6%">
                     <template #default="scope">
                       <span> {{ reportTriggerTypeMappingContent[scope.row.trigger_type] }} </span>
                     </template>
                   </el-table-column>
 
                   <el-table-column v-if="testType !== 'app'" show-overflow-tooltip prop="env" label="运行环境"
-                                   align="center" min-width="10%">
+                                   align="center" min-width="7%">
                     <template #default="scope">
                       <span> {{ eventDict[scope.row.env] }} </span>
                     </template>
                   </el-table-column>
 
                   <el-table-column show-overflow-tooltip prop="is_passed" label="是否通过" align="center"
-                                   min-width="10%">
+                                   min-width="8%">
                     <template #default="scope">
                       <el-tag size="small" :type="reportStatusMappingTagType[scope.row.is_passed]">
                         {{ reportStatusMappingContent[scope.row.is_passed] }}
@@ -155,7 +177,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="process" label="是否完成" align="center" min-width="8%">
+                  <el-table-column show-overflow-tooltip prop="process" label="是否完成" align="center" min-width="7%">
                     <template #default="scope">
                       <el-tag
                           size="small"
@@ -167,7 +189,7 @@
                   </el-table-column>
 
                   <el-table-column show-overflow-tooltip prop="create_user" label="创建人" align="center"
-                                   min-width="8%">
+                                   min-width="7%">
                     <template #default="scope">
                       <span> {{ userDict[scope.row.create_user] }} </span>
                     </template>
@@ -179,7 +201,7 @@
                       prop="desc"
                       align="center"
                       label="操作"
-                      min-width="12%">
+                      width="110">
                     <template #default="scope">
                       <el-button
                           v-show="scope.row.run_type !== 'api' || isAdmin"
@@ -306,7 +328,8 @@ const queryItems = ref({
   name: undefined,
   create_user: undefined,
   env_list: [],
-  run_type: undefined
+  run_type: undefined,
+  trigger_type: undefined
 })
 
 const tableHeight = computed(() => {

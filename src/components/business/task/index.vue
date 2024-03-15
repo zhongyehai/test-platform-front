@@ -122,7 +122,7 @@
                   </el-table-column>
 
                   <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作"
-                                   min-width="20%">
+                                   width="140">
                     <template #default="scope">
                       <el-button
                           style="margin: 0; padding: 2px"

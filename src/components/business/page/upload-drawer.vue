@@ -51,7 +51,7 @@ onBeforeUnmount(() => {
 
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'upload-element') {
-    pageId.value = message.content.id
+    pageId.value = message.content
     drawerIsShow.value = true
   }
 }

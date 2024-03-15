@@ -126,7 +126,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="5%">
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="80">
           <template #default="scope">
             <el-button type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
           </template>
