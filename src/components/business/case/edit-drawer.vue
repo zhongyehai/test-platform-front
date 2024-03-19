@@ -300,7 +300,7 @@ const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'edit-case') {
     getScriptList()
     resetForm()
-    getData(message.content.id)
+    getData(message.content.id, false)
     drawerIsShow.value = true
   }
 }
@@ -309,7 +309,7 @@ const drawerIsCommit = (message: any) => {
   if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
     runCase(message)
   }else if (message.eventType === 'quote-case'){ // 引用用例，会合并用例的变量和头信息，需要重新获取用例的详情
-    getData(formData.value.id)
+    getData(formData.value.id, true)
   }
 }
 
@@ -381,9 +381,13 @@ const showAddStepDrawer = () => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'select-step',  command: 'add', caseId: formData.value.id});
 }
 
-const getData = (dataId: any) => {
+const getData = (dataId: any, isQuoteCase: boolean) => {
   GetCase(props.testType, {id: dataId}).then(response => {
-    formData.value = response.data
+    if (isQuoteCase){ // 如果是发起引用步骤引发的获取数据，暂定只需要更新变量
+      formData.value.variables = response.data.variables
+    }else {
+      formData.value = response.data
+    }
     getCaseFrom(dataId)
   })
 }

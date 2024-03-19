@@ -56,105 +56,106 @@
         <template #title>
           <div class="el-collapse-item-title"> {{ '执行信息：' }}</div>
         </template>
+        <div style="margin-left: 10px">
+          <el-collapse-item name="skip_if">
+            <template #title>
+              <div class="el-collapse-item-title"> {{ '跳过条件：' }}</div>
+            </template>
+            <el-table
+                size="small"
+                :data="reportStepData.skip_if"
+                stripe
+                style="width: 100%"
+                @cell-dblclick="rowDblclick"
+            >
+              <el-table-column prop="skip_type" label="跳过类型" align="center" min-width="10%">
+                <template #default="scope">
+                  <span> {{ scope.row.skip_type }} </span>
+                </template>
+              </el-table-column>
 
-        <el-collapse-item name="skip_if">
-          <template #title>
-            <div class="el-collapse-item-title"> {{ '跳过条件：' }}</div>
-          </template>
-          <el-table
-              size="small"
-              :data="reportStepData.skip_if"
-              stripe
-              style="width: 100%"
-              @cell-dblclick="rowDblclick"
-          >
-            <el-table-column prop="skip_type" label="跳过类型" align="center" min-width="10%">
-              <template #default="scope">
-                <span> {{ scope.row.skip_type }} </span>
-              </template>
-            </el-table-column>
+              <el-table-column prop="data_source" label="数据源" align="center" min-width="10%">
+                <template #default="scope">
+                  <span> {{ scope.row.data_source }} </span>
+                </template>
+              </el-table-column>
 
-            <el-table-column prop="data_source" label="数据源" align="center" min-width="10%">
-              <template #default="scope">
-                <span> {{ scope.row.data_source }} </span>
-              </template>
-            </el-table-column>
+              <el-table-column prop="check_value" label="实际结果" align="center" min-width="25%">
+                <template #default="scope">
+                  <span> {{ scope.row.check_value }} </span>
+                </template>
+              </el-table-column>
 
-            <el-table-column prop="check_value" label="实际结果" align="center" min-width="25%">
-              <template #default="scope">
-                <span> {{ scope.row.check_value }} </span>
-              </template>
-            </el-table-column>
+              <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
+                <template #default="scope">
+                  <span> {{ scope.row.comparator }} </span>
+                </template>
+              </el-table-column>
 
-            <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
-              <template #default="scope">
-                <span> {{ scope.row.comparator }} </span>
-              </template>
-            </el-table-column>
+              <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
+                <template #default="scope">
+                  <span> {{ scope.row.expect }} </span>
+                </template>
+              </el-table-column>
 
-            <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
-              <template #default="scope">
-                <span> {{ scope.row.expect }} </span>
-              </template>
-            </el-table-column>
+              <el-table-column prop="data_type" label="类型" align="center" min-width="10%">
+                <template #default="scope">
+                  <span> {{ scope.row.data_type }} </span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-collapse-item>
 
-            <el-table-column prop="data_type" label="类型" align="center" min-width="10%">
-              <template #default="scope">
-                <span> {{ scope.row.data_type }} </span>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-collapse-item>
-
-        <el-row>
-          <el-col :span="12">
-            <el-collapse-item name="setup_hooks">
-              <template #title>
-                <div class="el-collapse-item-title"> {{ '前置条件：' }}</div>
-              </template>
-              <el-table
-                  size="small"
-                  :data="reportStepData.setup_hooks"
-                  stripe
-                  style="width: 100%"
-                  @cell-dblclick="rowDblclick"
-              >
-                <el-table-column  label="前置条件" align="center" min-width="10%">
-                  <template #default="scope">
-                    <span> {{ scope.row }} </span>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-collapse-item>
-          </el-col>
-          <el-col :span="12">
-            <el-collapse-item name="teardown_hooks">
-              <template #title>
-                <div class="el-collapse-item-title"> {{ '后置条件：' }}</div>
-              </template>
-              <el-table
-                  size="small"
-                  :data="reportStepData.teardown_hooks"
-                  stripe
-                  style="width: 100%"
-                  @cell-dblclick="rowDblclick"
-              >
-                <el-table-column  label="后置条件" align="center" min-width="10%">
-                  <template #default="scope">
-                    <span> {{ scope.row }} </span>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-collapse-item>
-          </el-col>
-        </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-collapse-item name="setup_hooks">
+                <template #title>
+                  <div class="el-collapse-item-title"> {{ '前置条件：' }}</div>
+                </template>
+                <el-table
+                    size="small"
+                    :data="reportStepData.setup_hooks"
+                    stripe
+                    style="width: 100%"
+                    @cell-dblclick="rowDblclick"
+                >
+                  <el-table-column  label="前置条件" align="center" min-width="10%">
+                    <template #default="scope">
+                      <span> {{ scope.row }} </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-collapse-item>
+            </el-col>
+            <el-col :span="12">
+              <el-collapse-item name="teardown_hooks">
+                <template #title>
+                  <div class="el-collapse-item-title"> {{ '后置条件：' }}</div>
+                </template>
+                <el-table
+                    size="small"
+                    :data="reportStepData.teardown_hooks"
+                    stripe
+                    style="width: 100%"
+                    @cell-dblclick="rowDblclick"
+                >
+                  <el-table-column  label="后置条件" align="center" min-width="10%">
+                    <template #default="scope">
+                      <span> {{ scope.row }} </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-collapse-item>
+            </el-col>
+          </el-row>
+        </div>
       </el-collapse-item>
 
       <el-collapse-item v-if="testType === 'api'" name="apiTestRequest">
         <template #title>
           <div class="el-collapse-item-title">请求信息：</div>
         </template>
-        <el-collapse v-model="defaultShowRequestInFo" style="margin-left: 10px; margin-right: 10px">
+        <el-collapse v-model="defaultShowRequestInFo" style="margin-left: 10px">
 
           <el-descriptions class="margin-top" :column="2" border>
             <el-descriptions-item>
@@ -283,7 +284,7 @@
         <template #title>
           <div class="el-collapse-item-title">响应信息:</div>
         </template>
-        <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px; margin-right: 10px">
+        <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px">
 
           <el-descriptions class="margin-top" :column="2" border>
             <el-descriptions-item>

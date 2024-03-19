@@ -26,6 +26,7 @@ import Config from './modules/config'
 
 import Debug from './modules/debug'
 import System from './modules/system'
+import {getmark} from "@/utils/watermark";
 
 /**
  * @name 初始化必须要的路由
@@ -95,6 +96,11 @@ router.afterEach((to, _from) => {
     if (to.meta && to.meta.cache && name && !keepAliveComponentsName.includes(name)) {
         store.commit('keepAlive/addKeepAliveComponentsName', name)
     }
+
+    // 加水印
+    const {watermark} = getmark();
+    const userName = localStorage.getItem("userName")
+    watermark(userName ? `测试平台 - ${userName}` : '测试平台') //全局加水印名
     NProgress.done()
 });
 

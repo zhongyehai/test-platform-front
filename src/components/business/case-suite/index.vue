@@ -137,9 +137,6 @@ import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import editDrawer from "./edit-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
 import caseIndex from "@/components/business/case/index.vue";
-import apiFromDrawer from "@/components/business/api/from-drawer.vue";
-import apiUseDrawer from "@/components/business/api/use-drawer.vue";
-import pageIndex from "@/components/business/page/index.vue";
 
 import {GetProjectList, GetProject} from '@/api/business-api/project'
 import {bus, busEvent} from "@/utils/bus-events";

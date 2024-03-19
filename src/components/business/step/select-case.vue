@@ -265,7 +265,7 @@ const copyCaseStepToCurrentCase = (row: { suite_id: any; isLoading: boolean; id:
   CopyCaseStep(props.testType,{ from_case: row.id, to_case: props.caseId }).then(response => {
     row.isLoading = false
     if (response) {
-      sendEvent(false)
+      sendEvent(true)
     }
   })
 }

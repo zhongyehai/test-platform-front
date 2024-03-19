@@ -33,7 +33,7 @@ const props = defineProps({
   paginationSizes: {
     type: Array,
     default: () => {
-      return [10, 20, 50, 100] //指定分页展示条数
+      return [10, 20, 50, 100, 500] //指定分页展示条数
     },
   },
   currentPage: {

@@ -311,7 +311,7 @@ const getDataSource = () => {
 
 // 获取服务对应的运行环境
 const getProjectRunEnv = () => {
-  if (busEvent.data.runEnvList.length < 1) {
+  if (busEvent.data.runEnvList.length < 1 && props.projectId) {
     GetProject(props.testType, { id: props.projectId }).then(response => { // 获取服务
       const project = response.data
 

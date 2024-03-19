@@ -15,11 +15,11 @@ const route: Route[] = [
         component: createNameComponent(() => import('@/views/manage/kym/index.vue')),
         meta: { title: 'KYM分析', icon: 'iconfont icon-testcluster' }
       },
-      {
-        path: 'make-test-case',
-        component: createNameComponent(() => import('@/views/manage/make-test-case/index.vue')),
-        meta: { title: '用例编写', icon: 'iconfont icon-testedit' }
-      },
+      // {
+      //   path: 'make-test-case',
+      //   component: createNameComponent(() => import('@/views/manage/make-test-case/index.vue')),
+      //   meta: { title: '用例编写', icon: 'iconfont icon-testedit' }
+      // },
       {
         path: 'account',
         component: createNameComponent(() => import('@/views/manage/env/index.vue')),
