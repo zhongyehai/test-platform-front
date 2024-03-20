@@ -138,6 +138,7 @@ const getDataJson = () => {
     return JSON.parse(jsonEditorViewRef.value.tempData)
   }catch (e) {
     ElMessage.warning('json参数数据格式错误')
+    throw new Error('json参数数据格式错误');
   }
 }
 
@@ -160,6 +161,7 @@ const getUrlencoded = () => {
     return JSON.parse(data)
   }catch (e) {
     ElMessage.warning('urlencoded参数数据格式错误')
+    throw new Error('urlencoded参数数据格式错误');
   }
 }
 
