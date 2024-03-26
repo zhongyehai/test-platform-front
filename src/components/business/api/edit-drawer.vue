@@ -50,7 +50,7 @@
                   <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
                 </el-tooltip>
               </template>
-              <oneColumnRow ref="upFuncInputRefRef" :current-data="formData.up_func" />
+              <oneColumnRow ref="upFuncInputRef" :current-data="formData.up_func" />
             </el-form-item>
           </el-col>
 
@@ -245,7 +245,7 @@ const busEventParam = 'param'
 const submitButtonIsLoading = ref(false)
 const moduleTree = ref([])
 const methodsList = ref([])
-const upFuncInputRefRef = ref(null)
+const upFuncInputRef = ref(null)
 const downFuncInputRef = ref(null)
 const debugButtonIsLoading = ref(false)
 const ruleFormRef = ref(null)
