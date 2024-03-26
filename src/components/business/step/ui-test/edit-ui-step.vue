@@ -551,7 +551,7 @@ const changeData = () => {
 
 const getDataToCommit = () => {
   let data = JSON.parse(JSON.stringify(formData.value))
-  data.up_func = downFuncInputRef.value.getData()
+  data.up_func = upFuncInputRef.value.getData()
   data.down_func = downFuncInputRef.value.getData()
   data.skip_if = skipIfViewRef.value.getSkipIfData()
   data.extracts = extractsViewRef.value.getExtracts()

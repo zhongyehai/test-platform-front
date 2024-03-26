@@ -155,13 +155,6 @@
         </el-table-column>
       </el-table>
 
-      <pagination
-          v-show="tableDataTotal > 0"
-          :pageNum="queryItems.page_num"
-          :pageSize="queryItems.page_size"
-          :total="tableDataTotal"
-          @pageFunc="changePagination"
-      />
     </div>
 
     <EditApiStepDrawer
@@ -227,10 +220,9 @@ const stepTableRef = ref(null)
 const tableDataList = ref([])
 const expandIdList = ref([])
 const userList = ref([])
-const tableDataTotal = ref(0)
 const queryItems = ref({
   page_num: 1,
-  page_size: 20,
+  page_size: 99,
   detail: true,
   case_id: undefined
 })
@@ -241,9 +233,9 @@ const newIdList = ref([])
 
 const tableHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.59}px`
+    return `${innerHeight * 0.64}px`
   }else {  // 大屏
-    return `${innerHeight * 0.73}px`
+    return `${innerHeight * 0.76}px`
   }
 })
 
@@ -349,7 +341,6 @@ const getTableDataList = () => {
   GetStepList(props.testType, queryItems.value).then((response: object) => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
-    tableDataTotal.value = response.data.total
 
     oldIdList.value = tableDataList.value.map(item => item.id)
     newIdList.value = oldIdList.value.slice()
