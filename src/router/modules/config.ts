@@ -29,6 +29,11 @@ const route: Route[] = [
         path: 'business',
         component: createNameComponent(() => import('@/views/config/config-business/index.vue')),
         meta: { title: '业务线管理', icon: 'iconfont icon-testunorderedlist' }
+      },
+      {
+        path: 'webhook',
+        component: createNameComponent(() => import('@/views/config/webhook/index.vue')),
+        meta: { title: 'webhook管理', icon: 'iconfont icon-testmessage' }
       }
     ]
   }

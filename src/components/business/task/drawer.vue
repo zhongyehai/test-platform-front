@@ -106,12 +106,13 @@
             </el-form-item>
 
             <el-form-item v-show="formData.is_send !== 'not_send'" prop="receive_type" size="small" class="is-required" label="接收方式">
-              <el-radio v-model="formData.receive_type" label="ding_ding">钉钉群</el-radio>
-              <el-radio v-model="formData.receive_type" label="we_chat">企业微信群</el-radio>
-              <el-radio v-model="formData.receive_type" label="email">邮件</el-radio>
+              <el-radio v-model="formData.receive_type" label="ding_ding" @change="changeWebHookList">钉钉</el-radio>
+              <el-radio v-model="formData.receive_type" label="we_chat" @change="changeWebHookList">企业微信</el-radio>
+              <el-radio v-model="formData.receive_type" label="fei_shu" disabled @change="changeWebHookList">飞书</el-radio>
+              <el-radio v-model="formData.receive_type" label="email" @change="changeWebHookList">邮件</el-radio>
               <el-tooltip class="item" effect="dark" placement="top-start">
                 <template #content>
-                  1、钉钉群为关键词模式，关键词为“测试”、“报告”、“统计”
+                  <div>企业微信和飞书的webhook未完全支持，请自行开发和调试</div>
                 </template>
                 <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
               </el-tooltip>
@@ -120,7 +121,15 @@
             <div v-show="formData.is_send !== 'not_send'">
               <div v-show="formData.receive_type === 'ding_ding' || formData.receive_type === 'we_chat'">
                 <el-form-item prop="webhook_list" label="webhook地址" size="small" class="is-required">
-                  <oneColumnRow ref="webhookListInputRef" :current-data="formData.webhook_list"/>
+                  <el-select
+                      v-model="formData.webhook_list"
+                      multiple
+                      filterable
+                      size="small"
+                      placeholder="webhook"
+                      style="width: 100%">
+                    <el-option v-for="item in webHookList" :key="item.id" :label="item.name" :value="item.id"/>
+                  </el-select>
                 </el-form-item>
               </div>
 
@@ -281,6 +290,7 @@ import {arrayToTree} from "@/utils/parse-data";
 import {GetCaseList} from "@/api/business-api/case";
 import {GetServerList} from "@/api/business-api/device-server";
 import {GetPhoneList} from "@/api/business-api/device-phone";
+import {GetWebHookList} from "@/api/config/webhook";
 
 const props = defineProps({
   testType: {
@@ -290,6 +300,7 @@ const props = defineProps({
 })
 
 onMounted(() => {
+  getWebHookList()
   bus.on(busEvent.treeIsChoice, onTreeIsChoice);
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
@@ -351,6 +362,36 @@ const getBrowserName = () => {
   }
 }
 
+const getWebHookList = () => {
+  GetWebHookList({page_num: 1, page_size: 99999}).then(response => {
+    response.data.data.forEach(item => {
+      if (item.webhook_type === 'ding_ding'){
+        dingDingWebHookList.value.push(item)
+      }else if (item.webhook_type === 'we_chat'){
+        weChatWebHookList.value.push(item)
+      }else {
+        feiShuWebHookList.value.push(item)
+      }
+    })
+  })
+}
+
+const changeWebHookList = (clearWebhookList: boolean) => {
+  if (clearWebhookList){
+    formData.value.webhook_list = []
+  }
+
+  if (formData.value.receive_type === 'ding_ding'){
+    webHookList.value = dingDingWebHookList.value
+  }else if (formData.value.receive_type === 'we_chat'){
+    webHookList.value = weChatWebHookList.value
+  }else if (formData.value.receive_type === 'fei_shu') {
+    webHookList.value = feiShuWebHookList.value
+  }else {
+    webHookList.value = []
+  }
+}
+
 const onTreeIsChoice = (message: any) => {
   if (message.eventType === 'project-tree') {
     project.value = message.content
@@ -370,6 +411,10 @@ const activeName = ref('task')
 const drawerIsShow = ref(false)
 const submitButtonIsLoading = ref(false)
 const runEnvList = ref([])
+const webHookList = ref([])
+const dingDingWebHookList = ref([])
+const weChatWebHookList = ref([])
+const feiShuWebHookList = ref([])
 const runServerList = ref([])
 const runPhoneList = ref([])
 const caseSuiteTree = ref([])
@@ -379,7 +424,6 @@ const runModeData = ref({})
 const runBrowserNameDict = ref({})
 const project = ref()
 const skipHolidayItem = [{ label: '跳过执行', value: 1 }, { label: '不跳过执行', value: 0 }]
-const webhookListInputRef = ref(null)
 const emailToInputRef = ref(null)
 const callBackEditorViewRef = ref(null)
 const caseSelectorRef = ref(null)
@@ -418,13 +462,21 @@ const formData = ref({
   }
 })
 
+const validateWebhookList = (rule: any, value: any, callback: any) => {
+  if (formData.value.is_send !== 'not_send' && formData.value.receive_type !== 'email'){
+    if (!formData.value.webhook_list || formData.value.webhook_list.length === 0 ) {
+      callback(new Error('请选择webhook'))
+    }
+  }
+  callback()
+}
+
 const validateEmailServer = (rule: any, value: any, callback: any) => {
   if (formData.value.receive_type === 'email' && !formData.value.email_server){
     callback(new Error('请选择邮箱服务器'))
   }
   callback()
 }
-
 
 const validateEmailFrom = (rule: any, value: any, callback: any) => {
   if (formData.value.receive_type === 'email' && !formData.value.email_from){
@@ -457,6 +509,9 @@ const formRules = {
   cron: [
     {required: true, message: '请输入cron表达式', trigger: 'blur'}
   ],
+  webhook_list: [
+    {validator: validateWebhookList, trigger: 'blur'}
+  ],
   email_server: [
     {validator: validateEmailServer, trigger: 'blur'}
   ],
@@ -470,8 +525,6 @@ const formRules = {
     {validator: validateEmailTo, trigger: 'blur'}
   ]
 }
-
-
 
 const resetForm = () => {
   formData.value = {
@@ -524,6 +577,7 @@ const jsonEditorStyle = computed(() => {
 const getData = (taskId: any) => {
   GetTask(props.testType, {id: taskId}).then(response => {
     formData.value = response.data
+    changeWebHookList(false)
   })
 }
 
@@ -572,12 +626,10 @@ const getRunMode = () => {
 
 const getCommitData = () => {
   const data = JSON.parse(JSON.stringify(formData.value))
-  data.webhook_list = webhookListInputRef.value.getData()
   data.email_to = emailToInputRef.value.getData()
   data.call_back = callBackEditorViewRef.value.getJsonData()
   data.suite_ids = caseSelectorRef.value.getCaseSuiteIdList()
   data.case_ids = caseSelectorRef.value.caseIdList
-  console.log('data: ', data)
   return data
 }
 

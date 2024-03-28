@@ -18,7 +18,7 @@ export const getmark = () => {
         cans.rotate((-15 * Math.PI) / 180);
         cans.font = "18px Vedana";
         //设置填充绘画的颜色、渐变或者模式
-        cans.fillStyle = "rgba(200, 200, 200, 0.40)";
+        cans.fillStyle = "rgba(225, 225, 225, 0.40)";
         //设置文本内容的当前对齐方式
         cans.textAlign = "left";
         //设置在绘制文本时使用的当前文本基线

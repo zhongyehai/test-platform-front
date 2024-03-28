@@ -18,24 +18,29 @@
         <el-form-item label="关联环境" prop="bind_env" class="is-required" size="small">
           <el-radio v-model="formData.bind_env" label="human">手动关联</el-radio>
           <el-radio v-model="formData.bind_env" label="auto">自动关联</el-radio>
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>此业务线与运行环境的关联机制</div>
-            <div>1、手动关联：新增运行环境后，需手动将此运行环境与此业务线关联</div>
-            <div>2、自动关联：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
-            <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要进行一次手动关联</div>
-            <el-button slot="reference" type="text" icon="el-icon-question"/>
-          </el-popover>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div>此业务线与运行环境的关联机制</div>
+              <div>1、手动关联：新增运行环境后，需手动将此运行环境与此业务线关联</div>
+              <div>2、自动关联：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
+              <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要进行一次手动关联</div>
+            </template>
+            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item label="统计通知" prop="receive_type" class="is-required" size="small">
-          <el-radio v-model="formData.receive_type" label="not_receive">不接收</el-radio>
-          <el-radio v-model="formData.receive_type" label="ding_ding">钉钉</el-radio>
-          <el-radio v-model="formData.receive_type" label="we_chat">企业微信</el-radio>
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>1、设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
-            <div>2、钉钉群为关键词模式，关键词为“测试”、“报告”、“统计”</div>
-            <el-button slot="reference" type="text" icon="el-icon-question"/>
-          </el-popover>
+          <el-radio v-model="formData.receive_type" label="not_receive" @change="changeWebHookList">不接收</el-radio>
+          <el-radio v-model="formData.receive_type" label="ding_ding" @change="changeWebHookList">钉钉</el-radio>
+          <el-radio v-model="formData.receive_type" label="we_chat" @change="changeWebHookList">企业微信</el-radio>
+          <el-radio v-model="formData.receive_type" label="fei_shu" disabled @change="changeWebHookList">飞书</el-radio>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div>1、设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
+              <div>2、企业微信和飞书的webhook未完全支持，请自行开发和调试</div>
+            </template>
+            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item
@@ -43,10 +48,15 @@
             v-show="formData.receive_type !== 'not_receive'"
             label="webhook"
             class="is-required" size="small">
-          <webhookInput
-              ref="webhookInputRef"
-              :current-data="formData.webhook_list"
-          />
+          <el-select
+              v-model="formData.webhook_list"
+              multiple
+              filterable
+              size="small"
+              placeholder="webhook"
+              style="width: 100%">
+            <el-option v-for="item in webHookList" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="备注" prop="desc" size="small">
@@ -112,8 +122,8 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
 
 import {bus, busEvent} from "@/utils/bus-events";
-import webhookInput from '@/components/input/one-column-row.vue'
 import {GetRunEnvList} from "@/api/config/run-env";
+import {GetWebHookList} from "@/api/config/webhook";
 import {GetBusiness, PostBusiness, PutBusiness} from "@/api/config/business";
 
 const props = defineProps({
@@ -124,6 +134,7 @@ const props = defineProps({
 })
 
 onMounted(() => {
+  getWebHookList()
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
 })
 
@@ -155,7 +166,38 @@ const getRunEnvList = () => {
 const getBusiness = (dataId: number) => {
   GetBusiness({id: dataId}).then(response => {
     formData.value = response.data
+    changeWebHookList(false)
   })
+}
+
+const getWebHookList = () => {
+  GetWebHookList({page_num: 1, page_size: 99999}).then(response => {
+    response.data.data.forEach(item => {
+      if (item.webhook_type === 'ding_ding'){
+        dingDingWebHookList.value.push(item)
+      }else if (item.webhook_type === 'we_chat'){
+        weChatWebHookList.value.push(item)
+      }else {
+        feiShuWebHookList.value.push(item)
+      }
+    })
+  })
+}
+
+const changeWebHookList = (clearWebhookList: boolean) => {
+  if (clearWebhookList){
+    formData.value.webhook_list = []
+  }
+
+  if (formData.value.receive_type === 'ding_ding'){
+    webHookList.value = dingDingWebHookList.value
+  }else if (formData.value.receive_type === 'we_chat'){
+    webHookList.value = weChatWebHookList.value
+  }else if (formData.value.receive_type === 'fei_shu') {
+    webHookList.value = feiShuWebHookList.value
+  }else {
+    webHookList.value = []
+  }
 }
 
 const sendEvent = () => {
@@ -164,9 +206,12 @@ const sendEvent = () => {
 
 const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
-let webhookInputRef = ref(null)
 const runEnvList = ref([])
 const runEnvIdList = ref([])
+const webHookList = ref([])
+const dingDingWebHookList = ref([])
+const weChatWebHookList = ref([])
+const feiShuWebHookList = ref([])
 const checkAll = ref(false)
 const isIndeterminate = ref(false)
 const formData = ref({
@@ -181,9 +226,8 @@ const formData = ref({
 })
 const validateWebhookList = (rule: any, value: any, callback: any) => {
   if (formData.value.receive_type !== 'not_receive'){
-    const webhookListData = webhookInputRef.value.getData()
-    if (!webhookListData || webhookListData.length === 0 ) {
-      callback(new Error('请输入通知地址'))
+    if (!formData.value.webhook_list || formData.value.webhook_list.length === 0 ) {
+      callback(new Error('请选择webhook'))
     }
   }
   callback()
@@ -246,7 +290,6 @@ const submitForm = () => {
 const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
-      formData.value.webhook_list = webhookInputRef.value.getData()
       submitButtonIsLoading.value = true
       PostBusiness(formData.value).then(response => {
         submitButtonIsLoading.value = false
@@ -258,10 +301,10 @@ const addData = () => {
     }
   })
 }
+
 const changeData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
-      formData.value.webhook_list = webhookInputRef.value.getData()
       submitButtonIsLoading.value = true
       PutBusiness(formData.value).then(response => {
         submitButtonIsLoading.value = false
