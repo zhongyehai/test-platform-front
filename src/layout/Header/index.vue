@@ -31,6 +31,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item @click="resetPassword">重置密码</el-dropdown-item>
               <el-dropdown-item @click="showPasswordLayer">修改密码</el-dropdown-item>
               <el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>
             </el-dropdown-menu>
@@ -51,6 +52,7 @@ import FullScreen from './functionList/fullscreen.vue'
 import Theme from './functionList/theme.vue'
 import Breadcrumb from './Breadcrumb.vue'
 import PasswordLayer from './passwordLayer.vue'
+import {ResetPassword} from "@/api/system/user";
 
 const store = useStore()
 const router = useRouter()
@@ -73,6 +75,10 @@ const loginOut = () => {
 
 const showPasswordLayer = () => {
   layer.show = true
+}
+
+const resetPassword = () => {
+  ResetPassword({id: localStorage.getItem("id")}).then(response => {})
 }
 
 </script>

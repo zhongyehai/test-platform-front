@@ -37,6 +37,12 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
     },
     build: {
       rollupOptions: {
+        // 代码混淆
+        // @ts-ignore
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        },
         output: {
           manualChunks: {
             'echarts': ['echarts']

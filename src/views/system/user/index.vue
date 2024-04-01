@@ -69,7 +69,7 @@
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row)">修改</el-button>
             <el-popconfirm :title="`确定重置【${ scope.row.name }】的密码?`" @confirm="resetPassword(scope.row.id)">
               <template #reference>
-                <el-button style="margin: 0; padding: 2px" type="text" size="small">重置密码</el-button>
+                <el-button style="margin: 0; padding: 2px" type="text" size="small" :disabled="!isAdmin">重置密码</el-button>
               </template>
             </el-popconfirm>
           </template>
@@ -101,6 +101,7 @@ import {GetUserList, ChangeUserStatus, ResetPassword, GetUserRoles} from "@/api/
 import {GetRoleList} from "@/api/system/role";
 import {GetBusinessList} from "@/api/config/business";
 
+const isAdmin = localStorage.getItem('permissions').indexOf('admin') !== -1
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
 const tableDataTotal = ref(0)
