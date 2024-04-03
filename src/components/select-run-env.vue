@@ -111,7 +111,7 @@
                       filterable
                       default-first-option
                       placeholder="请选择运行服务器"
-                      style="width: 70%"
+                      style="width: 80%"
                       size="small"
                   >
                     <el-option
@@ -132,7 +132,7 @@
                       filterable
                       default-first-option
                       placeholder="请选择运行手机"
-                      style="width: 70%"
+                      style="width: 80%"
                       size="small"
                   >
                     <el-option

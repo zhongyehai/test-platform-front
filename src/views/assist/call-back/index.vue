@@ -29,7 +29,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" width="80">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="100">
           <template #default="scope">
             <el-button type="text" size="small" @click.native="showDetail(scope.row)">查看详情</el-button>
           </template>

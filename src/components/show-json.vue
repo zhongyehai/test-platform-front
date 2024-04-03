@@ -1,6 +1,6 @@
 <template>
   <div>
-    <vueJsonViewer
+    <JsonViewer
         :value="props.jsonData"
         :expand-depth=5
         :copyable="{copyText: '复制', copiedText: '复制成功'}"
@@ -8,11 +8,12 @@
         :show-double-quotes="true"
         boxed
     />
+
   </div>
 </template>
 
 <script setup lang="ts">
-import vueJsonViewer from 'vue-json-viewer'
+import {JsonViewer} from "vue3-json-viewer"
 
 const props = defineProps({
   jsonData: {

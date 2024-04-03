@@ -9,26 +9,16 @@ import 'normalize.css' // css初始化
 import './assets/style/common.scss' // 公共css
 import './theme/modules/chinese/index.scss'
 import './assets/icons/iconfont.css'  // 引入本地的阿里巴巴矢量图标库，详见 https://developer.aliyun.com/article/891564
+import "vue3-json-viewer/dist/index.css"
+
 import App from './App.vue'
 import store from './store'
 import router from './router'
-// import { getAuthRoutes } from './router/permission'
-if (import.meta.env.MODE !== 'development') { // 非开发环境调用百度统计
-    baidu()
-}
 
-// /** 权限路由处理主方法 */
-// getAuthRoutes().then(() => {
-//   const app = createApp(App)
-//   // @ts-ignore
-//   app.use(ElementPlus, { size: store.state.app.elementSize })
-//   app.use(store)
-//   app.use(router)
-//   // app.config.performance = true
-//   app.config.globalProperties.$bus = mitt()
-//   app.config.globalProperties.$busEvents = busEvents
-//   app.mount('#app')
-// })
+// import { getAuthRoutes } from './router/permission'
+// if (import.meta.env.MODE !== 'development') { // 非开发环境调用百度统计
+//     baidu()
+// }
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
