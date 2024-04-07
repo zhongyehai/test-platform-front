@@ -38,12 +38,16 @@
                   reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-'
                 }} 秒</span>
 
-              <el-button
-                  v-if="report.run_type == 'api'"
-                  type="primary"
-                  size="small"
-                  @click.native="saveAsCase"
-              >存为用例</el-button>
+              <span v-if="report.run_type == 'api'">
+                <el-button type="primary" size="small" @click.native="saveAsCase" >存为用例</el-button>
+                <el-tooltip class="item" effect="dark" placement="top-start">
+                  <template #content>
+                    <div>1、把当前报告对应的接口转为用例</div>
+                    <div>2、保存成功后，新增后的用例归属在当前报告所属服务的【接口用例集】类型的用例集下</div>
+                  </template>
+                  <span><i style="color: #409EFF;margin-right: 20px" class="iconfont icon-testquestion-circle-fill" /></span>
+                </el-tooltip>
+              </span>
 
               <el-button
                   v-if="reportSummary.result !== 'success'"
@@ -115,7 +119,7 @@
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount} from "vue";
 import {useRoute} from "vue-router"
-import {GetReport, DeleteReport} from "@/api/business-api/report";
+import {GetReport, DeleteReport, ReportAsCase} from "@/api/business-api/report";
 import {GetProject} from "@/api/business-api/project";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {bus, busEvent} from "@/utils/bus-events";
@@ -258,7 +262,7 @@ const showHitDrawer = () => {
 }
 
 const saveAsCase = () => {
-
+  ReportAsCase(props.testType, {report_id: reportId}).then(response => {})
 }
 
 const getProjectAndSendEvent = () => {
