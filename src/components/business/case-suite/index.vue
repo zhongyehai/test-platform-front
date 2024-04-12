@@ -18,36 +18,36 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item v-if="testType === 'api'" label="查接口" size="small">
-            <el-input
-                v-model="queryItems.addr"
-                class="input-with-select"
-                placeholder="请输入接口地址"
-                size="small"
-                clearable
-                style="width: 400px"
-            />
-            <el-button
-                v-show="testType === 'api'"
-                :disabled="!queryItems.addr"
-                type="primary"
-                size="small"
-                :loading="queryButtonIsLoading"
-                style="margin-left: 10px"
-                @click.native="showApiFrom()"
-            >查归属
-            </el-button>
-            <el-button
-                v-show="testType === 'api'"
-                :disabled="!queryItems.addr"
-                type="primary"
-                size="small"
-                :loading="queryButtonIsLoading"
-                style="margin-left: 10px"
-                @click.native="getApiToStep()"
-            >查使用情况
-            </el-button>
-          </el-form-item>
+<!--          <el-form-item v-if="testType === 'api'" label="查接口" size="small">-->
+<!--            <el-input-->
+<!--                v-model="queryItems.addr"-->
+<!--                class="input-with-select"-->
+<!--                placeholder="请输入接口地址"-->
+<!--                size="small"-->
+<!--                clearable-->
+<!--                style="width: 400px"-->
+<!--            />-->
+<!--            <el-button-->
+<!--                v-show="testType === 'api'"-->
+<!--                :disabled="!queryItems.addr"-->
+<!--                type="primary"-->
+<!--                size="small"-->
+<!--                :loading="queryButtonIsLoading"-->
+<!--                style="margin-left: 10px"-->
+<!--                @click.native="showApiFrom()"-->
+<!--            >查归属-->
+<!--            </el-button>-->
+<!--            <el-button-->
+<!--                v-show="testType === 'api'"-->
+<!--                :disabled="!queryItems.addr"-->
+<!--                type="primary"-->
+<!--                size="small"-->
+<!--                :loading="queryButtonIsLoading"-->
+<!--                style="margin-left: 10px"-->
+<!--                @click.native="getApiToStep()"-->
+<!--            >查使用情况-->
+<!--            </el-button>-->
+<!--          </el-form-item>-->
         </el-form>
       </div>
     </div>
@@ -116,6 +116,8 @@
 
         <!-- 第二列，用例列表 -->
         <el-col style="width: 79%;">
+<!--          <apiFromDrawer :case-id="null" />-->
+<!--          <apiUseDrawer />-->
           <!-- 用例管理 -->
           <caseIndex :test-type="testType" :project-id="project.id" :project-list="projectList"></caseIndex>
         </el-col>
@@ -136,6 +138,8 @@
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import editDrawer from "./edit-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
+// import apiFromDrawer from "@/components/business/api/from-drawer.vue";
+// import apiUseDrawer from "@/components/business/api/use-drawer.vue";
 import caseIndex from "@/components/business/case/index.vue";
 
 import {GetProjectList, GetProject} from '@/api/business-api/project'

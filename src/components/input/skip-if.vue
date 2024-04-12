@@ -227,7 +227,7 @@
                 size="small"
                 style="color: red;margin: 2px; padding: 0"
                 @click.native="clearData()"
-            ><i class="iconfont icon-testshibai"></i></el-button>
+            ><i class="iconfont icon-testqingkong"></i></el-button>
           </el-tooltip>
         </template>
       </el-table-column>

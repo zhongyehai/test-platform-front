@@ -68,7 +68,7 @@
             <el-input
                 :id="'data_input' + scope.$index "
                 v-model="scope.row.value"
-                :disabled="['True', 'False'].indexOf(scope.row.data_type) !== -1"
+                :disabled="['True', 'False', 'None'].indexOf(scope.row.data_type) !== -1"
                 :placeholder="
                 scope.row.data_type === 'True'
                   ? 'True' : scope.row.data_type === 'False'
@@ -145,7 +145,7 @@
                 size="small"
                 style="color: red;margin: 2px; padding: 0"
                 @click.native="clearData()"
-            ><i class="iconfont icon-testshibai"></i></el-button>
+            ><i class="iconfont icon-testqingkong"></i></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -235,7 +235,7 @@ const changeData = (value: object) => {
 }
 
 const changeRowDataType = (row: { data_type: string; value: string; }) => {
-  if (['True', 'False'].indexOf(row.data_type) !== -1) {
+  if (['True', 'False', 'None'].indexOf(row.data_type) !== -1) {
     row.value = row.data_type
   } else {
     row.value = ''
