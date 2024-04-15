@@ -12,8 +12,7 @@ import {bus, busEvent} from "@/utils/bus-events";
 
 const title_list = ref([])
 const icon_dict = {
-  api: 'iconfont icon-testwangfandijia', case: 'iconfont icon-testcodepen',
-  step: 'iconfont icon-testorderedlist', report: 'iconfont icon-testbarchart'
+  api: 'api', case: 'cubeFive', step: 'listNumbers', report: 'chartHistogram'
 }
 const color_dict = {
   api: '#36b9cc', case: '#4e73df', step: '#1cc88a', report: '#f6c23e'

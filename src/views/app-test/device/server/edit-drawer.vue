@@ -36,7 +36,7 @@
               <div>如：地址为http://192.168.0.1，请填写：192.168.0.1</div>
             </template>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -66,6 +66,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetServer, PutServer} from "@/api/business-api/device-server";
 

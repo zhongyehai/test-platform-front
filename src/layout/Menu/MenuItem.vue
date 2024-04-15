@@ -2,19 +2,19 @@
   <template v-if="!menu.hideMenu">
     <el-sub-menu v-if="showMenuType === 2" :index="pathResolve" :show-timeout="0" :hide-timeout="0">
       <template #title>
-        <i :class="menu.meta.icon" v-if="menu.meta.icon"></i>
+        <component class="el-menu-item-icon" :is="getIcon(menu.meta.icon)" v-if="menu.meta.icon"></component>
         <span>{{ menu.meta.title }}</span>
       </template>
       <menu-item v-for="(item, key) in menu.children" :key="key" :menu="item" :basePath="pathResolve" />
     </el-sub-menu>
     <app-link v-else-if="showMenuType === 1" :to="pathResolve">
       <el-menu-item :index="pathResolve" v-if="!menu.children[0].children || menu.children[0].children.length === 0">
-        <i :class="menu.children[0].meta.icon || menu.meta.icon" v-if="menu.children[0].meta.icon || menu.meta.icon"></i>
+        <component class="el-menu-item-icon" :is="getIcon(menu.children[0].meta.icon || menu.meta.icon)" v-if="menu.children[0].meta.icon || menu.meta.icon"></component>
         <template #title>{{ menu.children[0].meta.title }}</template>
       </el-menu-item>
       <el-sub-menu v-else :index="pathResolve" :show-timeout="0" :hide-timeout="0">
         <template #title>
-          <i :class="menu.children[0].meta.icon || menu.meta.icon" v-if="menu.children[0].meta.icon || menu.meta.icon"></i>
+          <component class="el-menu-item-icon" :is="getIcon(menu.children[0].meta.icon || menu.meta.icon)" v-if="menu.children[0].meta.icon || menu.meta.icon"></component>
           <span>{{ menu.children[0].meta.title }}</span>
         </template>
         <menu-item v-for="(item, key) in menu.children[0].children" :key="key" :menu="item" :basePath="pathResolve" />
@@ -22,7 +22,7 @@
     </app-link>
     <app-link v-else :to="pathResolve">
       <el-menu-item :index="pathResolve">
-        <i :class="menu.meta.icon" v-if="menu.meta.icon"></i>
+        <component class="el-menu-item-icon" :is="getIcon(menu.meta.icon)"></component>
         <template #title>{{ menu.meta.title }}</template>
       </el-menu-item>
     </app-link>
@@ -31,6 +31,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
+import * as iconPark from '@icon-park/vue-next';
 import appLink from './Link.vue'
 import { isBackMenu } from '@/config'
 export default defineComponent({
@@ -80,10 +81,17 @@ export default defineComponent({
       path = props.basePath ? props.basePath + '/' + path : path
       return path
     })
+
+    const getIcon = (iconName: string) => {
+      const normalizedIconName = iconName.charAt(0).toUpperCase() + iconName.slice(1);
+      return iconPark[normalizedIconName] || null;
+    }
+
     return {
       showMenuType,
       pathResolve,
-      isBackMenu
+      isBackMenu,
+      getIcon
     }
   }
 })
@@ -96,7 +104,11 @@ export default defineComponent({
 .el-menu-item {
   text-align: left;
 }
-.el-menu-item i, .el-sub-menu__title i {
+.el-menu-item .el-menu-item-icon,
+.el-sub-menu__title .el-menu-item-icon {
   padding-right: 8px;
+  display: grid;
+  place-items: center; /* 将内容垂直居中 */
 }
+
 </style>

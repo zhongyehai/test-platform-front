@@ -8,10 +8,10 @@
           :rules="formRules"
           label-width="90px">
 
-        <el-form-item label="配置类型" class="is-required" prop="type" size="small">
+        <el-form-item label="配置分类" class="is-required" prop="type" size="small">
           <el-select
               v-model="formData.type"
-              placeholder="选择配置类型"
+              placeholder="选择配置分类"
               clearable
               filterable
               default-first-option
@@ -90,7 +90,7 @@ const ruleFormRef = ref(null)
 const formData = ref({id: undefined, type: undefined, name: undefined, value: undefined, desc: undefined})
 const formRules = {
   type: [
-    {required: true, message: '请选择配置类型', trigger: 'blur'}
+    {required: true, message: '请选择配置分类', trigger: 'blur'}
   ],
   name: [
     {required: true, message: '请输入配置code', trigger: 'blur'}

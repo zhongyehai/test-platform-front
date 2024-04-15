@@ -18,7 +18,7 @@
                     type="text"
                     style="margin-left: 10px"
                     @click="showEditDrawer('add', undefined)"
-                ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+                ><Plus></Plus></el-button>
               </template>
             </el-popover>
           </template>
@@ -133,7 +133,7 @@
                     <div>1: 批量/定时任务运行时，只有调试结果为 "调试通过-要执行" 的才会执行</div>
                     <div>2: 请务必将用例调试通过后再设为调试通过</div>
                   </template>
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
@@ -195,6 +195,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {Plus, Help} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import showCaseDesc from './show-desc.vue'
 import addCaseDrawer from './add-drawer.vue'

@@ -68,7 +68,7 @@
           <template #header>
             <span>状态</span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="若此处设置为不运行，则执行测试时将不会运行此步骤">
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <template #default="scope">
@@ -101,7 +101,7 @@
           <template #header>
             <span>详情</span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="引用用例的详情">
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <template #default="scope">
@@ -178,7 +178,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, computed, onBeforeUnmount, watch} from "vue";
-import Pagination from '@/components/pagination.vue'
+import {Help} from "@icon-park/vue-next";
 import EditApiStepDrawer from './api-test/edit-api-step.vue'
 import EditUiStepDrawer from './ui-test/edit-ui-step.vue'
 import AddStepDrawer from './add-step-drawer.vue'

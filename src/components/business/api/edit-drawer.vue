@@ -15,7 +15,7 @@
               <el-input-number v-model="formData.time_out" size="small" :min="5" />
               <el-popover class="el_popover_class" placement="top-start" trigger="hover">
                 <div>发送request请求时，等待回调的超时时间，最少设置为5秒</div>
-                <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-popover>
             </el-form-item>
           </el-col>
@@ -47,7 +47,7 @@
               <template #label>
                 <span> 前置条件 </span>
                 <el-tooltip class="item" effect="dark" placement="top-start" content="在运行接口之前要做的一些前置操作，使用自定义函数的形式实现">
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <oneColumnRow ref="upFuncInputRef" :current-data="formData.up_func" />
@@ -59,7 +59,7 @@
               <template #label>
                 <span> 后置条件 </span>
                 <el-tooltip class="item" effect="dark" placement="top-start" content="在运行接口之后要做的一些后置操作，使用自定义函数的形式实现">
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <oneColumnRow ref="downFuncInputRef" :current-data="formData.down_func" />
@@ -82,7 +82,7 @@
                 3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                 4、若在此处设置了与服务的头部参数设置的同样的key，则会用此处设置的value
               </template>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <headersView
@@ -175,14 +175,15 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {GetApi, PostApi, PutApi, RunApi, GetApiFrom} from "@/api/business-api/api";
+import {Help} from "@icon-park/vue-next";
+import {GetApi, PutApi, RunApi} from "@/api/business-api/api";
 import {bus, busEvent} from "@/utils/bus-events";
-import OneColumnRow from "@/components/input/one-column-row.vue";
 import headersView from '@/components/input/key-value-row.vue'
 import queryStringView from '@/components/input/key-value-row.vue'
 import apiExtractorView from '@/components/input/api-extractor.vue'
 import validatesView from '@/components/input/validates.vue'
 import bodyView from '@/components/input/api-body.vue'
+import oneColumnRow from "@/components/input/one-column-row.vue";
 
 import {GetConfigByCode} from "@/api/config/config-value";
 import showJson from "@/components/show-json.vue";

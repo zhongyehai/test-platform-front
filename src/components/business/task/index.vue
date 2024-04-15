@@ -44,7 +44,7 @@
                           type="text"
                           style="margin-left: 10px"
                           @click="showEditDrawer(undefined)"
-                      ><i style="color: #409EFF" class="iconfont icon-testadd"/></el-button>
+                      ><Plus></Plus></el-button>
                     </template>
                   </el-popover>
                 </template>
@@ -92,7 +92,7 @@
                           <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
                           <div>注：当选择了多个环境时，才会出现此选项</div>
                         </template>
-                        <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                        <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                       </el-tooltip>
                     </template>
                     <template #default="scope">
@@ -108,7 +108,7 @@
                           <div>1: 启用中的任务才会定时执行</div>
                           <div>2: 禁用中的任务才支持修改</div>
                         </template>
-                        <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                        <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                       </el-tooltip>
                     </template>
                     <template #default="scope">
@@ -182,6 +182,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, watch, nextTick, computed} from "vue";
+import {Help, Plus} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 

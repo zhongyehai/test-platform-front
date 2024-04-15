@@ -29,7 +29,7 @@
           <template #header>
             <span>定位方式</span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="在此处新增/修改地址（定位方式为【页面地址】）后，会自动同步到页面信息的页面地址">
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <template #default="scope">
@@ -47,7 +47,7 @@
           <template #header>
             <span>等待时间(秒)</span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="预设等待元素出现的超时时间，再执行用例时，将会执行此时间的等待(秒)">
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <template #default="scope">
@@ -86,6 +86,8 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import {Help} from "@icon-park/vue-next";
+
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'

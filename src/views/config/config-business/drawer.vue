@@ -25,7 +25,7 @@
               <div>2、自动关联：新增运行环境时，新增的运行环境将自动与此业务线关联</div>
               <div>注：不管此处选的是什么机制，对于已存在的运行环境，若此业务线需要关联，都需要进行一次手动关联</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -39,7 +39,7 @@
               <div>1、设置接收该业务线自动化测试阶段统计通知方式（周统计、月统计）</div>
               <div>2、企业微信和飞书的webhook未完全支持，请自行开发和调试</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -120,7 +120,7 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from "vue";
-
+import {Help} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {GetWebHookList} from "@/api/config/webhook";

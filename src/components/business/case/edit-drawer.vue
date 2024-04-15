@@ -40,7 +40,7 @@
                       <div>2、此处引用的脚本文件，对于当前用例下的测试步骤均有效</div>
                       <div>3、若此处引用了脚本文件，服务处也引用了脚本文件，则会把两边引用的合并去重</div>
                     </div>
-                    <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                   </el-popover>
                 </el-form-item>
               </el-col>
@@ -72,7 +72,7 @@
                 <template #label>
                   <span> 跳过条件 </span>
                   <el-tooltip class="item" effect="dark" placement="top-start" content="任意一行设置的表达式成立，都会执行跳过操作，使用方法与断言一致，详见断言示例">
-                    <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                   </el-tooltip>
                 </template>
                 <skipIfView
@@ -95,7 +95,7 @@
                       4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br>
                       5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
                     </template>
-                    <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                   </el-tooltip>
                 </template>
                 <variablesView
@@ -119,7 +119,7 @@
                       5、若在此处设置的key与服务的头部参数中的某个key一致，则对于这个key，则会用此处设置的值 <br>
                       6、若在用例中，测试步骤已用相同的key设置了其他值，则会使用测试步骤中设置的值
                     </template>
-                    <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                   </el-tooltip>
                 </template>
                 <headersView
@@ -149,7 +149,7 @@
                   type="text"
                   style="margin-left: 10px"
                   @click="showAddStepDrawer()"
-              ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+              ><Plus></Plus></el-button>
               </template>
             </el-popover>
           </template>
@@ -168,7 +168,7 @@
                 <div>2: 不会自动保存跳过条件、自定义变量、头部信息设置的参数</div>
                 <div>3: 若调试完毕后要保存参数设置，请手动点击保存按钮</div>
               </template>
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </div>
 
@@ -184,6 +184,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help, Plus} from "@icon-park/vue-next";
 import variablesView from '@/components/input/variables.vue'
 import headersView from '@/components/input/key-value-row.vue'
 import skipIfView from '@/components/input/skip-if.vue'
@@ -192,7 +193,7 @@ import {bus, busEvent} from "@/utils/bus-events";
 import {GetConfigByCode, GetSkipIfDataSourceMapping} from "@/api/config/config-value";
 import {GetCase, GetCaseFrom, PutCase, RunCase} from "@/api/business-api/case";
 import {GetScriptList} from "@/api/assist/script";
-import {getExtractMappingList, getFindElementOption, getUiAssertMappingList} from "@/utils/get-config";
+import {getFindElementOption, getUiAssertMappingList} from "@/utils/get-config";
 import {GetExecuteMappingList, GetExtractMappingList, GetKeyBoardCodeMappingList} from "@/api/business-api/step";
 import {ElMessage} from "element-plus";
 

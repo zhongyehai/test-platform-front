@@ -29,7 +29,7 @@
         <el-form-item label="设备id" prop="device_id" class="is-required" size="small">
           <el-input v-model="formData.device_id" size="small" style="width: 97%" placeholder="设备id" />
           <el-tooltip class="item" effect="dark" placement="top-start" content="使用 adb devices 命令查看">
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -45,7 +45,7 @@
               <div style="margin-bottom: 20px; color: white; font-size: 18px">使用 adb shell dumpsys window displays | findstr app= 命令查看</div>
               <el-image style="width: 1000px; height: 150px" src="/images/showScreen.png" />
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -57,7 +57,7 @@
                 <div>1、用于记录设备的信息，比短信条数、通讯录条数...</div>
                 <div>2、字段可自定义，在使用的时候用自定义的字段即可</div>
               </template>
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <div :style="jsonEditorStyle">
@@ -85,6 +85,7 @@
 <script lang="ts" setup>
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import jsonEditorView from '@/components/editor/json-editor.vue'
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetPhone, PutPhone} from "@/api/business-api/device-phone";

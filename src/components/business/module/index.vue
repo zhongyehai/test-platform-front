@@ -68,7 +68,7 @@
                         type="text"
                         style="margin-left: 10px"
                         @click="addParentModule"
-                    ><i class="iconfont icon-testadd"></i></el-button>
+                    ><Plus></Plus></el-button>
                   </template>
                 </el-popover>
               </template>
@@ -89,9 +89,9 @@
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span>{{ node.label }}</span>
                       <div v-show="data.id === currentNode.id" style="float: right">
-                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testadd" @click.stop="showEditDrawer('add', node, data)"/>
-                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testedit" @click.stop="showEditDrawer('edit', node, data)"/>
-                        <i style="margin: 0; padding: 1px;color: red" class="iconfont icon-testdelete1" @click.stop="clickDeleteModule(node, data)"/>
+                        <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>
+                        <Write style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('edit', node, data)"></Write>
+                        <Delete style="color: red;margin: 0; padding: 2px" @click.stop="clickDeleteModule(node, data)"></Delete>
                       </div>
                     </div>
 
@@ -132,6 +132,7 @@
 <script setup lang="ts">
 
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import {Clear, Copy, Delete, Minus, Plus, Write} from "@icon-park/vue-next";
 import editModuleDrawer from "./edit-drawer.vue";
 import apiIndex from "@/components/business/api/index.vue";
 import apiFromDrawer from "@/components/business/api/from-drawer.vue";

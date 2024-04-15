@@ -7,47 +7,47 @@ const route: Route[] = [
     component: Layout,
     redirect: '/system/user',
     hideMenu: false,
-    meta: { title: '系统管理', icon: 'iconfont icon-testearth', alwaysShow: false },
+    meta: { title: '系统管理', icon: 'system', alwaysShow: false },
     children: [
       {
         path: 'permission',
         component: createNameComponent(() => import('@/views/system/permission/index.vue')),
-        meta: { title: '权限管理', icon: 'iconfont icon-testlink' }
+        meta: { title: '权限管理', icon: 'permissions' }
       },
       {
         path: 'role',
         component: createNameComponent(() => import('@/views/system/role/index.vue')),
-        meta: { title: '角色管理', icon: 'iconfont icon-testuser' }
+        meta: { title: '角色管理', icon: 'people' }
       },
       {
         path: 'user',
         component: createNameComponent(() => import('@/views/system/user/index.vue')),
-        meta: { title: '用户管理', icon: 'iconfont icon-testteam' }
+        meta: { title: '用户管理', icon: 'user' }
       },
       {
         path: 'job',
         component: createNameComponent(() => import('@/views/system/job/index.vue')),
-        meta: { title: '系统定时任务', icon: 'iconfont icon-testcalendar-check' }
+        meta: { title: '系统定时任务', icon: 'calendar' }
       },
       {
         path: 'error-record',
         component: createNameComponent(() => import('@/views/system/error-record/index.vue')),
-        meta: { title: '系统错误记录', icon: 'iconfont icon-testalert-fill' }
+        meta: { title: '系统错误记录', icon: 'alarm' }
       },
       {
         path: 'platform',
         component: createNameComponent(() => import('@/views/system/platform/index.vue')),
-        meta: { title: '平台使用分析', hideTabs: false, icon: 'iconfont icon-testbarchart' },
+        meta: { title: '平台使用分析', hideTabs: false, icon: 'chartHistogram' },
         children: [
           {
             path: 'overview',
             component: createNameComponent( () => import('@/views/system/platform/overview/index.vue')),
-            meta: { title: '数据总览', icon: 'iconfont icon-testsignal-fill' }
+            meta: { title: '数据总览', icon: 'chartHistogramOne' }
           },
           {
             path: 'analyse',
             component: createNameComponent( () => import('@/views/system/platform/analyse/index.vue')),
-            meta: { title: '业务线分析', icon: 'iconfont icon-testdijiaqushi' }
+            meta: { title: '业务线分析', icon: 'chartProportion' }
           }
         ]
       },

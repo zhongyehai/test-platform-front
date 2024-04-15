@@ -8,44 +8,44 @@ const route: Route[] = [
     component: Layout,
     redirect: '/app-test/project',
     hideMenu: false,
-    meta: { title: 'app自动化', icon: 'iconfont icon-testandroid-fill' },
+    meta: { title: 'app自动化', icon: 'android' },
     children: [
       {
         path: 'device',
         component: createNameComponent(() => import('@/views/app-test/device/index.vue')),
-        meta: { title: '设备管理', icon: 'iconfont icon-testtablet' }
+        meta: { title: '设备管理', icon: 'iphone' }
       },
       {
         path: 'project',
         component: createNameComponent(() => import('@/views/app-test/project/index.vue')),
-        meta: { title: 'app管理', icon: 'iconfont icon-testandroid' }
+        meta: { title: 'app管理', icon: 'android' }
       },
       {
         path: 'page',
         component: createNameComponent(() => import('@/views/app-test/module/index.vue')),
-        meta: { title: '页面管理', icon: 'iconfont icon-testblock' }
+        meta: { title: '页面管理', icon: 'bookOpen' }
       },
       {
         path: 'case',
         component: createNameComponent(() => import('@/views/app-test/case-suite/index.vue')),
-        meta: { title: '用例管理', icon: 'iconfont icon-testcodepen' }
+        meta: { title: '用例管理', icon: 'cubeFive' }
       },
       {
         path: 'task',
         component: createNameComponent(() => import('@/views/app-test/task/index.vue')),
-        meta: { title: '任务管理', icon: 'iconfont icon-testcalendar-check' }
+        meta: { title: '任务管理', icon: 'calendar' }
       },
       {
         path: 'report-show',
         // @ts-ignore
         hideMenu: true,  // 不显示按钮
         component: createNameComponent(() => import('@/views/app-test/report/show.vue')),
-        meta: { title: '查看测试报告', icon: 'iconfont icon-testbarchart' }
+        meta: { title: '查看测试报告', icon: 'chartHistogram' }
       },
       {
         path: 'report',
         component: createNameComponent(() => import('@/views/app-test/report/index.vue')),
-        meta: { title: '测试报告', icon: 'iconfont icon-testbarchart' }
+        meta: { title: '测试报告', icon: 'chartHistogram' }
       },
     ]
   }

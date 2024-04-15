@@ -11,7 +11,7 @@
                     type="text"
                     style="margin-left: 10px"
                     @click="showEditDrawer('add', undefined)"
-                ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+                ><Plus></Plus></el-button>
               </template>
             </el-popover>
           </template>
@@ -46,7 +46,7 @@
                   <template #content>
                     <div>在页面元素处新增/修改地址（定位方式为【页面地址】）后，会自动同步到此处</div>
                   </template>
-                  <span> 页面地址 <i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span> 页面地址 <span style="margin-left:5px;color: #409EFF"><help></help></span></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {Plus, Help} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'

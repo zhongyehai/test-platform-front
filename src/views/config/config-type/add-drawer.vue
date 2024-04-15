@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" title="新增配置类型" size="90%">
+    <el-drawer v-model="drawerIsShow" title="新增配置分类" size="90%">
       <el-form
           ref="ruleFormRef"
           :model="formData">
@@ -21,7 +21,7 @@
 
             <el-table-column  prop="name" align="center" min-width="12%">
               <template slot="header" #header="scope">
-                <span><span style="color: red">*</span>配置类型</span>
+                <span><span style="color: red">*</span>配置分类</span>
               </template>
 
               <template #default="scope">
@@ -47,7 +47,7 @@
                       size="small"
                       style="margin: 2px; padding: 0"
                       @click.native="addRow"
-                  ><i class="iconfont icon-testadd"></i></el-button>
+                  ><Plus></Plus></el-button>
                 </el-tooltip>
 
                 <el-tooltip class="item" effect="dark" placement="top-end" content="复制当前行">
@@ -56,7 +56,7 @@
                       size="small"
                       style="margin: 2px; padding: 0"
                       @click.native="copyRow(scope.row)"
-                  ><i class="iconfont icon-testjingdianwanfa"></i></el-button>
+                  ><Copy></Copy></el-button>
                 </el-tooltip>
 
                 <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
@@ -66,7 +66,7 @@
                       size="small"
                       style="color: red;margin: 2px; padding: 0"
                       @click.native="delRow(scope.$index)"
-                  ><i class="iconfont icon-testdelete1"></i></el-button>
+                  ><Minus></Minus></el-button>
                 </el-tooltip>
 
                 <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
@@ -76,7 +76,7 @@
                       size="small"
                       style="color: red;margin: 2px; padding: 0"
                       @click.native="clearData()"
-                  ><i class="iconfont icon-testshibai"></i></el-button>
+                  ><Clear></Clear></el-button>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -105,6 +105,7 @@
 <script lang="ts" setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {ElMessage} from 'element-plus'
+import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {PostConfigType} from "@/api/config/config-type";
 

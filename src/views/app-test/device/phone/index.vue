@@ -41,7 +41,7 @@
           <template #header>
             <span> 设备id </span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="使用adb devices查看">
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </template>
           <template #default="scope">
@@ -86,6 +86,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import {Help} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'

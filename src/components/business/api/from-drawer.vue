@@ -54,7 +54,7 @@
       <template #header>
         <span> 重要级别 </span>
         <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口">
-          <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+          <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
         </el-tooltip>
       </template>
       <template #default="scope">
@@ -79,7 +79,7 @@
       <template #header>
         <span>状态</span>
         <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口是否被废弃">
-          <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+          <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
         </el-tooltip>
       </template>
       <template #default="scope">
@@ -131,6 +131,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {Help} from "@icon-park/vue-next";
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";

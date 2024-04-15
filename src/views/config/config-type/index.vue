@@ -3,7 +3,7 @@
 
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
-        <el-button type="primary" @click="showEditDrawer(undefined, 'add')"> 添加类型</el-button>
+        <el-button type="primary" @click="showEditDrawer(undefined, 'add')"> 添加分类</el-button>
       </div>
 
       <div class="layout-container-form-search">
@@ -12,7 +12,7 @@
             clearable
             size="small"
             style="width: 400px; margin-right: 10px"
-            placeholder="配置类型名，支持模糊搜索"/>
+            placeholder="配置分类名，支持模糊搜索"/>
 
         <el-select
             v-model="queryItems.create_user"
@@ -42,7 +42,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip prop="name" align="center" label="配置类型" min-width="35%">
+        <el-table-column show-overflow-tooltip prop="name" align="center" label="配置分类" min-width="35%">
           <template #default="scope">
             <span> {{ scope.row.name }} </span>
           </template>
@@ -135,7 +135,7 @@ const parseUser = (userId: number) => {
   return userDict.value[userId]
 }
 
-// 获取配置类型列表
+// 获取配置分类列表
 const getTableDataList = () => {
   queryItems.value.create_user = queryItems.value.create_user ? queryItems.value.create_user : undefined
   queryItems.value.name = queryItems.value.name ? queryItems.value.name : undefined
@@ -156,7 +156,7 @@ onMounted(() => {
     })
   })
 
-  // 获取配置类型列表
+  // 获取配置分类列表
   getTableDataList()
 
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);

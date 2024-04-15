@@ -19,7 +19,7 @@
             <template #content>
               <div>企业微信和飞书的webhook未完全支持，请自行开发和调试</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -38,7 +38,7 @@
               <div>1、若机器人设置的用加签模式，则此项必填</div>
               <div>2、若机器人设置的关键词模式，则此项不用填写，机器人需设置关键词包含“测试”、“报告”、“统计”</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -69,6 +69,7 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetWebHook, PostWebHook, PutWebHook} from "@/api/config/webhook";
+import {Help} from "@icon-park/vue-next";
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);

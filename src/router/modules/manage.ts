@@ -8,27 +8,27 @@ const route: Route[] = [
     component: Layout,
     redirect: '/manage/account',
     hideMenu: false,
-    meta: { title: '测试管理', icon: 'iconfont icon-testreddit' },
+    meta: { title: '测试管理', icon: 'layers' },
     children: [
       {
         path: 'kym',
         component: createNameComponent(() => import('@/views/manage/kym/index.vue')),
-        meta: { title: 'KYM分析', icon: 'iconfont icon-testcluster' }
+        meta: { title: 'KYM分析', icon: 'leftAndRightBranch' }
       },
       // {
       //   path: 'make-test-case',
       //   component: createNameComponent(() => import('@/views/manage/make-test-case/index.vue')),
-      //   meta: { title: '用例编写', icon: 'iconfont icon-testedit' }
+      //   meta: { title: '用例编写', icon: 'everyUser' }
       // },
       {
         path: 'account',
         component: createNameComponent(() => import('@/views/manage/env/index.vue')),
-        meta: { title: '地址和账号管理', icon: 'iconfont icon-testteam' }
+        meta: { title: '地址和账号管理', icon: 'everyUser' }
       },
       {
         path: 'bug-track',
         component: createNameComponent(() => import('@/views/manage/bug-track/index.vue')),
-        meta: { title: '线上问题跟踪', icon: 'iconfont icon-testbug-fill' }
+        meta: { title: '线上问题跟踪', icon: 'bug' }
       }
     ]
   }

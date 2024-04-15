@@ -31,7 +31,7 @@
                 <template #content>
                   触发此定时任务时，会以此处选择的环境来执行，请确保此任务涉中及到的所有服务都设置了当前选中环境的域名
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </el-form-item>
 
@@ -101,7 +101,7 @@
                   <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
                   <div>注：当选择了多个环境时，才会出现此选项</div>
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </el-form-item>
 
@@ -114,7 +114,7 @@
                 <template #content>
                   <div>企业微信和飞书的webhook未完全支持，请自行开发和调试</div>
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </el-form-item>
 
@@ -196,7 +196,7 @@
                   <div>2、节假日的数据来源：参数配置的holiday_list对应的值</div>
                   <div>注：每年需手动更新节假日，格式为 ["01-01", "10-01"] </div>
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </el-form-item>
 
@@ -210,7 +210,7 @@
                   <div>2、并行执行: 每条用例一个线程并行执行</div>
                   <div>注：并行执行仅仅是为了提升执行效率，请勿用于压力测试</div>
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </el-form-item>
 
@@ -225,7 +225,7 @@
                     <div>4、json参数会添加参数extend字段，来源于触发请求时传的extend字段，接收的什么就返回什么</div>
                     <div>5、请严格按照示例填写内容，否则回调会不成功</div>
                   </template>
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <div :style="jsonEditorStyle">
@@ -276,6 +276,7 @@
 <script lang="ts" setup>
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import jsonEditorView from '@/components/editor/json-editor.vue'
 import selectCaseView from './select-case.vue'
 import {GetConfigByCode, GetConfigList} from "@/api/config/config-value";

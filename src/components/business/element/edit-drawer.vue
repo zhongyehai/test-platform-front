@@ -53,7 +53,7 @@
               <div>请填写具体坐标值：(x, y)</div>
               <div>如坐标为(918,1079)，则填写: (918,1079)</div>
             </div>
-            <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-popover>
         </el-form-item>
 
@@ -121,6 +121,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetElement, PostElement, PutElement} from "@/api/business-api/element";
 

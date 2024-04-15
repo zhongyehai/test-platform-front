@@ -40,7 +40,7 @@
             <template #label>
               <span> 执行用例耗时 </span>
               <el-tooltip class="item" effect="dark" placement="top-start" content="执行此用例耗费的时间，不包含数据解析、数据写库时间">
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             {{ reportCaseData.summary.time.case_duration }} 秒
@@ -50,7 +50,7 @@
             <template #label>
               <span> 执行步骤总耗时 </span>
               <el-tooltip class="item" effect="dark" placement="top-start" content="执行此用例下的所有步骤的总耗时">
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             {{ reportCaseData.summary.time.step_duration }} 毫秒
@@ -60,7 +60,7 @@
             <template #label>
               <span> 执行测试总共耗时 </span>
               <el-tooltip class="item" effect="dark" placement="top-start" content="包含数据解析、数据写库时间">
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             {{ reportCaseData.summary.time.all_duration }} 秒
@@ -198,6 +198,7 @@
 </template>
 
 <script setup lang="ts">
+import {Help} from "@icon-park/vue-next";
 import skipIfView from '@/components/input/skip-if.vue'
 
 const props = defineProps({

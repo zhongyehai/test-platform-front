@@ -67,7 +67,7 @@
                               4、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                               5、若在用例的公用变量处设置了与此处同样的key，则会以用例处定义的变量覆盖此处的变量
                             </template>
-                            <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                           </el-tooltip>
                         </template>
                         <el-scrollbar class="aside_scroll" :style="{height: attrHeight}">
@@ -92,7 +92,7 @@
                               3、此处的value可以使用自定义函数处理/获取数据，比如用自定义函数取数据库获取对应的数据 <br>
                               4、若在用例的头部参数处设置了与此处同样的key，则会以用例处定义的参数覆盖此处的参数
                             </template>
-                            <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                           </el-tooltip>
                         </template>
                         <el-scrollbar class="aside_scroll" :style="{height: attrHeight}">
@@ -148,6 +148,7 @@ import headersView from '@/components/input/key-value-row.vue'
 import {GetProjectEnv, PutProjectEnv} from "@/api/business-api/project";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {ElMessage, ElTree} from "element-plus";
+import {Help} from "@icon-park/vue-next";
 
 const props = defineProps({
   testType: {

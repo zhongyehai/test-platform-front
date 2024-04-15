@@ -39,7 +39,7 @@
               <div>1: 批量运行时，只有调试结果为通过的才会执行</div>
               <div>2: 请务必将用例调试通过后再设为调试通过</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </template>
         <template #default="scope">
@@ -70,6 +70,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {Help} from "@icon-park/vue-next";
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";

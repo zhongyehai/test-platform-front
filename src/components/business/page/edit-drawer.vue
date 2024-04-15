@@ -27,7 +27,7 @@
                     type="text"
                     style="margin: 0; padding: 5px"
                     @click="showAddElement()"
-                ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+                ><Plus></Plus></el-button>
               </template>
             </el-popover>
             <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="点击导入元素">
@@ -37,7 +37,7 @@
                     type="text"
                     style="margin: 0; padding: 5px"
                     @click="showUploadDrawer()"
-                ><i style="color: #409EFF" class="iconfont icon-testtotop" /></el-button>
+                ><upload></upload></el-button>
               </template>
             </el-popover>
           </template>
@@ -65,6 +65,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Plus, Upload} from "@icon-park/vue-next";
 import {GetPage, PutPage} from "@/api/business-api/page";
 import elementIndexView from "../element/index.vue";
 import {bus, busEvent} from "@/utils/bus-events";

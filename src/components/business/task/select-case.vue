@@ -14,7 +14,7 @@
                   4、若要选择<span style="color: red">指定用例</span>，则点击对应的用例集获取用例列表，再在用例列表中勾选要选择的用例<br>
                   5、若要既选择了用例集，又选择了用例，则会运行选中用<span style="color: red">例集下的所有状态为要执行的用例 + 选择的用例</span><br>
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             <el-scrollbar :style="{height: treeHeight}">
@@ -47,7 +47,7 @@
                   4、若要既选择了用例集，又选择了用例，则会运行选中用<span style="color: red">例集下的所有状态为要执行的用例 + 选择的用例</span><br>
                   5、仅用例状态为<span style="color: red">要运行</span>的用例可选中、会执行
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             <el-table
@@ -102,6 +102,7 @@
 <script lang="ts" setup>
 
 import {ref, watch, nextTick, computed} from "vue";
+import {Help} from "@icon-park/vue-next";
 import showCaseDesc from '@/components/business/case/show-desc.vue'
 import {GetCaseList} from "@/api/business-api/case";
 

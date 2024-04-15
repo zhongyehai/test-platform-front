@@ -21,7 +21,7 @@
                   <template #label>
                     <span> 前置处理 </span>
                     <el-tooltip class="item" effect="dark" placement="top-start" content="在运行步骤之前要做的一些前置操作，使用自定义函数的形式实现">
-                      <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                      <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                     </el-tooltip>
                   </template>
                   <oneColumnRow ref="upFuncInputRef" :current-data="formData.up_func" />
@@ -33,7 +33,7 @@
                   <template #label>
                     <span> 后置处理 </span>
                     <el-tooltip class="item" effect="dark" placement="top-start" content="在运行步骤之后要做的一些后置操作，使用自定义函数的形式实现">
-                      <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                      <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                     </el-tooltip>
                   </template>
                   <oneColumnRow ref="downFuncInputRef" :current-data="formData.down_func" />
@@ -106,7 +106,7 @@
                   trigger="hover"
                   content="从坐标x1,y1移动到x2,y2"
               >
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-popover>
             </el-form-item>
 
@@ -148,7 +148,7 @@
                         3、若元素管理处已设置超时时间，以步骤处设置的为准
                       </div>
                     </template>
-                    <el-button type="text" ><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                   </el-tooltip>
                 </el-form-item>
               </el-col>
@@ -173,7 +173,7 @@
                           当前用例执行时，当前步骤之前的步骤出现失败/错误的情况，是否跳过当前步骤
                         </div>
                       </template>
-                      <el-button type="text" ><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+                      <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                     </el-tooltip>
                   </el-form-item>
                 </el-form>
@@ -314,12 +314,13 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
-import OneColumnRow from "@/components/input/one-column-row.vue";
 import skipIfView from '@/components/input/skip-if.vue'
 import uiExtractorView from '@/components/input/ui-extractor.vue'
 import validatesView from '@/components/input/validates.vue'
 import jsonEditorView from '@/components/editor/json-editor.vue'
+import oneColumnRow from "@/components/input/one-column-row.vue";
 
 import {ChangeElementById, GetElement, GetElementFrom, GetElementList} from "@/api/business-api/element";
 import {GetKeyBoardCodeMappingList, GetStep, PostStep, PutStep} from "@/api/business-api/step";

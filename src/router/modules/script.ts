@@ -8,12 +8,12 @@ const route: Route[] = [
     component: Layout,
     redirect: '/script/python',
     hideMenu: false,
-    meta: { title: '脚本管理', icon: 'iconfont icon-testskype' },
+    meta: { title: '脚本管理', icon: 'code' },
     children: [
       {
         path: 'python',
         component: createNameComponent(() => import('@/views/assist/script/index.vue')),
-        meta: { title: 'python脚本', icon: 'iconfont icon-testskype' }
+        meta: { title: 'python脚本', icon: 'code' }
       }
     ]
   }

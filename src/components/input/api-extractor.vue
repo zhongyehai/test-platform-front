@@ -329,7 +329,7 @@
               <div>2、若在其他地方已预设头部信息包含当前的key，对于头部信息中的这个key，则会以将此处提取到的值为准</div>
               <div>注：提取后的数据会以key、value的形式存在于自定义变量池中，不管是否选择更新到头部，都可使用</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </template>
         <template #default="scope">
@@ -356,7 +356,7 @@
                 size="small"
                 style="margin: 2px; padding: 0"
                 @click.native="addRow(true)"
-            ><i class="iconfont icon-testadd"></i></el-button>
+            ><Plus></Plus></el-button>
           </el-tooltip>
 
           <el-tooltip class="item" effect="dark" placement="top-end" content="复制当前行">
@@ -365,7 +365,7 @@
                 size="small"
                 style="margin: 2px; padding: 0"
                 @click.native="copyRow(scope.row)"
-            ><i class="iconfont icon-testjingdianwanfa"></i></el-button>
+            ><Copy></Copy></el-button>
           </el-tooltip>
 
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
@@ -375,7 +375,7 @@
                 size="small"
                 style="color: red;margin: 2px; padding: 0"
                 @click.native="delRow(scope.$index)"
-            ><i class="iconfont icon-testdelete1"></i></el-button>
+            ><Minus></Minus></el-button>
           </el-tooltip>
 
           <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
@@ -385,7 +385,7 @@
                 size="small"
                 style="color: red;margin: 2px; padding: 0"
                 @click.native="clearData()"
-            ><i class="iconfont icon-testqingkong"></i></el-button>
+            ><Clear></Clear></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -395,10 +395,12 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, watch} from "vue";
+import {Help} from "@icon-park/vue-next";
 import Sortable from "sortablejs"
 import {GetConfigByCode} from "@/api/config/config-value";
 import {busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
+import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 
 const props = defineProps({
   currentData: {

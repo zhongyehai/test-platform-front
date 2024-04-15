@@ -5,12 +5,14 @@
       <div class="detail">{{ row.total }}</div>
     </div>
     <div class="card-right">
-      <i :class="row.icon"></i>
+      <component class="card-icon" :is="getIcon(row.icon)"></component>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+
+import * as iconPark from "@icon-park/vue-next";
 
 defineProps({
   row: {
@@ -18,6 +20,11 @@ defineProps({
     type: Object
   }
 })
+
+const getIcon = (iconName: string) => {
+  const normalizedIconName = iconName.charAt(0).toUpperCase() + iconName.slice(1);
+  return iconPark[normalizedIconName] || null;
+}
 
 </script>
 
@@ -59,7 +66,7 @@ defineProps({
   &-right {
     padding-right: 15px;
 
-    i {
+    .card-icon {
       font-size: 40px;
       font-weight: 900;
       color: #e6e8ef;

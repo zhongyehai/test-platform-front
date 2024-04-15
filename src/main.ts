@@ -8,7 +8,6 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'normalize.css' // css初始化
 import './assets/style/common.scss' // 公共css
 import './theme/modules/chinese/index.scss'
-import './assets/icons/iconfont.css'  // 引入本地的阿里巴巴矢量图标库，详见 https://developer.aliyun.com/article/891564
 import "vue3-json-viewer/dist/index.css"
 
 import App from './App.vue'

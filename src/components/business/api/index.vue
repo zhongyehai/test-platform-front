@@ -11,7 +11,7 @@
                     type="text"
                     style="margin-left: 10px"
                     @click="showAddDrawer"
-                ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+                ><Plus></Plus></el-button>
               </template>
             </el-popover>
           </template>
@@ -63,7 +63,7 @@
               <template #header>
                 <span> 重要级别 </span>
                 <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口">
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
@@ -88,7 +88,7 @@
               <template #header>
                 <span>是否可用</span>
                 <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口是否被废弃">
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
@@ -112,7 +112,7 @@
                       <div>3: 被使用过的接口，点击使用次数数值可查看使用明细</div>
                     </div>
                   </template>
-                  <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
@@ -176,6 +176,7 @@ import {
   RunApi
 } from "@/api/business-api/api";
 import Sortable from "sortablejs";
+import {Plus, Help} from "@icon-park/vue-next";
 
 const tableIsLoading = ref(false)
 const activeTab = ref('api')

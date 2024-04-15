@@ -37,7 +37,7 @@
                 <div>1、若选择的服务是当前服务，可引用类型为<span style="color: red">基础用例集</span>和<span style="color: red">引用用例集</span>的用例集</div>
                 <div>2、若选择的服务不是当前服务，只可引用类型为<span style="color: red">引用用例集</span>的用例集</div>
               </template>
-              <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>
           </el-form-item>
         </el-col>
@@ -142,6 +142,7 @@
 <script lang="ts" setup>
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {GetProjectList} from "@/api/business-api/project";
 import showCaseDesc from '../case/show-desc.vue'
 import expandStep from './expand-step.vue'

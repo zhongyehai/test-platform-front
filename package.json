@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
+    "@icon-park/vue-next": "^1.4.2",
     "@vueuse/core": "^8.0.0",
     "ace-builds": "^1.32.3",
     "axios": "^1.6.3",

@@ -9,7 +9,7 @@
       <div class="layout-container-form-search">
         <el-select
             v-model="queryItems.type"
-            placeholder="选择配置类型"
+            placeholder="选择配置分类"
             clearable
             filterable
             default-first-option
@@ -83,7 +83,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip prop="desc" align="center" label="配置类型" min-width="10%">
+        <el-table-column show-overflow-tooltip prop="desc" align="center" label="配置分类" min-width="10%">
           <template #default="scope">
             <span> {{ parseConfigType(scope.row.type) }} </span>
           </template>

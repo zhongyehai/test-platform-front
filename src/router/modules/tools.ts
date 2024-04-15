@@ -8,32 +8,32 @@ const route: Route[] = [
     component: Layout,
     redirect: '/tools/data-pool',
     hideMenu: false,
-    meta: { title: '造数工具', icon: 'iconfont icon-testwrench' },
+    meta: { title: '造数工具', icon: 'tool' },
     children: [
       {
         path: 'make-data',
         component: createNameComponent(() => import('@/views/tools/make-business-data/index.vue')),
-        meta: { title: '造数据', icon: 'iconfont icon-testlogin' }
+        meta: { title: '造数据', icon: 'followUpDateSort' }
       },
       {
         path: 'data-pool',
         component: createNameComponent(() => import('@/views/tools/data-pool/index.vue')),
-        meta: { title: '数据池', icon: 'iconfont icon-testyouzhimaoyiqu' }
+        meta: { title: '数据池', icon: 'dataThree' }
       },
       {
         path: 'make-user-info',
         component: createNameComponent(() => import('@/views/tools/make-user-info/index.vue')),
-        meta: { title: '生成用户信息', icon: 'iconfont icon-testadduser' }
+        meta: { title: '生成用户信息', icon: 'idCardH' }
       },
       {
         path: 'queue',
         component: createNameComponent(() => import('@/views/tools/queue/index.vue')),
-        meta: { title: '消息队列', icon: 'iconfont icon-testdatabase' }
+        meta: { title: '消息队列', icon: 'databaseEnter' }
       },
       {
         path: 'token',
         component: createNameComponent(() => import('@/views/tools/parse-token/index.vue')),
-        meta: { title: '解析token', icon: 'iconfont icon-testswitchuser' }
+        meta: { title: '解析token', icon: 'userPositioning' }
       }
     ]
   }

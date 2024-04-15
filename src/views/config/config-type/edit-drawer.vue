@@ -1,13 +1,13 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改配置类型' : '复制配置类型'" size="60%">
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改配置分类' : '复制配置分类'" size="60%">
       <el-form
           ref="ruleFormRef"
           :model="formData"
           :rules="formRules"
           label-width="80px">
 
-        <el-form-item label="配置类型" prop="name" class="is-required" size="small">
+        <el-form-item label="配置分类" prop="name" class="is-required" size="small">
           <el-input v-model="formData.name" :disabled="!!formData.id" size="small"/>
         </el-form-item>
 
@@ -65,7 +65,7 @@ let submitButtonIsLoading = ref(false)
 const formData = ref({id: undefined, name: undefined, desc: undefined})
 const formRules = {
   name: [
-    { required: true, message: '请输入配置类型名字', trigger: 'blur' }
+    { required: true, message: '请输入配置分类名字', trigger: 'blur' }
   ]
 }
 const ruleFormRef = ref(null)

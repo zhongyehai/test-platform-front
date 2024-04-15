@@ -69,7 +69,7 @@
                         type="text"
                         style="margin: 0; padding: 5px"
                         @click="addParentCaseSuite"
-                    ><i class="iconfont icon-testadd"></i></el-button>
+                    ><Plus></Plus></el-button>
                   </template>
                 </el-popover>
                 <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="导入用例集">
@@ -79,7 +79,7 @@
                         type="text"
                         style="margin: 0; padding: 5px"
                         @click="uploadCaseSuite"
-                    ><i class="iconfont icon-testtotop"></i></el-button>
+                    ><UploadOne></UploadOne></el-button>
                   </template>
                 </el-popover>
               </template>
@@ -100,9 +100,9 @@
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span>{{ node.label }}</span>
                       <div v-show="data.id === currentNode.id">
-                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testadd" @click.stop="showEditDrawer('add', node, data)"/>
-                        <i style="color: #409EFF;margin: 0; padding: 1px" class="iconfont icon-testedit" @click.stop="showEditDrawer('edit', node, data)"/>
-                        <i style="margin: 0; padding: 1px;color: red" class="iconfont icon-testdelete1" @click.stop="clickDeleteModule(node, data)"/>
+                        <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>
+                        <Write style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('edit', node, data)"></Write>
+                        <Delete style="color: red;margin: 0; padding: 2px" @click.stop="clickDeleteModule(node, data)"></Delete>
                       </div>
                     </div>
                   </template>
@@ -146,6 +146,7 @@ import {GetProjectList, GetProject} from '@/api/business-api/project'
 import {bus, busEvent} from "@/utils/bus-events";
 import {arrayToTree, ellipsis} from "@/utils/parse-data";
 import {ElMessage, ElMessageBox, ElTree} from "element-plus";
+import {Plus, UploadOne, Write, Delete} from "@icon-park/vue-next";
 import {GetApiFrom, GetApiToStep} from "@/api/business-api/api";
 import {GetCaseSuiteList, DeleteCaseSuite} from "@/api/business-api/case-suite";
 import {GetConfigByCode} from "@/api/config/config-value";

@@ -32,7 +32,7 @@
             <template #content>
               <div>环境code不可更改</div>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill"/></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </el-form-item>
 
@@ -63,6 +63,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {PostRunEnv, PutRunEnv} from "@/api/config/run-env";
 import {bus, busEvent} from "@/utils/bus-events";
 

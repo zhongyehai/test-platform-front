@@ -52,7 +52,7 @@
               <div>注：请输入获取swagger数据的地址，不要输入swagger-ui地址</div>
             </div>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -68,7 +68,7 @@
           <el-popover class="el_popover_class" placement="top-start" trigger="hover" width="450px">
             <div>查看命令：adb shell dumpsys window | findstr mCurrentFocus </div>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -85,7 +85,7 @@
           <el-popover class="el_popover_class" placement="top-start" trigger="hover" width="450px">
             <div>查看命令：adb shell dumpsys window | findstr mCurrentFocus </div>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -109,7 +109,7 @@
           <el-popover class="el_popover_class" placement="top-start" trigger="hover">
             <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -132,7 +132,7 @@
               <div>2、此处引用的脚本文件，对于当前服务下的接口、用例均有效</div>
             </div>
             <template #reference>
-              <el-button type="text"><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></el-button>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </template>
           </el-popover>
         </el-form-item>
@@ -193,6 +193,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {Help} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetProject, PostProject, PutProject} from "@/api/business-api/project";
 import {GetScriptList} from "@/api/assist/script";

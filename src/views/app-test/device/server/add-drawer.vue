@@ -69,7 +69,7 @@
                   size="small"
                   style="margin: 2px; padding: 0"
                   @click.native="addRow"
-              ><i class="iconfont icon-testadd"></i></el-button>
+              ><Plus></Plus></el-button>
             </el-tooltip>
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="复制当前行">
@@ -78,7 +78,7 @@
                   size="small"
                   style="margin: 2px; padding: 0"
                   @click.native="copyRow(scope.row)"
-              ><i class="iconfont icon-testjingdianwanfa"></i></el-button>
+              ><Copy></Copy></el-button>
             </el-tooltip>
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
@@ -88,7 +88,7 @@
                   size="small"
                   style="color: red;margin: 2px; padding: 0"
                   @click.native="delRow(scope.$index)"
-              ><i class="iconfont icon-testdelete1"></i></el-button>
+              ><Minus></Minus></el-button>
             </el-tooltip>
 
             <el-tooltip class="item" effect="dark" placement="top-end" content="清除数据">
@@ -98,7 +98,7 @@
                   size="small"
                   style="color: red;margin: 2px; padding: 0"
                   @click.native="clearData()"
-              ><i class="iconfont icon-testshibai"></i></el-button>
+              ><Clear></Clear></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -127,6 +127,7 @@ import {onBeforeUnmount, onMounted, ref} from "vue";
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 import {PostServer} from "@/api/business-api/device-server";
+import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 
 const props = defineProps({
   deviceList: {

@@ -12,7 +12,7 @@
                   type="text"
                   style="margin-left: 10px"
                   @click="showAddDrawer"
-              ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+              ><Plus></Plus></el-button>
             </template>
           </el-popover>
         </template>
@@ -30,7 +30,7 @@
                 style="margin-left: 10px"
                 icon="el-icon-plus"
                 @click="showAddDrawer"
-            ><i style="color: #409EFF" class="iconfont icon-testadd" /></el-button>
+            ><Plus></Plus></el-button>
             </template>
           </el-popover>
         </template>
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
+import {Plus} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import serverView from './server/index.vue'
 import phoneView from './phone/index.vue'

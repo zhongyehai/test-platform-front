@@ -158,7 +158,7 @@
               1、支持执行时<span style="color: red">重新指定参数</span><br>
               2、此时设置的参数仅此次运行生效，<span style="color: red">不会保存</span>
             </template>
-            <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
           </el-tooltip>
         </template>
 
@@ -180,7 +180,7 @@
             <template #label>
               <span> 跳过条件 </span>
               <el-tooltip class="item" effect="dark" placement="top-start" content="任意一行设置的表达式成立，都会执行跳过操作，使用方法与断言一致，详见断言示例">
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             <skipIfView
@@ -203,7 +203,7 @@
                   4、若在此处设置的key与服务的公共变量中的某个key一致，则对于这个key，则会用此处设置的值 <br>
                   5、若在测试步骤中提取的值使用的key和此处设置的key相同，则在此用例的后续测试步骤执行过程用，会用测试步骤中提取到的值
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             <variablesView
@@ -226,7 +226,7 @@
                   5、若在此处设置的key与服务的头部参数中的某个key一致，则对于这个key，则会用此处设置的值 <br>
                   6、若在用例中，测试步骤已用相同的key设置了其他值，则会使用测试步骤中设置的值
                 </template>
-                <span><i style="color: #409EFF" class="iconfont icon-testquestion-circle-fill" /></span>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
               </el-tooltip>
             </template>
             <headersView
@@ -259,6 +259,7 @@ import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
+import {Help} from "@icon-park/vue-next";
 
 import runEnvCheckbox from '@/components/checkbox/run-env.vue'
 import variablesView from '@/components/input/variables.vue'

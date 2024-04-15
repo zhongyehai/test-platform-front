@@ -13,6 +13,7 @@
               <el-select
                   v-model="formData.script_type"
                   :placeholder="'选择脚本类型'"
+                  style="width: 100%"
                   filterable
                   default-first-option
                   clearable
@@ -20,44 +21,56 @@
                   class="filter-item"
                   @change="selectScriptType"
               >
-                <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key" />
+                <el-option v-for="(value, key) in scriptTypeDict" :key="key" :label="value" :value="key"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="脚本名" prop="name" class="is-required" size="small">
-              <el-input v-model="formData.name" size="small" style="width: 250px" placeholder="支持大小写字母和下划线" :disabled="formData.id"/>
+              <el-input v-model="formData.name" size="small" style="width: 250px" placeholder="支持大小写字母和下划线"
+                        :disabled="formData.id"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="备注" prop="desc" size="small">
-              <el-input v-model="formData.desc" size="small" style="width: 250px" type="textarea" :rows="1" :placeholder="'函数的描述、备注'"/>
+              <el-input v-model="formData.desc" size="small" style="width: 250px" type="textarea" :rows="1"
+                        :placeholder="'函数的描述、备注'"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="查找代码" prop="code" size="small">
-              <el-input v-model="formData.find_code" size="small" placeholder="输入具体代码" style="width: 300px"/>
-              <el-button v-show="formData.script_data && formData.find_code" type="primary" style="margin-left: 5px" size="small" @click="findCode">查找</el-button>
+              <el-input v-model="formData.find_code" size="small" placeholder="输入具体代码" style="width: 340px"/>
+              <el-button
+                  :disabled="!formData.find_code"
+                  type="primary"
+                  style="margin-left: 5px"
+                  size="small"
+                  @click="findCode"
+              >查找
+              </el-button>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="调试函数" prop="expression" size="small">
-              <el-input v-model="formData.expression" style="width: 300px" size="small" type="textarea" :rows="1" placeholder="输入格式：${func(abc,123)}"/>
+              <el-input v-model="formData.expression" style="width: 340px" size="small" type="textarea" :rows="1"
+                        placeholder="输入格式：${func(abc,123)}"/>
               <el-button
-                  v-show="formData.script_type !== 'mock' && formData.script_data && formData.expression"
+                  v-show="formData.script_type !== 'mock'"
+                  :disabled="!formData.expression"
                   type="primary"
                   style="margin-left: 5px"
                   size="small"
                   :loading="deBugButtonIsLoading"
                   @click="selectDebugEnvDialogIsShow = true"
-              >调试</el-button>
+              >调试
+              </el-button>
               <el-popover class="el_popover_class" placement="top-start" trigger="hover">
                 <div>1、输入运行表达式，调试自定义函数</div>
                 <div>2、输入内容均为字符串，所以若要传字符串，不用加引号</div>
                 <div>3、触发调试函数不会自动保存函数文件内容修改，若要保存，请自行点击保存按钮</div>
-                <el-button slot="reference" type="text" icon="el-icon-question" />
+                <el-button slot="reference" type="text" icon="el-icon-question"/>
               </el-popover>
             </el-form-item>
           </el-col>
@@ -91,32 +104,37 @@
         width="50%"
     >
 
-      <div>
-        <label>选择环境：</label>
-      </div>
-      <div style="margin-top: 10px">
-        <label>
+      <div v-loading="debugLoading" element-loading-text="正在运行脚本" element-loading-spinner="el-icon-loading">
+        <div>
+          <label>选择环境：</label>
+        </div>
+        <div style="margin-top: 10px">
+          <label>
           <span style="color: red">
             注：请确保此次运行中涉及到的所有服务都设置了当前选中环境的域名 <br>
             比如选择的测试环境，那么在运行的时候所有步骤都会找自己所在服务的测试环境的域名
           </span>
-        </label>
-      </div>
-      <div style="margin-top: 10px">
-        <el-radio
-            v-model="selectedRunEnv"
-            v-for="(env) in runEnvList"
-            :key="env.code"
-            :label="env.code">{{env.name}}
-        </el-radio>
+          </label>
+        </div>
+        <div style="margin-top: 10px">
+          <el-radio
+              v-model="selectedRunEnv"
+              v-for="(env) in runEnvList"
+              :key="env.code"
+              :label="env.code">{{ env.name }}
+          </el-radio>
+        </div>
+
       </div>
 
       <template #footer>
-        <span  class="dialog-footer">
-          <el-button size="small"  @click="selectDebugEnvDialogIsShow = false">取 消</el-button>
-          <el-button size="small" type="primary"  @click="submitForm(true)">确 定</el-button>
+        <span class="dialog-footer">
+          <el-button size="small" @click="selectDebugEnvDialogIsShow = false">取 消</el-button>
+          <el-button size="small" type="primary" :disabled="debugLoading" @click="submitForm(true)">确 定</el-button>
         </span>
       </template>
+
+
     </el-dialog>
 
     <!-- 展示调试结果 -->
@@ -152,7 +170,8 @@
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '执行结果：' }}</div>
                 </template>
-                <pre class="el-collapse-item-content" style="overflow: auto">{{debugResultDetail.result || debugResultDetail }}</pre>
+                <pre class="el-collapse-item-content"
+                     style="overflow: auto">{{ debugResultDetail.result || debugResultDetail }}</pre>
               </el-collapse-item>
 
               <el-collapse-item name="scriptPrint">
@@ -185,6 +204,7 @@ import {bus, busEvent} from "@/utils/bus-events";
 import pythonEditor from '@/components/editor/python-editor.vue'
 import {GetScript, PostScript, PutScript, DebugScript} from "@/api/assist/script";
 import {GetRunEnvList} from "@/api/config/run-env";
+import {ElMessage} from "element-plus";
 
 const props = defineProps({
   scriptTypeDict: {
@@ -205,20 +225,23 @@ onBeforeUnmount(() => {
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'script') {
     resetForm()
-    if (message.command !== 'add'){
+    if (message.command !== 'add') {
       getScript(message.content.id, message.command)
     }
     drawerIsShow.value = true
   }
 }
 
-const sendEvent = () => {bus.emit(busEvent.drawerIsCommit, {eventType: 'script'})}
+const sendEvent = () => {
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'script'})
+}
 
 const pythonEditorRef = ref()
 const pythonEditorRefDebug = ref()
 const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
 const deBugButtonIsLoading = ref(false)
+const debugLoading = ref(false)
 const selectDebugEnvDialogIsShow = ref(false)
 const runEnvList = ref([])
 const runEnvDict = ref({})
@@ -307,8 +330,8 @@ const findCode = () => {
 }
 
 const getRunEnvList = () => {
-  GetRunEnvList({page_num:1, page_size:99999}).then(response => {
-    runEnvList.value= response.data.data
+  GetRunEnvList({page_num: 1, page_size: 99999}).then(response => {
+    runEnvList.value = response.data.data
     if (runEnvList.value && runEnvList.value.length > 0) {
       selectedRunEnv.value = runEnvList.value[0].code
     }
@@ -326,7 +349,7 @@ const getScript = (scriptId: number, command: string) => {
     formData.value.desc = response.data.desc
     formData.value.script_type = response.data.script_type
     formData.value.script_data = response.data.script_data
-    if (command === 'edit'){
+    if (command === 'edit') {
       formData.value.id = response.data.id
     }
   })
@@ -336,9 +359,9 @@ const getScript = (scriptId: number, command: string) => {
 
 const submitForm = (isDebug) => {
   formData.value.script_data = pythonEditorRef.value.tempData
-  if (formData.value.id){
+  if (formData.value.id) {
     changeData(isDebug)
-  }else {
+  } else {
     addData(isDebug)
   }
 }
@@ -351,9 +374,9 @@ const changeData = (isDebug) => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()
-          if (isDebug){
+          if (isDebug) {
             runDeBug()
-          }else {
+          } else {
             drawerIsShow.value = false
           }
         }
@@ -361,7 +384,7 @@ const changeData = (isDebug) => {
     }
   })
 }
-const addData = (isDebug) => {
+const addData = (isDebug: boolean) => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       submitButtonIsLoading.value = true
@@ -369,9 +392,9 @@ const addData = (isDebug) => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()
-          if (isDebug){
+          if (isDebug) {
             runDeBug()
-          }else {
+          } else {
             drawerIsShow.value = false
           }
         }
@@ -381,14 +404,20 @@ const addData = (isDebug) => {
 }
 
 const runDeBug = () => {
+  if (!formData.value.expression.startsWith('${') || !formData.value.expression.endsWith('}')) {
+    ElMessage.warning('请用${}包裹要调试的函数, 如：${func(abc,123)}')
+    throw new Error('请用${}包裹要调试的函数, 如：${func(abc,123)}')
+  }
+  debugLoading.value = true
   deBugButtonIsLoading.value = true
   DebugScript({
     'id': formData.value.id,
     'expression': formData.value.expression,
     'env': selectedRunEnv.value
   }).then(response => {
+    debugLoading.value = false
     deBugButtonIsLoading.value = false
-    if (response){
+    if (response) {
       selectDebugEnvDialogIsShow.value = false
       debugResultDetail.value = response.result
       debugResultMessage.value = response.message
