@@ -121,6 +121,7 @@
 
       </el-row>
       <editModuleDrawer :test-type="testType"></editModuleDrawer>
+      <addModuleDrawer :test-type="testType"></addModuleDrawer>
 
       <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>
       <showRunProcess :test-type="testType"></showRunProcess>
@@ -134,6 +135,7 @@
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import {Clear, Copy, Delete, Minus, Plus, Write} from "@icon-park/vue-next";
 import editModuleDrawer from "./edit-drawer.vue";
+import addModuleDrawer from "./add-drawer.vue";
 import apiIndex from "@/components/business/api/index.vue";
 import apiFromDrawer from "@/components/business/api/from-drawer.vue";
 import apiUseDrawer from "@/components/business/api/use-drawer.vue";
@@ -203,13 +205,11 @@ const addParentModule = () => {
 }
 
 const showEditDrawer = (command: string, node: any, data: { name: any; controller: any; }) => {
-  let eventContent = {}
   if (command === 'add'){
-    eventContent =  {parent: data.id, project_id: project.value.id}
+    bus.emit(busEvent.drawerIsShow, {eventType: 'add-module', content: {parent: data.id, project_id: project.value.id}})
   }else {
-    eventContent =  JSON.parse(JSON.stringify(data))
+    bus.emit(busEvent.drawerIsShow, {eventType: 'edit-module', content: JSON.parse(JSON.stringify(data))})
   }
-  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-module', content: eventContent})
 }
 
 const moduleTreeIsDone = (moduleTree: never[]) => {
@@ -304,15 +304,20 @@ onBeforeUnmount(() => {
 const drawerIsCommit = (message: any) => {
   if (message.eventType === 'edit-module') {
     if (message.command === 'add'){
-      if (currentNode.value.id) {
-        if (!currentNode.value.children) {
-          currentNode.value.children = []
+      if (message.content){
+        if (currentNode.value.id) {
+          if (!currentNode.value.children) {
+            currentNode.value.children = []
+          }
+          currentNode.value.children.push(message.content)
+          treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
+        } else {
+          moduleTreeData.value.push(message.content)
         }
-        currentNode.value.children.push(message.content)
-        treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
-      } else {
-        moduleTreeData.value.push(message.content)
+      }else {
+        getModuleList(project.value.id)
       }
+
     }else {
       currentNode.value.name = message.content.name
     }

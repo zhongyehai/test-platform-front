@@ -45,7 +45,6 @@
                   {{ scope.row.method }}
                 </span>
           <span class="block-method block_url">{{ scope.row.addr }}</span>
-          <span class="block-summary-description">{{ scope.row.name }}</span>
         </div>
       </template>
     </el-table-column>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" title="修改用例集" size="60%">
+    <el-drawer v-model="drawerIsShow" title="新增用例集" size="60%">
 
       <el-form
           ref="ruleFormRef"
@@ -36,8 +36,15 @@
         </el-select>
         </el-form-item>
 
-        <el-form-item label="用例集名称" prop="name" class="is-required" size="small">
-          <el-input v-model="formData.name" size="small" placeholder="同一节点下，用例集名称不可重复"/>
+        <el-form-item label="用例集名" prop="name" class="is-required" size="small">
+          <template #label>
+            <span>用例集名
+                <el-tooltip class="item" effect="dark" placement="top-start" content="同一节点下，用例集名称不可重复">
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                </el-tooltip>
+            </span>
+          </template>
+          <oneColumnRow ref="dataListRef" :current-data="formData.data_list" />
         </el-form-item>
       </el-form>
 
@@ -48,7 +55,7 @@
               type="primary"
               size="small"
               :loading="submitButtonIsLoading"
-              @click="changeData"
+              @click="addData"
           >
             {{ '保存' }}
           </el-button>
@@ -62,9 +69,12 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {PutCaseSuite, GetCaseSuite} from "@/api/business-api/case-suite";
+import {PostCaseSuite, GetCaseSuite} from "@/api/business-api/case-suite";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetConfigByCode} from "@/api/config/config-value";
+import oneColumnRow from "@/components/input/one-column-row.vue";
+import {Help} from "@icon-park/vue-next";
+import {ElMessage} from "element-plus";
 
 const props = defineProps({
   testType: {
@@ -82,22 +92,24 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'edit-case-suite') {
+  if (message.eventType === 'add-case-suite') {
     getSuiteTypeList()
     resetForm()
-    getData(message.content.id)
+    formData.value.project_id = message.content.project_id
+    formData.value.parent = message.content.parent
+    formData.value.suite_type = message.content.suite_type
     drawerIsShow.value = true
   }
 }
 
 const suiteTypeList = ref([])
 const drawerIsShow = ref(false)
+const dataListRef = ref()
 let submitButtonIsLoading = ref(false)
 
 const ruleFormRef = ref(null)
 const formData = ref({
-  id: undefined,
-  name: undefined,
+  data_list: [],
   parent: undefined,
   suite_type: undefined,
   project_id: undefined
@@ -105,15 +117,11 @@ const formData = ref({
 const formRules = {
   suite_type: [
     {required: true, message: '请选择用例集类型', trigger: 'blur'}
-  ],
-  name: [
-    {required: true, message: '请输入用例集名字', trigger: 'blur'}
   ]
 }
 const resetForm = () => {
   formData.value = {
-    id: undefined,
-    name: undefined,
+    data_list: [],
     parent: undefined,
     suite_type: undefined,
     project_id: undefined
@@ -125,12 +133,6 @@ const sendEvent = (content: any, command: string) => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'case-suite', content: content, command: command});
 };
 
-const getData = (dataId: number) => {
-  GetCaseSuite(props.testType, {id: dataId}).then(response => {
-    formData.value = response.data
-  })
-}
-
 const getSuiteTypeList = () => {
   if (suiteTypeList.value.length < 1){
     GetConfigByCode({ code: props.testType === 'api' ? 'api_suite_list' : 'ui_suite_list' }).then(response => {
@@ -139,21 +141,36 @@ const getSuiteTypeList = () => {
   }
 }
 
-const changeData = () => {
+const getCaseSuiteName = () => {
+  const dataList = dataListRef.value.getData()
+  if(dataList.length === 0){
+    ElMessage.warning(`请填写数据`)
+    throw new Error(`请填写数据`);
+  }
+  dataList.forEach((item, index) => {
+    if (!item){
+      ElMessage.warning(`第 ${index + 1} 行，请填写数据`)
+      throw new Error(`第 ${index + 1} 行，请填写数据`);
+    }
+  })
+  return dataList
+}
+
+const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
+      const dataList = getCaseSuiteName()
       submitButtonIsLoading.value = true
-      PutCaseSuite(props.testType, formData.value).then(response => {
+      PostCaseSuite(props.testType, {...formData.value, data_list: dataList}).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
-          sendEvent(response.data, 'edit')
+          sendEvent(response.data, 'add')
           drawerIsShow.value = false
         }
       })
     }
   })
 }
-
 
 </script>
 

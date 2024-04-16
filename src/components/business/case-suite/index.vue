@@ -124,6 +124,7 @@
 
       </el-row>
       <editDrawer :test-type="testType"></editDrawer>
+      <addDrawer :test-type="testType"></addDrawer>
       <uploadDrawer :test-type="testType"></uploadDrawer>
 
       <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>
@@ -137,6 +138,7 @@
 
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import editDrawer from "./edit-drawer.vue";
+import addDrawer from "./add-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
 // import apiFromDrawer from "@/components/business/api/from-drawer.vue";
 // import apiUseDrawer from "@/components/business/api/use-drawer.vue";
@@ -214,11 +216,10 @@ const uploadCaseSuite = () => {
 const showEditDrawer = (command: string, node: any, data: { name: any; controller: any; }) => {
   let eventContent = {}
   if (command === 'add'){
-    eventContent =  {parent: data.id, suite_type: data.suite_type, project_id: project.value.id}
+    bus.emit(busEvent.drawerIsShow, {eventType: 'add-case-suite', content: {parent: data.id, suite_type: data.suite_type, project_id: project.value.id}})
   }else {
-    eventContent =  JSON.parse(JSON.stringify(data))
+    bus.emit(busEvent.drawerIsShow, {eventType: 'edit-case-suite', content: JSON.parse(JSON.stringify(data))})
   }
-  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-case-suite', content: eventContent})
 }
 
 const moduleTreeIsDone = (moduleTree: never[]) => {
@@ -309,16 +310,20 @@ onBeforeUnmount(() => {
 })
 
 const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'edit-case-suite') {
+  if (message.eventType === 'case-suite') {
     if (message.command === 'add'){
-      if (currentNode.value.id) {
-        if (!currentNode.value.children) {
-          currentNode.value.children = []
+      if (message.content){
+        if (currentNode.value.id) {
+          if (!currentNode.value.children) {
+            currentNode.value.children = []
+          }
+          currentNode.value.children.push(message.content)
+          treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
+        } else {
+          moduleTreeData.value.push(message.content)
         }
-        currentNode.value.children.push(message.content)
-        treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
-      } else {
-        moduleTreeData.value.push(message.content)
+      }else {
+        getCaseSuiteList(project.value.id)
       }
     }else {
       currentNode.value.name = message.content.name

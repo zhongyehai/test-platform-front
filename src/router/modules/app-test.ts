@@ -13,7 +13,7 @@ const route: Route[] = [
       {
         path: 'device',
         component: createNameComponent(() => import('@/views/app-test/device/index.vue')),
-        meta: { title: '设备管理', icon: 'iphone' }
+        meta: { title: '设备管理', icon: 'devices' }
       },
       {
         path: 'project',

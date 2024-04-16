@@ -1,19 +1,21 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" title="修改模块" size="60%">
+    <el-drawer v-model="drawerIsShow" title="新增模块" size="60%">
 
       <el-form
           ref="ruleFormRef"
           :model="formData"
-          :rules="formRules"
           label-width="90px">
 
         <el-form-item label="模块名称" prop="name" class="is-required" size="small">
-          <el-input v-model="formData.name" size="small"/>
-        </el-form-item>
-
-        <el-form-item label="controller" v-if="testType === 'api'" prop="controller" size="small">
-          <el-input v-model="formData.controller" disabled size="small"/>
+          <template #label>
+            <span>模块名称
+                <el-tooltip class="item" effect="dark" placement="top-start" content="同一节点下，用例集名称不可重复">
+                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                </el-tooltip>
+            </span>
+          </template>
+          <oneColumnRow ref="dataListRef" :current-data="formData.data_list" />
         </el-form-item>
 
       </el-form>
@@ -25,7 +27,7 @@
               type="primary"
               size="small"
               :loading="submitButtonIsLoading"
-              @click="changeData"
+              @click="addData"
           >
             {{ '保存' }}
           </el-button>
@@ -39,8 +41,11 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {PostModule, PutModule, GetModule} from "@/api/business-api/module";
+import {PostModule} from "@/api/business-api/module";
 import {bus, busEvent} from "@/utils/bus-events";
+import {Help} from "@icon-park/vue-next";
+import oneColumnRow from "@/components/input/one-column-row.vue";
+import {ElMessage} from "element-plus";
 
 const props = defineProps({
   testType: {
@@ -58,36 +63,30 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'edit-module') {
+  if (message.eventType === 'add-module') {
     resetForm()
-    getData(message.content.id)
+    formData.value.project_id = message.content.project_id
+    formData.value.parent = message.content.parent
     drawerIsShow.value = true
   }
 }
 
 const drawerIsShow = ref(false)
+const dataListRef = ref()
 let submitButtonIsLoading = ref(false)
 
 const ruleFormRef = ref(null)
 const formData = ref({
-  id: undefined,
-  name: undefined,
+  data_list: [],
   parent: undefined,
-  project_id: undefined,
-  controller: undefined
+  project_id: undefined
 })
-const formRules = {
-  name: [
-    {required: true, message: '请输入模块名字', trigger: 'blur'}
-  ]
-}
+
 const resetForm = () => {
   formData.value = {
-    id: undefined,
-    name: undefined,
+    data_list: [],
     parent: undefined,
-    project_id: undefined,
-    controller: undefined
+    project_id: undefined
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();
   submitButtonIsLoading.value = false
@@ -96,21 +95,31 @@ const sendEvent = (content: any, command: string) => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'edit-module', content: content, command: command});
 };
 
-const getData = (dataId: number) => {
-  GetModule(props.testType, {id: dataId}).then(response => {
-    formData.value = response.data
+const getCaseSuiteName = () => {
+  const dataList = dataListRef.value.getData()
+  if(dataList.length === 0){
+    ElMessage.warning(`请填写数据`)
+    throw new Error(`请填写数据`);
+  }
+  dataList.forEach((item, index) => {
+    if (!item){
+      ElMessage.warning(`第 ${index + 1} 行，请填写数据`)
+      throw new Error(`第 ${index + 1} 行，请填写数据`);
+    }
   })
+  return dataList
 }
 
-const changeData = () => {
+const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
+      const dataList = getCaseSuiteName()
       submitButtonIsLoading.value = true
-      PutModule(props.testType, formData.value).then(response => {
+      PostModule(props.testType, {...formData.value, data_list: dataList}).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
-          sendEvent(response.data, 'edit')
           drawerIsShow.value = false
+          sendEvent(response.data, 'add')
         }
       })
     }
