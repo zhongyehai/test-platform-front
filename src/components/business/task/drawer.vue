@@ -283,7 +283,7 @@ import {GetConfigByCode, GetConfigList} from "@/api/config/config-value";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {appiumServerRequestStatusMappingContent} from "@/components/business/mapping";
-import OneColumnRow from "@/components/input/one-column-row.vue";
+import oneColumnRow from "@/components/input/one-column-row.vue";
 import {GetConfigTypeList} from "@/api/config/config-type";
 import {GetTask, PostTask, PutTask, RunTask} from "@/api/business-api/task";
 import {GetCaseSuiteList} from "@/api/business-api/case-suite";
@@ -316,6 +316,7 @@ onBeforeUnmount(() => {
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'edit-task') {
     resetForm()
+    changeWebHookList(false)
     getRunAppEnv()
     getBrowserName()
     if (message.content){
