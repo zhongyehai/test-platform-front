@@ -67,7 +67,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="端口" prop="port" align="center" min-width="15%">
+        <el-table-column show-overflow-tooltip label="实例id" prop="instance_id" align="center" min-width="10%">
+          <template #default="scope">
+            <span> {{ scope.row.instance_id }} </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip label="端口" prop="port" align="center" min-width="5%">
           <template #default="scope">
             <span>{{ scope.row.port }}</span>
           </template>
@@ -79,7 +85,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="创建者" prop="create_user" align="center" min-width="10%">
+        <el-table-column show-overflow-tooltip label="创建人" prop="create_user" align="center" min-width="5%">
           <template #default="scope">
             <span>{{ userDict[scope.row.create_user] }}</span>
           </template>
@@ -90,24 +96,22 @@
             <el-button
                 type="text"
                 size="small" style="margin: 0; padding: 2px"
-                @click="showQueueList(scope.row)"
-            >队列列表
-            </el-button>
-
-            <!--修改文件信息-->
-            <el-button
-                type="text"
-                size="small" style="margin: 0; padding: 2px"
                 @click="showEditDrawer('edit', scope.row)"
             >修改
             </el-button>
 
-            <!-- 复制 -->
             <el-button
                 type="text"
                 size="small" style="margin: 0; padding: 2px"
                 @click="showEditDrawer('copy', scope.row)"
             >复制
+            </el-button>
+
+            <el-button
+                type="text"
+                size="small" style="margin: 0; padding: 2px"
+                @click="showQueueList(scope.row)"
+            >topic列表
             </el-button>
 
           </template>
@@ -122,16 +126,15 @@
           @pageFunc="changePagination"
       />
     </div>
-
     <queueLinkEditDrawer :queue-type-dict="queueTypeDict"></queueLinkEditDrawer>
-    <queueListDrawer :user-dict="userDict"></queueListDrawer>
+    <queueTopicListDrawer :user-dict="userDict"></queueTopicListDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import queueListDrawer from './queue-list-drawer.vue'
-import queueLinkEditDrawer from './queue-link-edit-drawer.vue'
+import queueLinkEditDrawer from './edit-drawer.vue'
+import queueTopicListDrawer from '../queue-topic/index.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetQueueLinkList} from "@/api/tools/queue";
@@ -152,7 +155,7 @@ const tableHeight = computed(() =>{
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, host: undefined, queue_type: undefined})
 const userDict = ref({})
-const queueTypeDict =  { 'rocket_mq': 'rocketmq', 'rabbit_mq': 'rabbitmq', 'redis': 'redis' }
+const queueTypeDict =  { 'rocket_mq': 'rocket_mq', 'rabbit_mq': 'rabbit_mq'}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -165,7 +168,7 @@ const showEditDrawer = (command: string, row: object | null) => {
 }
 
 const showQueueList = (row: any) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-list-info', content: row})
+  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-topic-list', content: row})
 }
 
 const rowDblclick = async (row: any, column: any, event: any) => {

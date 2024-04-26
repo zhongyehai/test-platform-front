@@ -2,52 +2,60 @@ import request from '@/utils/system/request'
 import {baseDirAssist} from '../base-url'
 
 const queueLinkDir = baseDirAssist + '/queue-link'
-const queueDir = baseDirAssist + '/queue'
+const queueTopicDir = baseDirAssist + '/queue-topic'
 
 export function GetQueueLinkList(params: object) {
-    return request({ url: queueLinkDir + '/list', method: 'get', params: params })
+    return request({url: queueLinkDir + '/list', method: 'get', params: params})
+}
+
+export function ChangQueueLinkSort(data: object) {
+    return request({url: queueLinkDir + '/sort', method: 'put', data: data})
+}
+
+export function GetQueueLink(params: object) {
+    return request({url: queueLinkDir, method: 'get', params: params})
 }
 
 export function PostQueueLink(data: object) {
-    return request({ url: queueLinkDir, method: 'post', data: data })
+    return request({url: queueLinkDir, method: 'post', data: data})
 }
 
 export function PutQueueLink(data: object) {
-    return request({ url: queueLinkDir, method: 'put', data: data })
+    return request({url: queueLinkDir, method: 'put', data: data})
 }
 
-export function GetQueue(params: object) {
-    return request({ url: queueDir, method: 'get', params: params })
+export function GetQueueTopicList(params: object) {
+    return request({url: queueTopicDir + '/list', method: 'get', params: params})
 }
 
-export function DeleteQueue(data: object) {
-    return request({ url: queueDir, method: 'delete', data: data })
+export function ChangQueueTopicSort(data: object) {
+    return request({url: queueTopicDir + '/sort', method: 'put', data: data})
 }
 
-export function GetQueueList(params: object) {
-    return request({ url: queueDir + '/list', method: 'get', params: params })
+export function SendMsgToQueueTopic(data: object) {
+    return request({url: queueTopicDir + '/message', method: 'POST', data: data})
 }
 
-export function PostQueue(data: object) {
-    return request({ url: queueDir, method: 'post', data: data })
+export function CopyQueueTopic(data: object) {
+    return request({url: queueTopicDir + '/copy', method: 'post', data: data})
 }
 
-export function PutQueue(data: object) {
-    return request({ url: queueDir, method: 'put', data: data })
+export function GetQueueTopicLogList(params: object) {
+    return request({url: queueTopicDir + '/log', method: 'get', params: params})
 }
 
-export function SendMsgToQueue(data: object) {
-    return request({ url: queueDir + '/message', method: 'POST', data: data })
+export function GetQueueTopic(params: object) {
+    return request({url: queueTopicDir, method: 'get', params: params})
 }
 
-export function CopyQueue(data: object) {
-    return request({ url: queueDir + '/copy', method: 'post', data: data })
+export function DeleteQueueTopic(data: object) {
+    return request({url: queueTopicDir, method: 'delete', data: data})
 }
 
-export function QueueSort(data: object) {
-    return request({ url: queueDir + '/sort', method: 'put', data: data })
+export function PostQueueTopic(data: object) {
+    return request({url: queueTopicDir, method: 'post', data: data})
 }
 
-export function GetQueueLogList(params: object) {
-    return request({ url: queueDir + '-log/list', method: 'get', params: params })
+export function PutQueueTopic(data: object) {
+    return request({url: queueTopicDir, method: 'put', data: data})
 }

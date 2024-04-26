@@ -143,7 +143,27 @@
 
         <!-- 响应信息 -->
         <el-tab-pane label="响应对象" name="response">
-          <show-json :json-data="formData.response"/>
+          <template #label>
+            <span> 响应对象 </span>
+            <el-tooltip class="item" effect="dark" placement="top-start" content="从swagger拉下来的响应对象">
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+            </el-tooltip>
+          </template>
+          <jsonEditorView ref="responseEditorViewRef" :json-data="formData.response" />
+        </el-tab-pane>
+
+        <!-- mock响应信息 -->
+        <el-tab-pane label="mock响应" name="mock_response">
+          <template #label>
+            <span> mock响应 </span>
+            <el-tooltip class="item" effect="dark" placement="top-start">
+              <template #content>
+                用于前端联调, 访问 测试平台域名 + /api/tools/mock/api + 此接口地址，即可返回此处设置的响应
+              </template>
+              <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+            </el-tooltip>
+          </template>
+          <jsonEditorView ref="mockResponseEditorViewRef" :json-data="formData.mock_response" />
         </el-tab-pane>
 
       </el-tabs>
@@ -175,7 +195,7 @@
 <script lang="ts" setup>
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import {Help} from "@icon-park/vue-next";
+import {Help, Plus} from "@icon-park/vue-next";
 import {GetApi, PutApi, RunApi} from "@/api/business-api/api";
 import {bus, busEvent} from "@/utils/bus-events";
 import headersView from '@/components/input/key-value-row.vue'
@@ -184,9 +204,9 @@ import apiExtractorView from '@/components/input/api-extractor.vue'
 import validatesView from '@/components/input/validates.vue'
 import bodyView from '@/components/input/api-body.vue'
 import oneColumnRow from "@/components/input/one-column-row.vue";
+import jsonEditorView from '@/components/editor/json-editor.vue'
 
 import {GetConfigByCode} from "@/api/config/config-value";
-import showJson from "@/components/show-json.vue";
 import {paramsListToStr} from "@/utils/parse-data";
 import {ElMessage} from "element-plus";
 
@@ -246,6 +266,8 @@ const busEventParam = 'param'
 const submitButtonIsLoading = ref(false)
 const moduleTree = ref([])
 const methodsList = ref([])
+const responseEditorViewRef = ref(null)
+const mockResponseEditorViewRef = ref(null)
 const upFuncInputRef = ref(null)
 const downFuncInputRef = ref(null)
 const debugButtonIsLoading = ref(false)
@@ -277,6 +299,7 @@ const formData = ref({
   extracts: [{ key: undefined, value: undefined, remark: undefined }],
   validates: [{ key: undefined, value: undefined, validate_type: 'data', remark: undefined }],
   response: {},
+  mock_response: {},
   module_id: undefined,
   project_id: undefined
 })
@@ -314,6 +337,7 @@ const resetForm = () => {
     extracts: [{ key: undefined, value: undefined, remark: undefined }],
     validates: [{ key: undefined, value: undefined, validate_type: 'data', remark: undefined }],
     response: {},
+    mock_response: {},
     module_id: undefined,
     project_id: undefined
   }
@@ -418,6 +442,8 @@ const getApiDataToCommit = () => {
   data.data_urlencoded = bodyViewRef.value.getUrlencoded()
   data.extracts = extractsViewRef.value.getExtracts()
   data.validates = validatesViewRef.value.getValidates()
+  data.response = responseEditorViewRef.value.getJsonData()
+  data.mock_response = mockResponseEditorViewRef.value.getJsonData()
   return data
 }
 

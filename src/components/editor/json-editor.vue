@@ -47,15 +47,24 @@ const props = defineProps({
   jsonData: {
     default: '{}',
     type: String
+  },
+  height:{
+    default: undefined,
+    type: String
   }
 })
 const jsonEditorRef = ref(null)
 const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.738}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.86}px`
+  if (props.height === undefined) {
+    if (innerHeight < 800) {  // 小屏
+      return `${innerHeight * 0.738}px`
+    } else {  // 大屏
+      return `${innerHeight * 0.86}px`
+    }
+  }else {
+    return props.height
   }
+
 })
 watch(() => props.jsonData, (newValue, oldValue) => {
   tempData.value = JSON.stringify(newValue, null, 4)

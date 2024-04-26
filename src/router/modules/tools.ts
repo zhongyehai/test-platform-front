@@ -27,7 +27,7 @@ const route: Route[] = [
       },
       {
         path: 'queue',
-        component: createNameComponent(() => import('@/views/tools/queue/index.vue')),
+        component: createNameComponent(() => import('@/views/tools/queue/queue-link/index.vue')),
         meta: { title: '消息队列', icon: 'databaseEnter' }
       },
       {

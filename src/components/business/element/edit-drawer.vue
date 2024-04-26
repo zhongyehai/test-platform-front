@@ -39,27 +39,24 @@
                   formData.by === 'coordinate' ? '请填写具体坐标: (x, y)' : '元素表达式'"
               :style="{'width': ['bounds', 'coordinate'].indexOf(formData.by) !== -1 ? '98%' : '100%'}"
           />
-          <el-popover
-              v-show="['bounds', 'coordinate'].indexOf(formData.by) !== -1"
-              class="el_popover_class"
-              placement="top-start"
-              trigger="hover"
-          >
-            <div v-show="formData.by === 'bounds'">
-              <div>请填写定位工具上bounds字段的值：[[x1, y1], [x2, y2]]</div>
-              <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
-            </div>
-            <div v-show="formData.by === 'coordinate'">
-              <div>请填写具体坐标值：(x, y)</div>
-              <div>如坐标为(918,1079)，则填写: (918,1079)</div>
-            </div>
-            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
-          </el-popover>
+
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div v-show="formData.by === 'bounds'">
+                <div>请填写定位工具上bounds字段的值：[[x1, y1], [x2, y2]]</div>
+                <div>如坐标为[918,1079][1080,1205]，则填写: ([918,1079], [1080,1205])</div>
+              </div>
+              <div v-show="formData.by === 'coordinate'">
+                <div>请填写具体坐标值：(x, y)</div>
+                <div>如坐标为(918,1079)，则填写: (918,1079)</div>
+              </div>
+            </template>
+            <span v-show="['bounds', 'coordinate'].indexOf(formData.by) !== -1" style="margin-left:5px;color: #409EFF"><Help></Help></span>
+          </el-tooltip>
         </el-form-item>
 
-
         <el-form-item
-            v-if="testType==='app' && formData.by === 'bounds'"
+            v-show="testType==='app' && formData.by === 'bounds'"
             label="参照设备"
             prop="template_device"
             size="small"
@@ -73,28 +70,32 @@
               placeholder="请选则元素定位时参照的设备"
           >
             <el-option
-                v-for="script in deviceList"
-                :key="script.id"
-                :label="script.name"
-                :value="script.id"
+                v-for="device in deviceList"
+                :key="device.id"
+                :label="device.name"
+                :value="device.id"
             />
           </el-select>
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div>元素定位时参照的设备，用于坐标定位时计算元素的具体位置</div>
+            </template>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item label="等待超时时间" size="small" class="is-required">
           <el-input-number v-model="formData.wait_time_out" size="small" :min="2" />
-          <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-            <div>
-              1、等待元素出现的超时时间，最少设置为2秒 <br>
-              2、若在此时间内，元素出现，则立即执行步骤，若超过此时间，元素仍未出现，则报错 <br>
-              3、若元素管理处已设置超时时间，以步骤处设置的为准
-            </div>
-            <el-button slot="reference" type="text" icon="el-icon-question" />
-          </el-popover>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div>
+                1、等待元素出现的超时时间，最少设置为2秒 <br>
+                2、若在此时间内，元素出现，则立即执行步骤，若超过此时间，元素仍未出现，则报错 <br>
+                3、若元素管理处已设置超时时间，以步骤处设置的为准
+              </div>
+            </template>
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item :label="'备注'" prop="desc" size="small">

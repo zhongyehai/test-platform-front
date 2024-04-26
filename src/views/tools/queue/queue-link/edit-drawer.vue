@@ -25,16 +25,28 @@
           <el-input v-model="formData.host" size="small" placeholder="地址" />
         </el-form-item>
 
-        <el-form-item label="端口" prop="port" class="is-required" size="small">
+        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="端口" prop="port" class="is-required" size="small">
           <el-input v-model="formData.port" size="small" placeholder="端口" />
         </el-form-item>
 
-        <el-form-item label="账号" prop="account" class="is-required" size="small">
+        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="账号" prop="account" class="is-required" size="small">
           <el-input v-model="formData.account" size="small" placeholder="账号" />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password" class="is-required" size="small">
+        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="密码" prop="password" class="is-required" size="small">
           <el-input v-model="formData.password" size="small" placeholder="密码" />
+        </el-form-item>
+
+        <el-form-item v-show="formData.queue_type === 'rocket_mq'" label="实例id" prop="instance_id" class="is-required" size="small">
+          <el-input v-model="formData.instance_id" size="small" placeholder="实例id" />
+        </el-form-item>
+
+        <el-form-item v-show="formData.queue_type === 'rocket_mq' && !formData.id" label="access_id" prop="access_id" class="is-required" size="small">
+          <el-input v-model="formData.access_id" size="small" placeholder="access_id" />
+        </el-form-item>
+
+        <el-form-item v-show="formData.queue_type === 'rocket_mq' && !formData.id" label="access_key" prop="access_key" class="is-required" size="small">
+          <el-input v-model="formData.access_key" size="small" placeholder="access_key" />
         </el-form-item>
 
         <el-form-item label="备注" prop="desc" size="small">
@@ -63,7 +75,7 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {bus, busEvent} from "@/utils/bus-events";
-import { GetQueue, PostQueueLink, PutQueueLink } from '@/api/tools/queue'
+import { GetQueueLink, PostQueueLink, PutQueueLink } from '@/api/tools/queue'
 
 const props = defineProps({
   queueTypeDict: {
@@ -91,7 +103,7 @@ const onShowDrawerEvent = (message: any) => {
 }
 
 const getQueue = (dataId: number, command: string) => {
-  GetQueue({id: dataId}).then(response => {
+  GetQueueLink({id: dataId}).then(response => {
     formData.value = response.data
     if (command === 'copy'){
       formData.value.id = undefined
@@ -107,13 +119,58 @@ const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
 const formData = ref({
   id: undefined,
-  queue_type: '',
+  queue_type: 'rocket_mq',
   host: '',
-  port: 5672,
+  port: undefined,
   account: '',
   password: '',
+  access_id: '',
+  access_key: '',
+  instance_id: '',
   desc: ''
 })
+
+const validatePort = (rule: any, value: any, callback: any) => {
+  if (!formData.value.id && formData.value.queue_type === 'rabbit_mq' && !formData.value.port){
+    callback(new Error('请输入端口号'))
+  }
+  callback()
+}
+
+const validateAccount = (rule: any, value: any, callback: any) => {
+  if (!formData.value.id && formData.value.queue_type === 'rabbit_mq' && !formData.value.account){
+    callback(new Error('请输入账号'))
+  }
+  callback()
+}
+
+const validatePassword = (rule: any, value: any, callback: any) => {
+  if (!formData.value.id && formData.value.queue_type === 'rabbit_mq' && !formData.value.password){
+    callback(new Error('请输入密码'))
+  }
+  callback()
+}
+
+const validateAccessId = (rule: any, value: any, callback: any) => {
+  if (!formData.value.id && formData.value.queue_type === 'rocket_mq' && !formData.value.access_id){
+    callback(new Error('请输入access_id'))
+  }
+  callback()
+}
+
+const validateAccessKey = (rule: any, value: any, callback: any) => {
+  if (!formData.value.id && formData.value.queue_type === 'rocket_mq' && !formData.value.access_key){
+    callback(new Error('请输入access_key'))
+  }
+  callback()
+}
+
+const validateInstanceId = (rule: any, value: any, callback: any) => {
+  if (formData.value.queue_type === 'rocket_mq' && !formData.value.instance_id){
+    callback(new Error('请输入实例id'))
+  }
+  callback()
+}
 
 const formRules = {
   queue_type: [
@@ -123,24 +180,37 @@ const formRules = {
     {required: true, message: '请输入队列的链接地址', trigger: 'blur'}
   ],
   port: [
-    {required: true, message: '请输入队列链接地址的端口', trigger: 'blur'}
+    {validator: validatePort, trigger: 'blur'}
   ],
   account: [
-    {required: true, message: '请输入账号', trigger: 'blur'}
+    {validator: validateAccount, trigger: 'blur'}
   ],
   password: [
-    {required: true, message: '请输入密码', trigger: 'blur'}
+    {validator: validatePassword, trigger: 'blur'}
+  ],
+  access_id: [
+    {validator: validateAccessId, trigger: 'blur'}
+  ],
+  access_key: [
+    {validator: validateAccessKey, trigger: 'blur'}
+  ],
+  instance_id: [
+    {validator: validateInstanceId, trigger: 'blur'}
   ],
 }
+
 const ruleFormRef = ref(null)
 const resetForm = () => {
   formData.value = {
     id: undefined,
-    queue_type: '',
+    queue_type: 'rocket_mq',
     host: '',
-    port: 5672,
+    port: undefined,
     account: '',
     password: '',
+    access_id: '',
+    access_key: '',
+    instance_id: '',
     desc: ''
   }
   ruleFormRef.value && ruleFormRef.value.resetFields()
@@ -157,6 +227,7 @@ const submitForm = () => {
 const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
+      console.log(444444444444)
       submitButtonIsLoading.value = true
       PostQueueLink(formData.value).then(response => {
         submitButtonIsLoading.value = false
@@ -168,6 +239,7 @@ const addData = () => {
     }
   })
 }
+
 const changeData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
