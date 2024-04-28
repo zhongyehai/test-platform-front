@@ -1,26 +1,26 @@
 import request from '@/utils/system/request'
 import {baseDirAssist} from '../base-url'
 
-const queueLinkDir = baseDirAssist + '/queue-link'
+const queueLinkDir = baseDirAssist + '/queue-instance'
 const queueTopicDir = baseDirAssist + '/queue-topic'
 
-export function GetQueueLinkList(params: object) {
+export function GetQueueInstanceList(params: object) {
     return request({url: queueLinkDir + '/list', method: 'get', params: params})
 }
 
-export function ChangQueueLinkSort(data: object) {
+export function ChangQueueInstanceSort(data: object) {
     return request({url: queueLinkDir + '/sort', method: 'put', data: data})
 }
 
-export function GetQueueLink(params: object) {
+export function GetQueueInstance(params: object) {
     return request({url: queueLinkDir, method: 'get', params: params})
 }
 
-export function PostQueueLink(data: object) {
+export function PostQueueInstance(data: object) {
     return request({url: queueLinkDir, method: 'post', data: data})
 }
 
-export function PutQueueLink(data: object) {
+export function PutQueueInstance(data: object) {
     return request({url: queueLinkDir, method: 'put', data: data})
 }
 

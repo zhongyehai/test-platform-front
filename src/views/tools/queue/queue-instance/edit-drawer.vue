@@ -1,16 +1,16 @@
 <template>
   <div>
-    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改链接' : '新增链接'" size="60%">
+    <el-drawer v-model="drawerIsShow" :title="formData.id ? '修改实例' : '新增实例'" size="60%">
       <el-form
           ref="ruleFormRef"
           :model="formData"
           :rules="formRules"
           label-width="80px">
 
-        <el-form-item label="队列类型" prop="queue_type" class="is-required" size="small">
+        <el-form-item label="实例类型" prop="queue_type" class="is-required" size="small">
           <el-select
               v-model="formData.queue_type"
-              :placeholder="'选择队列类型'"
+              :placeholder="'选择实例类型'"
               filterable
               default-first-option
               clearable
@@ -22,7 +22,10 @@
         </el-form-item>
 
         <el-form-item label="地址" prop="host" class="is-required" size="small">
-          <el-input v-model="formData.host" size="small" placeholder="地址" />
+          <el-input v-model="formData.host" size="small" placeholder="地址" style="width: 97%"/>
+          <el-tooltip class="item" effect="dark" placement="top-start" content="链接地址">
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="端口" prop="port" class="is-required" size="small">
@@ -38,7 +41,10 @@
         </el-form-item>
 
         <el-form-item v-show="formData.queue_type === 'rocket_mq'" label="实例id" prop="instance_id" class="is-required" size="small">
-          <el-input v-model="formData.instance_id" size="small" placeholder="实例id" />
+          <el-input v-model="formData.instance_id" size="small" placeholder="实例id" style="width: 97%"/>
+          <el-tooltip class="item" effect="dark" placement="top-start" content="rocket_mq 实例的id">
+            <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+          </el-tooltip>
         </el-form-item>
 
         <el-form-item v-show="formData.queue_type === 'rocket_mq' && !formData.id" label="access_id" prop="access_id" class="is-required" size="small">
@@ -75,7 +81,8 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {bus, busEvent} from "@/utils/bus-events";
-import { GetQueueLink, PostQueueLink, PutQueueLink } from '@/api/tools/queue'
+import { GetQueueInstance, PostQueueInstance, PutQueueInstance } from '@/api/tools/queue'
+import {Help} from "@icon-park/vue-next";
 
 const props = defineProps({
   queueTypeDict: {
@@ -93,7 +100,7 @@ onBeforeUnmount(() => {
 })
 
 const onShowDrawerEvent = (message: any) => {
-  if (message.eventType === 'queue-link-info') {
+  if (message.eventType === 'queue-instance-info') {
     resetForm()
     if (message.content){
       getQueue(message.content.id, message.command)
@@ -103,7 +110,7 @@ const onShowDrawerEvent = (message: any) => {
 }
 
 const getQueue = (dataId: number, command: string) => {
-  GetQueueLink({id: dataId}).then(response => {
+  GetQueueInstance({id: dataId}).then(response => {
     formData.value = response.data
     if (command === 'copy'){
       formData.value.id = undefined
@@ -112,7 +119,7 @@ const getQueue = (dataId: number, command: string) => {
 }
 
 const sendEvent = () => {
-  bus.emit(busEvent.drawerIsCommit, {eventType: 'queue-link-info'});
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'queue-instance-info'});
 };
 
 const drawerIsShow = ref(false)
@@ -174,10 +181,10 @@ const validateInstanceId = (rule: any, value: any, callback: any) => {
 
 const formRules = {
   queue_type: [
-    {required: true, message: '请选择队列类型', trigger: 'blur'}
+    {required: true, message: '请选择实例的类型', trigger: 'blur'}
   ],
   host: [
-    {required: true, message: '请输入队列的链接地址', trigger: 'blur'}
+    {required: true, message: '请输入实例的地址', trigger: 'blur'}
   ],
   port: [
     {validator: validatePort, trigger: 'blur'}
@@ -227,9 +234,8 @@ const submitForm = () => {
 const addData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
-      console.log(444444444444)
       submitButtonIsLoading.value = true
-      PostQueueLink(formData.value).then(response => {
+      PostQueueInstance(formData.value).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()
@@ -244,7 +250,7 @@ const changeData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       submitButtonIsLoading.value = true
-      PutQueueLink(formData.value).then(response => {
+      PutQueueInstance(formData.value).then(response => {
         submitButtonIsLoading.value = false
         if (response) {
           sendEvent()

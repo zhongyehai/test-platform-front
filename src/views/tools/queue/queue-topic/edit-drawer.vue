@@ -69,7 +69,7 @@ import {GetQueueTopic, PostQueueTopic, PutQueueTopic, SendMsgToQueueTopic} from 
 import {ElMessage} from "element-plus";
 
 const props = defineProps({
-  queueLinkId: {
+  queueInstanceId: {
     default: undefined,
     type: Number
   }
@@ -133,7 +133,7 @@ const msgEditorViewRef = ref(null)
 let submitButtonIsLoading = ref(false)
 const formData = ref({
   id: undefined,
-  link_id: '',
+  instance_id: '',
   topic: '',
   desc: '',
   message: {},
@@ -143,7 +143,7 @@ const formData = ref({
 
 const formRules = {
   topic: [
-    {required: true, message: '请输入队列名字', trigger: 'blur'}
+    {required: true, message: '请输入topic名字', trigger: 'blur'}
   ],
   message: [
     {validator: validateMessage, trigger: 'blur'}
@@ -153,7 +153,7 @@ const ruleFormRef = ref(null)
 const resetForm = () => {
   formData.value = {
     id: undefined,
-    link_id: props.queueLinkId,
+    instance_id: props.queueInstanceId,
     topic: '',
     desc: ''
   }

@@ -98,7 +98,7 @@
     </el-drawer>
   </div>
 
-  <topicEditDrawer :queue-link-id="queryItems.link_id"></topicEditDrawer>
+  <topicEditDrawer :queue-instance-id="queryItems.instance_id"></topicEditDrawer>
   <msgLogDrawer :user-dict="props.userDict"></msgLogDrawer>
 </template>
 
@@ -131,7 +131,7 @@ const tableHeight = computed(() =>{
   }
 })
 const tableDataTotal = ref(0)
-const queryItems = ref({page_num: 1, page_size:20, link_id: undefined})
+const queryItems = ref({page_num: 1, page_size:20, instance_id: undefined})
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
 
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'queue-topic-list') {
-    queryItems.value.link_id = message.content.id
+    queryItems.value.instance_id = message.content.id
     getTableDataList()
     queueDrawerIsShow.value = true
   }

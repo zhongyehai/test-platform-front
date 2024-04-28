@@ -8,15 +8,15 @@
             size="small"
             style="margin-left: 10px"
             @click.native="showEditDrawer('add', null)"
-        >新增链接
+        >新增实例
         </el-button>
       </div>
 
       <div class="layout-container-form-search">
         <el-select
-            style="margin-right: 10px"
+            style="margin-right: 10px; width: 100%"
             v-model="queryItems.queue_type"
-            placeholder="队列类型"
+            placeholder="实例类型"
             filterable
             default-first-option
             clearable
@@ -29,7 +29,7 @@
         <el-input
             style="margin-right: 10px"
             v-model="queryItems.host"
-            placeholder="队列链接地址，支持模糊搜索"
+            placeholder="实例地址，支持模糊搜索"
             size="small"
             clearable
         />
@@ -55,13 +55,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="类型" prop="queue_type" align="center" min-width="5%">
+        <el-table-column show-overflow-tooltip label="实例类型" prop="queue_type" align="center" min-width="6%">
           <template #default="scope">
             <span> {{ queueTypeDict[scope.row.queue_type] }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="地址" prop="host" align="center" min-width="20%">
+        <el-table-column show-overflow-tooltip label="实例地址" prop="host" align="center" min-width="20%">
           <template #default="scope">
             <span> {{ scope.row.host }} </span>
           </template>
@@ -79,7 +79,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="备注" prop="desc" align="center" min-width="10%">
+        <el-table-column show-overflow-tooltip label="备注" prop="desc" align="center" min-width="5%">
           <template #default="scope">
             <span>{{ scope.row.desc }}</span>
           </template>
@@ -126,18 +126,18 @@
           @pageFunc="changePagination"
       />
     </div>
-    <queueLinkEditDrawer :queue-type-dict="queueTypeDict"></queueLinkEditDrawer>
+    <queueInstanceEditDrawer :queue-type-dict="queueTypeDict"></queueInstanceEditDrawer>
     <queueTopicListDrawer :user-dict="userDict"></queueTopicListDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import queueLinkEditDrawer from './edit-drawer.vue'
+import queueInstanceEditDrawer from './edit-drawer.vue'
 import queueTopicListDrawer from '../queue-topic/index.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
-import {GetQueueLinkList} from "@/api/tools/queue";
+import {GetQueueInstanceList} from "@/api/tools/queue";
 import Pagination from "@/components/pagination.vue";
 import {GetUserList} from "@/api/system/user";
 import toClipboard from "@/utils/copy-to-memory";
@@ -155,7 +155,7 @@ const tableHeight = computed(() =>{
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, host: undefined, queue_type: undefined})
 const userDict = ref({})
-const queueTypeDict =  { 'rocket_mq': 'rocket_mq', 'rabbit_mq': 'rabbit_mq'}
+const queueTypeDict =  { 'rocket_mq': '阿里rocket_mq', 'rabbit_mq': 'rabbit_mq'}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -164,7 +164,7 @@ const changePagination = (pagination: any) => {
 }
 
 const showEditDrawer = (command: string, row: object | null) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-link-info', command: command, content: row});
+  bus.emit(busEvent.drawerIsShow, {eventType: 'queue-instance-info', command: command, content: row});
 }
 
 const showQueueList = (row: any) => {
@@ -192,7 +192,7 @@ const getTableDataList = () => {
   queryItems.value.host = queryItems.value.host ? queryItems.value.host : undefined
   queryItems.value.queue_type = queryItems.value.queue_type ? queryItems.value.queue_type : undefined
   tableIsLoading.value = true
-  GetQueueLinkList(queryItems.value).then(response => {
+  GetQueueInstanceList(queryItems.value).then(response => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
     tableDataTotal.value = response.data.total
@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
 })
 
 const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'queue-link-info') {
+  if (message.eventType === 'queue-instance-info') {
     getTableDataList()
   }
 }
