@@ -29,6 +29,11 @@ const route: Route[] = [
         path: 'bug-track',
         component: createNameComponent(() => import('@/views/manage/bug-track/index.vue')),
         meta: { title: '线上问题跟踪', icon: 'bug' }
+      },
+      {
+        path: 'todo',
+        component: createNameComponent(() => import('@/views/manage/todo/index.vue')),
+        meta: { title: '待办管理', icon: 'list' }
       }
     ]
   }
