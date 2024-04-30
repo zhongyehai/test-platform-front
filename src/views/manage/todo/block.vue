@@ -103,7 +103,7 @@ const addTodo = () => {
 
 <style lang="scss" scoped>
 .block {
-  width: 300px;
+  width: calc(100% / 4.3);
   height: calc(100% - 10px);
   background: #efefef;
   border: 1px solid #e3e3e3;

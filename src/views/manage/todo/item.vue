@@ -14,13 +14,14 @@
     </div>
     <div class="options">
       <p v-for="(option, key) in data.options" :key="key">{{ option }}</p>
-      {{ userDict[data.create_user] }} 创建于 {{ data.create_time }}
+      <p>{{ userDict[data.create_user] }} 创建于 {{ data.create_time }}</p>
+      <p v-if="data.status == 'done'">{{ userDict[data.done_user] }} 完成于 {{ data.done_time }}</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, defineProps} from 'vue'
+import {computed} from 'vue'
 import {bus, busEvent} from "@/utils/bus-events";
 
 const props = defineProps({

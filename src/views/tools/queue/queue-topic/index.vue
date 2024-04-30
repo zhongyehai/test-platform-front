@@ -59,7 +59,7 @@
             </el-button>
 
             <el-button
-                style="margin: 0; padding: 2px"
+                style="margin: 0; padding: 2px;color: #FF6600"
                 type="text"
                 size="small"
                 @click="showEditQueueDrawer('sendMsg', scope.row)"
