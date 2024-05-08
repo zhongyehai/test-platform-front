@@ -219,7 +219,6 @@ const tableIsLoading = ref(false)
 const stepTableRef = ref(null)
 const tableDataList = ref([])
 const expandIdList = ref([])
-const userList = ref([])
 const queryItems = ref({
   page_num: 1,
   page_size: 99,

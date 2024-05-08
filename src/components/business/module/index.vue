@@ -78,7 +78,8 @@
                 <el-scrollbar :style="{height: treeHeight}">
                   <el-tree
                     ref="treeRef"
-                    :data="moduleTreeData"
+                    default-expand-all
+                    :data="treeData"
                     :props="defaultProps"
                     :filter-node-method="filterNode"
                     node-key="id"
@@ -89,6 +90,7 @@
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span>{{ node.label }}</span>
                       <div v-show="data.id === currentNode.id" style="float: right">
+                        <SortThree v-show="data.parent" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showSortDrawer(data)"></SortThree>
                         <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>
                         <Write style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('edit', node, data)"></Write>
                         <Delete style="color: red;margin: 0; padding: 2px" @click.stop="clickDeleteModule(node, data)"></Delete>
@@ -120,6 +122,9 @@
         </el-col>
 
       </el-row>
+      <el-drawer v-model="sortDrawerIsShow" title="拖拽排序" size="30%">
+        <sortDrawer :test-type="testType" :use-type="'module'"></sortDrawer>
+      </el-drawer>
       <editModuleDrawer :test-type="testType"></editModuleDrawer>
       <addModuleDrawer :test-type="testType"></addModuleDrawer>
 
@@ -133,9 +138,10 @@
 <script setup lang="ts">
 
 import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
-import {Clear, Copy, Delete, Minus, Plus, Write} from "@icon-park/vue-next";
+import {Clear, Copy, Delete, Minus, Plus, SortThree, Write} from "@icon-park/vue-next";
 import editModuleDrawer from "./edit-drawer.vue";
 import addModuleDrawer from "./add-drawer.vue";
+import sortDrawer from "../sort-drawer.vue";
 import apiIndex from "@/components/business/api/index.vue";
 import apiFromDrawer from "@/components/business/api/from-drawer.vue";
 import apiUseDrawer from "@/components/business/api/use-drawer.vue";
@@ -175,10 +181,11 @@ const filterNode = (value: string, data: Tree) => {
 const defaultProps = {children: 'children', label: 'name'}
 const tempLabel = ref()
 const currentNode = ref({id: undefined})
+const sortDrawerIsShow = ref(true) // 挂载之前，设为显示状态，否则会出现第一次触发bus事件失败的情况
 const queryButtonIsLoading = ref(false)
 const tabActiveName = ref('moduleTree')
 const projectList = ref([])
-const moduleTreeData = ref([])
+const treeData = ref([])
 const project = ref({})
 const queryItems = ref({
   page_num: 1,
@@ -204,6 +211,11 @@ const addParentModule = () => {
   showEditDrawer('add', null, {id: null})
 }
 
+const showSortDrawer = (data) => {
+  sortDrawerIsShow.value = true
+  bus.emit(busEvent.drawerIsShow, {eventType: 'sort-case-suite', content: {project_id: data.project_id, parent: data.parent}})
+}
+
 const showEditDrawer = (command: string, node: any, data: { name: any; controller: any; }) => {
   if (command === 'add'){
     bus.emit(busEvent.drawerIsShow, {eventType: 'add-module', content: {parent: data.id, project_id: project.value.id}})
@@ -212,7 +224,7 @@ const showEditDrawer = (command: string, node: any, data: { name: any; controlle
   }
 }
 
-const moduleTreeIsDone = (moduleTree: never[]) => {
+const treeIsDone = (moduleTree: never[]) => {
   bus.emit(busEvent.treeIsDone, {eventType: 'module', content: JSON.parse(JSON.stringify(moduleTree))})
 }
 
@@ -225,7 +237,7 @@ const clickDeleteModule = (node: any, data: { name: any; }) => {
         DeleteModule(props.testType, { id: data.id }).then(response => {
           if (response){
             treeRef.value.remove(data)
-            moduleTreeIsDone(moduleTreeData.value)
+            treeIsDone(treeData.value)
           }
         })
       }).catch(() => {})
@@ -267,19 +279,28 @@ const getProjectList = () => {
 }
 
 const getModuleList = (projectId: number) => {
-  GetModuleList(props.testType, { 'project_id': projectId, page_num: 1, page_size: 99999 }).then(response => {
-    var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
-    moduleTreeData.value = arrayToTree(response_data, null)
-    moduleTreeIsDone(moduleTreeData.value)
-  })
+  if (projectId){
+    GetModuleList(props.testType, { 'project_id': projectId, page_num: 1, page_size: 99999 }).then(response => {
+      var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
+      treeData.value = arrayToTree(response_data, null)
+      treeIsDone(treeData.value)
+    })
 
-  GetProject(props.testType, {id: projectId }).then(response => {
-    project.value = response.data
-  })
-
+    GetProject(props.testType, {id: projectId }).then(response => {
+      project.value = response.data
+    })
+  }
 }
 
+watch(() => sortDrawerIsShow.value, (newValue, oldValue) => {
+  if (project.value && !newValue){
+    getModuleList(project.value.id)
+  }
+})
+
 onMounted(() => {
+  sortDrawerIsShow.value = false
+
   getProjectList()
 
   GetConfigByCode({ code: 'data_type_mapping' }).then(response => {
@@ -312,7 +333,7 @@ const drawerIsCommit = (message: any) => {
           currentNode.value.children.push(message.content)
           treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
         } else {
-          moduleTreeData.value.push(message.content)
+          treeData.value.push(message.content)
         }
       }else {
         getModuleList(project.value.id)
@@ -321,7 +342,7 @@ const drawerIsCommit = (message: any) => {
     }else {
       currentNode.value.name = message.content.name
     }
-    moduleTreeIsDone(moduleTreeData.value)
+    treeIsDone(treeData.value)
   }
 }
 

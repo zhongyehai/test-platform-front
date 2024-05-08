@@ -20,6 +20,10 @@ export function DeleteModule(testType: string, data: object) {
     return request({ url: getBaseDir(testType), method: 'delete', data: data })
 }
 
+export function ChangeModuleSort(testType: string, data: object) {
+    return request({ url: getBaseDir(testType) + '/sort', method: 'put', data: data })
+}
+
 export function RunModule(testType: string, data: object) {
     return request({ url: getBaseDir(testType) + '/run', method: 'post', data: data })
 }

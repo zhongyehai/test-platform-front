@@ -498,7 +498,7 @@ const props = defineProps({
 
 // 默认展开报告详情的项
 const defaultShowDetailInfo = ref([
-    'attachment', 'apiTestRequest', 'apiTestResponse', 'uiTestExecuteInfo', 'redirectPrint'
+    'attachment', 'apiTestRequest', 'apiTestResponse', 'uiTestExecuteInfo', 'redirectPrint', 'variablesMapping', 'extractMsg'
 ])
 
 // 接口自动化，请求信息

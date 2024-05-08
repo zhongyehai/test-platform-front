@@ -9,7 +9,20 @@
 <!--      </div>-->
       {{ data.title }}
       <div style="float: right">
-        <el-button @click="showDetail(data.id)">{{data.status === 'todo' ? '编辑' : '详情' }}</el-button>
+        <el-tooltip class="item" effect="dark" placement="top-start" content="编辑待办">
+          <Write v-show="data.status === 'todo'" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showDetail(data.id)"></Write>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" placement="top-start" content="查看详情">
+          <PreviewOpen v-show="data.status !== 'todo'" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showDetail(data.id)"></PreviewOpen>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" placement="top-start" content="复制待办">
+          <Copy style="color: #409EFF;margin: 0; padding: 2px" @click.stop="addTodo(data)"></Copy>
+        </el-tooltip>
+        <el-popconfirm width="300px" :title="`确定删除【${ data.title }】?`" @confirm="deleteTodo(data)">
+          <template #reference>
+            <Delete v-show="data.status === 'todo'" style="color: red;margin: 0; padding: 2px"></Delete>
+          </template>
+        </el-popconfirm>
       </div>
     </div>
     <div class="options">
@@ -23,6 +36,8 @@
 <script lang="ts" setup>
 import {computed} from 'vue'
 import {bus, busEvent} from "@/utils/bus-events";
+import {Delete, PreviewOpen, Copy, Write, Plus, Help} from "@icon-park/vue-next";
+import {DeleteTodo} from "@/api/manage/todo";
 
 const props = defineProps({
   data: {
@@ -62,6 +77,18 @@ const colorInit = computed(() => {
 
 const showDetail = (dataId: number) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'edit-todo', content: dataId});
+}
+
+const addTodo = (content: object) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'add-todo', content: content});
+}
+
+const deleteTodo = (content: object) => {
+  DeleteTodo({id: content.id}).then(response => {
+    if (response){
+      bus.emit(busEvent.drawerIsCommit, {eventType: 'get-todo-list'});
+    }
+  })
 }
 
 </script>

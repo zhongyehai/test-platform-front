@@ -124,7 +124,7 @@ import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {ElMessage} from 'element-plus'
 import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
-import {PostTodo} from "@/api/manage/todo";
+import {PostTodo, GetTodo} from "@/api/manage/todo";
 
 
 onMounted(() => {
@@ -138,6 +138,12 @@ onBeforeUnmount(() => {
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'add-todo') {
     resetForm()
+    if (message.content.id){
+      GetTodo({id: message.content.id}).then(res => {
+        formData.value.data_list[0].title = res.data.title
+        formData.value.data_list[0].detail = res.data.detail
+      })
+    }
     drawerIsShow.value = true
   }
 }

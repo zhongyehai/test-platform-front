@@ -50,7 +50,7 @@
     </div>
 
     <!-- 脑图 -->
-    <div ref="mindMap" id="map" style="margin-top: 5px; width: 100%; height: 1000px" />
+    <div ref="mindMap" id="map" :style="{marginTop: '5px', width: '100%', height: mapHeight}" />
 
     <!-- 新增KYM分析 -->
     <el-dialog
@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 // 使用方法详见：https://inspiring-golick-3c01b9.netlify.app/
 import MindElixir from 'mind-elixir'
 import {GetProjectKYM, PutProjectKYM, PostKYM, GetKYMProjectList, GetKymAsXmind} from '@/api/manage/kym'
@@ -106,6 +106,13 @@ const kymData = ref({
     'topic': '新建服务',
     'root': true,
     'children': []
+  }
+})
+const mapHeight = computed(() =>{
+  if (innerHeight < 800){  // 小屏
+    return `${innerHeight * 0.8}px`
+  }else {  // 大屏
+    return `${innerHeight * 0.87}px`
   }
 })
 const queryItems = ref({project: ''})

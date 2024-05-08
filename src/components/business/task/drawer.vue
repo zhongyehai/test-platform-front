@@ -236,10 +236,11 @@
 
           <el-tab-pane label="选择用例" name="case">
             <selectCaseView
+                v-if="drawerIsShow"
                 ref="caseSelectorRef"
                 :test-type="testType"
                 :case-id="formData.case_ids"
-                :suite-id="formData.suite_ids"
+                :suite-id-list="formData.suite_ids"
                 :case-suite-Tree="caseSuiteTree"
                 :case-list="caseList"
             ></selectCaseView>
@@ -316,6 +317,7 @@ onBeforeUnmount(() => {
 const onShowDrawerEvent = (message: any) => {
   if (message.eventType === 'edit-task') {
     resetForm()
+    activeName.value = 'task'
     changeWebHookList(false)
     getRunAppEnv()
     getBrowserName()

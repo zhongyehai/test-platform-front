@@ -12,6 +12,10 @@ export function DownloadSuiteTemplate(testType: string) {
     return request({ url: getBaseDir(testType) + '/template/download', method: 'get', responseType: 'blob' })
 }
 
+export function ChangeCaseSuiteSort(testType: string, data: object) {
+    return request({ url: getBaseDir(testType) + '/sort', method: 'put', data: data })
+}
+
 export function PostCaseSuite(testType: string, data: object) {
     return request({ url: getBaseDir(testType), method: 'post', data: data })
 }

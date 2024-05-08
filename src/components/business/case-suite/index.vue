@@ -17,37 +17,6 @@
               <el-option v-for="item in projectList" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
           </el-form-item>
-
-<!--          <el-form-item v-if="testType === 'api'" label="查接口" size="small">-->
-<!--            <el-input-->
-<!--                v-model="queryItems.addr"-->
-<!--                class="input-with-select"-->
-<!--                placeholder="请输入接口地址"-->
-<!--                size="small"-->
-<!--                clearable-->
-<!--                style="width: 400px"-->
-<!--            />-->
-<!--            <el-button-->
-<!--                v-show="testType === 'api'"-->
-<!--                :disabled="!queryItems.addr"-->
-<!--                type="primary"-->
-<!--                size="small"-->
-<!--                :loading="queryButtonIsLoading"-->
-<!--                style="margin-left: 10px"-->
-<!--                @click.native="showApiFrom()"-->
-<!--            >查归属-->
-<!--            </el-button>-->
-<!--            <el-button-->
-<!--                v-show="testType === 'api'"-->
-<!--                :disabled="!queryItems.addr"-->
-<!--                type="primary"-->
-<!--                size="small"-->
-<!--                :loading="queryButtonIsLoading"-->
-<!--                style="margin-left: 10px"-->
-<!--                @click.native="getApiToStep()"-->
-<!--            >查使用情况-->
-<!--            </el-button>-->
-<!--          </el-form-item>-->
         </el-form>
       </div>
     </div>
@@ -89,7 +58,8 @@
                 <el-scrollbar :style="{height: treeHeight}">
                 <el-tree
                     ref="treeRef"
-                    :data="moduleTreeData"
+                    default-expand-all
+                    :data="treeData"
                     :props="defaultProps"
                     :filter-node-method="filterNode"
                     node-key="id"
@@ -100,6 +70,7 @@
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span>{{ node.label }}</span>
                       <div v-show="data.id === currentNode.id">
+                        <SortThree v-show="data.parent" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showSortDrawer(data)"></SortThree>
                         <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>
                         <Write style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('edit', node, data)"></Write>
                         <Delete style="color: red;margin: 0; padding: 2px" @click.stop="clickDeleteModule(node, data)"></Delete>
@@ -116,13 +87,14 @@
 
         <!-- 第二列，用例列表 -->
         <el-col style="width: 79%;">
-<!--          <apiFromDrawer :case-id="null" />-->
-<!--          <apiUseDrawer />-->
           <!-- 用例管理 -->
           <caseIndex :test-type="testType" :project-id="project.id" :project-list="projectList"></caseIndex>
         </el-col>
 
       </el-row>
+      <el-drawer v-model="sortDrawerIsShow" title="拖拽排序" size="30%">
+        <sortDrawer :test-type="testType" :use-type="'caseSuite'"></sortDrawer>
+      </el-drawer>
       <editDrawer :test-type="testType"></editDrawer>
       <addDrawer :test-type="testType"></addDrawer>
       <uploadDrawer :test-type="testType"></uploadDrawer>
@@ -140,20 +112,18 @@ import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
 import editDrawer from "./edit-drawer.vue";
 import addDrawer from "./add-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
-// import apiFromDrawer from "@/components/business/api/from-drawer.vue";
-// import apiUseDrawer from "@/components/business/api/use-drawer.vue";
+import sortDrawer from "../sort-drawer.vue";
 import caseIndex from "@/components/business/case/index.vue";
 
 import {GetProjectList, GetProject} from '@/api/business-api/project'
 import {bus, busEvent} from "@/utils/bus-events";
 import {arrayToTree, ellipsis} from "@/utils/parse-data";
-import {ElMessage, ElMessageBox, ElTree} from "element-plus";
-import {Plus, UploadOne, Write, Delete} from "@icon-park/vue-next";
-import {GetApiFrom, GetApiToStep} from "@/api/business-api/api";
+import {ElMessageBox, ElTree} from "element-plus";
+import {Plus, UploadOne, Write, Delete, SortThree} from "@icon-park/vue-next";
 import {GetCaseSuiteList, DeleteCaseSuite} from "@/api/business-api/case-suite";
 import {GetConfigByCode} from "@/api/config/config-value";
-import SelectRunEnv from "@/components/select-run-env.vue";
-import ShowRunProcess from "@/components/show-run-process.vue";
+import selectRunEnv from "@/components/select-run-env.vue";
+import showRunProcess from "@/components/show-run-process.vue";
 
 const props = defineProps({
   testType: {
@@ -180,11 +150,11 @@ const filterNode = (value: string, data: Tree) => {
 const defaultProps = {children: 'children', label: 'name'}
 const tempLabel = ref()
 const currentNode = ref({id: undefined})
-const queryButtonIsLoading = ref(false)
+const sortDrawerIsShow = ref(true) // 挂载之前，设为显示状态，否则会出现第一次触发bus事件失败的情况
 const tabActiveName = ref('moduleTree')
 const projectList = ref([])
 const project = ref({})
-const moduleTreeData = ref([])
+const treeData = ref([])
 const queryItems = ref({
   page_num: 1,
   page_size: 20,
@@ -213,8 +183,12 @@ const uploadCaseSuite = () => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'upload-case-suite', content: {project_id: project.value.id}})
 }
 
+const showSortDrawer = (data) => {
+  sortDrawerIsShow.value = true
+  bus.emit(busEvent.drawerIsShow, {eventType: 'sort-case-suite', content: {project_id: data.project_id, parent: data.parent}})
+}
+
 const showEditDrawer = (command: string, node: any, data: { name: any; controller: any; }) => {
-  let eventContent = {}
   if (command === 'add'){
     bus.emit(busEvent.drawerIsShow, {eventType: 'add-case-suite', content: {parent: data.id, suite_type: data.suite_type, project_id: project.value.id}})
   }else {
@@ -222,7 +196,7 @@ const showEditDrawer = (command: string, node: any, data: { name: any; controlle
   }
 }
 
-const moduleTreeIsDone = (moduleTree: never[]) => {
+const treeIsDone = (moduleTree: never[]) => {
   bus.emit(busEvent.treeIsDone, {eventType: 'case-suite', content: JSON.parse(JSON.stringify(moduleTree))})
 }
 
@@ -235,7 +209,7 @@ const clickDeleteModule = (node: any, data: { name: any; }) => {
         DeleteCaseSuite(props.testType, { id: data.id }).then(response => {
           if (response){
             treeRef.value.remove(data)
-            moduleTreeIsDone(moduleTreeData.value)
+            treeIsDone(treeData.value)
           }
         })
       }).catch(() => {})
@@ -248,27 +222,6 @@ const clickTree = (data: any) => {
   })
 }
 
-const showApiFrom = () => {
-  queryButtonIsLoading.value = true
-  GetApiFrom({ api_addr: queryItems.value.addr }).then(response => {
-    queryButtonIsLoading.value = false
-    if (response.data.length > 0){
-      bus.emit(busEvent.drawerIsShow, {eventType: 'api-from', content: response.data})
-    }else {
-      ElMessage.warning('没有查到相关数据')
-    }
-  })
-}
-const getApiToStep = () => {
-  queryButtonIsLoading.value = true
-  GetApiToStep({ api_addr: queryItems.value.addr }).then(response => {
-    queryButtonIsLoading.value = false
-    if (response){
-      bus.emit(busEvent.drawerIsShow, {eventType: 'api-use', content: response.data})
-    }
-  })
-}
-
 const getProjectList = () => {
   GetProjectList(props.testType, {page_num: 1, page_size: 99999}).then(response => {
     projectList.value = response.data.data
@@ -276,18 +229,29 @@ const getProjectList = () => {
 }
 
 const getCaseSuiteList = (projectId: number) => {
-  GetCaseSuiteList(props.testType, { 'project_id': projectId, page_num: 1, page_size: 99999 }).then(response => {
-    var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
-    moduleTreeData.value = arrayToTree(response_data, null)
-    moduleTreeIsDone(moduleTreeData.value)
-  })
+  if (projectId){
+    GetCaseSuiteList(props.testType, { 'project_id': projectId, page_num: 1, page_size: 99999 }).then(response => {
+      var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
+      treeData.value = arrayToTree(response_data, null)
+      treeIsDone(treeData.value)
+    })
 
-  GetProject(props.testType, {id: projectId }).then(response => {
-    project.value = response.data
-  })
+    GetProject(props.testType, {id: projectId }).then(response => {
+      project.value = response.data
+    })
+  }
 }
 
+
+watch(() => sortDrawerIsShow.value, (newValue, oldValue) => {
+  if (project.value && !newValue){
+    getCaseSuiteList(project.value.id)
+  }
+})
+
 onMounted(() => {
+  sortDrawerIsShow.value = false
+
   getProjectList()
 
   GetConfigByCode({ code: 'data_type_mapping' }).then(response => {
@@ -320,7 +284,7 @@ const drawerIsCommit = (message: any) => {
           currentNode.value.children.push(message.content)
           treeRef.value.store.nodesMap[currentNode.value.id].expanded = true // 展开节点
         } else {
-          moduleTreeData.value.push(message.content)
+          treeData.value.push(message.content)
         }
       }else {
         getCaseSuiteList(project.value.id)
@@ -328,7 +292,7 @@ const drawerIsCommit = (message: any) => {
     }else {
       currentNode.value.name = message.content.name
     }
-    moduleTreeIsDone(moduleTreeData.value)
+    treeIsDone(treeData.value)
   }else if (message.eventType === 'upload-case-suite'){
     getCaseSuiteList(project.value.id)
   }

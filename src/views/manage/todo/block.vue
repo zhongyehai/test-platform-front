@@ -4,17 +4,9 @@
       <span class="num">{{ data.children.length }}</span>
       <div :class="data.status">{{ data.title }}</div>
       <div>
-        <el-popover class="el_popover_class" placement="top-start" trigger="hover" content="添加任务">
-          <template #reference>
-            <el-button
-                v-if="data.status === 'todo'"
-                type="text"
-                style="margin-left: 10px"
-                @click="addTodo"
-            ><Plus></Plus>
-            </el-button>
-          </template>
-        </el-popover>
+        <el-tooltip class="item" effect="dark" placement="top-start" content="添加待办任务">
+          <Plus v-show="data.status === 'todo'" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="addTodo"></Plus>
+        </el-tooltip>
       </div>
     </div>
     <div class="dataList" ref="dom">
@@ -96,7 +88,7 @@ onMounted(() => {
 })
 
 const addTodo = () => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'add-todo'});
+  bus.emit(busEvent.drawerIsShow, {eventType: 'add-todo', content: {}});
 }
 
 </script>

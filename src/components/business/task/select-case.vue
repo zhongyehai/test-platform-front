@@ -21,11 +21,12 @@
             <el-tree
                 ref="suiteTreeRef"
                 :data="caseSuiteTree"
+                default-expand-all
                 show-checkbox
                 node-key="id"
                 highlight-current
-                :default-expanded-keys="suiteIdList"
-                :default-checked-keys="suiteIdList"
+                :default-expanded-keys="tempSuiteIdList"
+                :default-checked-keys="tempSuiteIdList"
                 :props="defaultProps"
                 @node-click="clickTree"
             />
@@ -119,7 +120,7 @@ const props = defineProps({
     default: [],
     type: Array
   },
-  suiteId: {
+  suiteIdList: {
     default: [],
     type: Array
   },
@@ -135,10 +136,8 @@ watch(() => props.caseList, (newValue, oldValue) => {
   }
 })
 
-watch(() => props.suiteId, (newValue, oldValue) => {
-  if (newValue){
-    suiteIdList.value = newValue
-  }
+watch(() => props.suiteIdList, (newValue, oldValue) => {
+  tempSuiteIdList.value = newValue
 })
 
 watch(() => props.caseId, (newValue, oldValue) => {
@@ -147,7 +146,7 @@ watch(() => props.caseId, (newValue, oldValue) => {
   }
 })
 
-const suiteIdList = ref([])
+const tempSuiteIdList = ref([])
 const caseIdList = ref([])
 const caseTab = ref('case')
 const suiteTab = ref('suite')
