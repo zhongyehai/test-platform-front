@@ -2,9 +2,9 @@
   <div class="layout-container">
 
     <!-- 无测试报告数据，或者测试报告中没有运行数据 -->
-    <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">
-      无运行数据或所有运行数据均已跳过
-    </div>
+<!--    <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">-->
+<!--      无运行数据或所有运行数据均已跳过-->
+<!--    </div>-->
 
     <!-- 有数据 -->
     <div v-show="reportSummary && reportSummary.stat.count.step > 0">

@@ -22,13 +22,13 @@
 
         <el-form-item v-show="command === 'sendMsg'" label="自定义参数" prop="options" size="small">
           <div style="width: 100%">
-            <jsonEditorView ref="optionsEditorViewRef" :json-data="formData.options" height="100px"/>
+            <jsonEditorView ref="optionsEditorViewRef" :json-data="formData.options" height="150px"/>
           </div>
         </el-form-item>
 
         <el-form-item v-show="command === 'sendMsg'" label="消息体" class="is-required" prop="message" size="small">
           <div style="width: 100%">
-            <jsonEditorView ref="msgEditorViewRef" :json-data="formData.message" height="100px"/>
+            <jsonEditorView ref="msgEditorViewRef" :json-data="formData.message" height="300px"/>
           </div>
         </el-form-item>
       </el-form>

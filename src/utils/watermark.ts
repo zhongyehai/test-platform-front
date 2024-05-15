@@ -16,9 +16,9 @@ export const getmark = () => {
         const cans = can.getContext("2d")!;
         //旋转角度
         cans.rotate((-15 * Math.PI) / 180);
-        cans.font = "18px Vedana";
+        cans.font = "18px Microsoft Yahei"; // 宋体
         //设置填充绘画的颜色、渐变或者模式
-        cans.fillStyle = "rgba(225, 225, 225, 0.40)";
+        cans.fillStyle = "rgba(0,0,0,.15)";
         //设置文本内容的当前对齐方式
         cans.textAlign = "left";
         //设置在绘制文本时使用的当前文本基线

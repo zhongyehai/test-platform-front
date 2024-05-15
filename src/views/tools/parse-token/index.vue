@@ -4,10 +4,10 @@
       <el-col :span="11" style="float: left">
         <div style="margin-bottom: 20px;text-align: center; font-size: 25px; color: #fb015b">token字符串</div>
         <div style="margin-left: 20px">
-          <el-input v-model="tokenStr" size="small" type="textarea" rows="20" :placeholder="'token字符串'" />
           <div v-show="errorMsg" style="padding-top: 10px; color: red">
             <span> {{ errorMsg }}</span>
           </div>
+          <el-input v-model="tokenStr" size="small" type="textarea" rows="20" :placeholder="'token字符串'" />
         </div>
       </el-col>
 

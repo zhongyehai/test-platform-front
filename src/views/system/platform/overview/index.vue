@@ -20,7 +20,7 @@ import overviewChart from './chart.vue'
 import {GetUseCard, GetUseChart} from "@/api/business-api/stat";
 
 const timeSlot = ref('近7天')
-const timeSlotMapping = ref({'近7天': -7, '近14天': -14, '近30天': -30, '近90天': -90, '近180天': -180})
+const timeSlotMapping = {'近7天': -7, '近14天': -14, '近30天': -30, '近90天': -90, '近180天': -180, '近360天': -360}
 const useCardRes = ref([
     {
       title: '人工触发次数',
@@ -63,7 +63,7 @@ const getOverviewData = () => {
 
 
 const getUseCard = () => {
-  GetUseCard({time_slot: timeSlotMapping.value[timeSlot.value]}).then(response => {
+  GetUseCard({time_slot: timeSlotMapping[timeSlot.value]}).then(response => {
     useCardRes.value[0].total = response.data.page_trigger_count
     useCardRes.value[1].total = response.data.page_trigger_pass_rate
     useCardRes.value[2].total = response.data.patrol_count
@@ -73,7 +73,7 @@ const getUseCard = () => {
 
 // 统计图
 const getUseChart = () => {
-  GetUseChart({time_slot: timeSlotMapping.value[timeSlot.value]}).then(response => {
+  GetUseChart({time_slot: timeSlotMapping[timeSlot.value]}).then(response => {
     useChartRes.value = response.data
   })
 }

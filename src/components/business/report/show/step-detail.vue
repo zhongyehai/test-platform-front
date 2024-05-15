@@ -52,7 +52,7 @@
         </div>
       </el-collapse-item>
 
-      <el-collapse-item name="run_info">
+      <el-collapse-item name="runTimeInfo">
         <template #title>
           <div class="el-collapse-item-title"> {{ '执行信息：' }}</div>
         </template>
@@ -176,7 +176,7 @@
 
           <el-row>
             <el-col :span="12">
-              <el-collapse-item name="request_headers">
+              <el-collapse-item name="requestHeaders">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '头部参数：' }}</div>
                 </template>
@@ -202,7 +202,7 @@
               </el-collapse-item>
             </el-col>
             <el-col :span="12">
-              <el-collapse-item name="request_data">
+              <el-collapse-item name="requestData">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ 'data参数：' }}</div>
                 </template>
@@ -249,7 +249,7 @@
 
           <el-row>
             <el-col :span="12">
-              <el-collapse-item name="request_params">
+              <el-collapse-item name="requestParams">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                 </template>
@@ -259,7 +259,7 @@
               </el-collapse-item>
             </el-col>
             <el-col :span="12">
-              <el-collapse-item name="request_file">
+              <el-collapse-item name="requestFile">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '文件参数：' }}</div>
                 </template>
@@ -268,7 +268,7 @@
             </el-col>
           </el-row>
 
-          <el-collapse-item name="request_json">
+          <el-collapse-item name="requestJson">
             <template #title>
               <div class="el-collapse-item-title"> {{ 'json参数：' }}</div>
             </template>
@@ -298,7 +298,7 @@
             </el-descriptions-item>
           </el-descriptions>
 
-          <el-collapse-item name="response_text">
+          <el-collapse-item name="responseText">
             <template #title>
               <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
             </template>
@@ -311,7 +311,7 @@
             <div v-else class="el-collapse-item-content" v-html="reportStepData.response ? reportStepData.response.text : '-'" />
           </el-collapse-item>
 
-          <el-collapse-item name="response_json">
+          <el-collapse-item name="responseJson">
             <template #title>
               <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
             </template>
@@ -353,7 +353,7 @@
 
           <el-row>
             <el-col :span="12">
-              <el-collapse-item name="execute_before_page">
+              <el-collapse-item name="executeBeforePage">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '执行前页面：' }}</div>
                 </template>
@@ -371,7 +371,7 @@
               </el-collapse-item>
             </el-col>
             <el-col :span="12">
-              <el-collapse-item name="execute_after_page">
+              <el-collapse-item name="executeAfterPage">
                 <template #title>
                   <div class="el-collapse-item-title"> {{ '执行后页面：' }}</div>
                 </template>
@@ -498,17 +498,30 @@ const props = defineProps({
 
 // 默认展开报告详情的项
 const defaultShowDetailInfo = ref([
-    'attachment', 'apiTestRequest', 'apiTestResponse', 'uiTestExecuteInfo', 'redirectPrint', 'variablesMapping', 'extractMsg'
+    'attachment',
+    'runTimeInfo',
+    'apiTestRequest',
+    'apiTestResponse',
+    'uiTestExecuteInfo',
+    'variablesMapping',
+    'extractMsg',
+    'redirectPrint'
 ])
 
 // 接口自动化，请求信息
-const defaultShowRequestInFo = ref(['request_json'])
+const defaultShowRequestInFo = ref([
+    'requestHeaders',
+    'requestData',
+    'requestParams',
+    'requestFile',
+    'requestJson'
+])
 
 // 接口自动化，响应信息
-const defaultShowResponseInFo = ref(['response_text', 'response_json'])
+const defaultShowResponseInFo = ref(['responseText', 'responseJson'])
 
 // UI自动化，执行信息
-const defaultShowExecuteInFo = ref(['execute_before_page', 'execute_after_page'])
+const defaultShowExecuteInFo = ref(['executeBeforePage', 'executeAfterPage'])
 
 const copyDataAsJson = async (data: string | object) => {
   try {

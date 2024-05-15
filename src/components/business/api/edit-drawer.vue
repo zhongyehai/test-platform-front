@@ -158,7 +158,7 @@
             <span> mock响应 </span>
             <el-tooltip class="item" effect="dark" placement="top-start">
               <template #content>
-                用于前端联调, 访问 测试平台域名 + /api/tools/mock/api + 此接口地址，即可返回此处设置的响应
+                用于前端联调, 访问 测试平台域名 + /api/tools/mock/swagger + 此接口地址，即可返回此处设置的响应
               </template>
               <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
             </el-tooltip>

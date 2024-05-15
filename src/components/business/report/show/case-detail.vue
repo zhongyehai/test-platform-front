@@ -217,7 +217,7 @@ const props = defineProps({
   }
 })
 
-const defaultShowDetailInfo =  ['caseInfo', 'stepInfo', props.reportCaseData.error_msg ? 'error_msg' : '']
+const defaultShowDetailInfo =  ['error_msg', 'caseInfo', 'stepInfo', props.reportCaseData.error_msg ? 'error_msg' : '']
 const resultMapping = {waite: '等待', running: '执行中', fail: '不通过', success: '通过', skip: '跳过', error: '报错'}
 const resultTagMapping = {waite: 'info', running: '', fail: 'danger', success: 'success', skip: 'info', error: 'warning'}
 

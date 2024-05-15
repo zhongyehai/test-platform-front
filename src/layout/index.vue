@@ -14,27 +14,23 @@
       <!-- <Logo v-if="showLogo" />-->
       <Menu/>
     </el-aside>
+
     <el-container>
       <el-header v-show="!contentFullScreen">
         <Header/>
       </el-header>
       <!-- 打开页面的tabs, 打开注释即可-->
       <!-- <Tabs v-show="showTabs"/>-->
+
       <el-main>
         <router-view v-slot="{ Component, route }">
-          <transition
-              :name="route.meta.transition || 'fade-transform'"
-              mode="out-in"
-          >
-            <keep-alive
-                v-if="keepAliveComponentsName"
-                :include="keepAliveComponentsName"
-            >
-              <component :is="Component" :key="route.fullPath"/>
-            </keep-alive>
-            <component v-else :is="Component" :key="route.fullPath"/>
-          </transition>
-        </router-view>
+            <transition :name="route.meta.transition || 'fade-transform'" mode="out-in">
+              <keep-alive v-if="keepAliveComponentsName" :include="keepAliveComponentsName">
+                <component :is="Component" :key="route.fullPath"/>
+              </keep-alive>
+              <component v-else :is="Component" :key="route.fullPath"/>
+            </transition>
+          </router-view>
       </el-main>
     </el-container>
   </el-container>
