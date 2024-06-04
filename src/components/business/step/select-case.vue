@@ -241,7 +241,8 @@ const getProjectList = () => {
 }
 
 const selectProject = (projectId: any) => {
-  GetCaseSuiteList(props.testType, { project_id: projectId, suite_type: 'base,quote', page_num: 1, page_size: 99999 }).then(response => {
+  // GetCaseSuiteList(props.testType, { project_id: projectId, suite_type: 'base,quote', page_num: 1, page_size: 99999 }).then(response => {
+  GetCaseSuiteList(props.testType, { project_id: projectId, suite_type: 'base,api,quote,process,make_data', page_num: 1, page_size: 99999 }).then(response => {
     caseSuiteTree.value = arrayToTree(response.data.data, null)
   })
 }

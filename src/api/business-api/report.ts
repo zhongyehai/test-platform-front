@@ -28,6 +28,10 @@ export function ReportAsCase(testType: string, data: object) {
     return request({ url: getBaseDir(testType) + '/as-case', method: 'post', data: data })
 }
 
+export function GetReportSuiteList(testType: string, params: object) {
+    return request({ url: getBaseDir(testType) + '/suite-list', method: 'get', data: null, params: params })
+}
+
 export function GetReportCaseList(testType: string, params: object) {
     return request({ url: getBaseDir(testType) + '/case-list', method: 'get', data: null, params: params })
 }

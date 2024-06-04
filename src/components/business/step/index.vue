@@ -44,9 +44,9 @@
           @selection-change="clickSelectAll"
           @row-dblclick="rowDblclick">
 
-        <el-table-column type="selection" min-width="2%" />
+        <el-table-column type="selection" width="20" />
 
-        <el-table-column type="expand">
+        <el-table-column type="expand" width="20">
           <template #default="scope">
             <expandStep
                 :ref="`${scope.row.id}_${scope.$index}_${scope.row.quote_case}`"
@@ -58,13 +58,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="id" label="序号" align="center" min-width="5%">
+        <el-table-column prop="id" label="序号" align="center" width="40">
           <template #default="scope">
             <span>{{ scope.$index + 1 }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="status" label="状态" min-width="5%">
+        <el-table-column prop="status" label="状态" width="60">
           <template #header>
             <span>状态</span>
             <el-tooltip class="item" effect="dark" placement="top-start" content="若此处设置为不运行，则执行测试时将不会运行此步骤">
@@ -126,6 +126,12 @@
                 <span> {{ scope.row.desc || '-' }} </span>
               </template>
             </el-popover>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建人" width="60">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.create_user] }}</span>
           </template>
         </el-table-column>
 
@@ -205,6 +211,10 @@ const props = defineProps({
   caseId: {
     default: '',
     type: Number,
+  },
+  userDict: {
+    default: {},
+    type: Object,
   }
 })
 

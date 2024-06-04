@@ -155,6 +155,12 @@
               </template>
             </el-table-column>
 
+            <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建人" min-width="6%">
+              <template #default="scope">
+                <span>{{ userDict[scope.row.create_user] }}</span>
+              </template>
+            </el-table-column>
+
             <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
               <template #default="scope">
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="clickRun(scope.row)">运行</el-button>
@@ -183,7 +189,7 @@
         </el-tab-pane>
 
         <addCaseDrawer :test-type="testType"></addCaseDrawer>
-        <EditCaseDrawer :test-type="testType" :project-id="projectId"></EditCaseDrawer>
+        <EditCaseDrawer :test-type="testType" :project-id="projectId" :user-dict></EditCaseDrawer>
         <ChangeCaseParentDrawer
             :test-type="testType"
             :project-id="projectId"
@@ -207,6 +213,7 @@ import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
 import {GetCaseList, DeleteCase, ChangeCaseSort, ChangeCaseStatus, CopyCase, RunCase} from "@/api/business-api/case";
 import Sortable from "sortablejs";
+import {GetUserList} from "@/api/system/user";
 
 const props = defineProps({
   testType: {
@@ -234,6 +241,7 @@ const tableDataList = ref([])
 const selectedList = ref([])
 const runCaseIdList = ref([])
 const tableDataTotal = ref(0)
+const userDict = ref({})
 const queryItems = ref({
   page_num: 1,
   page_size: 20,
@@ -262,6 +270,14 @@ const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
   queryItems.value.page_size = pagination.pageSize
   getTableDataList()
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    response.data.data.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
 }
 
 const clickSelectAll = (val: never[]) => {
@@ -416,6 +432,7 @@ const setSort = () => {
 }
 
 onMounted(() => {
+  getUserList()
   setSort()
   bus.on(busEvent.treeIsChoice, treeIsChoice);
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);

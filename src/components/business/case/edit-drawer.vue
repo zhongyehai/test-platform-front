@@ -153,7 +153,7 @@
               </template>
             </el-popover>
           </template>
-          <stepIndexView :test-type="testType" :case-id="formData.id" :project-id="projectId"></stepIndexView>
+          <stepIndexView :test-type="testType" :case-id="formData.id" :project-id="projectId" :user-dict="userDict"></stepIndexView>
         </el-tab-pane>
 
       </el-tabs>
@@ -205,6 +205,10 @@ const props = defineProps({
   projectId: {
     default: '',
     type: String,
+  },
+  userDict: {
+    default: {},
+    type: Object,
   }
 })
 

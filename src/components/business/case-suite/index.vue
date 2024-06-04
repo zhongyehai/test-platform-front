@@ -65,10 +65,12 @@
                     node-key="id"
                     @node-click="clickTree"
                     highlight-current
+                    :expand-on-click-node="false"
                 >
                   <template #default="{ node, data }">
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
-                      <span>{{ node.label }}</span>
+                      <span v-if="data.parent === null" style="color: red">{{ node.label }}</span>
+                      <span v-else>{{ node.label }}</span>
                       <div v-show="data.id === currentNode.id">
                         <SortThree v-show="data.parent" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showSortDrawer(data)"></SortThree>
                         <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>

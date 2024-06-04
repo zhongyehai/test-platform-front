@@ -127,9 +127,15 @@
                       filterable
                       size="small"
                       placeholder="webhook"
-                      style="width: 100%">
+                      style="width: 98%">
                     <el-option v-for="item in webHookList" :key="item.id" :label="item.name" :value="item.id"/>
                   </el-select>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <template #content>
+                      没有找到对应的webhook？点此添加webhook
+                    </template>
+                    <span style="margin-left:5px;color: #409EFF" @click="addWebhook"><Plus></Plus></span>
+                  </el-tooltip>
                 </el-form-item>
               </div>
 
@@ -214,6 +220,19 @@
               </el-tooltip>
             </el-form-item>
 
+            <el-form-item prop="is_async" label="自动记录问题" size="small" class="is-required">
+              <el-radio v-model="formData.push_hit" v-for="(value, key) in pushHitTypeDict" :key="parseInt(key)" :label="parseInt(key)">
+                {{ value }}
+              </el-radio>
+
+              <el-tooltip class="item" effect="dark" placement="top-start">
+                <template #content>
+                  <div>当触发任务的方式为【定时巡检】或者【流水线】时，如果执行结果为不通过，是否自动将此次的执行记录同步到自动化测试问题记录中</div>
+                </template>
+                <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+              </el-tooltip>
+            </el-form-item>
+
             <el-form-item prop="call_back" size="small">
               <template #label>
                 <span>回调流水线</span>
@@ -271,15 +290,18 @@
       </template>
 
     </el-drawer>
+
+    <addWebhookView></addWebhookView>
   </div>
 </template>
 
 <script lang="ts" setup>
 
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {Help} from "@icon-park/vue-next";
+import {Help, Plus} from "@icon-park/vue-next";
 import jsonEditorView from '@/components/editor/json-editor.vue'
 import selectCaseView from './select-case.vue'
+import addWebhookView from '@/views/config/webhook/add-drawer.vue'
 import {GetConfigByCode, GetConfigList} from "@/api/config/config-value";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetRunEnvList} from "@/api/config/run-env";
@@ -368,6 +390,9 @@ const getBrowserName = () => {
 
 const getWebHookList = () => {
   GetWebHookList({page_num: 1, page_size: 99999}).then(response => {
+    dingDingWebHookList.value = [];
+    weChatWebHookList.value = [];
+    feiShuWebHookList.value = [];
     response.data.data.forEach(item => {
       if (item.webhook_type === 'ding_ding'){
         dingDingWebHookList.value.push(item)
@@ -377,6 +402,7 @@ const getWebHookList = () => {
         feiShuWebHookList.value.push(item)
       }
     })
+    changeWebHookList(false)
   })
 }
 
@@ -405,7 +431,10 @@ const onTreeIsChoice = (message: any) => {
 }
 
 const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
+  if (message.eventType === 'webhook'){
+    getWebHookList()
+  }
+  else if (message.eventType === 'select-run-env' && message.triggerFrom === triggerFrom) {
     submitForm(message)
   }
 }
@@ -426,6 +455,7 @@ const caseList = ref([])
 const emailServerList = ref([])
 const runModeData = ref({})
 const runBrowserNameDict = ref({})
+const pushHitTypeDict = {0: '不记录', 1: '记录'}
 const project = ref()
 const skipHolidayItem = [{ label: '跳过执行', value: 1 }, { label: '不跳过执行', value: 0 }]
 const emailToInputRef = ref(null)
@@ -450,6 +480,7 @@ const formData = ref({
   email_pwd: undefined,
   suite_ids: [],
   case_ids: [],
+  push_hit: 1,
   call_back: [
     {
       url: 'https://xxx',
@@ -549,6 +580,7 @@ const resetForm = () => {
     email_pwd: undefined,
     suite_ids: [],
     case_ids: [],
+    push_hit: 1,
     call_back: [
       {
         url: 'https://xxx',
@@ -577,6 +609,9 @@ const jsonEditorStyle = computed(() => {
   }
 })
 
+const addWebhook = () => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'add-webhook', content: undefined, command: 'add'});
+}
 
 const getData = (taskId: any) => {
   GetTask(props.testType, {id: taskId}).then(response => {

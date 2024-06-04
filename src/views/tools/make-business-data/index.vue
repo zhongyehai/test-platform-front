@@ -1,6 +1,6 @@
 <template>
   <div class="layout-container" v-loading="isLoading">
-    <div style="margin: 10px">
+    <div style="margin-top: 10px; margin-left: 5px; margin-right: 5px;">
       <div>
         <span style="color: red">*</span>
         数据来源：
@@ -79,7 +79,7 @@
         <el-col :span="16">
           <el-tabs v-model="caseListTab">
             <el-tab-pane :label="caseListTab" :name="caseListTab">
-              <div style="margin-left: 10px; margin-right: 10px">
+              <div style="margin-left: 10px">
                 <el-table
                     ref="caseTable"
                     element-loading-text="正在获取数据..."

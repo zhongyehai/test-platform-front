@@ -74,8 +74,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="问题内容" prop="hit_detail" class="is-required" size="small">
-          <el-input v-model="formData.hit_detail" size="small" type="textarea" :placeholder="'问题内容'" />
+        <el-form-item label="问题详情" prop="hit_detail" class="is-required" size="small">
+          <el-input v-model="formData.hit_detail" size="small" type="textarea" :placeholder="'问题详情'" />
         </el-form-item>
 
         <el-form-item label="备注" prop="desc" size="small">

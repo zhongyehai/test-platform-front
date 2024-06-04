@@ -2,7 +2,7 @@
   <div class="layout-container">
     <div>
       <el-row>
-        <el-col :xs="4" :sm="3" :md="4" :lg="5" :xl="5"
+        <el-col :xs="3" :sm="2" :md="3" :lg="4" :xl="4"
                 style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
           <el-tabs v-model="projectTab" style="margin-left: 10px">
             <el-tab-pane name="project">
@@ -32,7 +32,7 @@
           </el-tabs>
         </el-col>
 
-        <el-col :xs="20" :sm="21" :md="20" :lg="19" :xl="19">
+        <el-col :xs="21" :sm="22" :md="21" :lg="20" :xl="20">
           <div style="margin-left: 5px">
             <el-tabs v-model="reportTab">
               <el-tab-pane name="report" label="报告列表">

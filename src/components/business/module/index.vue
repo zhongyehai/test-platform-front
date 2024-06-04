@@ -85,6 +85,7 @@
                     node-key="id"
                     @node-click="clickTree"
                     highlight-current
+                    :expand-on-click-node="false"
                 >
                   <template #default="{ node, data }">
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">

@@ -34,7 +34,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="addr" align="center" label="接口信息" min-width="50%">
+            <el-table-column show-overflow-tooltip prop="addr" align="center" label="接口信息" min-width="55%">
               <template #default="scope">
                 <div
                     class="block"
@@ -59,15 +59,18 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="level" align="center" min-width="10%">
+            <el-table-column show-overflow-tooltip prop="level" align="center" min-width="7%">
               <template #header>
-                <span> 重要级别 </span>
-                <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口的重要级别，根据重要级别筛选优先做自动化测试的接口">
-                  <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                <span> 重要级 </span>
+                <el-tooltip class="item" effect="dark" placement="top-start">
+                  <template #content>
+                    用于标识接口的重要级别，后续可根据重要级别筛选优先做自动化测试的接口
+                  </template>
+                  <span style="margin-left:2px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
               <template #default="scope">
-                <div style="width: 80%; margin-left:auto; margin-right:auto">
+                <div style="width: 100%; margin-left:auto; margin-right:auto">
                   <el-select
                       v-model="scope.row.level"
                       size="small"
@@ -84,10 +87,14 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="status" align="center" min-width="10%">
+            <el-table-column show-overflow-tooltip prop="status" align="center" min-width="6%">
               <template #header>
-                <span>是否可用</span>
-                <el-tooltip class="item" effect="dark" placement="top-start" content="标识接口是否被废弃">
+                <span>状态</span>
+                <el-tooltip class="item" effect="dark" placement="top-start">
+                  <template #content>
+                    1、用于标识接口是否已经被废弃
+                    2、关闭状态则为废弃
+                  </template>
                   <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                 </el-tooltip>
               </template>
@@ -101,14 +108,14 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="use_count" align="center" min-width="10%">
+            <el-table-column show-overflow-tooltip prop="use_count" align="center" min-width="7%">
               <template #header>
-                <span> 使用次数 </span>
+                <span> 使用 </span>
                 <el-tooltip class="item" effect="dark" placement="top-start">
                   <template #content>
                     <div>
-                      <div>1: 统计有多少条用例里直接使用了此接口</div>
-                      <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入统计</div>
+                      <div>1: 统计有多少个步骤直接使用了此接口</div>
+                      <div>2: 被设计为用例的步骤后，该用例被引用的，不纳入此处统计</div>
                       <div>3: 被使用过的接口，点击使用次数数值可查看使用明细</div>
                     </div>
                   </template>
@@ -121,10 +128,16 @@
                     <div>{{ scope.row.use_count > 0 ? '点击查看详情' : '未被使用过' }}</div>
                   </template>
                   <el-tag v-if="scope.row.use_count" @click="getApiToStep(scope.row)">
-                    {{ scope.row.use_count }}
+                    {{ scope.row.use_count }}次
                   </el-tag>
-                  <el-tag v-else type="info">0</el-tag>
+                  <el-tag v-else type="info">0次</el-tag>
                 </el-tooltip>
+              </template>
+            </el-table-column>
+
+            <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建人" min-width="6%">
+              <template #default="scope">
+                <span>{{ userDict[scope.row.create_user] }}</span>
               </template>
             </el-table-column>
 
@@ -177,13 +190,14 @@ import {
 } from "@/api/business-api/api";
 import Sortable from "sortablejs";
 import {Plus, Help} from "@icon-park/vue-next";
+import {GetUserList} from "@/api/system/user";
 
 const tableIsLoading = ref(false)
 const activeTab = ref('api')
 const oldIdList = ref([])
 const newIdList = ref([])
 const tableDataList = ref([])
-const userList = ref([])
+const userDict = ref({})
 const selectApi = ref({})
 const runTrigger = 'api-index'
 const runEvent = 'select-run-env'
@@ -216,6 +230,14 @@ const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
   queryItems.value.page_size = pagination.pageSize
   getTableDataList()
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    response.data.data.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
 }
 
 const getApiToStep = (row: { id: any; }) => {
@@ -337,6 +359,7 @@ const setSort = () => {
 }
 
 onMounted(() => {
+  getUserList()
   setSort()
   bus.on(busEvent.treeIsChoice, treeIsChoice);
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);

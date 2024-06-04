@@ -8,16 +8,15 @@
           element-loading-spinner="el-icon-loading"
       />
 
-      <div style="margin-left: 20px;margin-right: 20px">
-        <div style="margin-bottom: 20px">
-          1、必须<span style="color: red;">按照模板填写内容</span><br>
-          2、必须使用<span style="color: red;">XMind8</span>版本 <a href="https://xmind.cn/download/xmind8/" target="_blank" style="color: #3a8ee6">去下载</a><br>
+      <div style="margin-left: 10px;margin-right: 10px">
+        <div style="margin-bottom: 10px">
+          1、<span style="color: red;font-size: 38px">只支持XMind8版本</span> <a href="https://xmind.cn/download/xmind8/" target="_blank" style="color: #3a8ee6">去下载</a><br>
+          2、必须<span style="color: red;">按照模板填写内容</span><br>
           3、导入后，<span style="color: red;">默认类型为流程用例集</span>，若要修改为其他类型，<span style="color: red;">只需修改一级用例集即可</span>，子用例集会跟随修改
         </div>
-        <!-- 示例图片 -->
-        <el-image src="/images/uploadCase.jpg" />
+
         <el-row>
-          <el-col :span="12">
+          <el-col :span="12" style="margin-bottom: 10px">
             <el-upload
                 class="upload-demo"
                 :action="getUploadDir(testType)"
@@ -25,25 +24,28 @@
                 :show-file-list="false"
                 :on-success="uploadFile"
             >
-              <el-button size="small" type="primary">选择文件</el-button>
+              <el-button size="small" type="primary">选择 xmind 文件</el-button>
             </el-upload>
           </el-col>
 
-          <el-col :span="12">
-            <el-button size="small" type="primary" style="float: right" @click="downloadTemplate">下载模板</el-button>
+          <el-col :span="12" style="margin-bottom: 10px">
+            <el-button size="small" type="primary" style="float: right" @click="downloadTemplate">下载导入模板</el-button>
           </el-col>
         </el-row>
+        <!-- 示例图片 -->
+        <el-image src="/images/uploadCase.jpg" />
+
         <div v-if="uploadFailTotal > 0">
           <span>共失败 {{ uploadFailTotal }}条</span>
           {{ uploadFailList }}
         </div>
       </div>
 
-      <template #footer>
-        <div slot="footer" class="dialog-footer">
-          <el-button size="small" @click="drawerIsShow = false">关闭</el-button>
-        </div>
-      </template>
+<!--      <template #footer>-->
+<!--        <div slot="footer" class="dialog-footer">-->
+<!--          <el-button size="small" @click="drawerIsShow = false">关闭</el-button>-->
+<!--        </div>-->
+<!--      </template>-->
 
     </el-drawer>
   </div>

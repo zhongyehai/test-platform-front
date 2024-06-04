@@ -44,6 +44,23 @@
 
         <el-input v-model="queryItems.report_id" size="small" placeholder="测试报告id" style="margin-right: 10px"/>
 
+        <el-select
+            v-model="queryItems.record_from"
+            style="width: 100%; margin-right: 10px"
+            placeholder="记录的来源"
+            size="small"
+            filterable
+            clearable
+            default-first-option
+        >
+          <el-option
+              v-for="(value, key) in recordFromTypeDict"
+              :key="key"
+              :label="value"
+              :value="key"
+          />
+        </el-select>
+
         <el-button type="primary" @click="getTableDataList()"> 搜索</el-button>
       </div>
     </div>
@@ -75,7 +92,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="测试类型" prop="test_type" align="center" min-width="10%">
+        <el-table-column show-overflow-tooltip label="测试类型" prop="test_type" align="center" min-width="6%">
           <template #default="scope">
             <span>{{ runTestTypeDict[scope.row.test_type] }}</span>
           </template>
@@ -87,7 +104,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="问题类型" prop="hit_type" align="center" min-width="10%">
+        <el-table-column show-overflow-tooltip label="问题类型" prop="hit_type" align="center" min-width="6%">
           <template #default="scope">
             <span>{{ scope.row.hit_type }}</span>
           </template>
@@ -99,9 +116,21 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="报告id" prop="report_id" align="center" min-width="10%">
+        <el-table-column show-overflow-tooltip label="报告id" prop="report_id" align="center" min-width="6%">
           <template #default="scope">
             <span>{{ scope.row.report_id }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip label="记录来源" prop="report_id" align="center" min-width="6%">
+          <template #default="scope">
+            <span>{{ recordFromTypeDict[scope.row.record_from] }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column show-overflow-tooltip label="创建人" prop="create_user" align="center" min-width="6%">
+          <template #default="scope">
+            <span>{{ userDict[scope.row.create_user] }}</span>
           </template>
         </el-table-column>
 
@@ -146,6 +175,7 @@ import {GetHitList, GetHitTypeList, DeleteHit} from "@/api/assist/hit";
 import {GetConfigByCode} from "@/api/config/config-value";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {GetProjectList} from "@/api/business-api/project";
+import {GetUserList} from "@/api/system/user";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
@@ -155,7 +185,8 @@ const queryItems = ref({
   page_size: 20,
   test_type: undefined,
   hit_type: undefined,
-  report_id: undefined
+  report_id: undefined,
+  record_from: undefined,
 })
 const tableHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
@@ -168,15 +199,24 @@ const tableHeight = computed(() =>{
 const runTestTypeList = ref([])
 const runTestTypeDict = ref({})
 const hitTypeList = ref([])
+const recordFromTypeDict = {1: '人为记录', 2: '自动记录'}
 const envList = ref([])
 const envDict = ref({})
 const projectListData = ref([])
 const projectDictData = ref({})
-
+const userDict = ref({})
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
   queryItems.value.page_size = pagination.pageSize
   getTableDataList()
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    response.data.data.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
 }
 
 const showEditDrawer = (row: object | undefined) => {
@@ -229,6 +269,7 @@ const getRunEnvList = () => {
 }
 
 const getTableDataList = () => {
+  queryItems.value.record_from = queryItems.value.record_from ? queryItems.value.record_from : undefined
   queryItems.value.test_type = queryItems.value.test_type ? queryItems.value.test_type : undefined
   queryItems.value.hit_type = queryItems.value.hit_type ? queryItems.value.hit_type : undefined
   queryItems.value.report_id = queryItems.value.report_id ? queryItems.value.report_id : undefined
@@ -241,6 +282,7 @@ const getTableDataList = () => {
 }
 
 onMounted(() => {
+  getUserList()
   getProjectList()
   getRunEnvList()
   getHitTypeList()

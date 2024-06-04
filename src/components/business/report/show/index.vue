@@ -2,44 +2,28 @@
   <div class="layout-container">
 
     <!-- 无测试报告数据，或者测试报告中没有运行数据 -->
-<!--    <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">-->
-<!--      无运行数据或所有运行数据均已跳过-->
-<!--    </div>-->
+    <!--    <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">-->
+    <!--      无运行数据或所有运行数据均已跳过-->
+    <!--    </div>-->
 
     <!-- 有数据 -->
     <div v-show="reportSummary && reportSummary.stat.count.step > 0">
       <!-- 第一行，头部信息 -->
       <div class="report-header">
+        <span style="float: left;font-size: 13px;color: #3a8ee6;margin-left: 10px">
+          <span v-if="testType !== 'app'" style="margin-right: 20px"
+          >运行环境: {{runEnvDict[reportSummary.env.code] }}</span>
+          <span style="margin-right: 20px">执行模式: {{ report.is_async === 1 ? '并行运行' : '串行运行' }}</span>
+          <span style="margin-right: 20px">开始时间: {{ reportSummary.time.start_at }}</span>
+          <!-- 执行耗时保留3为小数 -->
+          <span style="margin-right: 20px">总共耗时: {{
+              reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-'
+            }} 秒</span>
 
-        <el-select
-            v-model="showCaseResultType"
-            placeholder="用例展示类型"
-            size="small"
-            style="margin-left: 10px; width: 130px"
-            filterable
-            default-first-option
-        >
-          <el-option
-              v-for="item in showCaseResultTypeList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
-
+        </span>
         <span style="float: right;font-size: 13px;color: #3a8ee6">
-              <span v-if="testType !== 'app'" style="margin-right: 10px">环境: {{
-                  runEnvDict[reportSummary.env.code]
-                }}</span>
-              <span style="margin-right: 10px">模式: {{ report.is_async === 1 ? '并行运行' : '串行运行' }}</span>
-              <span style="margin-right: 10px">开始: {{ reportSummary.time.start_at }}</span>
-            <!-- 执行耗时保留3为小数 -->
-              <span style="margin-right: 10px"> 耗时: {{
-                  reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-'
-                }} 秒</span>
-
               <span v-if="report.run_type == 'api'">
-                <el-button type="primary" size="small" @click.native="saveAsCase" >存为用例</el-button>
+                <el-button type="primary" size="small" @click.native="saveAsCase">存为用例</el-button>
                 <el-tooltip class="item" effect="dark" placement="top-start">
                   <template #content>
                     <div>1、把当前报告对应的接口转为用例</div>
@@ -60,7 +44,7 @@
 
               <el-button type="primary" size="small" @click="clickReRun">重跑</el-button>
 
-            <!-- 删除报告 -->
+          <!-- 删除报告 -->
             <el-popover :visible="checkDeleteIsShow" placement="top" popper-class="down-popover" width="450px">
               确定删除所选中的测试报告?
               <div style="color: red">
@@ -88,18 +72,13 @@
     </div>
 
     <!-- 用例/步骤列表查看 -->
-    <showCaseAndStepListView
-        :test-type="testType"
-        :show-case-type="showCaseResultType"
-        :show-step-type="showStepResultType"
-    />
+    <showCaseAndStepListView :test-type="testType"/>
 
     <!-- 记录问题 -->
-    <addHitDrawer />
-
+    <addHitDrawer/>
 
     <!-- 打开用例 -->
-    <editCaseDrawer :test-type="testType" :project-id="report.project_id" />
+    <editCaseDrawer :test-type="testType" :project-id="report.project_id"/>
 
     <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>
     <showRunProcess :test-type="testType"></showRunProcess>
@@ -110,7 +89,7 @@
         :append-to-body="true"
         v-model="showPythonScript"
     >
-      <pythonScriptIndex />
+      <pythonScriptIndex/>
     </el-drawer>
 
   </div>
@@ -128,8 +107,8 @@ import {bus, busEvent} from "@/utils/bus-events";
 import addHitDrawer from '@/views/assist/hits/drawer.vue'
 import editCaseDrawer from '@/components/business/case/edit-drawer.vue'
 import showCaseAndStepListView from './case-and-step-list.vue'
-import SelectRunEnv from "@/components/select-run-env.vue";
-import ShowRunProcess from "@/components/show-run-process.vue";
+import selectRunEnv from "@/components/select-run-env.vue";
+import showRunProcess from "@/components/show-run-process.vue";
 import pythonScriptIndex from '@/views/assist/script/index.vue'
 import {GetServerList} from "@/api/business-api/device-server";
 import {GetPhoneList} from "@/api/business-api/device-phone";
@@ -165,26 +144,6 @@ const reportSummary = ref({
   env: {code: '', name: ''}
 })
 
-// 要展示的用例类型
-const showCaseResultType = ref('all')
-// 根据用例结果类型展示报告
-const showCaseResultTypeList = ref([
-  {label: '展示全部用例', value: 'all'},
-  {label: '展示成功的用例', value: 'success'},
-  {label: '展示失败的用例', value: 'fail'},
-  {label: '展示跳过的用例', value: 'skip'}
-])
-// 要展示的步骤类型
-const showStepResultType = ref('all')
-// 根据步骤结果类型展示报告
-const showStepResultTypeList = ref([
-  {label: '展示全部步骤', value: 'all'},
-  {label: '展示成功的步骤', value: 'success'},
-  {label: '展示失败的步骤', value: 'fail'},
-  {label: '展示错误的步骤', value: 'error'},
-  {label: '展示跳过的步骤', value: 'skip'}
-])
-
 const runEnvList = ref([])
 const runEnvDict = ref({})
 const checkDeleteIsShow = ref(false)
@@ -216,7 +175,10 @@ const getReport = (reportId: any) => {
     report.value = response.data
     reportSummary.value = response.data.summary
 
-    bus.emit(busEvent.drawerIsShow, {eventType: 'show-report-case-list', reportId: reportId})
+    bus.emit(busEvent.drawerIsShow, {
+      eventType: 'show-report-case-list',
+      content: {id: reportId, runType: response.data.run_type}
+    })
 
     // 渲染饼图需要的数据, 如果是没完成的报告，则饼图统计为0
     if (reportSummary.value.stat) {
@@ -252,7 +214,7 @@ const getRunEnvList = () => {
 const showHitDrawer = () => {
   bus.emit(busEvent.drawerIsShow, {
     eventType: 'hit',
-    content:       {
+    content: {
       date: reportSummary.value.time.start_at,
       test_type: reportSummary.value.run_type,
       run_env: reportSummary.value.env.code,
@@ -263,7 +225,8 @@ const showHitDrawer = () => {
 }
 
 const saveAsCase = () => {
-  ReportAsCase(props.testType, {report_id: reportId}).then(response => {})
+  ReportAsCase(props.testType, {report_id: reportId}).then(response => {
+  })
 }
 
 const getProjectAndSendEvent = () => {
@@ -276,7 +239,7 @@ const getProjectAndSendEvent = () => {
         sendReRun(tempVariables)
       } else { // 没有就获取用例的数据
         if (report.value.trigger_id.length === 1) {
-          GetCase(props.testType, { id: report.value.trigger_id[0] }).then(response => {
+          GetCase(props.testType, {id: report.value.trigger_id[0]}).then(response => {
             const case_data = response.data
             sendReRun({
               skip_if: case_data.skip_if, variables: case_data.variables,
@@ -287,7 +250,7 @@ const getProjectAndSendEvent = () => {
           sendReRun(null)
         }
       }
-    }else {
+    } else {
       sendReRun(null)
     }
   })
@@ -306,13 +269,13 @@ const sendReRun = (tempRunArgs: any) => {
 const clickReRun = () => {
   if (props.testType === 'app') {
     if (busEvent.data.runServerList.length < 1) {
-      GetServerList({ page_num: 1, page_size: 99999 }).then(response => {
+      GetServerList({page_num: 1, page_size: 99999}).then(response => {
         busEvent.data.runServerList = response.data.data
       })
     }
 
     if (busEvent.data.runPhoneList.length < 1) {
-      GetPhoneList({ page_num: 1, page_size: 99999 }).then(response => {
+      GetPhoneList({page_num: 1, page_size: 99999}).then(response => {
         busEvent.data.runPhoneList = response.data.data
       })
     }
@@ -375,7 +338,7 @@ const drawerIsCommit = (message: any) => {
 
 const showCaseEditor = (message: any) => {
   if (message.eventType === 'report-show-edit-case') {
-    GetCaseFromProject(props.testType, { id: message.content.caseId }).then(response => {
+    GetCaseFromProject(props.testType, {id: message.content.caseId}).then(response => {
       project.value = response.data.project
       bus.emit(busEvent.drawerIsShow, {
         eventType: 'edit-case',

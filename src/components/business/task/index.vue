@@ -2,7 +2,7 @@
   <div class="layout-container">
     <div>
       <el-row>
-        <el-col :xs="4" :sm="3" :md="4" :lg="5" :xl="5" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
+        <el-col :xs="3" :sm="2" :md="3" :lg="4" :xl="4" style="border:1px solid;border-color: #ffffff rgb(234, 234, 234) #ffffff #ffffff;">
           <el-tabs v-model="projectTab" style="margin-left: 10px">
             <el-tab-pane name="project">
               <template #label>
@@ -31,7 +31,7 @@
           </el-tabs>
         </el-col>
 
-        <el-col :xs="20" :sm="21" :md="20" :lg="19" :xl="19">
+        <el-col :xs="21" :sm="22" :md="21" :lg="20" :xl="20">
           <div style="margin-left: 5px">
             <el-tabs v-model="taskTab">
               <el-tab-pane name="task">
@@ -70,27 +70,26 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="cron" label="cron表达式" align="center" min-width="30%">
+                  <el-table-column show-overflow-tooltip prop="cron" label="cron表达式" align="center" min-width="25%">
                     <template #default="scope">
                       <span> {{ scope.row.cron }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="skip_holiday" label="节假日/调休日" align="center"
-                                   min-width="15%">
+                  <el-table-column show-overflow-tooltip prop="skip_holiday" label="节假/调休" align="center" min-width="10%">
                     <template #default="scope">
-                      <span> {{ scope.row.skip_holiday === 1 ? "跳过" : "不跳过" }} </span>
+                      <span> {{ scope.row.skip_holiday === 1 ? "不执行" : "执行" }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column prop="merge_notify" label="合并通知" align="center" min-width="15%">
+                  <el-table-column prop="merge_notify" label="通知" align="center" min-width="10%">
                     <template #header>
-                      <span>合并通知</span>
+                      <span>通知</span>
                       <el-tooltip class="item" effect="dark" placement="top-start">
                         <template #content>
                           <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
                           <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
-                          <div>注：当选择了多个环境时，才会出现此选项</div>
+                          <div>注：当选择了多个环境时，才能在编辑抽屉中设置此选项</div>
                         </template>
                         <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                       </el-tooltip>
@@ -100,13 +99,37 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column prop="status" align="center" min-width="15%">
+                  <el-table-column prop="push_hit" label="记录问题" align="center" min-width="10%">
                     <template #header>
-                      <span>是否启用</span>
+                      <span>记录问题</span>
                       <el-tooltip class="item" effect="dark" placement="top-start">
                         <template #content>
-                          <div>1: 启用中的任务才会定时执行</div>
-                          <div>2: 禁用中的任务才支持修改</div>
+                          <div>当触发任务的方式为
+                            <span style="color: red">【定时巡检】</span>
+                            或者
+                            <span style="color: red">【流水线】</span>
+                            ，且执行结果为
+                            <span style="color: red">【不通过】</span>
+                            时，如果设置的是
+                            <span style="color: red">【要记录】</span>
+                            ，将
+                            <span style="color: red"> 自动 </span>
+                            把此次的执行记录同步到自动化测试问题记录中</div>
+                        </template>
+                        <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                      </el-tooltip>
+                    </template>
+                    <template #default="scope">
+                      <span> {{ scope.row.push_hit === 1 ? "记录" : "不记录" }} </span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column prop="status" align="center" min-width="10%">
+                    <template #header>
+                      <span>状态</span>
+                      <el-tooltip class="item" effect="dark" placement="top-start">
+                        <template #content>
+                          <div>启用中的任务才会按cron表达式定时执行</div>
                         </template>
                         <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
                       </el-tooltip>
@@ -121,8 +144,13 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作"
-                                   width="140">
+                  <el-table-column show-overflow-tooltip prop="create_user" align="center" label="创建人" min-width="8%">
+                    <template #default="scope">
+                      <span>{{ userDict[scope.row.create_user] }}</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="140">
                     <template #default="scope">
                       <el-button
                           style="margin: 0; padding: 2px"
@@ -194,6 +222,7 @@ import {CopyTask, DeleteTask, DisableTask, EnableTask, GetTaskList, RunTask} fro
 import {RunCase} from "@/api/business-api/case";
 import SelectRunEnv from "@/components/select-run-env.vue";
 import ShowRunProcess from "@/components/show-run-process.vue";
+import {GetUserList} from "@/api/system/user";
 
 const props = defineProps({
   testType: {
@@ -227,6 +256,7 @@ const defaultProps = {children: 'children', label: 'name'}
 const projectTab = ref('project')
 const taskTab = ref('task')
 const tableIsLoading = ref(false)
+const userDict = ref({})
 const projectDataList = ref([])
 const tableDataList = ref([])
 const tableDataTotal = ref(0)
@@ -271,6 +301,14 @@ const changePagination = (pagination: any) => {
 
 const showEditDrawer = (row: object | undefined) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'edit-task', content: row});
+}
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    response.data.data.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
 }
 
 const clickRun = (row) => {
@@ -374,6 +412,7 @@ const getProjectList = () => {
   })
 }
 onMounted(() => {
+  getUserList()
   getProjectList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
 })
