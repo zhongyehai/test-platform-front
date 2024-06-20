@@ -230,6 +230,11 @@ const validateUserList =  () => {
       if (env.group || env.name || env.code){
         if (!env.group || !env.name || !env.code){
           return ElMessage.warning(`请完善第 ${index + 1} 行数据`)
+        }else {
+          let res = env.code.match('^[a-zA-Z][a-zA-Z0-9_\\.]+$')
+          if (!res){
+            return ElMessage.warning(`第 ${index + 1} 行数据, code 【${env.code}】错误，正确格式为：英文字母开头+英文字母/下划线/数字`)
+          }
         }
       }
     }

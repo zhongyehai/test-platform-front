@@ -103,7 +103,8 @@ const formRules = {
     {required: true, message: '请输入环境名字', trigger: 'blur'}
   ],
   code: [
-    {required: true, message: '请输入环境值', trigger: 'blur'}
+    {required: true, message: '请输入环境值', trigger: 'blur'},
+    {patten: '^[a-zA-Z][a-zA-Z0-9_\\.]+$', message: '正确格式为：英文字母开头+英文字母/下划线/数字', trigger: ['blur', 'change']}
   ]
 }
 const resetForm = () => {

@@ -73,10 +73,15 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="80">
+        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="120">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row, 'edit')">修改</el-button>
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer(scope.row, 'copy')">复制</el-button>
+            <el-popconfirm width="250px" title="此操作将发送一条测试信息到此webhook，用于验证此webhook配置是否正确，确定触发测试?" @confirm="debugWebHook(scope.row.id)">
+              <template #reference>
+                <el-button style="margin: 0; padding: 2px" type="text" size="small">测试</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -100,7 +105,7 @@ import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'
 
-import {GetWebHookList} from "@/api/config/webhook";
+import {GetWebHookList, DebugWebHook} from "@/api/config/webhook";
 import {bus, busEvent} from "@/utils/bus-events";
 
 const tableIsLoading = ref(false)
@@ -137,11 +142,18 @@ const changePagination = (pagination: any) => {
 const showEditDrawer = (row: object | undefined, command: string) => {
   let eventType = 'add-webhook'
   let content = undefined
-  if (command !== 'add'){
+  if (command == 'edit'){
     eventType = 'edit-webhook'
     content = JSON.parse(JSON.stringify(row))
   }
   bus.emit(busEvent.drawerIsShow, {eventType: eventType, content: content, command: command});
+}
+
+const debugWebHook = (webhookId: number) => {
+  tableIsLoading.value = true
+  DebugWebHook({id: webhookId}).then(response => {
+    tableIsLoading.value = false
+  })
 }
 
 // 获取列表

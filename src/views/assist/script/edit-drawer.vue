@@ -281,6 +281,7 @@ const resetForm = () => {
     find_code: '',
     expression: ''
   }
+  submitButtonIsLoading.value = false
   ruleFormRef.value && ruleFormRef.value.resetFields()
 }
 

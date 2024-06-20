@@ -264,7 +264,9 @@ const beforeImgIsLoading = ref(false)
 const afterImgIsLoading = ref(false)
 
 const getStepData = (reportStepId: any) => {
+  treeIsLoading.value = true
   GetReportStepDetail(props.testType, {id: reportStepId}).then(response => {
+    treeIsLoading.value = false
     reportStep.value = response.data.step_data
     reportStepDetailIsShow.value = true
 

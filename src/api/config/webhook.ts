@@ -20,6 +20,10 @@ export function DeleteWebHook(data: object) {
     return request({url: currentBaseDir, method: 'delete', data: data})
 }
 
+export function DebugWebHook(data: object) {
+    return request({ url: currentBaseDir + '/debug', method: 'post', data: data })
+}
+
 export function GetWebHookList(params: object) {
     return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
