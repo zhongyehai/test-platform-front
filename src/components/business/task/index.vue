@@ -150,7 +150,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="140">
+                  <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" width="200">
                     <template #default="scope">
                       <el-button
                           style="margin: 0; padding: 2px"
@@ -172,6 +172,8 @@
                           <el-button style="margin: 0; padding: 2px" type="text" size="small">复制</el-button>
                         </template>
                       </el-popconfirm>
+
+                      <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showReport(scope.row)">查看报告</el-button>
 
                       <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
                         <template #reference>
@@ -205,6 +207,10 @@
     <EditDrawer :test-type="testType"></EditDrawer>
     <selectRunEnv :test-type="testType"></selectRunEnv>
     <showRunProcess :test-type="testType"></showRunProcess>
+    <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
+      <ReportTable :test-type="'api'" :user-dict="userDict" :user-list="userList"></ReportTable>
+    </el-drawer>
+
   </div>
 </template>
 
@@ -223,6 +229,7 @@ import {RunCase} from "@/api/business-api/case";
 import SelectRunEnv from "@/components/select-run-env.vue";
 import ShowRunProcess from "@/components/show-run-process.vue";
 import {GetUserList} from "@/api/system/user";
+import ReportTable from "@/components/business/report/report-table.vue";
 
 const props = defineProps({
   testType: {
@@ -256,6 +263,8 @@ const defaultProps = {children: 'children', label: 'name'}
 const projectTab = ref('project')
 const taskTab = ref('task')
 const tableIsLoading = ref(false)
+const reportTableIsShow = ref(false)
+const userList = ref({})
 const userDict = ref({})
 const projectDataList = ref([])
 const tableDataList = ref([])
@@ -305,6 +314,7 @@ const showEditDrawer = (row: object | undefined) => {
 
 const getUserList = () => {
   GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
     response.data.data.forEach(item => {
       userDict.value[item.id] = item.name
     })
@@ -352,6 +362,17 @@ const copyData = (row: { id: any; }) => {
       getTableDataList()
     }
   })
+}
+
+const showReport = (row) => {
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'show-report-table',
+    projectId: queryItems.value.project_id,
+    businessId: undefined,
+    runType: 'task',
+    triggerId: row.id
+  })
+  reportTableIsShow.value = true
 }
 
 const deleteData = (row: { id: any, isLoading: boolean; }) => {

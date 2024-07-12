@@ -157,7 +157,7 @@ const clearData = () => {
 
 
 const sendEvent = () => {
-  bus.emit(busEvent.drawerIsCommit, {eventType: 'run-env'});
+  bus.emit(busEvent.drawerIsCommit, {eventType: 'config-type'});
 };
 
 const drawerIsShow = ref(false)

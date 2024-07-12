@@ -31,7 +31,7 @@ export function GetApiList(params: object) {
     return request({ url: baseAddr + '/list', method: 'get', params: params })
 }
 
-export function RunApi(data: object) {
+export function RunApi(test_type: string, data: object) {
     return request({ url: baseAddr + '/run', method: 'post', data: data })
 }
 

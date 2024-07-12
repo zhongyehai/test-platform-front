@@ -93,10 +93,11 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" width="110">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="180">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer('edit', scope.row)">修改</el-button>
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer('copy', scope.row)">复制</el-button>
+            <el-button type="text" size="small" v-show="scope.row.script_type == 'mock'" style="margin: 0; padding: 2px" @click.native="showRecordDrawer(scope.row.name)">调用记录</el-button>
             <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
               <template #reference>
                 <el-button style="margin: 0; padding: 2px; color: red" type="text" size="small">删除</el-button>
@@ -116,6 +117,7 @@
     </div>
 
     <EditDrawer :script-type-dict="scriptTypeDict"></EditDrawer>
+    <MockRecordDrawer></MockRecordDrawer>
   </div>
 </template>
 
@@ -123,6 +125,7 @@
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
+import MockRecordDrawer from './mock-record-drawer.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetUserList} from "@/api/system/user";
@@ -172,6 +175,10 @@ const cellDblclick = async (row: any, column: any, event: any) => {
 
 const showEditDrawer = (command: string, row: object | undefined) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'script', command: command, content: row})
+}
+
+const showRecordDrawer = (scriptName: string) => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'script-mock-record', content: scriptName})
 }
 
 const deleteData = (row: object) => {

@@ -161,7 +161,13 @@
               </template>
             </el-table-column>
 
-            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
+            <el-table-column show-overflow-tooltip prop="create_user" align="center" label="修改人" min-width="6%">
+              <template #default="scope">
+                <span>{{ userDict[scope.row.update_user] }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="200">
               <template #default="scope">
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="clickRun(scope.row)">运行</el-button>
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>
@@ -170,6 +176,7 @@
                     <el-button style="margin: 0; padding: 2px" type="text" size="small">复制</el-button>
                   </template>
                 </el-popconfirm>
+                <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showReport(scope.row)">查看报告</el-button>
                 <el-popconfirm width="300px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
                   <template #reference>
                     <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
@@ -189,11 +196,15 @@
         </el-tab-pane>
 
         <addCaseDrawer :test-type="testType"></addCaseDrawer>
-        <EditCaseDrawer :test-type="testType" :project-id="projectId" :user-dict></EditCaseDrawer>
+        <EditCaseDrawer :test-type="testType" :project-id="projectId" :user-dict="userDict"></EditCaseDrawer>
         <ChangeCaseParentDrawer
             :test-type="testType"
             :project-id="projectId"
             :project-list="projectList"></ChangeCaseParentDrawer>
+
+        <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
+          <ReportTable :test-type="testType" :user-dict="userDict" :user-list="userList"></ReportTable>
+        </el-drawer>
       </el-tabs>
     </div>
 
@@ -207,6 +218,7 @@ import showCaseDesc from './show-desc.vue'
 import addCaseDrawer from './add-drawer.vue'
 import EditCaseDrawer from './edit-drawer.vue'
 import ChangeCaseParentDrawer from './change-case-parent.vue'
+import ReportTable from '../report/report-table.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
@@ -221,8 +233,8 @@ const props = defineProps({
     type: String
   },
   projectId: {
-    default: '',
-    type: String,
+    default: undefined,
+    type: Number,
   },
   projectList: {
     default: [],
@@ -233,6 +245,7 @@ const props = defineProps({
 const triggerFrom = 'case-index'
 const tableIsLoading = ref(false)
 const drawerIsLoading = ref(false)
+const reportTableIsShow = ref(false)
 const caseTableRef = ref(null)
 const activeTab = ref('case')
 const oldIdList = ref([])
@@ -241,6 +254,7 @@ const tableDataList = ref([])
 const selectedList = ref([])
 const runCaseIdList = ref([])
 const tableDataTotal = ref(0)
+const userList = ref([])
 const userDict = ref({})
 const queryItems = ref({
   page_num: 1,
@@ -274,6 +288,7 @@ const changePagination = (pagination: any) => {
 
 const getUserList = () => {
   GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
     response.data.data.forEach(item => {
       userDict.value[item.id] = item.name
     })
@@ -297,6 +312,17 @@ const changeCaseStatus = (row: { id: any; status: number; } | null, status: numb
 
 const showChangeCaseParent = () => {
   bus.emit(busEvent.drawerIsShow, { eventType: 'change-case-parent', content: getSubmitId(null) })
+}
+
+const showReport = (row) => {
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'show-report-table',
+    projectId: props.projectId,
+    businessId: undefined,
+    runType: 'case',
+    triggerId: row.id
+  })
+  reportTableIsShow.value = true
 }
 
 const clickRun = (row) => {

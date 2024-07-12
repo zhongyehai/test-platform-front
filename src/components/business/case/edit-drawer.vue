@@ -203,8 +203,8 @@ const props = defineProps({
     type: String,
   },
   projectId: {
-    default: '',
-    type: String,
+    default: undefined,
+    type: Number,
   },
   userDict: {
     default: {},

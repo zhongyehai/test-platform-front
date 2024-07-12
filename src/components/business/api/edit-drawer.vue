@@ -458,7 +458,7 @@ const selectRunEnv = () => {
 }
 
 const runApis = (runConf: { runEnv: any; }) => {
-  RunApi({
+  RunApi('api',{
     project_id: formData.value.project_id,
     api_list: [formData.value.id],
     env_list: runConf.runEnv

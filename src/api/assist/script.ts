@@ -25,13 +25,21 @@ export function GetScriptList(params: object) {
 }
 
 export function DebugScript(data: object) {
-    return request({ url: currentBaseDir + '/debug', method: 'POST', data: data })
+    return request({url: currentBaseDir + '/debug', method: 'POST', data: data})
 }
 
 export function CopyScript(data: object) {
-    return request({ url: currentBaseDir + '/copy', method: 'post', data: data })
+    return request({url: currentBaseDir + '/copy', method: 'post', data: data})
 }
 
 export function ScriptSort(data: object) {
-    return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
+    return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}
+
+export function GetScriptMockRecordList(params: object) {
+    return request({url: currentBaseDir + '/mock-list', method: 'get', params: params})
+}
+
+export function GetScriptMockRecord(params: object) {
+    return request({url: currentBaseDir + '/mock-record', method: 'get', params: params})
 }

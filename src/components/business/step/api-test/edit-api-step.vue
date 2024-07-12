@@ -56,6 +56,22 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
+                <el-form-item label="超时时间">
+                  <el-input-number v-model="formData.time_out" size="small" :min="5"/>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <template #content>
+                      <div>
+                        发送request请求时，等待回调的超时时间，最少设置为5秒
+                      </div>
+                    </template>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                  </el-tooltip>
+                </el-form-item>
+              </el-col>
+            </el-row>
+
+            <el-row>
+              <el-col :span="8">
                 <el-form label-width="200px">
                   <el-form-item label="是否使用用例所在项目的域名">
                     <el-switch v-model="formData.replace_host" :active-value="1" :inactive-value="0" />
@@ -70,23 +86,7 @@
                   </el-form-item>
                 </el-form>
               </el-col>
-            </el-row>
-
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="超时时间">
-                  <el-input-number v-model="formData.time_out" size="small" :min="5"/>
-                  <el-tooltip class="item" effect="dark" placement="top-start">
-                    <template #content>
-                      <div>
-                        发送request请求时，等待回调的超时时间，最少设置为5秒
-                      </div>
-                    </template>
-                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
-                  </el-tooltip>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
+              <el-col :span="8">
                 <el-form label-width="200px">
                   <el-form-item label="当有步骤失败时跳过当前步骤">
                     <el-switch v-model="formData.skip_on_fail" :active-value="1" :inactive-value="0" />
@@ -94,6 +94,21 @@
                       <template #content>
                         <div>
                           当前用例执行时，当前步骤之前的步骤出现失败/错误的情况，是否跳过当前步骤
+                        </div>
+                      </template>
+                      <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                    </el-tooltip>
+                  </el-form-item>
+                </el-form>
+              </el-col>
+              <el-col :span="8">
+                <el-form label-width="200px">
+                  <el-form-item label="是否允许重定向">
+                    <el-switch v-model="formData.allow_redirect" :active-value="true" :inactive-value="false" />
+                    <el-tooltip class="item" effect="dark" placement="top-start">
+                      <template #content>
+                        <div>
+                          执行此步骤的时候，是否允许重定向
                         </div>
                       </template>
                       <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
@@ -342,6 +357,7 @@ const formData = ref({
     check_value: undefined
   },
   skip_on_fail: 1,
+  allow_redirect: false,
   pop_header_filed: [],
   run_times: 1,
   headers: [],
@@ -384,6 +400,7 @@ const resetForm = () => {
       check_value: undefined
     },
     skip_on_fail: 1,
+    allow_redirect: false,
     pop_header_filed: [],
     run_times: 1,
     headers: [],
@@ -416,6 +433,7 @@ const getApi = (apiId: number, isAdd: boolean) => {
       formData.value.api_id = apiId
       formData.value.run_times = 1
       formData.value.skip_on_fail = 1
+      formData.value.allow_redirect = false
       formData.value.case_id = props.caseId
     }
   })

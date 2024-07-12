@@ -59,7 +59,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="level" align="center" min-width="7%">
+            <el-table-column show-overflow-tooltip prop="level" align="center" min-width="8%">
               <template #header>
                 <span> 重要级 </span>
                 <el-tooltip class="item" effect="dark" placement="top-start">
@@ -87,7 +87,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column show-overflow-tooltip prop="status" align="center" min-width="6%">
+            <el-table-column show-overflow-tooltip prop="status" align="center" min-width="7%">
               <template #header>
                 <span>状态</span>
                 <el-tooltip class="item" effect="dark" placement="top-start">
@@ -141,11 +141,12 @@
               </template>
             </el-table-column>
 
-            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="140">
+            <el-table-column fixed="right" prop="desc" align="center" label="操作" width="190">
               <template #default="scope">
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEnvSelector(scope.row)">运行</el-button>
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showEditDrawer('edit', scope.row)">修改</el-button>
                 <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showAddDrawer(scope.row)">复制</el-button>
+                <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showReport(scope.row)">查看报告</el-button>
                 <el-popconfirm width="250px" :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
                   <template #reference>
                     <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
@@ -166,6 +167,9 @@
 
         <EditDrawer></EditDrawer>
         <AddDrawer :project-id="queryItems.project_id" :module-id="queryItems.module_id"></AddDrawer>
+        <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
+          <ReportTable :test-type="'api'" :user-dict="userDict" :user-list="userList"></ReportTable>
+        </el-drawer>
       </el-tabs>
     </div>
 </template>
@@ -191,12 +195,15 @@ import {
 import Sortable from "sortablejs";
 import {Plus, Help} from "@icon-park/vue-next";
 import {GetUserList} from "@/api/system/user";
+import ReportTable from "@/components/business/report/report-table.vue";
 
 const tableIsLoading = ref(false)
+const reportTableIsShow = ref(false)
 const activeTab = ref('api')
 const oldIdList = ref([])
 const newIdList = ref([])
 const tableDataList = ref([])
+const userList = ref([])
 const userDict = ref({})
 const selectApi = ref({})
 const runTrigger = 'api-index'
@@ -234,6 +241,7 @@ const changePagination = (pagination: any) => {
 
 const getUserList = () => {
   GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
     response.data.data.forEach(item => {
       userDict.value[item.id] = item.name
     })
@@ -272,6 +280,17 @@ const deleteData = (row: { id: any; }) => {
   })
 }
 
+const showReport = (row) => {
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'show-report-table',
+    projectId: queryItems.value.project_id,
+    businessId: undefined,
+    runType: 'api',
+    triggerId: row.id
+  })
+  reportTableIsShow.value = true
+}
+
 const showAddDrawer = (row) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'add-api', content: row})
 }
@@ -298,7 +317,7 @@ const showEnvSelector = (row) => {
 }
 
 const runApis = (runConf: { runEnv: any; }) => {
-  RunApi({
+  RunApi('api',{
     project_id: selectApi.value.project_id,
     api_list: [selectApi.value.id],
     env_list: runConf.runEnv

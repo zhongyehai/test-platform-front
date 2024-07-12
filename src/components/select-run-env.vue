@@ -410,9 +410,8 @@ const runData = () =>  {
       noReset: noReset.value,
       temp_variables: temp_variables
     }
-    console.log(data)
-    bus.emit(
-      busEvent.drawerIsCommit,data)
+
+    bus.emit(busEvent.drawerIsCommit,data)
     submitButtonIsLoading.value = true
     dialogIsShow.value = false
   } else {
