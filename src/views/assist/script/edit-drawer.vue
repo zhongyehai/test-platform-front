@@ -305,9 +305,10 @@ const addMockScriptMsg = '\n# 1、支持python3.11及以下语法 \n' +
     '#        query = {} \n' +
     '#        headers = {} \n' +
     '#        body = {} \n' +
-    '# 4、最后的result的值为mock返回值，可自己随意定义 \n' +
-    '# 5、支持get、post、put、delete \n' +
-    '# 6、访问 【域名 + /api/tools/mock/脚本名字】即可获取到 result 对应的值 \n\n\n' +
+    '# 4、最后的【http_status_code】的值为响应的HTTP状态码，可自己随意定义但必须定义 \n' +
+    '# 5、最后的【http_response_body】的值为mock返回响应体，可自己随意定义但必须定义 \n' +
+    '# 6、支持get、post、put、delete \n' +
+    '# 7、访问 【域名 + /api/tools/mock/脚本名字】即可获取到【http_response_body】对应的值 \n\n\n' +
     'import sys\n' +
     'this = sys.modules[__name__]\n\n' +
     'if hasattr(this, "path") is False:\n' +
@@ -319,7 +320,8 @@ const addMockScriptMsg = '\n# 1、支持python3.11及以下语法 \n' +
     'if hasattr(this, "body") is False:\n' +
     '    setattr(this, "body", {})\n' +
     '\n\n\n\n\n' +
-    'result = {"code": 200, "msg": "操作成功"} \n'
+    'http_status_code = 200  # HTTP响应状态码\n' +
+    'http_response_body = {"code": 200, "msg": "操作成功"}    # HTTP响应体\n'
 
 const selectScriptType = () => {
   if ([addMockScriptMsg, addTestScriptMsg].indexOf(formData.value.script_data) !== -1) {
