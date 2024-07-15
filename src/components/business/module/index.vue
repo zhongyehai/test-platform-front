@@ -129,8 +129,8 @@
       <editModuleDrawer :test-type="testType"></editModuleDrawer>
       <addModuleDrawer :test-type="testType"></addModuleDrawer>
 
-      <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>
-      <showRunProcess :test-type="testType"></showRunProcess>
+<!--      <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>-->
+<!--      <showRunProcess :test-type="testType"></showRunProcess>-->
 
     </div>
   </div>
@@ -147,8 +147,8 @@ import apiIndex from "@/components/business/api/index.vue";
 import apiFromDrawer from "@/components/business/api/from-drawer.vue";
 import apiUseDrawer from "@/components/business/api/use-drawer.vue";
 import pageIndex from "@/components/business/page/index.vue";
-import selectRunEnv from "@/components/select-run-env.vue"
-import showRunProcess from "@/components/show-run-process.vue"
+// import selectRunEnv from "@/components/select-run-env.vue"
+// import showRunProcess from "@/components/show-run-process.vue"
 
 import {GetProjectList, GetProject} from '@/api/business-api/project'
 import {GetModuleList, DeleteModule} from '@/api/business-api/module'

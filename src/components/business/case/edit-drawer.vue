@@ -206,6 +206,10 @@ const props = defineProps({
     default: undefined,
     type: Number,
   },
+  businessId: {
+    default: undefined,
+    type: Number,
+  },
   userDict: {
     default: {},
     type: Object,
@@ -441,7 +445,7 @@ const clickRun = () =>{
     eventType: 'select-run-env',
     triggerFrom: triggerFrom,
     showSelectRunModel: false,
-    business_id: null,
+    business_id: props.businessId,
     runArgs: tempRunArgs
   })
 }

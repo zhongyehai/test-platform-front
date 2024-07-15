@@ -141,10 +141,11 @@ const changePagination = (pagination: any) => {
 
 const showEditDrawer = (row: object | undefined, command: string) => {
   let eventType = 'edit-webhook'
-  let content = JSON.parse(JSON.stringify(row))
+  let content = undefined
   if (command == 'add'){
     eventType = 'add-webhook'
-    content = undefined
+  }else {
+    content = JSON.parse(JSON.stringify(row))
   }
   bus.emit(busEvent.drawerIsShow, {eventType: eventType, content: content, command: command});
 }

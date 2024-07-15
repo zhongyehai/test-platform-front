@@ -196,7 +196,7 @@
         </el-tab-pane>
 
         <addCaseDrawer :test-type="testType"></addCaseDrawer>
-        <EditCaseDrawer :test-type="testType" :project-id="projectId" :user-dict="userDict"></EditCaseDrawer>
+        <EditCaseDrawer :test-type="testType" :project-id="projectId" :business-id="project.business_id" :user-dict="userDict"></EditCaseDrawer>
         <ChangeCaseParentDrawer
             :test-type="testType"
             :project-id="projectId"
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed, nextTick} from "vue";
 import {Plus, Help} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import showCaseDesc from './show-desc.vue'
@@ -226,6 +226,7 @@ import toClipboard from "@/utils/copy-to-memory";
 import {GetCaseList, DeleteCase, ChangeCaseSort, ChangeCaseStatus, CopyCase, RunCase} from "@/api/business-api/case";
 import Sortable from "sortablejs";
 import {GetUserList} from "@/api/system/user";
+import {GetProject} from "@/api/business-api/project";
 
 const props = defineProps({
   testType: {
@@ -248,6 +249,7 @@ const drawerIsLoading = ref(false)
 const reportTableIsShow = ref(false)
 const caseTableRef = ref(null)
 const activeTab = ref('case')
+const project = ref({})
 const oldIdList = ref([])
 const newIdList = ref([])
 const tableDataList = ref([])
@@ -315,6 +317,8 @@ const showChangeCaseParent = () => {
 }
 
 const showReport = (row) => {
+  console.log('row: ', JSON.stringify(row))
+  reportTableIsShow.value = true
   bus.emit(busEvent.drawerIsShow, {
     eventType: 'show-report-table',
     projectId: props.projectId,
@@ -322,7 +326,6 @@ const showReport = (row) => {
     runType: 'case',
     triggerId: row.id
   })
-  reportTableIsShow.value = true
 }
 
 const clickRun = (row) => {
@@ -345,7 +348,7 @@ const clickRun = (row) => {
     eventType: 'select-run-env',
     triggerFrom: triggerFrom,
     showSelectRunModel: false,
-    business_id: null,
+    business_id: project.value.business_id,
     runArgs: tempRunArgs
   })
 }
@@ -458,6 +461,12 @@ const setSort = () => {
 }
 
 onMounted(() => {
+  nextTick(() => {
+    reportTableIsShow.value = true
+    setTimeout(function() {
+      reportTableIsShow.value = false // 确保报告的组件会渲染，先打开一次
+    }, 1)
+  });
   getUserList()
   setSort()
   bus.on(busEvent.treeIsChoice, treeIsChoice);
@@ -477,6 +486,13 @@ const drawerIsCommit = (message: any) => {
   }
 }
 
+const getProject = () => {
+  GetProject('api', {id: props.projectId}).then(response => {
+    project.value = response.data
+  })
+}
+
+
 const treeIsChoice = (message: any) => {
   if (message.eventType === 'case-suite') {
     queryItems.value.suite_id = message.content.id
@@ -484,6 +500,7 @@ const treeIsChoice = (message: any) => {
     queryItems.value.page_num = 1
     queryItems.value.page_size = 20
     getTableDataList()
+    getProject()
   }
 }
 

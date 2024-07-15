@@ -97,12 +97,12 @@
       <el-drawer v-model="sortDrawerIsShow" title="拖拽排序" size="30%">
         <sortDrawer :test-type="testType" :use-type="'caseSuite'"></sortDrawer>
       </el-drawer>
-      <editDrawer :test-type="testType"></editDrawer>
+      <editDrawer></editDrawer>
       <addDrawer :test-type="testType"></addDrawer>
       <uploadDrawer :test-type="testType"></uploadDrawer>
 
-      <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>
-      <showRunProcess :test-type="testType"></showRunProcess>
+<!--      <selectRunEnv :test-type="testType" :business-id="project.business_id"></selectRunEnv>-->
+<!--      <showRunProcess :test-type="testType"></showRunProcess>-->
 
     </div>
   </div>
@@ -124,8 +124,8 @@ import {ElMessageBox, ElTree} from "element-plus";
 import {Plus, UploadOne, Write, Delete, SortThree} from "@icon-park/vue-next";
 import {GetCaseSuiteList, DeleteCaseSuite} from "@/api/business-api/case-suite";
 import {GetConfigByCode} from "@/api/config/config-value";
-import selectRunEnv from "@/components/select-run-env.vue";
-import showRunProcess from "@/components/show-run-process.vue";
+// import selectRunEnv from "@/components/select-run-env.vue";
+// import showRunProcess from "@/components/show-run-process.vue";
 
 const props = defineProps({
   testType: {

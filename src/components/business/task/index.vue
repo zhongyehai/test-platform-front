@@ -205,8 +205,8 @@
       </el-row>
     </div>
     <EditDrawer :test-type="testType"></EditDrawer>
-    <selectRunEnv :test-type="testType"></selectRunEnv>
-    <showRunProcess :test-type="testType"></showRunProcess>
+<!--    <selectRunEnv :test-type="testType"></selectRunEnv>-->
+<!--    <showRunProcess :test-type="testType"></showRunProcess>-->
     <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
       <ReportTable :test-type="'api'" :user-dict="userDict" :user-list="userList"></ReportTable>
     </el-drawer>
@@ -220,14 +220,14 @@ import {Help, Plus} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 
-import {GetProjectList} from "@/api/business-api/project";
+import {GetProject, GetProjectList} from "@/api/business-api/project";
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage, ElTree} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
 import {CopyTask, DeleteTask, DisableTask, EnableTask, GetTaskList, RunTask} from "@/api/business-api/task";
 import {RunCase} from "@/api/business-api/case";
-import SelectRunEnv from "@/components/select-run-env.vue";
-import ShowRunProcess from "@/components/show-run-process.vue";
+// import SelectRunEnv from "@/components/select-run-env.vue";
+// import ShowRunProcess from "@/components/show-run-process.vue";
 import {GetUserList} from "@/api/system/user";
 import ReportTable from "@/components/business/report/report-table.vue";
 
@@ -282,7 +282,7 @@ const tableHeight = computed(() =>{
     return `${innerHeight * 0.83}px`
   }
 })
-const currentProject = ref()
+const project = ref()
 const triggerFrom = 'task-index'
 const runTaskId = ref()
 
@@ -297,7 +297,7 @@ const rowDblclick = async (row: any, column: any, event: any) => {
 
 const clickTree = (row) => {
   queryItems.value.project_id = row.id
-  currentProject.value = row
+  project.value = row
   getTableDataList()
   bus.emit(busEvent.treeIsChoice, {eventType: 'project-tree', content: row})
 }
@@ -327,7 +327,7 @@ const clickRun = (row) => {
     eventType: 'select-run-env',
     triggerFrom: triggerFrom,
     showSelectRunModel: true,
-    business_id: currentProject.value.business_id,
+    business_id: project.value.business_id,
     runArgs: undefined
   })
 }
@@ -433,6 +433,12 @@ const getProjectList = () => {
   })
 }
 onMounted(() => {
+  nextTick(() => {
+    reportTableIsShow.value = true
+    setTimeout(function() {
+      reportTableIsShow.value = false // 确保报告的组件会渲染，先打开一次
+    }, 1)
+  });
   getUserList()
   getProjectList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);

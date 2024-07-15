@@ -260,6 +260,12 @@ const paramsToStr = (paramsList: any) => {
   formData.value.addr = formData.value.addr.split('?')[0] + paramsListToStr(paramsList)
 }
 
+const props = defineProps({
+  businessId: {
+    default: undefined,
+    type: Number
+  },
+})
 const drawerIsShow = ref(false)
 const dataActiveName = ref('headers')
 const busEventParam = 'param'
@@ -452,7 +458,7 @@ const selectRunEnv = () => {
     eventType: runEvent,
     triggerFrom: runTrigger,
     showSelectRunModel: false,
-    business_id: null,
+    business_id: props.businessId,
     args: null
   })
 }

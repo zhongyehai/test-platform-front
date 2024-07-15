@@ -60,7 +60,7 @@
       />
     </el-drawer>
 
-    <el-drawer v-model="detailIsShow" :append-to-body="true" title="调用记录详情" size="40%">
+    <el-drawer v-model="detailIsShow" :append-to-body="true" title="调用记录详情" size="60%">
       <div style="margin-right: 20px;margin-left: 20px">
 
         <div style="margin-bottom: 20px">

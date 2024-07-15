@@ -165,7 +165,7 @@
 
         </el-tab-pane>
 
-        <EditDrawer></EditDrawer>
+        <EditDrawer :business-id="project.business_id"></EditDrawer>
         <AddDrawer :project-id="queryItems.project_id" :module-id="queryItems.module_id"></AddDrawer>
         <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
           <ReportTable :test-type="'api'" :user-dict="userDict" :user-list="userList"></ReportTable>
@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, onBeforeUnmount, computed} from "vue";
+import {onMounted, ref, onBeforeUnmount, computed, nextTick} from "vue";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './edit-drawer.vue'
 import AddDrawer from './add-drawer.vue'
@@ -196,6 +196,7 @@ import Sortable from "sortablejs";
 import {Plus, Help} from "@icon-park/vue-next";
 import {GetUserList} from "@/api/system/user";
 import ReportTable from "@/components/business/report/report-table.vue";
+import {GetProject} from "@/api/business-api/project";
 
 const tableIsLoading = ref(false)
 const reportTableIsShow = ref(false)
@@ -206,6 +207,7 @@ const tableDataList = ref([])
 const userList = ref([])
 const userDict = ref({})
 const selectApi = ref({})
+const project = ref({})
 const runTrigger = 'api-index'
 const runEvent = 'select-run-env'
 const tableDataTotal = ref(0)
@@ -284,7 +286,7 @@ const showReport = (row) => {
   bus.emit(busEvent.drawerIsShow, {
     eventType: 'show-report-table',
     projectId: queryItems.value.project_id,
-    businessId: undefined,
+    businessId: project.value.business_id,
     runType: 'api',
     triggerId: row.id
   })
@@ -305,13 +307,19 @@ const showEditDrawer = (command: string, row: any) => {
   })
 }
 
+const getProject = () => {
+  GetProject('api', {id: queryItems.value.project_id}).then(response => {
+    project.value = response.data
+  })
+}
+
 const showEnvSelector = (row) => {
   selectApi.value = row
   bus.emit(busEvent.drawerIsShow, {
     eventType: runEvent,
     triggerFrom: runTrigger,
     showSelectRunModel: false,
-    business_id: null,
+    business_id: project.value.business_id,
     args: null
   })
 }
@@ -378,6 +386,12 @@ const setSort = () => {
 }
 
 onMounted(() => {
+  nextTick(() => {
+    reportTableIsShow.value = true
+    setTimeout(function() {
+      reportTableIsShow.value = false // 确保报告的组件会渲染，先打开一次
+    }, 1)
+  });
   getUserList()
   setSort()
   bus.on(busEvent.treeIsChoice, treeIsChoice);
@@ -403,6 +417,7 @@ const treeIsChoice = (message: any) => {
     queryItems.value.project_id = message.content.project_id
     queryItems.value.page_num = 1
     queryItems.value.page_size = 20
+    getProject()
     getTableDataList()
   }
 }
