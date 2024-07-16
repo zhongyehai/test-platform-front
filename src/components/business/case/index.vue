@@ -487,7 +487,7 @@ const drawerIsCommit = (message: any) => {
 }
 
 const getProject = () => {
-  GetProject('api', {id: props.projectId}).then(response => {
+  GetProject(props.testType, {id: props.projectId}).then(response => {
     project.value = response.data
   })
 }

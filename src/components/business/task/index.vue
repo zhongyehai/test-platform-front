@@ -208,7 +208,7 @@
 <!--    <selectRunEnv :test-type="testType"></selectRunEnv>-->
 <!--    <showRunProcess :test-type="testType"></showRunProcess>-->
     <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
-      <ReportTable :test-type="'api'" :user-dict="userDict" :user-list="userList"></ReportTable>
+      <ReportTable :test-type="testType" :user-dict="userDict" :user-list="userList"></ReportTable>
     </el-drawer>
 
   </div>
