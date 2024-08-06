@@ -73,10 +73,16 @@
           <show-json :json-data="currentDetail.request"/>
         </div>
 
-        <div style="margin-bottom: 20px">
+        <div v-if="currentDetail.response" style="margin-bottom: 20px">
           <label class="label-style">响应参数：</label>
           <show-json :json-data="currentDetail.response"/>
         </div>
+
+        <div v-if="currentDetail.error" style="margin-bottom: 20px">
+          <label class="label-style">脚本错误：</label>
+          <div>{{currentDetail.error}}</div>
+        </div>
+
       </div>
     </el-drawer>
   </div>
@@ -111,7 +117,8 @@ const tableHeight = computed(() => {
 const currentDetail = ref({
   create_time: undefined,
   request: undefined,
-  response: undefined
+  response: undefined,
+  error: undefined
 })
 
 
@@ -155,8 +162,14 @@ const onShowDrawerEvent = (message: any) => {
 }
 
 const showDetailDrawer = (row: {response: string, request: object, create_time: object}) => {
-  currentDetail.value = row
-  currentDetail.value.response = JSON.parse(row.response)
+  currentDetail.value = JSON.parse(JSON.stringify(row))
+  currentDetail.value.response = undefined
+  currentDetail.value.error = undefined
+  try {
+    currentDetail.value.response = JSON.parse(row.response)
+  }catch(error) {
+    currentDetail.value.error = row.response
+  }
   detailIsShow.value = true
 }
 

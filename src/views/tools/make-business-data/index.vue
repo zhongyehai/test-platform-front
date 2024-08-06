@@ -206,6 +206,7 @@ const scrollHeight = computed(() =>{
 const getProjectList = (row: { id: any; }) => {
   caseList.value = []
   isLoading.value = true
+  selectBusinessId.value = row.id
   GetProjectList(testType,{ business_id: row.id }).then(response => {
     isLoading.value = false
     projectList.value = response.data.data

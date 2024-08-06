@@ -97,7 +97,7 @@
       <el-drawer v-model="sortDrawerIsShow" title="拖拽排序" size="30%">
         <sortDrawer :test-type="testType" :use-type="'caseSuite'"></sortDrawer>
       </el-drawer>
-      <editDrawer></editDrawer>
+      <editDrawer :test-type="testType"></editDrawer>
       <addDrawer :test-type="testType"></addDrawer>
       <uploadDrawer :test-type="testType"></uploadDrawer>
 

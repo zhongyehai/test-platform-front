@@ -36,10 +36,6 @@ export function ChangeElementById(testType: string, data: object) {
     return request({ url: getBaseDir(testType) + '/id', method: 'put', data: data })
 }
 
-export function CopyElement(testType: string, data: object) {
-    return request({url: getBaseDir(testType) + '/copy', method: 'post', data: data})
-}
-
 export function GetElementFrom(testType: string, params: object) {
     return request({ url: getBaseDir(testType) + '/from', method: 'get', params: params })
 }
