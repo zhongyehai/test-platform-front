@@ -326,54 +326,53 @@ const openReportById = (reportId: any) => {
   window.open(`/${props.testType}-test/report-show?id=${reportId}`, '_blank')
 }
 
-const getReport = (batch_id) => {
+async function getReport (batch_id) {
   // 触发运行成功，每1.5秒查询一次，
   // 最后都没查出结果，则停止查询，提示用户去测试报告页查看
   // 已出结果，则停止查询，展示测试报告
   const runTimeoutCount = Number(busEvent.data.runTimeout) * 1000 / 1500
   let queryCount = 1
-  timer.value = setInterval(function() {
+
+  async function waiteTestFinish() {
     if (queryCount <= runTimeoutCount) {
-      GetReportStatus(props.testType, {
+      const reportStatus = await GetReportStatus(props.testType, {
         batch_id: batch_id,
         process: activeProcess.value,
         status: activeStatus.value
-      }).then(response => {
-        if (response.status === 200) {
-          activeProcess.value = response.data.process
-          activeStatus.value = response.data.status
+      });
 
-          if (reportId.value && activeProcess.value === 2) { // 执行中
-            // 获取执行的用例
-            GetReportCaseList(props.testType, { report_id: reportId.value }).then(response => {
-              reportCaseDataList.value = response.data
-              // getRunningReportCaseId(reportCaseDataList)  // 自动查最新的在执行的用例
-              if (!reportCaseId.value) {
-                reportCaseId.value = response.data[0].id
-              }
-              // 获取指定用例的执行步骤
-              GetReportStepList(props.testType, { report_case_id: reportCaseId.value }).then(response => {
-                reportStepDataList.value = response.data
-              })
-            })
-          } else if (activeProcess.value === 3 && activeStatus.value === 2) {
-            processIsShow.value = false // 关闭进度框
-            getShowReportId(batch_id)
-            clearInterval(timer.value) // 关闭定时器
+      if (reportStatus.status === 200) { // 获取成功
+        activeProcess.value = reportStatus.data.process
+        activeStatus.value = reportStatus.data.status
+
+        if (reportId.value && activeProcess.value === 2) { // 执行中
+          const reportCaseList = await GetReportCaseList(props.testType, {report_id: reportId.value}) // 获取执行的用例
+          reportCaseDataList.value = reportCaseList.data
+          if (!reportCaseId.value) {
+            reportCaseId.value = reportCaseList.data[0].id // 最新的在执行的用例
           }
-        } else {
+
+          const reportStepList = GetReportStepList(props.testType, {report_case_id: reportCaseId.value}) // 获取指定用例的执行步骤
+          reportStepDataList.value = reportStepList.data
+
+        } else if (activeProcess.value === 3 && activeStatus.value === 2) {// 执行完毕
           processIsShow.value = false // 关闭进度框
-          clearInterval(timer.value) // 关闭定时器
+          getShowReportId(batch_id)
+          return
         }
-      })
+      } else { // 获取失败
+        processIsShow.value = false // 关闭进度框
+      }
+      await new Promise(resolve => setTimeout(resolve, 1500));
       queryCount += 1
-    } else {
+    } else { // 超时还未出结果
       showTimeOutMessage.value = true
-      // processIsShow.value = false // 关闭进度框
-      clearInterval(timer.value) // 关闭定时器
     }
-  }, 1500)
+    return waiteTestFinish()
+  }
+  await waiteTestFinish()
 }
+
 </script>
 
 <style scoped lang="scss">

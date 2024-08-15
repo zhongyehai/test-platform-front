@@ -28,6 +28,7 @@
               placeholder="选择业务线"
               clearable
               filterable
+              allow-create
               default-first-option
               style="margin-right: 10px; width: 100%"
               size="small"

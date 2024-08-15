@@ -310,6 +310,7 @@ onBeforeUnmount(() => {
 
 const drawerIsCommit = (message: any) => {
   if (message.eventType === 'bug-track') {
+    getIterationList()
     getTableDataList()
   }
 }
