@@ -334,7 +334,7 @@ const clickRun = (row) => {
 
 const runTask = (runConf) => {
   RunTask(props.testType, {
-    id: runTaskId.value,
+    id_list: [runTaskId.value],
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,

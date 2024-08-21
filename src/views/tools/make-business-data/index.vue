@@ -254,7 +254,7 @@ const clickRunCase = (row) => {
 // 运行用例
 const runCase = (runConf) => {
   RunCase(testType, {
-    case_id_list: runCaseId.value,
+    id_list: runCaseId.value,
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,

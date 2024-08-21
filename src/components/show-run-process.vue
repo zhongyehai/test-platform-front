@@ -271,16 +271,6 @@ const reportStepDataList = ref([])  // [{ 'id': 1, 'name': '步骤1', 'process':
 const reportStepData = ref({})
 const reportStepDetailIsShow = ref(false)
 
-watch(() => processIsShow.value, (newValue, oldValue) => {
-  if (!newValue) {
-    try {
-      clearInterval(timer.value) // 关闭定时器
-    } catch (e) {
-      console.log('查询定时器已关闭')
-    }
-  }
-})
-
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
 })
@@ -334,6 +324,9 @@ async function getReport (batch_id) {
   let queryCount = 1
 
   async function waiteTestFinish() {
+    if (processIsShow.value == false){
+      return
+    }
     if (queryCount <= runTimeoutCount) {
       const reportStatus = await GetReportStatus(props.testType, {
         batch_id: batch_id,
@@ -352,7 +345,7 @@ async function getReport (batch_id) {
             reportCaseId.value = reportCaseList.data[0].id // 最新的在执行的用例
           }
 
-          const reportStepList = GetReportStepList(props.testType, {report_case_id: reportCaseId.value}) // 获取指定用例的执行步骤
+          const reportStepList = await GetReportStepList(props.testType, {report_case_id: reportCaseId.value}) // 获取指定用例的执行步骤
           reportStepDataList.value = reportStepList.data
 
         } else if (activeProcess.value === 3 && activeStatus.value === 2) {// 执行完毕

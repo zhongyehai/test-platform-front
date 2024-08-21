@@ -684,7 +684,7 @@ const clickRun = () =>{
 
 const runTask = (runConf) => {
   RunTask(props.testType, {
-    id: formData.value.id,
+    id_list: [formData.value.id],
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,

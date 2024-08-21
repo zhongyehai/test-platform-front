@@ -295,9 +295,7 @@ const getRunUrl = () => {
 const reRun = (runConf) => {
   const runUrl = getRunUrl()
   runUrl(props.testType, {
-    api_list: report.value.run_type === 'api' ? report.value.trigger_id : undefined,
-    case_id_list: report.value.run_type === 'case' ? report.value.trigger_id : undefined,
-    id: ['task', 'suite'].indexOf(report.value.run_type) !== -1 ? report.value.trigger_id[0] : undefined,
+    id_list: report.value.trigger_id,
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,

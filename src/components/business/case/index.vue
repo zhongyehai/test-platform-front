@@ -355,7 +355,7 @@ const clickRun = (row) => {
 
 const runCase = (runConf) => {
   RunCase(props.testType, {
-    case_id_list: runCaseIdList.value,
+    id_list: runCaseIdList.value,
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,
