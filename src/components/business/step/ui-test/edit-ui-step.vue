@@ -246,7 +246,7 @@
               ref="validatesViewRef"
               :test-type="testType"
               :element-list="elementList"
-              :validates="formData.validates"
+              :current-data="formData.validates"
           />
         </el-tab-pane>
 

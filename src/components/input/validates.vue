@@ -358,8 +358,8 @@ const props = defineProps({
 })
 
 watch(() => props.currentData, (newValue, oldValue) => {
-  console.log('validate.props.currentData: ', newValue)
-  console.log('validate.props.oldValue: ', oldValue)
+  // console.log('validate.props.currentData: ', newValue)
+  // console.log('validate.props.oldValue: ', oldValue)
   initTempData(newValue)
 })
 
