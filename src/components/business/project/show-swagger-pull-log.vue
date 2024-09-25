@@ -102,6 +102,7 @@ import {swaggerPullStatusMappingContent, swaggerPullStatusMappingTagType} from "
 import Pagination from "@/components/pagination.vue";
 import toClipboard from "@/utils/copy-to-memory";
 import {ElMessage} from "element-plus";
+import {getFindElementOption} from "@/utils/get-config";
 
 const props = defineProps({
   userDict: {
@@ -130,13 +131,20 @@ const pullLogDetailData = ref({})
 const pullLogDetailIsShow = ref(false)
 const drawerIsShow = ref(false)
 const tableIsLoading = ref(false)
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.78}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.78}px`
   }else {  // 大屏
-    return `${innerHeight * 0.85}px`
+    tableHeight.value =  `${window.innerHeight * 0.85}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const tableDataList = ref([])
 const tableDataTotal = ref(0)
 const queryItems = ref({
@@ -175,6 +183,16 @@ const showDetail = (row: { id: any; }) => {
     pullLogDetailIsShow.value = true
   })
 }
+
+onMounted(() => {
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
+
 </script>
 
 

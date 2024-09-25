@@ -28,15 +28,15 @@
           </el-tooltip>
         </el-form-item>
 
-        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="端口" prop="port" class="is-required" size="small">
+        <el-form-item v-show="['rabbit_mq', 'active_mq'].indexOf(formData.queue_type) != -1 && !formData.id" label="端口" prop="port" class="is-required" size="small">
           <el-input v-model="formData.port" size="small" placeholder="端口" />
         </el-form-item>
 
-        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="账号" prop="account" class="is-required" size="small">
+        <el-form-item v-show="['rabbit_mq', 'active_mq'].indexOf(formData.queue_type) != -1 && !formData.id" label="账号" prop="account" class="is-required" size="small">
           <el-input v-model="formData.account" size="small" placeholder="账号" />
         </el-form-item>
 
-        <el-form-item v-show="formData.queue_type === 'rabbit_mq' && !formData.id" label="密码" prop="password" class="is-required" size="small">
+        <el-form-item v-show="['rabbit_mq', 'active_mq'].indexOf(formData.queue_type) != -1 && !formData.id" label="密码" prop="password" class="is-required" size="small">
           <el-input v-model="formData.password" size="small" placeholder="密码" />
         </el-form-item>
 
@@ -126,7 +126,7 @@ const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
 const formData = ref({
   id: undefined,
-  queue_type: 'rocket_mq',
+  queue_type: 'active_mq',
   host: '',
   port: undefined,
   account: '',
@@ -210,7 +210,7 @@ const ruleFormRef = ref(null)
 const resetForm = () => {
   formData.value = {
     id: undefined,
-    queue_type: 'rocket_mq',
+    queue_type: 'active_mq',
     host: '',
     port: undefined,
     account: '',

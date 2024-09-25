@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import showDetailDrawer from './show-detail.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
@@ -77,13 +77,20 @@ import {GetUserList} from "@/api/system/user";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.77}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.77}px`
   }else {  // 大屏
-    return `${innerHeight * 0.86}px`
+    tableHeight.value =  `${window.innerHeight * 0.86}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20})
 const userDict = ref({})
@@ -116,6 +123,12 @@ const getTableDataList = () => {
 onMounted(() => {
   getUserList()
   getTableDataList()
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
 })
 
 </script>

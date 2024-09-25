@@ -150,23 +150,44 @@
                       style="min-width: 100%"
                       size="small"
                   >
-                    <el-option v-for="item in emailServerList" :key="item.id" :label="item.name" :value="item.value" />
+                    <el-option v-for="item in emailServerList" :key="item.id" :label="item.name" :value="item.name" />
                   </el-select>
                 </el-form-item>
-                <el-form-item prop="email_from" label="发件人邮箱" size="small" class="is-required">
-                  <el-input
+
+                <el-form-item prop="email_from" label="选择发件人" size="small" class="is-required">
+                  <el-select
                       v-model="formData.email_from"
+                      filterable
+                      default-first-option
+                      placeholder="选择发件人，可到全局参数添加对应的服务器，配置类型选邮箱"
+                      value-key="id"
+                      style="min-width: 98%"
                       size="small"
-                      placeholder="默认支持QQ邮箱，可到全局参数添加对应的服务器，配置类型选邮箱"
-                  />
+                  >
+                    <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id" />
+                  </el-select>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <template #content> 在用户管理处设置邮箱和密码 </template>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                  </el-tooltip>
                 </el-form-item>
 
-                <el-form-item prop="email_pwd" label="邮箱密码" size="small" class="is-required">
-                  <el-input v-model="formData.email_pwd" size="small" type="text" />
-                </el-form-item>
-
-                <el-form-item prop="email_to" label="收件人邮箱" size="small" class="is-required">
-                  <oneColumnRow ref="emailToInputRef" :current-data="formData.email_to" />
+                <el-form-item prop="email_to" label="选择收件人" size="small" class="is-required">
+                  <el-select
+                      v-model="formData.email_to"
+                      multiple
+                      filterable
+                      default-first-option
+                      placeholder="选择收件人"
+                      style="width: 98%"
+                      size="small"
+                  >
+                    <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id" />
+                  </el-select>
+                  <el-tooltip class="item" effect="dark" placement="top-start">
+                    <template #content> 具体人员的邮箱，在用户管理处设置 </template>
+                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
+                  </el-tooltip>
                 </el-form-item>
               </div>
             </div>
@@ -301,12 +322,11 @@ import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {Help, Plus} from "@icon-park/vue-next";
 import jsonEditorView from '@/components/editor/json-editor.vue'
 import selectCaseView from './select-case.vue'
-import addWebhookView from '@/views/config/webhook/add-drawer.vue'
+import addWebhookView from '@/views/config/notify/webhook/add-drawer.vue'
 import {GetConfigByCode, GetConfigList} from "@/api/config/config-value";
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {appiumServerRequestStatusMappingContent} from "@/components/business/mapping";
-import oneColumnRow from "@/components/input/one-column-row.vue";
 import {GetConfigTypeList} from "@/api/config/config-type";
 import {GetTask, PostTask, PutTask, RunTask} from "@/api/business-api/task";
 import {GetCaseSuiteList} from "@/api/business-api/case-suite";
@@ -320,6 +340,10 @@ const props = defineProps({
   testType: {
     default: '',
     type: String
+  },
+  userList: {
+    default: [],
+    type: Array
   }
 })
 
@@ -477,7 +501,6 @@ const formData = ref({
   email_server: undefined,
   email_to: [],
   email_from: undefined,
-  email_pwd: undefined,
   suite_ids: [],
   case_ids: [],
   push_hit: 1,
@@ -515,21 +538,14 @@ const validateEmailServer = (rule: any, value: any, callback: any) => {
 
 const validateEmailFrom = (rule: any, value: any, callback: any) => {
   if (formData.value.receive_type === 'email' && !formData.value.email_from){
-    callback(new Error('请输入发件人邮箱'))
-  }
-  callback()
-}
-
-const validateEmailPwd = (rule: any, value: any, callback: any) => {
-  if (formData.value.receive_type === 'email' && !formData.value.email_pwd){
-    callback(new Error('请输入发件人邮箱密码'))
+    callback(new Error('请选择发件人'))
   }
   callback()
 }
 
 const validateEmailTo = (rule: any, value: any, callback: any) => {
-  if (formData.value.receive_type === 'email' && (!formData.value.email_to || formData.value.email_to.length < 1)){
-    callback(new Error('请输入接收人的邮箱'))
+  if (formData.value.receive_type === 'email' && (formData.value.email_to.length < 1)){
+    callback(new Error('请输选择接收人'))
   }
   callback()
 }
@@ -553,9 +569,6 @@ const formRules = {
   email_from: [
     {validator: validateEmailFrom, trigger: 'blur'}
   ],
-  email_pwd: [
-    {validator: validateEmailPwd, trigger: 'blur'}
-  ],
   email_to: [
     {validator: validateEmailTo, trigger: 'blur'}
   ]
@@ -577,7 +590,6 @@ const resetForm = () => {
     email_server: undefined,
     email_to: [],
     email_from: undefined,
-    email_pwd: undefined,
     suite_ids: [],
     case_ids: [],
     push_hit: 1,
@@ -665,7 +677,6 @@ const getRunMode = () => {
 
 const getCommitData = () => {
   const data = JSON.parse(JSON.stringify(formData.value))
-  data.email_to = emailToInputRef.value.getData()
   data.call_back = callBackEditorViewRef.value.getJsonData()
   data.suite_ids = caseSelectorRef.value.getCaseSuiteIdList()
   data.case_ids = caseSelectorRef.value.caseIdList

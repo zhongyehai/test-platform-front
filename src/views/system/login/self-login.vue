@@ -4,7 +4,7 @@
       <div class="login-content-left">
         <img :src="loginLeftPng"/>
         <div class="login-content-left-mask">
-          <div>{{ systemTitle }}</div>
+          <div>{{ platformName }}</div>
           <div>{{ systemSubTitle }}</div>
         </div>
       </div>
@@ -53,18 +53,20 @@
 
 <script lang="ts" setup>
 import { systemTitle, systemSubTitle } from '@/config'
-import { ref, reactive } from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from 'element-plus'
 import loginLeftPng from '@/assets/login/left.jpg';
 import {LoginApi} from "@/api/system/user";
+import {GetConfigByCode} from "@/api/config/config-value";
 // import loginLeftPng from '@/assets/login/loginBackground.jpg';
 
+const platformName = ref()
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
-const form = reactive({account: '', password: '', loading: false})
+const form = reactive({account: 'common', password: 'common', loading: false})
 const passwordType = ref('password')
 const passwordTypeChange = () => {
   passwordType.value === '' ? passwordType.value = 'password' : passwordType.value = ''
@@ -100,6 +102,14 @@ const submit = () => {
     })
   })
 }
+
+onMounted(() => {
+    GetConfigByCode({ code: 'platform_name' }).then(response => {
+      platformName.value = response.data
+      localStorage.setItem('platform_name', response.data)
+    })
+})
+
 </script>
 
 <style lang="scss" scoped>

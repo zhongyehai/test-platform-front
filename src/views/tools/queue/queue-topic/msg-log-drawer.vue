@@ -65,7 +65,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip align="center" label="操作" width="80">
+        <el-table-column align="center" label="操作" width="90">
           <template #default="scope">
             <el-button
                 type="text"
@@ -108,13 +108,20 @@ const props = defineProps({
 const queueDrawerIsShow = ref(false)
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, topic_id: undefined})
 
@@ -150,11 +157,14 @@ const getTableDataList = () => {
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
   bus.on(busEvent.drawerIsCommit, reSendMsgIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
   bus.off(busEvent.drawerIsCommit, reSendMsgIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {

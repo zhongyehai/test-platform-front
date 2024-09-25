@@ -73,13 +73,19 @@ import {GetJobFuncList, DeleteJob, PostJob, JobRun} from "@/api/system/job";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.84}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.84}px`
   }else {  // 大屏
-    return `${innerHeight * 0.89}px`
+    tableHeight.value =  `${window.innerHeight * 0.89}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const showEditDrawer = (funcName: string) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'job', content: funcName});
@@ -120,6 +126,12 @@ const getTableDataList = () => {
 
 onMounted(() => {
   getTableDataList()
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
 })
 
 </script>

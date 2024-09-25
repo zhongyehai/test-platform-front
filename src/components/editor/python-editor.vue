@@ -57,23 +57,33 @@ const props = defineProps({
     type: String
   }
 })
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.738}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.86}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.738}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.86}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 watch(() => props.pythonCode, (newValue, oldValue) => {
   tempData.value = newValue
 })
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, findAndSelectText);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, findAndSelectText);
+  window.removeEventListener('resize', handleResize);
 })
 
 const findAndSelectText = (message: any) => {

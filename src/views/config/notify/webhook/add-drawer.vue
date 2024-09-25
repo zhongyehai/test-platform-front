@@ -147,13 +147,17 @@ import {ElMessage} from 'element-plus'
 import {Help, Copy, Minus, Plus, Clear} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {PostWebHook} from "@/api/config/webhook";
+import {getFindElementOption} from "@/utils/get-config";
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {
@@ -209,13 +213,20 @@ const webHookType = {
   'we_chat': '企业微信',
   'fei_shu': '飞书'
 }
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const formData = ref({
   data_list: []
 })

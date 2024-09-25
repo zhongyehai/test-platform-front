@@ -152,6 +152,7 @@ import {ElMessage} from 'element-plus'
 import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {PostPermission} from "@/api/system/permission";
+import {getFindElementOption} from "@/utils/get-config";
 
 const props = defineProps({
   sourceTypeDict: {
@@ -220,13 +221,19 @@ const sendEvent = () => {
 
 const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.73}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.82}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const frontSourceClass = ref([
   {'key': 'menu', 'value': '菜单'},
@@ -288,6 +295,15 @@ const addData = () => {
     })
   }
 }
+
+onMounted(() => {
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
 
 </script>
 

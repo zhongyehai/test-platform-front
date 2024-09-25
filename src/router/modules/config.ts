@@ -31,9 +31,9 @@ const route: Route[] = [
         meta: { title: '业务线管理', icon: 'hamburgerButton' }
       },
       {
-        path: 'webhook',
-        component: createNameComponent(() => import('@/views/config/webhook/index.vue')),
-        meta: { title: 'webhook管理', icon: 'comment' }
+        path: 'notify',
+        component: createNameComponent(() => import('@/views/config/notify/index.vue')),
+        meta: { title: '通知管理', icon: 'comment' }
       }
     ]
   }

@@ -34,7 +34,7 @@ const route: Route[] = [
   },
   {
     path: '/login',
-    component: createNameComponent(() => import('@/views/system/login/sso-login.vue')),
+    component: createNameComponent(() => import('@/views/system/login/self-login.vue')),
     hideMenu: true,
     meta: { title: '登录', hideTabs: false, icon: 'system' }
   },

@@ -218,13 +218,20 @@ const queryItems = ref({
   module_id: undefined,
   project_id: undefined
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.68}px`
+
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.68}px`
   }else {  // 大屏
-    return `${innerHeight * 0.79}px`
+    tableHeight.value =  `${window.innerHeight * 0.79}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -396,11 +403,14 @@ onMounted(() => {
   setSort()
   bus.on(busEvent.treeIsChoice, treeIsChoice);
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.treeIsChoice, treeIsChoice);
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

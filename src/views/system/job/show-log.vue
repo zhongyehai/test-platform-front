@@ -92,13 +92,19 @@ const queryItems = ref({
   func_name: '',
   detail: true
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.75}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.75}px`
   }else {  // 大屏
-    return `${innerHeight * 0.83}px`
+    tableHeight.value =  `${window.innerHeight * 0.83}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -125,10 +131,13 @@ const getTableDataList = () => {
 onMounted(() => {
   getBusinessList()
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {

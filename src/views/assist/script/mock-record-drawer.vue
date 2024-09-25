@@ -107,13 +107,20 @@ const queryItems = ref({
   page_size: 20,
   name: undefined
 })
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.73}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.82}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const currentDetail = ref({
   create_time: undefined,
   request: undefined,
@@ -147,10 +154,13 @@ const changePagination = (pagination: any) => {
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {

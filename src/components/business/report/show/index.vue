@@ -1,6 +1,5 @@
 <template>
   <div class="layout-container">
-
     <!-- 无测试报告数据，或者测试报告中没有运行数据 -->
     <!--    <div v-show="!reportSummary || reportSummary.stat.test_case.total === 0" class="str">-->
     <!--      无运行数据或所有运行数据均已跳过-->
@@ -66,6 +65,7 @@
               </template>
             </el-popover>
 
+          <el-button style="text-align: right; margin-right: 10px" type="primary" size="small" @click="showReportStat = true">查看统计</el-button>
           </span>
       </div>
 
@@ -90,6 +90,85 @@
         v-model="showPythonScript"
     >
       <pythonScriptIndex/>
+    </el-drawer>
+
+    <el-drawer
+        title="报告统计"
+        size="85%"
+        :append-to-body="true"
+        v-model="showReportStat"
+    >
+      <div>
+        <el-collapse v-model="defaultShowDetailInfo">
+        <el-collapse-item name="reportInfo">
+          <template #title>
+            <div class="el-collapse-item-title"> {{ '报告统计：' }}</div>
+          </template>
+          <el-descriptions class="margin-top" :column="2" border>
+            <el-descriptions-item>
+              <template #label> 用例名 </template>
+              {{ report.name }}
+            </el-descriptions-item>
+          </el-descriptions>
+        </el-collapse-item>
+
+        <el-collapse-item name="caseInfo">
+          <template #title>
+            <div class="el-collapse-item-title"> {{ '用例统计：' }}</div>
+          </template>
+          <el-descriptions class="margin-top" :column="2" border>
+            <el-descriptions-item>
+              <template #label> 执行用例 </template>
+              {{ reportSummary.stat.test_case.total }}条
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 通过用例 </template>
+              {{reportSummary.stat.test_case.success}} 条
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 不通过用例 </template>
+              {{reportSummary.stat.test_case.fail}} 条
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 报错用例 </template>
+              {{reportSummary.stat.test_case.error}} 条
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 通过率 </template>
+              {{(reportSummary.stat.test_case.success / reportSummary.stat.test_case.total).toFixed(6) * 100}} %
+            </el-descriptions-item>
+
+          </el-descriptions>
+        </el-collapse-item>
+
+        <el-collapse-item name="stepInfo">
+          <template #title>
+            <div class="el-collapse-item-title"> {{ '步骤统计：' }}</div>
+          </template>
+          <el-descriptions class="margin-top" :column="3" border>
+            <el-descriptions-item>
+              <template #label> 执行步骤 </template>
+              {{reportSummary.stat.test_step.total}} 个
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 通过步骤 </template>
+              {{reportSummary.stat.test_step.success}} 个
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> {{ testType=='api' ? '涉及接口' : '涉及元素'}} </template>
+              {{testType=='api' ? reportSummary.stat.count.api : reportSummary.stat.count.element}} 个
+            </el-descriptions-item>
+
+          </el-descriptions>
+        </el-collapse-item>
+        </el-collapse>
+      </div>
     </el-drawer>
 
   </div>
@@ -127,6 +206,7 @@ const props = defineProps({
 const route = useRoute()
 const reportId = route.query.id
 const report = ref({
+  name: '',
   project_id: undefined,
   is_async: 0,
   run_type: '',
@@ -169,6 +249,8 @@ const project = ref({
 })
 
 const triggerFrom = 'show-report'
+const showReportStat = ref(false)
+const defaultShowDetailInfo = ['reportInfo', 'caseInfo', 'stepInfo']
 
 const getReport = (reportId: any) => {
   GetReport(props.testType, {id: reportId}).then(response => {
@@ -359,4 +441,10 @@ const showCaseEditor = (message: any) => {
   margin-top: 10px;
 }
 
+.el-collapse-item-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-left: 10px;
+  color: #409eff
+}
 </style>

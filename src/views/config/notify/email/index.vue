@@ -1,9 +1,9 @@
 <template>
-  <div class="layout-container">
+  <div>
 
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
-        <el-button type="primary" @click="showEditDrawer(undefined)"> 添加角色</el-button>
+<!--        <el-button type="primary" @click="showEditDrawer(undefined)"> 添加用户</el-button>-->
       </div>
 
       <div class="layout-container-form-search">
@@ -11,8 +11,15 @@
             v-model="queryItems.name"
             clearable
             size="small"
-            style="width: 400px; margin-right: 10px"
-            placeholder="角色名，支持模糊搜索"/>
+            style="width: 200px; margin-right: 10px"
+            placeholder="用户名，支持模糊搜索"/>
+
+        <el-input
+            v-model="queryItems.account"
+            clearable
+            size="small"
+            style="width: 200px; margin-right: 10px"
+            placeholder="账号，支持模糊搜索"/>
 
         <el-button type="primary" @click="getTableDataList()"> 搜索</el-button>
       </div>
@@ -33,38 +40,27 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="角色名" prop="name" align="center" min-width="20%">
+        <el-table-column show-overflow-tooltip label="用户名" prop="name" align="center" min-width="20%">
           <template #default="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="备注" prop="desc" align="center" min-width="25%">
+        <el-table-column show-overflow-tooltip label="邮箱" prop="email" align="center" min-width="20%">
           <template #default="scope">
-            <span> {{ scope.row.desc }} </span>
+            <span> {{ scope.row.email }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="创建时间" prop="create_time" align="center" min-width="15%">
+        <el-table-column show-overflow-tooltip label="创建时间" prop="create_time" align="center" min-width="20%">
           <template #default="scope">
             <span>{{ scope.row.create_time }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="修改时间" prop="update_time" align="center" min-width="15%">
-          <template #default="scope">
-            <span>{{ scope.row.update_time }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column show-overflow-tooltip align="center" label="操作" width="80">
+        <el-table-column show-overflow-tooltip align="center" label="操作" width="110">
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row)">修改</el-button>
-            <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row.id)">
-              <template #reference>
-                <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
-              </template>
-            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -78,17 +74,17 @@
       />
     </div>
 
-    <EditDrawer :role-list="tableDataList"></EditDrawer>
+    <EditDrawer></EditDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import Pagination from '@/components/pagination.vue'
-import EditDrawer from './drawer.vue'
+import EditDrawer from './edit-drawer.vue'
 
 import {bus, busEvent} from "@/utils/bus-events";
-import {GetRoleList, DeleteRole} from "@/api/system/role";
+import {GetUserList} from "@/api/system/user";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
@@ -96,17 +92,17 @@ const tableDataTotal = ref(0)
 const queryItems = ref({
   page_num: 1,
   page_size: 20,
-  detail: true,
-  name: undefined
+  name: undefined,
+  account: undefined
 })
 
 const tableHeight = ref('10px')
 
 const setTableHeight = () => {
   if (window.innerHeight < 800){  // 小屏
-    tableHeight.value = `${window.innerHeight * 0.73}px`
+    tableHeight.value = `${window.innerHeight * 0.69}px`
   }else {  // 大屏
-    tableHeight.value =  `${window.innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.76}px`
   }
 }
 
@@ -121,29 +117,26 @@ const changePagination = (pagination: any) => {
 }
 
 const showEditDrawer = (row: object | undefined) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'role', content: row});
-}
-
-const deleteData = (dataId: number) => {
-  DeleteRole({id: dataId}).then(response => {
-    if (response){
-      getTableDataList()
-    }
-  })
+  bus.emit(busEvent.drawerIsShow, {eventType: 'edit-user-email', content: row})
 }
 
 const getTableDataList = () => {
   queryItems.value.name = queryItems.value.name ? queryItems.value.name : undefined
+  queryItems.value.account = queryItems.value.account ? queryItems.value.account : undefined
   tableIsLoading.value = true
-  GetRoleList(queryItems.value).then((response: object) => {
+  GetUserList(queryItems.value).then((response: object) => {
     tableIsLoading.value = false
-    tableDataList.value = response.data.data
+    tableDataList.value = []
+    response.data.data.forEach((item: any) => {
+      tableDataList.value.push(item)
+    })
     tableDataTotal.value = response.data.total
   })
 }
 
 onMounted(() => {
   getTableDataList()
+
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
   setTableHeight()
   window.addEventListener('resize', handleResize);
@@ -155,7 +148,7 @@ onBeforeUnmount(() => {
 })
 
 const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'role') {
+  if (message.eventType === 'user') {
     getTableDataList()
   }
 }

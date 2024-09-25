@@ -145,17 +145,24 @@ import {ElMessage} from "element-plus";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const tableDataTotal = ref(0)
 const queryItems = ref({page_num: 1, page_size:20, host: undefined, queue_type: undefined})
 const userDict = ref({})
-const queueTypeDict =  { 'rocket_mq': '阿里rocket_mq', 'rabbit_mq': 'rabbit_mq'}
+const queueTypeDict =  { 'active_mq': 'active_mq', 'rocket_mq': 'rocket_mq', 'rabbit_mq': 'rabbit_mq'}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -203,10 +210,13 @@ onMounted(() => {
   getUserList()
   getTableDataList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

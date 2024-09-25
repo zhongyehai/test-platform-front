@@ -15,6 +15,14 @@
           <el-input v-model="formData.account" :disabled="formData.id && !formData.sso_user_id" size="small"/>
         </el-form-item>
 
+        <el-form-item label="邮箱" prop="email" size="small">
+          <el-input v-model="formData.email" size="small"/>
+        </el-form-item>
+
+        <el-form-item label="邮箱密码" prop="email_password" size="small">
+          <el-input v-model="formData.email_password" size="small"/>
+        </el-form-item>
+
         <el-form-item label="角色" prop="role_list" class="is-required" size="small">
           <el-select
               v-model="formData.role_list"
@@ -108,6 +116,8 @@ const formData = ref({
   id: undefined,
   name: '',
   account: '',
+  email: null,
+  email_password: null,
   business_list: [],
   role_list: []
 })
@@ -132,6 +142,8 @@ const resetForm = () => {
     id: undefined,
     name: '',
     account: '',
+    email: null,
+    email_password: null,
     business_list: [],
     role_list: []
   }

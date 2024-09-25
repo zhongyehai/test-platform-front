@@ -270,13 +270,20 @@ const queryItems = ref({
   trigger_id: undefined
 })
 
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.7}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.81}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.7}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.81}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const isAdmin = localStorage.getItem('permissions').indexOf('admin') !== -1
 const triggerFrom = 'report-index'
 
@@ -444,11 +451,14 @@ onMounted(() => {
   getRunTypeDict()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
   bus.on(busEvent.drawerIsShow, selectProject);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
   bus.off(busEvent.drawerIsShow, selectProject);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

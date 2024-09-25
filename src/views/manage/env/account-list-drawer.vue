@@ -119,13 +119,20 @@ const queryItems = ref({
   name: undefined,
   value: undefined
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.7}px`
+
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.7}px`
   }else {  // 大屏
-    return `${innerHeight * 0.8}px`
+    tableHeight.value =  `${window.innerHeight * 0.8}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -178,11 +185,14 @@ const deleteData = (dataId: object) => {
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, drawerIsShowByBus);
   bus.on(busEvent.drawerIsCommit, drawerIsCommitByBus);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, drawerIsShowByBus);
   bus.off(busEvent.drawerIsCommit, drawerIsCommitByBus);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsShowByBus = (message: any) => {

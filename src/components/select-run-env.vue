@@ -312,28 +312,30 @@ const eventType = 'select-run-env'
 const triggerFrom = ref()
 const runServerList = ref([])
 const runPhoneList = ref([])
-const envScrollHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.6}px`
+const envScrollHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    envScrollHeight.value = `${window.innerHeight * 0.6}px`
   }else {  // 大屏
-    return `${innerHeight * 0.7}px`
+    envScrollHeight.value =  `${window.innerHeight * 0.7}px`
   }
-})
-const scrollHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
-  }else {  // 大屏
-    return `${innerHeight * 0.82}px`
-  }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 onMounted(() =>{
   getRunTimeout() // 初始化等待用例运行超时时间
   bus.on(busEvent.drawerIsShow, onDrawerIsShow)
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onDrawerIsShow)
+  window.removeEventListener('resize', handleResize);
 })
 
 const onDrawerIsShow = (message) => {

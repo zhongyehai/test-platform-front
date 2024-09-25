@@ -48,6 +48,11 @@ export function GetUserRoles(params: object) {
   return request({ url: currentBaseDir + '/role', method: 'get', params: params })
 }
 
+// 修改用户的密码
+export function ChangeUserEmail(data: object) {
+  return request({ url: currentBaseDir + '/email', method: 'put', data: data })
+}
+
 // 获取用户信息
 export function GetUser(params: object) {
   return request({ url: currentBaseDir, method: 'get', params: params })

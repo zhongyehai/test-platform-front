@@ -113,13 +113,20 @@ const queryItems = ref({
   name: undefined,
   account: undefined
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -175,10 +182,13 @@ onMounted(() => {
   })
 
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

@@ -204,7 +204,7 @@
         </el-col>
       </el-row>
     </div>
-    <EditDrawer :test-type="testType"></EditDrawer>
+    <EditDrawer :test-type="testType" :user-list="userList"></EditDrawer>
 <!--    <selectRunEnv :test-type="testType"></selectRunEnv>-->
 <!--    <showRunProcess :test-type="testType"></showRunProcess>-->
     <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
@@ -275,13 +275,20 @@ const queryItems = ref({
   detail: true,
   project_id: undefined
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.83}px`
+    tableHeight.value =  `${window.innerHeight * 0.83}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const project = ref()
 const triggerFrom = 'task-index'
 const runTaskId = ref()
@@ -442,10 +449,13 @@ onMounted(() => {
   getUserList()
   getProjectList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

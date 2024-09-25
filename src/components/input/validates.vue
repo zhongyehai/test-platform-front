@@ -331,15 +331,49 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-drawer v-model="showSelectValidator" title="选择预置断言" size="60%">
+      <el-table
+          ref="validatorTableRef"
+          element-loading-text="正在获取数据"
+          element-loading-spinner="el-icon-loading"
+          :data="defaultValidator"
+          key="label"
+          stripe
+          :height="tableHeight">
+
+        <el-table-column type="selection" width="20" />
+
+        <el-table-column prop="id" label="序号" align="center" min-width="6%">
+          <template #default="scope">
+            <span>{{ scope.$index + 1 }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="label" label="描述" align="center" min-width="40%">
+          <template #default="scope">
+            <span>{{ scope.row.label }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="6%">
+          <template #default="scope">
+            <el-button type="text" size="small" @click.native="addDefaultValidator(scope.row)">添加</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+    </el-drawer>
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch} from "vue";
+import {onBeforeUnmount, onMounted, ref, watch} from "vue";
 import Sortable from "sortablejs"
 import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 import {GetConfigByCode} from "@/api/config/config-value";
-import {busEvent} from "@/utils/bus-events";
+import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 
 const props = defineProps({
@@ -363,6 +397,23 @@ watch(() => props.currentData, (newValue, oldValue) => {
   initTempData(newValue)
 })
 
+const defaultValidator = ref([])
+const showSelectValidator = ref(false)
+const validatorTableRef = ref()
+const tableHeight = ref(`${window.innerHeight * 0.8}px`)
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.8}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.85}px`
+  }
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const tempData = ref([])
 const validateTypeList =  [{ 'label': '数据', 'value': 'data' }, { 'label': '页面', 'value': 'page' }]
 const assertOne = ['值为真', '值为假', '值为null', '值不为null', '值为true', '值不为true', '值为false', '值不为false']
@@ -382,6 +433,11 @@ const disabledAssertType = [
 const validateDataTableRef = ref(null)
 const oldList = ref([])
 const newList = ref([])
+
+const addDefaultValidator = (row) => {
+  row.value['id'] = `${Date.now()}`
+  tempData.value.push(row.value)
+}
 
 const initTempData = (data: string | any[] | undefined) => {
   if (data && data.length > 0) { // 有数据
@@ -508,10 +564,26 @@ const clearData = () => {
   tempData.value[0] = getNewData()
 }
 
+const getSelectValidator = (message: any) => {
+  if (message.eventType === 'showSelectValidator') {
+    GetConfigByCode({"code": `${props.testType}_default_validator`}).then(response => {
+      defaultValidator.value = response.data
+      showSelectValidator.value = true
+    })
+  }
+}
+
 onMounted(() => {
   getConfigByCode()
   initTempData(undefined)
   setSort()
+  bus.on(busEvent.drawerIsShow, getSelectValidator)
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  bus.off(busEvent.drawerIsShow, getSelectValidator)
+  window.removeEventListener('resize', handleResize);
 })
 
 const setSort = () => {

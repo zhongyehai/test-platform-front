@@ -62,11 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import Pagination from '@/components/pagination.vue'
 
 import {GetCallBack, GetCallBackList} from "@/api/assist/call-back";
 import showJson from "@/components/show-json.vue";
+import {bus, busEvent} from "@/utils/bus-events";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
@@ -76,13 +77,20 @@ const queryItems = ref({
   page_size: 20,
   detail: true
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.79}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.79}px`
   }else {  // 大屏
-    return `${innerHeight * 0.86}px`
+    tableHeight.value =  `${window.innerHeight * 0.86}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const drawerIsShow = ref(false)
 const currentRow = ref()
 
@@ -110,6 +118,12 @@ const getTableDataList = () => {
 
 onMounted(() => {
   getTableDataList()
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
 })
 
 </script>

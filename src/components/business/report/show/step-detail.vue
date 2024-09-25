@@ -1,6 +1,13 @@
 <template>
   <div>
     <el-collapse v-model="defaultShowDetailInfo">
+      <el-collapse-item name="step_name">
+        <template #title>
+          <div class="el-collapse-item-title"> {{ '步骤名：' }}</div>
+        </template>
+        <div style="text-align: center; font-size: 14px">{{ reportStepData.name }}</div>
+      </el-collapse-item>
+
       <el-collapse-item v-show="reportStepData.attachment" name="attachment">
         <template #title>
           <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
@@ -223,6 +230,13 @@
                         @click="copyDataAsKV(reportStepData.request.data)"
                     >复制为k:v
                     </el-button>
+                    <el-button
+                        v-if="Object.keys(reportStepData.request.data).length > 0"
+                        size="small"
+                        type="primary"
+                        @click="copyDataAsKAndV(reportStepData.request.data)"
+                    >复制为k=v
+                    </el-button>
                   </div>
                   <showJson :json-data="reportStepData.request.data"/>
                 </div>
@@ -254,6 +268,22 @@
                   <div class="el-collapse-item-title"> {{ '查询字符串参数：' }}</div>
                 </template>
                 <div v-if="reportStepData.request.params">
+                  <div style="margin-bottom: 5px">
+                    <el-button
+                        v-if="Object.keys(reportStepData.request.params).length > 0"
+                        size="small"
+                        type="primary"
+                        @click="copyDataAsKV(reportStepData.request.params)"
+                    >复制为k:v
+                    </el-button>
+                    <el-button
+                        v-if="Object.keys(reportStepData.request.params).length > 0"
+                        size="small"
+                        type="primary"
+                        @click="copyDataAsKAndV(reportStepData.request.params)"
+                    >复制为k=v
+                    </el-button>
+                  </div>
                   <showJson :json-data="reportStepData.request.params"/>
                 </div>
               </el-collapse-item>
@@ -498,6 +528,7 @@ const props = defineProps({
 
 // 默认展开报告详情的项
 const defaultShowDetailInfo = ref([
+    'step_name',
     'attachment',
     'runTimeInfo',
     'apiTestRequest',
@@ -547,6 +578,22 @@ const copyDataAsKV = async (data: { [x: string]: any; }) => {
     ElMessage.success("已复制到粘贴板")
   } catch (e) {
     console.error(e);
+  }
+}
+
+const copyDataAsKAndV = async (data) => {
+  if (data){
+    const kvStr = Object.keys(data)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+        .join('&');
+    try {
+      await toClipboard(kvStr);
+      ElMessage.success("已复制到粘贴板")
+    } catch (e) {
+      console.error(e);
+    }
+  }else {
+    ElMessage.warning("空数据，无需复制")
   }
 }
 

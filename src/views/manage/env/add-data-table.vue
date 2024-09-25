@@ -102,15 +102,24 @@
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
+import {getFindElementOption} from "@/utils/get-config";
+import {bus, busEvent} from "@/utils/bus-events";
 
 const tableDataList = ref([{ id: `${Date.now()}`, name: null, value: null, password: null, desc: null }])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.64}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.64}px`
   }else {  // 大屏
-    return `${innerHeight * 0.77}px`
+    tableHeight.value =  `${window.innerHeight * 0.77}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const props = defineProps({
   addType: {
     default: '',
@@ -147,6 +156,15 @@ const delRow = (index: number) => {
 const clearData = () => {
   tableDataList.value[0] = getNewData()
 }
+
+onMounted(() => {
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
 
 defineExpose({
   tableDataList

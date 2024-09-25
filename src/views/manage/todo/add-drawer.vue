@@ -125,6 +125,7 @@ import {ElMessage} from 'element-plus'
 import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
 import {bus, busEvent} from "@/utils/bus-events";
 import {PostTodo, GetTodo} from "@/api/manage/todo";
+import {getFindElementOption} from "@/utils/get-config";
 
 
 onMounted(() => {
@@ -187,13 +188,20 @@ const sendEvent = () => {
 
 const drawerIsShow = ref(false)
 let submitButtonIsLoading = ref(false)
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.73}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.82}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const formData = ref({
   data_list: []
 })
@@ -234,6 +242,15 @@ const addData = () => {
     })
   }
 }
+
+onMounted(() => {
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
 
 </script>
 

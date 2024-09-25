@@ -178,6 +178,14 @@
               @click="changeData(true)"
           >运行</el-button>
 
+          <el-button
+              type="primary"
+              size="small"
+              style="float: left"
+              v-show="dataActiveName=='validates'"
+              @click="showSelectValidator"
+          >选择预置断言</el-button>
+
           <el-button size="small" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
           <el-button
               type="primary"
@@ -209,6 +217,10 @@ import jsonEditorView from '@/components/editor/json-editor.vue'
 import {GetConfigByCode} from "@/api/config/config-value";
 import {paramsListToStr} from "@/utils/parse-data";
 import {ElMessage} from "element-plus";
+
+const showSelectValidator = () => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'showSelectValidator'});
+}
 
 onMounted(() => {
   bus.on(busEvent.changeData, changeParamData);

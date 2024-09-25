@@ -179,13 +179,19 @@ const projectList = ref([])
 const moduleTree = ref([])
 const tableDataTotal = ref(0)
 const sendEvent = 'case-api-list'
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.54}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.54}px`
   }else {  // 大屏
-    return `${innerHeight * 0.70}px`
+    tableHeight.value =  `${window.innerHeight * 0.70}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -265,10 +271,13 @@ const apiToStep = (row: any) => {
 onMounted(() => {
   getProjectList()
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {

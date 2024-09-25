@@ -96,13 +96,14 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import Pagination from '@/components/pagination.vue'
 
 import {GetRunEnvList} from "@/api/config/run-env";
 import {GetAutoTestUser} from "@/api/tools/data-pool";
 import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
+import {bus, busEvent} from "@/utils/bus-events";
 
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
@@ -112,13 +113,20 @@ const queryItems = ref({
   page_size: 20,
   env: undefined
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.73}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.82}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
+
 const envList = ref([])
 const envDict = ref({})
 
@@ -161,8 +169,13 @@ onMounted(() => {
 
     getTableDataList()
   })
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
 
 </script>
 

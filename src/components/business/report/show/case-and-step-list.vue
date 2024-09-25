@@ -120,6 +120,7 @@ const filterNode = (value: string, data: Tree) => {
 
 // 鼠标滑入
 const mouseenter = (data: { name: string; showDropdownMenu: boolean; }) => {
+  data.realName = data.name
   currentNode.value = data
   tempLabel.value = JSON.parse(JSON.stringify(data.name))
   data.name = ellipsis(data.name, 8)

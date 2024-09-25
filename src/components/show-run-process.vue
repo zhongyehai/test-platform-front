@@ -226,13 +226,19 @@ const statusMapping = ref({
   3: 'error',
   4: 'finish'
 })
-const tableHeight = computed(() => {
-  if (innerHeight < 800) {  // 小屏
-    return `${innerHeight * 0.68}px`
-  } else {  // 大屏
-    return `${innerHeight * 0.79}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.68}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.79}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const activeProcess = ref(2)
 const activeStatus = ref(1)
@@ -273,10 +279,13 @@ const reportStepDetailIsShow = ref(false)
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, onShowDrawerEvent);
+  window.removeEventListener('resize', handleResize);
 })
 
 const onShowDrawerEvent = (message: any) => {

@@ -1,6 +1,5 @@
 <template>
-  <div class="layout-container">
-
+  <div >
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
         <el-button type="primary" @click="showEditDrawer(undefined, 'add')"> 添加webhook</el-button>
@@ -125,13 +124,19 @@ const webHookType = {
   'fei_shu': '飞书'
 }
 
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.73}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.68}px`
   }else {  // 大屏
-    return `${innerHeight * 0.82}px`
+    tableHeight.value =  `${window.innerHeight * 0.76}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
@@ -173,10 +178,13 @@ const getTableDataList = () => {
 onMounted(() => {
   getTableDataList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {

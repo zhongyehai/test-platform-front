@@ -253,6 +253,22 @@
 
       <template #footer>
         <div slot="footer" class="dialog-footer">
+          <el-button
+              type="primary"
+              size="small"
+              style="float: left"
+              v-show="activeName=='editParams'"
+              @click="showKVInput = true"
+          >输入k=v内容</el-button>
+
+          <el-button
+              type="primary"
+              size="small"
+              style="float: left"
+              v-show="activeName=='editAssert'"
+              @click="showSelectValidator"
+          >选择预置断言</el-button>
+
           <el-button size="small" @click="drawerIsShow = false"> {{ '取消' }}</el-button>
           <el-button
               type="primary"
@@ -262,6 +278,31 @@
           >保存</el-button>
         </div>
       </template>
+
+      <el-drawer v-model="showKVInput" title="输入k=v内容" size="60%">
+
+        <el-input
+            v-model="KVString"
+            size="small"
+            type="textarea"
+            :rows="20"
+            placeholder="请输入k=v格式的内容"
+        />
+
+        <template #footer>
+          <div slot="footer" class="dialog-footer">
+            <el-button size="small" @click="showKVInput = false"> {{ '取消' }}</el-button>
+            <el-button
+                type="primary"
+                size="small"
+                @click="SaveKVString"
+            >
+              {{ '保存' }}
+            </el-button>
+          </div>
+        </template>
+
+      </el-drawer>
 
     </el-drawer>
   </div>
@@ -336,6 +377,8 @@ const headersViewRef = ref(null)
 const popHeaderFiledInputRef = ref(null)
 const dataDriverViewRef = ref(null)
 const headersActiveName = ref('setHeaders')
+const showKVInput = ref(false)
+const KVString = ref("")
 const formData = ref({
   id: undefined,
   method: undefined,
@@ -419,9 +462,31 @@ const resetForm = () => {
   ruleFormRef.value && ruleFormRef.value.resetFields();
   submitButtonIsLoading.value = false
 }
+
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'step-editor'});
-};
+}
+
+const showSelectValidator = () => {
+  bus.emit(busEvent.drawerIsShow, {eventType: 'showSelectValidator'});
+}
+
+const SaveKVString = () => {
+  if(KVString.value.length > 0){
+    const newParam = []
+    const KVStringParam = KVString.value.split('&')
+
+    KVStringParam.forEach((item, index) => {
+      const [key, value] = item.split('=');
+      if (key) {
+        newParam.push({ 'id': `${Date.now()}_${index}`, 'key': key, 'value': value, 'remark': null, 'data_type': 'str' })
+      }
+    })
+
+    formData.value.params = newParam
+  }
+  showKVInput.value = false
+}
 
 const getApi = (apiId: number, isAdd: boolean) => {
   GetApi({ id: apiId }).then(response => {

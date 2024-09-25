@@ -148,13 +148,19 @@ const drawerIsShow = ref(false)
 const showApiFromRef = ref(null)
 const tableIsLoading = ref(false)
 const tableDataList = ref([])
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.83}px`
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.83}px`
   }else {  // 大屏
-    return `${innerHeight * 0.88}px`
+    tableHeight.value =  `${window.innerHeight * 0.88}px`
   }
-})
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -202,10 +208,13 @@ const apiToStep = (row: any) => {
 
 onMounted(() => {
   bus.on(busEvent.drawerIsShow, busDrawerIsShow);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsShow, busDrawerIsShow);
+  window.removeEventListener('resize', handleResize);
 })
 
 const busDrawerIsShow = (message: any) => {

@@ -149,6 +149,7 @@ import {GetProjectEnv, PutProjectEnv} from "@/api/business-api/project";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {ElMessage, ElTree} from "element-plus";
 import {Help} from "@icon-park/vue-next";
+import {getFindElementOption} from "@/utils/get-config";
 
 const props = defineProps({
   testType: {
@@ -187,21 +188,31 @@ const filterNode = (value: string, data: Tree) => {
   return data.name.includes(value)
 }
 
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.68}px`
-  }else {  // 大屏
-    return `${innerHeight * 0.78}px`
-  }
-})
+const tableHeight = ref('10px')
 
-const attrHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.54}px`
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.68}px`
   }else {  // 大屏
-    return `${innerHeight * 0.7}px`
+    tableHeight.value =  `${window.innerHeight * 0.78}px`
   }
-})
+}
+
+const attrHeight = ref('10px')
+
+const setAttrHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    attrHeight.value = `${window.innerHeight * 0.54}px`
+  }else {  // 大屏
+    attrHeight.value =  `${window.innerHeight * 0.7}px`
+  }
+}
+
+const handleResize = () => {
+  setTableHeight();
+  setAttrHeight();
+}
+
 const businessId = ref()
 const drawerIsShow = ref(false)
 const drawerIsLoading = ref(true)
@@ -317,6 +328,14 @@ const changeData = (isClose: boolean) => {
   })
 }
 
+onMounted(() => {
+  handleResize()
+  window.addEventListener('resize', handleResize);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
 
 </script>
 

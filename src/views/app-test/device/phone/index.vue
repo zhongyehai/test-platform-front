@@ -109,14 +109,20 @@ const queryItems = ref({
   page_size: 20,
   detail: true
 })
-const tableHeight = computed(() =>{
-  if (innerHeight < 800){  // 小屏
-    return `${innerHeight * 0.71}px`
-  }else {  // 大屏
-    return `${innerHeight * 0.81}px`
-  }
-})
 
+const tableHeight = ref('10px')
+
+const setTableHeight = () => {
+  if (window.innerHeight < 800){  // 小屏
+    tableHeight.value = `${window.innerHeight * 0.71}px`
+  }else {  // 大屏
+    tableHeight.value =  `${window.innerHeight * 0.81}px`
+  }
+}
+
+const handleResize = () => {
+  setTableHeight();
+}
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
     await toClipboard(row[column.property]);
@@ -220,11 +226,14 @@ onMounted(() => {
   getDeviceExtends()
   setSort()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
+  setTableHeight()
+  window.addEventListener('resize', handleResize);
 
 })
 
 onBeforeUnmount(() => {
   bus.off(busEvent.drawerIsCommit, drawerIsCommit);
+  window.removeEventListener('resize', handleResize);
 })
 
 const drawerIsCommit = (message: any) => {
