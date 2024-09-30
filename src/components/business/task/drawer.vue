@@ -493,7 +493,7 @@ const formData = ref({
   skip_holiday: 1,
   cron: '0 15 10 ? * MON-FRI',
   is_send: 'not_send',
-  is_async: 1,
+  is_async: 0,
   merge_notify: 0,
   receive_type: 'ding_ding',
   webhook_list: [],
@@ -516,7 +516,7 @@ const formData = ref({
     browser: '',
     server_id: '',
     phone_id: '',
-    no_reset: false
+    no_reset: true
   }
 })
 
@@ -582,7 +582,7 @@ const resetForm = () => {
     skip_holiday: 1,
     cron: '0 15 10 ? * MON-FRI',
     is_send: 'not_send',
-    is_async: 1,
+    is_async: 0,
     merge_notify: 0,
     receive_type: 'ding_ding',
     webhook_list: [],
@@ -605,7 +605,7 @@ const resetForm = () => {
       browser: '',
       server_id: '',
       phone_id: '',
-      no_reset: false
+      no_reset: true
     }
   }
   ruleFormRef.value && ruleFormRef.value.resetFields();

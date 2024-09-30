@@ -1,18 +1,58 @@
 <template>
   <div>
+    <div :style="{color: getColor(reportStepData)}">
+      <div style="text-align: center; margin-bottom: 10px;font-weight: bold">{{ reportStepData.name }} </div>
+    </div>
     <el-collapse v-model="defaultShowDetailInfo">
-      <el-collapse-item name="step_name">
-        <template #title>
-          <div class="el-collapse-item-title"> {{ '步骤名：' }}</div>
-        </template>
-        <div style="text-align: center; font-size: 14px">{{ reportStepData.name }}</div>
-      </el-collapse-item>
 
       <el-collapse-item v-show="reportStepData.attachment" name="attachment">
         <template #title>
           <div class="el-collapse-item-title"> {{ '错误信息：' }}</div>
         </template>
         <pre class="el-collapse-item-content" style="overflow: auto; color: #FA6E86">{{ reportStepData.attachment }}</pre>
+      </el-collapse-item>
+
+      <el-collapse-item v-if="testType === 'api'" name="apiTestResponse">
+        <template #title>
+          <div class="el-collapse-item-title">响应信息:</div>
+        </template>
+        <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px">
+
+          <el-descriptions class="margin-top" :column="2" border>
+            <el-descriptions-item>
+              <template #label> 响应时间</template>
+              {{ reportStepData.stat ? reportStepData.stat.response_at : '-' }}
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+              <template #label> 响应状态码</template>
+              {{ reportStepData.response ? reportStepData.response.status_code : '-' }}
+            </el-descriptions-item>
+          </el-descriptions>
+
+          <el-collapse-item name="responseText">
+            <template #title>
+              <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
+            </template>
+            <!-- 可能返回的是个html文件，<!DOCTYPE 开头-->
+            <pre
+                v-if="reportStepData.response && reportStepData.response.text && reportStepData.response.text.startsWith('<!DOCTYPE')"
+                class="el-collapse-item-content"
+                style="overflow: auto"
+            >{{ reportStepData.response.text }}</pre>
+            <div v-else class="el-collapse-item-content" v-html="reportStepData.response ? reportStepData.response.text : '-'" />
+          </el-collapse-item>
+
+          <el-collapse-item name="responseJson">
+            <template #title>
+              <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
+            </template>
+            <div v-if="reportStepData.response && reportStepData.response.json">
+              <showJson :json-data="reportStepData.response.json"/>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+
       </el-collapse-item>
 
       <el-collapse-item
@@ -310,49 +350,6 @@
         </el-collapse>
       </el-collapse-item>
 
-      <el-collapse-item v-if="testType === 'api'" name="apiTestResponse">
-        <template #title>
-          <div class="el-collapse-item-title">响应信息:</div>
-        </template>
-        <el-collapse v-model="defaultShowResponseInFo" style="margin-left: 10px">
-
-          <el-descriptions class="margin-top" :column="2" border>
-            <el-descriptions-item>
-              <template #label> 响应时间</template>
-              {{ reportStepData.stat ? reportStepData.stat.response_at : '-' }}
-            </el-descriptions-item>
-
-            <el-descriptions-item>
-              <template #label> 响应状态码</template>
-              {{ reportStepData.response ? reportStepData.response.status_code : '-' }}
-            </el-descriptions-item>
-          </el-descriptions>
-
-          <el-collapse-item name="responseText">
-            <template #title>
-              <div class="el-collapse-item-title"> {{ '响应文本：' }}</div>
-            </template>
-            <!-- 可能返回的是个html文件，<!DOCTYPE 开头-->
-            <pre
-                v-if="reportStepData.response && reportStepData.response.text && reportStepData.response.text.startsWith('<!DOCTYPE')"
-                class="el-collapse-item-content"
-                style="overflow: auto"
-            >{{ reportStepData.response.text }}</pre>
-            <div v-else class="el-collapse-item-content" v-html="reportStepData.response ? reportStepData.response.text : '-'" />
-          </el-collapse-item>
-
-          <el-collapse-item name="responseJson">
-            <template #title>
-              <div class="el-collapse-item-title"> {{ '响应json：' }}</div>
-            </template>
-            <div v-if="reportStepData.response && reportStepData.response.json">
-              <showJson :json-data="reportStepData.response.json"/>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-
-      </el-collapse-item>
-
       <el-collapse-item v-if="testType !== 'api'" name="uiTestExecuteInfo">
         <template #title>
           <div class="el-collapse-item-title">执行信息：</div>
@@ -466,6 +463,7 @@ const props = defineProps({
   },
   reportStepData: {
     default: {
+      result: '',
       case_id: undefined,
       name: undefined,
       stat: {elapsed_ms: undefined, content_size: undefined, request_at: undefined, response_at: undefined},
@@ -530,7 +528,6 @@ const props = defineProps({
 const defaultShowDetailInfo = ref([
     'step_name',
     'attachment',
-    'runTimeInfo',
     'apiTestRequest',
     'apiTestResponse',
     'uiTestExecuteInfo',
@@ -565,6 +562,13 @@ const copyDataAsJson = async (data: string | object) => {
   } catch (e) {
     console.error(e);
   }
+}
+
+const getColor = (data) => {
+  return data.result === 'error' ? 'rgb(232, 124, 37)'
+      : data.result === 'fail' ? 'rgb(250, 110, 134)'
+          : data.result === 'skip' ? '#909399'
+              : 'rgb(25, 212, 174)'
 }
 
 const copyDataAsKV = async (data: { [x: string]: any; }) => {

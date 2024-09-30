@@ -344,7 +344,8 @@ const sendReRun = (tempRunArgs: any) => {
     triggerFrom: triggerFrom,
     showSelectRunModel: ['task', 'suite'].indexOf(report.value.run_type) !== -1,
     business_id: project.value.business_id,
-    runArgs: tempRunArgs
+    runArgs: tempRunArgs,
+    runEnv: report.value.summary.env.code
   })
 }
 

@@ -34,6 +34,11 @@ const route: Route[] = [
         path: 'token',
         component: createNameComponent(() => import('@/views/tools/parse-token/index.vue')),
         meta: { title: '解析token', icon: 'userPositioning' }
+      },
+      {
+        path: 'code-diff',
+        component: createNameComponent(() => import('@/views/tools/code-diff/index.vue')),
+        meta: { title: '代码对比', icon: 'fourArrows' } // <iconpark-icon name=""></iconpark-icon>
       }
     ]
   }

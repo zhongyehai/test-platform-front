@@ -19,7 +19,7 @@
             size="small"
             v-show="!showErrorMsg"
             style="margin-left:20px;margin-bottom: 10px"
-            @click="showKVInput = true"
+            @click="clickShowKVInput"
         >填入 k=v 格式
         </el-button>
       </div>
@@ -147,6 +147,11 @@ const SaveKVString = () => {
     tempData.value = JSON.stringify(result)
   }
   showKVInput.value = false
+}
+
+const clickShowKVInput = () => {
+  KVString.value = ""
+  showKVInput.value = true
 }
 
 const copyAsKV = async () => {

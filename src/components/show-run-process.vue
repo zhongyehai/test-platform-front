@@ -302,6 +302,7 @@ const onShowDrawerEvent = (message: any) => {
 const showStepData = (stepDataId) => {
   GetReportStepDetail(props.testType, { id: stepDataId }).then(response => {
     reportStepData.value = response.data.step_data
+    reportStepData.value.result = response.data.result
     reportStepDetailIsShow.value = true
   })
 }

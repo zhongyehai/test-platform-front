@@ -58,6 +58,7 @@
                 <el-scrollbar :style="{height: treeHeight}">
                 <el-tree
                     ref="treeRef"
+                    class="flow-tree"
                     default-expand-all
                     :data="treeData"
                     :props="defaultProps"
@@ -70,7 +71,16 @@
                   <template #default="{ node, data }">
                     <div class="custom-tree-node" @mouseenter="mouseenter(data)" @mouseleave="mouseleave(data)">
                       <span v-if="data.parent === null" style="color: red">{{ node.label }}</span>
-                      <span v-else>{{ node.label }}</span>
+
+                      <span v-else>
+                        <el-tooltip class="item" effect="dark" placement="top-start">
+                          <template #content>
+                            {{ tempLabel }}
+                          </template>
+                          <span>{{ node.label }}</span>
+                        </el-tooltip>
+                      </span>
+
                       <div v-show="data.id === currentNode.id">
                         <SortThree v-show="data.parent" style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showSortDrawer(data)"></SortThree>
                         <Plus style="color: #409EFF;margin: 0; padding: 2px" @click.stop="showEditDrawer('add', node, data)"></Plus>
@@ -121,7 +131,7 @@ import {GetProjectList, GetProject} from '@/api/business-api/project'
 import {bus, busEvent} from "@/utils/bus-events";
 import {arrayToTree, ellipsis} from "@/utils/parse-data";
 import {ElMessageBox, ElTree} from "element-plus";
-import {Plus, UploadOne, Write, Delete, SortThree} from "@icon-park/vue-next";
+import {Plus, UploadOne, Write, Delete, SortThree, Help} from "@icon-park/vue-next";
 import {GetCaseSuiteList, DeleteCaseSuite} from "@/api/business-api/case-suite";
 import {GetConfigByCode} from "@/api/config/config-value";
 // import selectRunEnv from "@/components/select-run-env.vue";

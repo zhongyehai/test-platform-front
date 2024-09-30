@@ -258,8 +258,16 @@
               size="small"
               style="float: left"
               v-show="activeName=='editParams'"
-              @click="showKVInput = true"
+              @click="clickShowKVInput('=')"
           >输入k=v内容</el-button>
+
+          <el-button
+              type="primary"
+              size="small"
+              style="float: left"
+              v-show="activeName=='editParams'"
+              @click="clickShowKVInput(':')"
+          >输入k:v内容</el-button>
 
           <el-button
               type="primary"
@@ -279,14 +287,14 @@
         </div>
       </template>
 
-      <el-drawer v-model="showKVInput" title="输入k=v内容" size="60%">
+      <el-drawer v-model="showKVInput" :title='KVStringType === "=" ? "请输入k1=v1&k2=v2格式的内容" : `输入{"k1":"v1","k2":"v2"}内容` '  size="60%">
 
         <el-input
             v-model="KVString"
             size="small"
             type="textarea"
             :rows="20"
-            placeholder="请输入k=v格式的内容"
+            :placeholder='KVStringType === "=" ? "请输入k1=v1&k2=v2格式的内容" : `输入{"k1":"v1","k2":"v2"}内容` '
         />
 
         <template #footer>
@@ -303,7 +311,6 @@
         </template>
 
       </el-drawer>
-
     </el-drawer>
   </div>
 </template>
@@ -379,6 +386,7 @@ const dataDriverViewRef = ref(null)
 const headersActiveName = ref('setHeaders')
 const showKVInput = ref(false)
 const KVString = ref("")
+const KVStringType = ref("=")
 const formData = ref({
   id: undefined,
   method: undefined,
@@ -463,6 +471,12 @@ const resetForm = () => {
   submitButtonIsLoading.value = false
 }
 
+const clickShowKVInput = (showType) => {
+  KVStringType.value = showType
+  KVString.value = ""
+  showKVInput.value = true
+}
+
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'step-editor'});
 }
@@ -472,20 +486,33 @@ const showSelectValidator = () => {
 }
 
 const SaveKVString = () => {
-  if(KVString.value.length > 0){
-    const newParam = []
-    const KVStringParam = KVString.value.split('&')
+  if (KVStringType.value === ':'){
+    try {
+      const temp = JSON.parse(KVString.value)
+      const newParam = []
+      Object.keys(temp).forEach((key, index) => {
+        newParam.push({ 'id': `${Date.now()}_${index}`, 'key': key, 'value': temp[key].toString(), 'remark': null, 'data_type': 'str' })
+      })
+      formData.value.params = newParam
+      showKVInput.value = false
+    }catch(error) {
+      ElMessage.error("格式错误，请检查数据");
+    }
+  }else {
+    if(KVString.value.length > 0){
+      const newParam = []
+      const KVStringParam = KVString.value.split('&')
 
-    KVStringParam.forEach((item, index) => {
-      const [key, value] = item.split('=');
-      if (key) {
-        newParam.push({ 'id': `${Date.now()}_${index}`, 'key': key, 'value': value, 'remark': null, 'data_type': 'str' })
-      }
-    })
-
-    formData.value.params = newParam
+      KVStringParam.forEach((item, index) => {
+        const [key, value] = item.split('=');
+        if (key) {
+          newParam.push({ 'id': `${Date.now()}_${index}`, 'key': key, 'value': value, 'remark': null, 'data_type': 'str' })
+        }
+      })
+      formData.value.params = newParam
+    }
+    showKVInput.value = false
   }
-  showKVInput.value = false
 }
 
 const getApi = (apiId: number, isAdd: boolean) => {

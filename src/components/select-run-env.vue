@@ -23,7 +23,7 @@
               </span>
               </label>
             </div>
-            <runEnvCheckbox ref="runEnvCheckboxRef" :run-env-list="runEnvList" :get-item="'code'" />
+            <runEnvCheckbox ref="runEnvCheckboxRef" :run-env-list="runEnvList" :default-env="defaultEnv" :get-item="'code'" />
           </div>
 
           <!-- 选择运行浏览器 -->
@@ -292,7 +292,7 @@ const showRunArgs = ref(false)
 const runBrowser = ref(undefined)
 const runServer = ref(undefined)
 const runPhone = ref(undefined)
-const noReset = ref(false)
+const noReset = ref(true)
 const runModeData = ref(undefined)
 const runEnvCheckboxRef = ref(null)
 const skipIfViewRef = ref(null)
@@ -305,6 +305,7 @@ const runArgs = ref({
   run_times: 1
 })
 const runEnvList = ref([])
+const defaultEnv = ref()
 const runType = ref('0')
 const showTabName = ref('selectRunEnv')
 const showArgsTabName = ref('variables')
@@ -348,7 +349,7 @@ const onDrawerIsShow = (message) => {
       initRunMode()
     } else if (props.testType === 'app') {
       getRunAppEnv()
-      noReset.value = false
+      noReset.value = true
     } else {
       initRunMode()
       initBrowserName()
@@ -368,6 +369,12 @@ const onDrawerIsShow = (message) => {
         headers: [],
         run_times: 1
       }
+    }
+
+    if (message.runEnv){
+      defaultEnv.value = message.runEnv
+    }else {
+      defaultEnv.value = ""
     }
 
     showTabName.value = 'selectRunEnv'

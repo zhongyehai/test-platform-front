@@ -38,6 +38,10 @@ const props = defineProps({
     default: 'code',
     type: String,
   },
+  defaultEnv: {
+    default: '',
+    type: String,
+  },
 })
 
 const allEnvItemList = ref([])  // 全选数据，根据传入的要获取的项判断
@@ -58,8 +62,19 @@ const handleCheckedItemChange = (value: string | any[]) => {
   isIndeterminate.value = checkedCount > 0 && checkedCount < allEnvItemList.value.length
 }
 
+const setSelectedEnvDataList = (defaultEnv) => {
+  if (defaultEnv){
+    if (allEnvItemList.value.indexOf(defaultEnv) != -1){
+      selectedEnvDataList.value = [defaultEnv]
+    }else {
+      selectedEnvDataList.value = []
+    }
+  }else {
+    selectedEnvDataList.value = []
+  }
+}
+
 const initData = () => {
-  selectedEnvDataList.value = []
   envGroupDataDict.value = {}
   props.runEnvList.forEach((env: any) => {
     let item: string = props.getItem === 'code' ? env.code : env.id
@@ -70,11 +85,17 @@ const initData = () => {
       envGroupDataDict.value[env.group] = []
     }
     envGroupDataDict.value[env.group].push(env)
+
+    setSelectedEnvDataList(props.defaultEnv)
   })
 }
 
 onMounted(() => {
   initData()
+})
+
+watch(() => props.defaultEnv, (newValue, oldValue) => {
+  setSelectedEnvDataList(newValue)
 })
 
 watch(() => props.runEnvList, (newValue, oldValue) => {

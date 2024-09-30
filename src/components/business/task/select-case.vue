@@ -29,7 +29,16 @@
                 :default-checked-keys="tempSuiteIdList"
                 :props="defaultProps"
                 @node-click="clickTree"
-            />
+            >
+              <template #default="{ node, data }">
+                <el-tooltip class="item" effect="dark" placement="top-start">
+                  <template #content>
+                    {{ node.label }}
+                  </template>
+                  <span>{{ node.label }}</span>
+                </el-tooltip>
+              </template>
+            </el-tree>
             </el-scrollbar>
           </el-tab-pane>
         </el-tabs>
@@ -103,9 +112,10 @@
 <script lang="ts" setup>
 
 import {ref, watch, nextTick, computed} from "vue";
-import {Help} from "@icon-park/vue-next";
+import {Delete, Help, Plus, SortThree, Write} from "@icon-park/vue-next";
 import showCaseDesc from '@/components/business/case/show-desc.vue'
 import {GetCaseList} from "@/api/business-api/case";
+import {ElTree} from "element-plus";
 
 const props = defineProps({
   testType: {

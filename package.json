@@ -1,6 +1,9 @@
 {
   "name": "test-platform",
   "version": "1.1.0",
+  "private": true,
+  "license": "MIT",
+  "repository": "https://github.com/zhongyehai/test-platform-front.git",
   "scripts": {
     "dev": "vite",
     "start": "vite",
@@ -21,6 +24,8 @@
     "mitt": "^3.0.1",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
+    "test": "file:../../../../Users/PC/Documents/starRailScript",
+    "v-code-diff": "^1.13.1",
     "vue": "^3.4.3",
     "vue-clipboard3": "^2.0.0",
     "vue-draggable-plus": "^0.3.4",

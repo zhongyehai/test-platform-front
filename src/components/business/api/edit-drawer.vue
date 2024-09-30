@@ -182,6 +182,14 @@
               type="primary"
               size="small"
               style="float: left"
+              v-show="dataActiveName=='params'"
+              @click="clickShowKVInput()"
+          >输入k:v内容</el-button>
+
+          <el-button
+              type="primary"
+              size="small"
+              style="float: left"
               v-show="dataActiveName=='validates'"
               @click="showSelectValidator"
           >选择预置断言</el-button>
@@ -195,6 +203,31 @@
           >保存</el-button>
         </div>
       </template>
+
+      <el-drawer v-model="showKVInput" title='请输入{"k1":"v1","k2":"v2"}内容'  size="60%">
+
+        <el-input
+            v-model="KVString"
+            size="small"
+            type="textarea"
+            :rows="20"
+            placeholder='请输入{"k1":"v1","k2":"v2"}内容'
+        />
+
+        <template #footer>
+          <div slot="footer" class="dialog-footer">
+            <el-button size="small" @click="showKVInput = false"> {{ '取消' }}</el-button>
+            <el-button
+                type="primary"
+                size="small"
+                @click="SaveKVString"
+            >
+              {{ '保存' }}
+            </el-button>
+          </div>
+        </template>
+
+      </el-drawer>
 
     </el-drawer>
   </div>
@@ -281,6 +314,8 @@ const props = defineProps({
 const drawerIsShow = ref(false)
 const dataActiveName = ref('headers')
 const busEventParam = 'param'
+const showKVInput = ref(false)
+const KVString = ref("")
 const submitButtonIsLoading = ref(false)
 const moduleTree = ref([])
 const methodsList = ref([])
@@ -365,6 +400,25 @@ const resetForm = () => {
 const sendEvent = () => {
   bus.emit(busEvent.drawerIsCommit, {eventType: 'api-editor'});
 };
+
+const clickShowKVInput = () => {
+  KVString.value = ""
+  showKVInput.value = true
+}
+
+const SaveKVString = () => {
+    try {
+      const temp = JSON.parse(KVString.value)
+      const newParam = []
+      Object.keys(temp).forEach((key, index) => {
+        newParam.push({ 'id': `${Date.now()}_${index}`, 'key': key, 'value': temp[key].toString(), 'remark': null, 'data_type': 'str' })
+      })
+      formData.value.params = newParam
+      showKVInput.value = false
+    }catch(error) {
+      ElMessage.error("格式错误，请检查数据");
+    }
+}
 
 const getMethods = () => {
   if (methodsList.value.length < 1){

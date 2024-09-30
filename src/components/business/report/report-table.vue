@@ -21,11 +21,10 @@
     </el-select>
 
     <el-select
-        v-model="queryItems.env_list"
+        v-model="queryItems.run_env"
         style="width: 150px; margin-right: 10px"
         placeholder="运行环境"
         size="small"
-        multiple
         clearable
         default-first-option
     >
@@ -264,7 +263,7 @@ const queryItems = ref({
   project_id: undefined,
   name: undefined,
   create_user: undefined,
-  env_list: [],
+  run_env: undefined,
   run_type: undefined,
   trigger_type: undefined,
   trigger_id: undefined
@@ -336,7 +335,8 @@ const sendReRun = (tempRunArgs: any) => {
     triggerFrom: triggerFrom,
     showSelectRunModel: ['task', 'suite'].indexOf(report.value.run_type) !== -1,
     business_id: projectBusinessId.value,
-    runArgs: tempRunArgs
+    runArgs: tempRunArgs,
+    runEnv: report.value.summary.env.code
   })
 }
 

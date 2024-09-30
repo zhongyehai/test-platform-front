@@ -213,6 +213,7 @@ const reportCase = ref({
   error_msg: ''
 })
 const reportStep = ref({
+  result: '',
   case_id: undefined,
   name: undefined,
   stat: {elapsed_ms: undefined, content_size: undefined, request_at: undefined, response_at: undefined},
@@ -269,6 +270,7 @@ const getStepData = (reportStepId: any) => {
   GetReportStepDetail(props.testType, {id: reportStepId}).then(response => {
     treeIsLoading.value = false
     reportStep.value = response.data.step_data
+    reportStep.value.result = response.data.result
     reportStepDetailIsShow.value = true
 
     // 非接口测试，获取对应的步骤截图
