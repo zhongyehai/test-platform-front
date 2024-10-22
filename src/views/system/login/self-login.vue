@@ -66,7 +66,7 @@ const platformName = ref()
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
-const form = reactive({account: 'common', password: 'common', loading: false})
+const form = reactive({account: '', password: '', loading: false})
 const passwordType = ref('password')
 const passwordTypeChange = () => {
   passwordType.value === '' ? passwordType.value = 'password' : passwordType.value = ''
@@ -107,6 +107,12 @@ onMounted(() => {
     GetConfigByCode({ code: 'platform_name' }).then(response => {
       platformName.value = response.data
       localStorage.setItem('platform_name', response.data)
+    })
+
+    // 获取配置的默认登录账户
+    GetConfigByCode({ code: 'default_account' }).then(response => {
+      form.account = response.data.account
+      form.password = response.data.password
     })
 })
 
