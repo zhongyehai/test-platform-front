@@ -123,7 +123,7 @@
         </template>
 
         <el-table
-            :data="reportCaseData.case_data.variables"
+            :data="objectToList(reportCaseData.case_data.variables)"
             size="small"
             stripe
         >
@@ -155,7 +155,8 @@
         <template #title>
           <div class="el-collapse-item-title"> {{ '头部信息：' }}</div>
         </template>
-        <el-table :data="reportCaseData.case_data.headers" size="small" stripe>
+
+        <el-table :data="objectToList(reportCaseData.case_data.headers)" size="small" stripe>
           <el-table-column prop="num" label="序号" align="center" min-width="10%">
             <template #default="scope">
               <span> {{ scope.$index + 1 }} </span>
@@ -184,6 +185,7 @@
         <template #title>
           <div class="el-collapse-item-title"> {{ '跳过条件：' }}</div>
         </template>
+
         <skipIfView
             ref="skipIfView"
             :test-type="testType"
@@ -220,6 +222,14 @@ const props = defineProps({
 const defaultShowDetailInfo =  ['error_msg', 'caseInfo', 'stepInfo', props.reportCaseData.error_msg ? 'error_msg' : '']
 const resultMapping = {waite: '等待', running: '执行中', fail: '不通过', success: '通过', skip: '跳过', error: '报错'}
 const resultTagMapping = {waite: 'info', running: '', fail: 'danger', success: 'success', skip: 'info', error: 'warning'}
+
+const objectToList = (variables) => {
+  let newVariables = []
+  Object.keys(variables).forEach(key => {
+    newVariables.push({key: key, value: variables[key]})
+  })
+  return newVariables
+}
 
 </script>
 

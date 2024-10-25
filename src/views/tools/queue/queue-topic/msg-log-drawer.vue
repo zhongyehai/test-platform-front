@@ -43,7 +43,8 @@
 
         <el-table-column show-overflow-tooltip label="状态" prop="status" align="center" min-width="10%">
           <template #default="scope">
-            <span> {{ scope.row.status }} </span>
+            <el-tag type="success" v-show="scope.row.status == 'success'">成功</el-tag>
+            <el-tag type="danger" v-show="scope.row.status != 'success'">失败</el-tag>
           </template>
         </el-table-column>
 
@@ -133,7 +134,7 @@ const changePagination = (pagination: any) => {
 
 const showReSendMsgDrawer = (command: string, row: object) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'queue-topic', command: command, content: {
-      topic_id: row.topic_id, tag: row.tag, message: row.message, options: row.options
+      topic_id: row.topic_id, tag: row.tag, message_type: row.message_type, message: row.message, options: row.options
     }})
 }
 

@@ -28,7 +28,19 @@
 
         <el-form-item v-show="command === 'sendMsg'" label="消息体" class="is-required" prop="message" size="small">
           <div style="width: 100%">
-            <jsonEditorView ref="msgEditorViewRef" :json-data="formData.message" height="600px"/>
+            <el-radio-group v-model="messageType">
+              <el-radio label="json">json</el-radio>
+              <el-radio label="str">字符串</el-radio>
+            </el-radio-group>
+            <jsonEditorView v-show="messageType == 'json'" ref="msgEditorViewRef" :json-data="formData.message" height="600px"/>
+            <div v-show="messageType == 'str'">
+              <el-input
+                  v-model="formData.message"
+                  autosize
+                  type="textarea"
+                  placeholder="请输入字符串消息"
+              />
+            </div>
           </div>
         </el-form-item>
       </el-form>
@@ -105,10 +117,12 @@ const getQueue = (content: number, command: string) => {
         formData.value.message = content.message
         formData.value.tag = content.tag
         formData.value.options = content.options
+        messageType.value = content.message_type || 'json'
       }else {
         formData.value.message = {}
         formData.value.tag = ''
         formData.value.options = {KEYS: null, MERCHANTID: null}
+        messageType.value = 'json'
       }
     }
   })
@@ -131,11 +145,13 @@ const drawerIsShow = ref(false)
 const optionsEditorViewRef = ref(null)
 const msgEditorViewRef = ref(null)
 let submitButtonIsLoading = ref(false)
+const messageType = ref('json')
 const formData = ref({
   id: undefined,
   instance_id: '',
   topic: '',
   desc: '',
+  messageType: {},
   message: {},
   tag: '',
   options: {KEYS: null, MERCHANTID: null}
@@ -221,12 +237,19 @@ const getMessageDataJson = () => {
 
 const sendMsg = () => {
   const options = getOptionsDataJson()
-  const msg = getMessageDataJson()
+  let msg = ''
+  if (messageType.value == 'json') {
+    msg = getMessageDataJson()
+  }else {
+    msg = formData.value.message
+  }
+
   submitButtonIsLoading.value = true
   SendMsgToQueueTopic({
     id: formData.value.id,
     tag: formData.value.tag,
     options: options,
+    message_type: messageType.value,
     message: msg
   }).then(response => {
     submitButtonIsLoading.value = false
