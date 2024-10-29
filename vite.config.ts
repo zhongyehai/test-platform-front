@@ -1,7 +1,7 @@
 import { ConfigEnv, UserConfigExport } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // @ts-ignore
-import {vitePluginSvg} from "@webxrd/vite-plugin-svg"
+// import {vitePluginSvg} from "@webxrd/vite-plugin-svg"
 import { resolve } from 'path'
 
 const pathResolve = (dir: string): any => {
@@ -52,29 +52,29 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
     },
     plugins: [
       vue(),
-      vitePluginSvg({
-        // 必要的。必须是绝对路径组成的数组。
-        iconDirs: [
-            resolve(__dirname, 'src/assets/svg'),
-        ],
-        // 必要的。入口script
-        main: resolve(__dirname, 'src/main.js'),
-        symbolIdFormat: 'icon-[name]'
-      }),
+      // vitePluginSvg({
+      //   // 必要的。必须是绝对路径组成的数组。
+      //   iconDirs: [
+      //       resolve(__dirname, 'src/assets/svg'),
+      //   ],
+      //   // 必要的。入口script
+      //   main: resolve(__dirname, 'src/main.js'),
+      //   symbolIdFormat: 'icon-[name]'
+      // }),
     ],
     css: {
       postcss: {
         plugins: [
-            {
-              postcssPlugin: 'internal:charset-removal',
-              AtRule: {
-                charset: (atRule) => {
-                  if (atRule.name === 'charset') {
-                    atRule.remove();
-                  }
+          {
+            postcssPlugin: 'internal:charset-removal',
+            AtRule: {
+              charset: (atRule) => {
+                if (atRule.name === 'charset') {
+                  atRule.remove();
                 }
               }
             }
+          }
         ],
       },
     }

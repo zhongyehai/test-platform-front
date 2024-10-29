@@ -7,10 +7,10 @@
 ## 步骤
 
 ```bash
-# 1.安装node14.x（一定要控制在14.x，版本太高会出一系列幺蛾子），确保在 cmd 下 node -v 能出现版本号
+# 1.安装node18+，确保在 cmd 下 node -v 能出现版本号
 # 2.克隆并进入项目目录
 # 3.安装依赖
-npm install --registry=https://registry.npm.taobao.org
+npm install --registry=https://registry.npmmirror.com
 
 # 4.启动服务
 npm run dev
