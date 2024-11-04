@@ -82,6 +82,16 @@
                     </template>
                   </el-table-column>
 
+                  <el-table-column show-overflow-tooltip prop="receive_type" label="发送报告" align="center" min-width="10%">
+                    <template #default="scope">
+                      <span v-show="scope.row.is_send === 'not_send'">-</span>
+                      <span v-show="scope.row.is_send !== 'not_send'"> {{
+                          scope.row.receive_type === 'ding_ding' ? "钉钉" :
+                          scope.row.receive_type === 'we_chat' ? "企业微信" : '邮件'
+                        }} </span>
+                    </template>
+                  </el-table-column>
+
                   <el-table-column prop="merge_notify" label="通知" align="center" min-width="10%">
                     <template #header>
                       <span>通知</span>

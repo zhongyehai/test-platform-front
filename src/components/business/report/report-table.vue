@@ -186,7 +186,7 @@
           <el-popconfirm :title="`确定删除【${ scope.row.name }】?`" @confirm="deleteData(scope.row)">
             <template #reference>
               <el-button
-                  :disabled="scope.row.status === 1"
+                  v-show="scope.row.status !== 1"
                   style="margin: 0; padding: 2px;color: red"
                   type="text"
                   size="small"
