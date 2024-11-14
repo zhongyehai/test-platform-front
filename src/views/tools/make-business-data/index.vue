@@ -124,7 +124,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column label="操作" align="left" width="80">
+                  <el-table-column label="操作" align="left" width="130">
                     <template #default="scope">
 
                       <!-- 运行用例 -->
@@ -132,6 +132,9 @@
 
                       <!--修改用例-->
                       <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="editCase(scope.row)">修改 </el-button>
+
+                      <!--查看报告-->
+                      <el-button type="text" size="small" style="margin: 0; padding: 2px" @click="showReport(scope.row)">查看报告</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -141,18 +144,21 @@
         </el-col>
       </el-row>
 
-      <selectRunEnv :test-type="'api'" :project-business-id="selectBusinessId"></selectRunEnv>
+<!--      <selectRunEnv :test-type="'api'" :project-business-id="selectBusinessId"></selectRunEnv>-->
       <showRunProcess :test-type="'api'"></showRunProcess>
 
       <editCaseDrawer :test-type="'api'" :project-id="selectProjectId"/>
 
+      <el-drawer v-model="reportTableIsShow" title="报告列表" size="80%">
+        <ReportTable :test-type="testType" :user-dict="userDict" :user-list="userList"></ReportTable>
+      </el-drawer>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import SelectRunEnv from "@/components/select-run-env.vue";
+// import SelectRunEnv from "@/components/select-run-env.vue";
 import ShowRunProcess from "@/components/show-run-process.vue";
 import showCaseDesc from '@/components/business/case/show-desc.vue'
 import editCaseDrawer from '@/components/business/case/edit-drawer.vue'
@@ -161,6 +167,8 @@ import {GetBusinessList} from "@/api/config/business";
 import {GetProjectList} from "@/api/business-api/project";
 import {GetMakeDataCaseList, RunCase} from "@/api/business-api/case";
 import {ElTree} from "element-plus";
+import ReportTable from "@/components/business/report/report-table.vue";
+import {GetUserList} from "@/api/system/user";
 
 const isLoading = ref(false)
 const businessListTab = ref('业务线列表')
@@ -195,6 +203,9 @@ const caseList = ref([])
 const runCaseId = ref([])
 const testType = 'api'
 const triggerFrom = 'make-business-data'
+const reportTableIsShow = ref(false)
+const userList = ref([])
+const userDict = ref({})
 const scrollHeight = computed(() =>{
   if (innerHeight < 800){  // 小屏
     return `${innerHeight * 0.73}px`
@@ -202,6 +213,15 @@ const scrollHeight = computed(() =>{
     return `${innerHeight * 0.82}px`
   }
 })
+
+const getUserList = () => {
+  GetUserList({}).then((response: object) => {
+    userList.value = response.data.data
+    response.data.data.forEach(item => {
+      userDict.value[item.id] = item.name
+    })
+  })
+}
 
 const getProjectList = (row: { id: any; }) => {
   caseList.value = []
@@ -226,6 +246,18 @@ const getCaseList = (row: { id: any; } | undefined) => {
       isLoading.value = false
       caseList.value = response.data.data
     })
+}
+
+// 查看报告
+const showReport = (row) => {
+  reportTableIsShow.value = true
+  bus.emit(busEvent.drawerIsShow, {
+    eventType: 'show-report-table',
+    projectId: selectProjectId.value,
+    businessId: undefined,
+    runType: 'case',
+    triggerId: row.id
+  })
 }
 
 // 编辑用例
@@ -288,7 +320,14 @@ const getBusinessList = () => {
 }
 
 onMounted(() => {
+  nextTick(() => {
+    reportTableIsShow.value = true
+    setTimeout(function() {
+      reportTableIsShow.value = false // 确保报告的组件会渲染，先打开一次
+    }, 1)
+  });
   getBusinessList()
+  getUserList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
 })
 

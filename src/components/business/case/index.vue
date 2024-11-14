@@ -38,7 +38,7 @@
             <template #reference>
               <el-button
                   :disabled="selectedList.length < 1"
-                  type="primary"
+                  type="info"
                   size="small">批量改为未调试-不执行</el-button>
             </template>
           </el-popconfirm>
@@ -47,7 +47,7 @@
             <template #reference>
               <el-button
                   :disabled="selectedList.length < 1"
-                  type="primary"
+                  type="success"
                   size="small">批量改为调试通过-要执行</el-button>
             </template>
           </el-popconfirm>
@@ -56,7 +56,7 @@
             <template #reference>
               <el-button
                   :disabled="selectedList.length < 1"
-                  type="primary"
+                  type="info"
                   size="small">批量改为调试通过-不执行</el-button>
             </template>
           </el-popconfirm>
@@ -65,7 +65,7 @@
             <template #reference>
               <el-button
                   :disabled="selectedList.length < 1"
-                  type="primary"
+                  type="danger"
                   size="small">批量改为调试不通过-不执行</el-button>
             </template>
           </el-popconfirm>
@@ -324,7 +324,6 @@ const showChangeCaseParent = () => {
 }
 
 const showReport = (row) => {
-  console.log('row: ', JSON.stringify(row))
   reportTableIsShow.value = true
   bus.emit(busEvent.drawerIsShow, {
     eventType: 'show-report-table',
