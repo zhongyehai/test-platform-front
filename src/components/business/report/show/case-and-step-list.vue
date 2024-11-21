@@ -140,9 +140,8 @@ const getColor = (data) => {
 }
 
 const getTage = (data) => {
-  return data.report_case_id ? '步骤'
-      : data.suite_id ? '用例'
-      : data.result ? '用例集' : '接口'
+  return data.summary === undefined ? '用例集' :
+      data.report_case_id ? '步骤' : '用例'
 }
 
 const getDuration = (data) => {
@@ -154,7 +153,7 @@ const clickTree = (data: any) => {
   if (data.report_case_id) { // 点步骤
     getStepData(data.id)
     reportCaseDetailIsShow.value = false
-  } else if (data.suite_id) { // 点用例
+  } else if (data.summary !== undefined) { // 点用例
     reportCase.value = JSON.parse(JSON.stringify(data))
     reportStepDetailIsShow.value = false
     reportCaseDetailIsShow.value = true
