@@ -31,7 +31,7 @@
                     'textDecoration': data.result === 'skip' ? 'line-through' : ''
                   }"
                   >
-                    <span style="font-size: 12px">【{{ getTage(data) }}】{{ getDuration(data) }}</span>
+                    <span style="font-size: 12px">【{{ getTage(data) }}】<span :style="{color: getSpanColor(data)}">{{ getDuration(data) }}</span></span>
                     <span>{{ node.label }}</span>
                   </span>
                     <span v-show="data.id === currentNode.id && data.suite_id && data.result !== 'waite'">
@@ -147,6 +147,20 @@ const getTage = (data) => {
 const getDuration = (data) => {
   if (!data.summary) return ''
   return data.summary.time ? `【${data.summary.time.all_duration}秒】` : `【${data.summary.elapsed_ms}毫秒】`
+}
+
+// 如果是接口自动化测试，把响应时间长的耗时标注出来
+const getSpanColor = (data) => {
+  if (props.testType !== 'api' || !data.summary || !data.summary.elapsed_ms){
+    return ''
+  }
+  else if (data.summary.elapsed_ms > 1000) { // 响应时间大于1秒
+    return 'rgb(250, 110, 134)'
+  }
+  else if (data.summary.elapsed_ms > 300) { // 响应时间大于500毫秒
+    return 'rgb(232, 124, 37)'
+  }
+  return 'rgb(25, 212, 174)'
 }
 
 const clickTree = (data: any) => {
