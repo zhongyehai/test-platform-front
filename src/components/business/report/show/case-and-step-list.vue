@@ -88,6 +88,7 @@ import {bus, busEvent} from "@/utils/bus-events";
 import showReportCaseDetailView from './case-detail.vue'
 import showReportStepDetailView from './step-detail.vue'
 import {ellipsis} from "@/utils/parse-data";
+import {GetConfigByCode} from "@/api/config/config-value";
 
 const props = defineProps({
   testType: {
@@ -108,6 +109,7 @@ const defaultProps = {
   children: 'children',
   label: 'name',
 }
+const responseTimeLevel = ref({"fast": 300, "slow": 1000})
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
@@ -154,10 +156,10 @@ const getSpanColor = (data) => {
   if (props.testType !== 'api' || !data.summary || !data.summary.elapsed_ms){
     return ''
   }
-  else if (data.summary.elapsed_ms > 1000) { // 响应时间大于1秒
+  else if (data.summary.elapsed_ms > responseTimeLevel.value.slow) { // 响应时间大于1秒
     return 'rgb(250, 110, 134)'
   }
-  else if (data.summary.elapsed_ms > 300) { // 响应时间大于500毫秒
+  else if (data.summary.elapsed_ms > responseTimeLevel.value.fast) { // 响应时间大于300毫秒
     return 'rgb(232, 124, 37)'
   }
   return 'rgb(25, 212, 174)'
@@ -313,6 +315,12 @@ const getStepData = (reportStepId: any) => {
   })
 }
 
+const getResponseTimeLevel = () => {
+  GetConfigByCode({ code: 'response_time_level' }).then(response => {
+    responseTimeLevel.value = response.data
+  })
+}
+
 const getReportSuiteList = () => {
   treeIsLoading.value = true
   GetReportSuiteList(props.testType, {report_id: reportId.value}).then(response => {
@@ -342,6 +350,7 @@ const showCaseEditor = (row: { case_id: any; }) => {
 }
 
 onMounted(() => {
+  getResponseTimeLevel()
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
 })
 
