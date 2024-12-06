@@ -6,9 +6,17 @@
         <el-tabs v-model="caseListTab">
           <el-tab-pane :label="caseListTab" :name="caseListTab">
             <span>
-              <el-input v-model="filterText" placeholder="输入关键字过滤" style="width: 70%;margin-right: 10px"/>
-              <el-button type="primary" @click="treeIsShowAll('expand')" style="margin: 0 5px 0 0; padding: 4px; float: right">展开全部</el-button>
-              <el-button type="primary" @click="treeIsShowAll('collapse')" style="margin: 0 5px 0 0; padding: 4px; float: right">收起全部</el-button>
+              <el-select v-model="responseTimeLevelFilter" placeholder="根据响应时间筛选" size="small" style="width: 20%;margin-right: 5px" @change="selectByResponseTime">
+                <el-option
+                    v-for="item in responseTimeLevelFilterOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+              </el-select>
+              <el-input v-model="filterText" placeholder="输入关键字过滤" style="width: 55%;margin-right: 5px"/>
+              <el-button type="primary" @click="treeIsShowAll('expand')" style="margin: 0 3px 0 0; padding: 4px; float: right">展开全部</el-button>
+              <el-button type="primary" @click="treeIsShowAll('collapse')" style="margin: 0 3px 0 0; padding: 4px; float: right">收起全部</el-button>
             </span>
             <el-scrollbar class="aside_scroll" :style="{height: `${treeScrollHeight}`}">
               <el-tree
@@ -16,7 +24,7 @@
                   ref="treeRef"
                   class="filter-tree"
                   node-key="id"
-                  :data="suiteList"
+                  :data="treeShowList"
                   :props="defaultProps"
                   highlight-current
                   :default-expanded-keys="suiteIdList"
@@ -109,7 +117,9 @@ const defaultProps = {
   children: 'children',
   label: 'name',
 }
-const responseTimeLevel = ref({"fast": 300, "slow": 1000})
+const responseTimeLevel = ref({"slow": 300, "very_slow": 1000})
+const responseTimeLevelFilterOptions = ref({})
+const responseTimeLevelFilter = ref(0)
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
@@ -156,10 +166,10 @@ const getSpanColor = (data) => {
   if (props.testType !== 'api' || !data.summary || !data.summary.elapsed_ms){
     return ''
   }
-  else if (data.summary.elapsed_ms > responseTimeLevel.value.slow) { // 响应时间大于1秒
+  else if (data.summary.elapsed_ms > responseTimeLevel.value.very_slow) {
     return 'rgb(250, 110, 134)'
   }
-  else if (data.summary.elapsed_ms > responseTimeLevel.value.fast) { // 响应时间大于300毫秒
+  else if (data.summary.elapsed_ms > responseTimeLevel.value.slow) {
     return 'rgb(232, 124, 37)'
   }
   return 'rgb(25, 212, 174)'
@@ -179,6 +189,9 @@ const clickTree = (data: any) => {
 const reportId = ref()
 const treeIsLoading = ref(false)
 const suiteList = ref([])
+const slowList = ref([])
+const verySlowList = ref([])
+const treeShowList = ref([])
 const suiteIdList = ref([])
 const currentNode = ref({id: undefined})
 const treeScrollHeight = computed(() => {
@@ -318,6 +331,11 @@ const getStepData = (reportStepId: any) => {
 const getResponseTimeLevel = () => {
   GetConfigByCode({ code: 'response_time_level' }).then(response => {
     responseTimeLevel.value = response.data
+    responseTimeLevelFilterOptions.value = [
+        {label: "展示全部", value: 0},
+        {label: `耗时>${responseTimeLevel.value.slow}毫秒`, value: responseTimeLevel.value.slow},
+        {label: `耗时>${responseTimeLevel.value.very_slow}毫秒`, value: responseTimeLevel.value.very_slow},
+    ]
   })
 }
 
@@ -326,10 +344,40 @@ const getReportSuiteList = () => {
   GetReportSuiteList(props.testType, {report_id: reportId.value}).then(response => {
     treeIsLoading.value = false
     suiteList.value = response.data
-    response.data.forEach(item => {
-      suiteIdList.value.push(item.id)
+    treeShowList.value = suiteList.value
+    response.data.forEach(suite => {
+      suiteIdList.value.push(suite.id)
+      groupByElapsedMs(suite)
     })
   })
+}
+
+// 根据响应时间分组，方便筛选
+const groupByElapsedMs = (suite) => {
+  if (suite.children && suite.children.length > 0) {
+    suite.children.forEach(testCase => {
+      if (testCase.children && testCase.children.length > 0) {
+        testCase.children.forEach(testStep => {
+          if (testStep.summary.elapsed_ms > responseTimeLevel.value.very_slow){
+            verySlowList.value.push(testStep)
+          }else if (testStep.summary.elapsed_ms > responseTimeLevel.value.very_slow){
+            slowList.value.push(testStep)
+          }
+        })
+      }
+    })
+  }
+}
+
+// 根据响应时间展示结果
+const selectByResponseTime = () => {
+  if (responseTimeLevelFilter.value === responseTimeLevel.value.very_slow){
+    treeShowList.value = verySlowList.value
+  }else if (responseTimeLevelFilter.value === responseTimeLevel.value.slow){
+    treeShowList.value = slowList.value
+  }else {
+    treeShowList.value = suiteList.value
+  }
 }
 
 // 控制展开全部和收起全部
