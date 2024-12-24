@@ -356,6 +356,7 @@ const getTableDataList = () => {
   GetStepList(props.testType, queryItems.value).then((response: object) => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
+    expandIdList.value = []
 
     oldIdList.value = tableDataList.value.map(item => item.id)
     newIdList.value = oldIdList.value.slice()

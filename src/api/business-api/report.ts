@@ -51,3 +51,7 @@ export function GetReportStepDetail(testType: string, params: object) {
 export function GetReportStepImg(testType: string, params: object) {
     return request({ url: getBaseDir(testType) + '/step-img', method: 'get', params: params })
 }
+
+export function ChangeReportStepStatus(testType: string, data: object) {
+    return request({ url: getBaseDir(testType) + '/step-status', method: 'put', data: data })
+}

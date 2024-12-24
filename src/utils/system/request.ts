@@ -111,7 +111,11 @@ service.interceptors.response.use(
                         ElMessage.error(responseBody.message)
                         return
                     } else if (responseBody.status >= 400) {
-                        ElMessage.warning(responseBody.message)
+                        if (typeof responseBody.message === 'object'){ // 脚本保存，脚本语法错误
+                            ElMessage.warning(`${responseBody.message.msg}\n${responseBody.message.result}`)
+                        }else {
+                            ElMessage.warning(responseBody.message)
+                        }
                         return
                     } else {
                         // @ts-ignore

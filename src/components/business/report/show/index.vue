@@ -13,7 +13,7 @@
           <span v-if="testType !== 'app'" style="margin-right: 20px"
           >运行环境: {{runEnvDict[reportSummary.env.code] }}</span>
           <span style="margin-right: 20px">执行模式: {{ report.is_async === 1 ? '并行运行' : '串行运行' }}</span>
-          <span style="margin-right: 20px">开始时间: {{ reportSummary.time.start_at }}</span>
+          <span style="margin-right: 20px">开始时间: {{ report.create_time }}</span>
           <!-- 执行耗时保留3为小数 -->
           <span style="margin-right: 20px">总共耗时: {{
               reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-'
@@ -207,6 +207,7 @@ const route = useRoute()
 const reportId = route.query.id
 const report = ref({
   name: '',
+  create_time: '',
   project_id: undefined,
   is_async: 0,
   run_type: '',

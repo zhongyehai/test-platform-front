@@ -8,6 +8,9 @@
         append-to-body
     >
       <div style="margin-left: 20px; margin-right: 20px">
+        <div style="text-align: center; margin-bottom: 5px">
+          <el-button type="danger" @click="changeReportStepStatus(reportId, null,null,'stop')">中断所有用例的测试执行</el-button>
+        </div>
         <el-steps
             :active="activeProcess"
             align-center
@@ -50,6 +53,7 @@
                             <span> {{ scope.$index + 1 }} </span>
                           </template>
                         </el-table-column>
+
                         <el-table-column prop="result" label="状态" align="center" min-width="20%">
                           <template #default="scope">
                             <el-tag
@@ -65,6 +69,12 @@
                             <span
                                 :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
                             > {{ scope.row.name }} </span>
+                          </template>
+                        </el-table-column>
+
+                        <el-table-column prop="result" align="center" label="操作" min-width="12%">
+                          <template #default="scope">
+                            <el-button type="danger" @click="changeReportStepStatus(null, reportCaseId,null,'stop')">中断</el-button>
                           </template>
                         </el-table-column>
                       </el-table>
@@ -99,7 +109,7 @@
                             </template>
                           </el-table-column>
 
-                          <el-table-column show-overflow-tooltip prop="name" align="left" label="步骤名" min-width="55%">
+                          <el-table-column show-overflow-tooltip prop="name" align="left" label="步骤名" min-width="50%">
                             <template #default="scope">
                             <span
                                 :style="{'textDecoration': scope.row.result === 'skip' ? 'line-through' : ''}"
@@ -113,14 +123,31 @@
                             </template>
                           </el-table-column>
 
-                          <el-table-column prop="result" align="center" label="操作" min-width="10%">
+                          <el-table-column prop="result" align="center" label="操作" min-width="15%">
                             <template #default="scope">
                               <el-button
                                   v-show="scope.row.result !== 'waite'"
-                                  type="text"
+                                  type="primary"
                                   size="small"
+                                  style="margin: 2px;padding: 2px"
                                   @click="showStepData(scope.row.id)"
                               >查看
+                              </el-button>
+                              <el-button
+                                  v-show="scope.row.status == 'pause'"
+                                  type="success"
+                                  size="small"
+                                  style="margin: 2px;padding: 2px"
+                                  @click="changeReportStepStatus(null, null, scope.row.id, 'resume')"
+                              >放行
+                              </el-button>
+                              <el-button
+                                  v-show="scope.row.status == 'resume'"
+                                  type="warning"
+                                  size="small"
+                                  style="margin: 2px;padding: 2px"
+                                  @click="changeReportStepStatus(null, null, scope.row.id, 'pause')"
+                              >暂停
                               </el-button>
                             </template>
                           </el-table-column>
@@ -200,6 +227,7 @@
 
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {
+  ChangeReportStepStatus,
   GetReportCaseList,
   GetReportShowId,
   GetReportStatus,
@@ -219,7 +247,6 @@ const props = defineProps({
 
 const showTimeOutMessage = ref(false)
 const processIsShow = ref(false)
-const timer = ref(undefined)
 const statusMapping = ref({
   1: 'finish',
   2: 'success',
@@ -315,6 +342,15 @@ const getShowReportId = (batch_id: any) => {
   GetReportShowId(props.testType, { batch_id: batch_id }).then(response => (
       openReportById(response.data)
   ))
+}
+
+const changeReportStepStatus = (report_id: number, report_case_id: number, report_step_id: number, status: string) => {
+  ChangeReportStepStatus(props.testType, {
+    report_id: report_id,
+    report_case_id: report_case_id,
+    report_step_id: report_step_id,
+    status: status,
+  }).then(response => {})
 }
 
 // 点击用例，查对应用例的步骤执行信息

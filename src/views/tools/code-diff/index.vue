@@ -8,15 +8,15 @@
     <el-row>
       <el-col :span="12">
         <div class="code-section">
-          <h3>旧数据 <span v-show="oldStringError" style="color: red">{{ oldStringError }}</span> </h3>
-          <textarea v-model="oldString" placeholder="输入对比项1" :style="{height: inputHeight}"></textarea>
+          <h3>数据1 <span v-show="oldStringError" style="color: red">{{ oldStringError }}</span> </h3>
+          <textarea v-model="oldString" placeholder="输入数据1" :style="{height: inputHeight}"></textarea>
         </div>
       </el-col>
 
       <el-col :span="12">
         <div class="code-section">
-          <h3>新数据<span v-show="newStringError" style="color: red">{{ newStringError }}</span> </h3>
-          <textarea v-model="newString" placeholder="输入对比项2" :style="{height: inputHeight}"></textarea>
+          <h3>数据2<span v-show="newStringError" style="color: red">{{ newStringError }}</span> </h3>
+          <textarea v-model="newString" placeholder="输入数据2" :style="{height: inputHeight}"></textarea>
         </div>
       </el-col>
     </el-row>
@@ -25,6 +25,14 @@
 
   <el-drawer v-model="showDiffRes" title="对比结果" size="80%">
     <div >
+      <el-row>
+        <el-col :span="12">
+          <div style="text-align: center">数据1</div>
+        </el-col>
+        <el-col :span="12">
+          <div style="text-align: center">数据2</div>
+        </el-col>
+      </el-row>
       <code-diff
           :old-string="oldStringDiff"
           :new-string="newStringDiff"

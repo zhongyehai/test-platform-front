@@ -70,19 +70,25 @@
               style="width: 100%"
               @cell-dblclick="rowDblclick"
           >
-            <el-table-column prop="check_value" label="数据源" align="center" min-width="30%">
+            <el-table-column prop="check" label="数据源" align="center" min-width="15%">
+              <template #default="scope">
+                <span> {{ scope.row.check }} </span>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="check_value" label="实际结果" align="center" min-width="35%">
               <template #default="scope">
                 <span> {{ scope.row.check_value }} </span>
               </template>
             </el-table-column>
 
-            <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
+            <el-table-column prop="comparator" label="断言方式" align="center" min-width="10%">
               <template #default="scope">
                 <span> {{ scope.row.comparator_str }} </span>
               </template>
             </el-table-column>
 
-            <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
+            <el-table-column prop="expect" label="预期结果" align="center" min-width="35%">
               <template #default="scope">
                 <span> {{ scope.row.expect }} </span>
               </template>
@@ -115,31 +121,39 @@
                 style="width: 100%"
                 @cell-dblclick="rowDblclick"
             >
-              <el-table-column prop="skip_type" label="跳过类型" align="center" min-width="10%">
+              <el-table-column prop="skip_type" label="类型" align="center" min-width="8%">
                 <template #default="scope">
-                  <span> {{ scope.row.skip_type }} </span>
+                  <span> {{  scope.row.skip_type === 'or' ? '或' : '且' }} </span>
                 </template>
               </el-table-column>
 
               <el-table-column prop="data_source" label="数据源" align="center" min-width="10%">
                 <template #default="scope">
-                  <span> {{ scope.row.data_source }} </span>
+                  <span> {{ scope.row.data_source === 'variable' ?
+                      '变量' : scope.row.data_source === 'run_env' ?
+                          '环境': '函数' }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="check_value" label="实际结果" align="center" min-width="25%">
+              <el-table-column prop="check_value" label="表达式" align="center" min-width="20%">
                 <template #default="scope">
                   <span> {{ scope.row.check_value }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="comparator" label="断言方式" align="center" min-width="25%">
+              <el-table-column prop="check_value_real" label="实际结果" align="center" min-width="15%">
                 <template #default="scope">
-                  <span> {{ scope.row.comparator }} </span>
+                  <span> {{ scope.row.check_value_real }} </span>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="expect" label="预期结果" align="center" min-width="30%">
+              <el-table-column prop="comparator" label="断言方式" align="center" min-width="15%">
+                <template #default="scope">
+                  <span> {{ scope.row.comparator_str }} </span>
+                </template>
+              </el-table-column>
+
+              <el-table-column prop="expect" label="预期结果" align="center" min-width="15%">
                 <template #default="scope">
                   <span> {{ scope.row.expect }} </span>
                 </template>
@@ -148,6 +162,14 @@
               <el-table-column prop="data_type" label="类型" align="center" min-width="10%">
                 <template #default="scope">
                   <span> {{ scope.row.data_type }} </span>
+                </template>
+              </el-table-column>
+
+              <el-table-column prop="check_result" label="结果" align="center" min-width="10%">
+                <template #default="scope">
+                  <el-tag :type="scope.row.check_result === 'pass' ? 'success' : 'danger'">
+                    {{ scope.row.check_result === 'pass' ? '通过' : '不通过' }}
+                  </el-tag>
                 </template>
               </el-table-column>
             </el-table>
