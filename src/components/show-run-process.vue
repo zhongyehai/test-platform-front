@@ -134,7 +134,7 @@
                               >查看
                               </el-button>
                               <el-button
-                                  v-show="scope.row.status == 'pause'"
+                                  v-show="scope.row.result === 'waite' && scope.row.status == 'pause'"
                                   type="success"
                                   size="small"
                                   style="margin: 2px;padding: 2px"
@@ -142,7 +142,7 @@
                               >放行
                               </el-button>
                               <el-button
-                                  v-show="scope.row.status == 'resume'"
+                                  v-show="scope.row.result === 'waite' && scope.row.status == 'resume'"
                                   type="warning"
                                   size="small"
                                   style="margin: 2px;padding: 2px"
