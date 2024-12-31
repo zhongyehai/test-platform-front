@@ -39,6 +39,11 @@ const route: Route[] = [
         path: 'code-diff',
         component: createNameComponent(() => import('@/views/tools/code-diff/index.vue')),
         meta: { title: '代码对比', icon: 'fourArrows' } // <iconpark-icon name=""></iconpark-icon>
+      },
+      {
+        path: 'shell-mock',
+        component: createNameComponent(() => import('@/views/tools/shell-mock/index.vue')),
+        meta: { title: 'shell造数据', icon: 'code' } // <iconpark-icon name=""></iconpark-icon>
       }
     ]
   }

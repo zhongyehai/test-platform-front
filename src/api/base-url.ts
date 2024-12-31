@@ -16,3 +16,5 @@ export const baseDirTool = '/api/tools'
 export const baseDirConfig = '/api/config'
 
 export const baseDirSystemURL = '/api/system'
+
+export const baseDirShellMockURL = '/api/shell-mock'

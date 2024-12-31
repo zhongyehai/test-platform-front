@@ -28,6 +28,11 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
       host: '0.0.0.0',
       open: true,
       proxy: {
+        // 转发到执行shell的服务器
+        '/api/shell-mock/': {
+          target: 'http://127.0.0.1:8024',
+          changeOrigin: true
+        },
         // 后端资源访问方式
         '/api/': {
           target: 'http://127.0.0.1:8024',
@@ -65,16 +70,16 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
     css: {
       postcss: {
         plugins: [
-          {
-            postcssPlugin: 'internal:charset-removal',
-            AtRule: {
-              charset: (atRule) => {
-                if (atRule.name === 'charset') {
-                  atRule.remove();
+            {
+              postcssPlugin: 'internal:charset-removal',
+              AtRule: {
+                charset: (atRule) => {
+                  if (atRule.name === 'charset') {
+                    atRule.remove();
+                  }
                 }
               }
             }
-          }
         ],
       },
     }
