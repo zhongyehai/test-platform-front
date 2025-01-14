@@ -74,7 +74,7 @@
 
                         <el-table-column prop="result" align="center" label="操作" min-width="12%">
                           <template #default="scope">
-                            <el-button type="danger" @click="changeReportStepStatus(null, reportCaseId,null,'stop')">中断</el-button>
+                            <el-button type="danger" size="small" @click="changeReportStepStatus(null, reportCaseId,null,'stop')">中断</el-button>
                           </template>
                         </el-table-column>
                       </el-table>

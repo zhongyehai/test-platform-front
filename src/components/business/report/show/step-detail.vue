@@ -168,7 +168,7 @@
               <el-table-column prop="check_result" label="结果" align="center" min-width="10%">
                 <template #default="scope">
                   <el-tag :type="scope.row.check_result === 'pass' ? 'success' : 'danger'">
-                    {{ scope.row.check_result === 'pass' ? '通过' : '不通过' }}
+                    {{ scope.row.check_result === 'pass' ? '满足' : '不满足' }}
                   </el-tag>
                 </template>
               </el-table-column>
