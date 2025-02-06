@@ -64,13 +64,13 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="name" align="center" label="任务名称" min-width="25%">
+                  <el-table-column show-overflow-tooltip prop="name" align="center" label="任务名称" min-width="23%">
                     <template #default="scope">
                       <span> {{ scope.row.name }} </span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="cron" label="cron表达式" align="center" min-width="25%">
+                  <el-table-column show-overflow-tooltip prop="cron" label="cron表达式" align="center" min-width="22%">
                     <template #default="scope">
                       <span> {{ scope.row.cron }} </span>
                     </template>
@@ -78,40 +78,45 @@
 
                   <el-table-column show-overflow-tooltip prop="skip_holiday" label="节假/调休" align="center" min-width="10%">
                     <template #default="scope">
-                      <span> {{ scope.row.skip_holiday === 1 ? "不执行" : "执行" }} </span>
+                      <el-tag :type="scope.row.skip_holiday === 1 ? 'warning' : 'success'">
+                        {{ scope.row.skip_holiday === 1 ? "不执行" : "执行" }}
+                      </el-tag>
                     </template>
                   </el-table-column>
 
-                  <el-table-column show-overflow-tooltip prop="receive_type" label="发送报告" align="center" min-width="10%">
+                  <el-table-column show-overflow-tooltip prop="receive_type" label="发送报告" align="center" min-width="19%">
                     <template #default="scope">
-                      <span v-show="scope.row.is_send === 'not_send'">-</span>
-                      <span v-show="scope.row.is_send !== 'not_send'"> {{
+                      <el-tag v-if="scope.row.is_send === 'not_send'" type="warning">不发送</el-tag>
+                      <el-tag v-else type="success">{{scope.row.is_send === 'always' ? '始终' : '不通过'}} =>
+                        {{
                           scope.row.receive_type === 'ding_ding' ? "钉钉" :
-                          scope.row.receive_type === 'we_chat' ? "企业微信" : '邮件'
-                        }} </span>
+                              scope.row.receive_type === 'we_chat' ? "企业微信" : "邮件"
+                        }}</el-tag>
                     </template>
                   </el-table-column>
 
-                  <el-table-column prop="merge_notify" label="通知" align="center" min-width="10%">
-                    <template #header>
-                      <span>通知</span>
-                      <el-tooltip class="item" effect="dark" placement="top-start">
-                        <template #content>
-                          <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>
-                          <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>
-                          <div>注：当选择了多个环境时，才能在编辑抽屉中设置此选项</div>
-                        </template>
-                        <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
-                      </el-tooltip>
-                    </template>
-                    <template #default="scope">
-                      <span> {{ scope.row.merge_notify === 1 ? "合并" : "不合并" }} </span>
-                    </template>
-                  </el-table-column>
+<!--                  <el-table-column prop="merge_notify" label="通知" align="center" min-width="10%">-->
+<!--                    <template #header>-->
+<!--                      <span>通知</span>-->
+<!--                      <el-tooltip class="item" effect="dark" placement="top-start">-->
+<!--                        <template #content>-->
+<!--                          <div>1、不合并通知：达到触发发送通知的条件时，每个环境都会发一份通知</div>-->
+<!--                          <div>2、合并通知：达到触发发送通知的条件时，汇总每个环境的通知，只通知一次</div>-->
+<!--                          <div>注：当选择了多个环境时，才能在编辑抽屉中设置此选项</div>-->
+<!--                        </template>-->
+<!--                        <span style="margin-left:5px;color: #409EFF"><Help></Help></span>-->
+<!--                      </el-tooltip>-->
+<!--                    </template>-->
+<!--                    <template #default="scope">-->
+<!--                      <el-tag :type="scope.row.merge_notify === 1 ? 'success' : 'primary'">-->
+<!--                        {{ scope.row.merge_notify === 1 ? "合并" : "不合并" }}-->
+<!--                      </el-tag>-->
+<!--                    </template>-->
+<!--                  </el-table-column>-->
 
-                  <el-table-column prop="push_hit" label="记录问题" align="center" min-width="10%">
+                  <el-table-column prop="push_hit" label="问题" align="center" min-width="9%">
                     <template #header>
-                      <span>记录问题</span>
+                      <span>问题</span>
                       <el-tooltip class="item" effect="dark" placement="top-start">
                         <template #content>
                           <div>当触发任务的方式为
@@ -130,11 +135,13 @@
                       </el-tooltip>
                     </template>
                     <template #default="scope">
-                      <span> {{ scope.row.push_hit === 1 ? "记录" : "不记录" }} </span>
+                      <el-tag :type="scope.row.push_hit === 1 ? 'success' : 'warning'">
+                        {{ scope.row.push_hit === 1 ? "记录" : "不记录" }}
+                      </el-tag>
                     </template>
                   </el-table-column>
 
-                  <el-table-column prop="status" align="center" min-width="10%">
+                  <el-table-column prop="status" label="状态" align="center" min-width="8%">
                     <template #header>
                       <span>状态</span>
                       <el-tooltip class="item" effect="dark" placement="top-start">

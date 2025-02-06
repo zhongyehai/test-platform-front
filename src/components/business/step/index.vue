@@ -5,7 +5,7 @@
         <template #reference>
           <el-button
               :disabled="selectedList.length < 1"
-              type="primary"
+              type="danger"
               size="small">批量删除</el-button>
         </template>
       </el-popconfirm>

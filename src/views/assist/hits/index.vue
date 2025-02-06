@@ -4,6 +4,14 @@
     <div class="layout-container-form flex space-between">
       <div class="layout-container-form-handle">
         <el-button type="primary" @click="showEditDrawer(undefined)">新增问题记录</el-button>
+        <el-popconfirm width="250px" title="确定删除所选中的记录?" @confirm="deleteData(null)">
+          <template #reference>
+            <el-button
+                :disabled="selectedList.length < 1"
+                type="danger"
+                size="small">批量删除</el-button>
+          </template>
+        </el-popconfirm>
       </div>
 
       <div class="layout-container-form-search">
@@ -73,7 +81,11 @@
           :data="tableDataList"
           style="width: 100%"
           stripe
-          :height="tableHeight">
+          :height="tableHeight"
+          @selection-change="clickSelectAll">
+
+        <el-table-column type="selection" min-width="2%"/>
+
         <el-table-column prop="id" label="序号" align="center" min-width="6%">
           <template #default="scope">
             <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
@@ -138,7 +150,7 @@
           <template #default="scope">
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showReport(scope.row)">查看报告</el-button>
             <el-button type="text" size="small" style="margin: 0; padding: 2px" @click.native="showEditDrawer(scope.row)">修改</el-button>
-            <el-popconfirm title="确定删除数据?" @confirm="deleteData(scope.row.id)">
+            <el-popconfirm title="确定删除数据?" @confirm="deleteData(scope.row)">
               <template #reference>
                 <el-button style="margin: 0; padding: 2px;color: red" type="text" size="small">删除</el-button>
               </template>
@@ -211,6 +223,7 @@ const envDict = ref({})
 const projectListData = ref([])
 const projectDictData = ref({})
 const userDict = ref({})
+const selectedList = ref([])
 const changePagination = (pagination: any) => {
   queryItems.value.page_num = pagination.pageNum
   queryItems.value.page_size = pagination.pageSize
@@ -225,6 +238,20 @@ const getUserList = () => {
   })
 }
 
+const clickSelectAll = (val: never[]) => {
+  selectedList.value = val
+}
+
+const getSubmitId = (row: any) => {
+  let selectedIdList: any[] = []
+  if (row){
+    selectedIdList = [row.id]
+  }else {
+    selectedList.value.forEach(item => { selectedIdList.push(item.id) })
+  }
+  return selectedIdList
+}
+
 const showEditDrawer = (row: object | undefined) => {
   bus.emit(busEvent.drawerIsShow, {eventType: 'hit', content: row});
 }
@@ -233,8 +260,8 @@ const showReport = (row: { test_type: string, report_id: any; }) => {
   window.open(`/${row.test_type}-test/report-show?id=${row.report_id}`, '_blank')
 }
 
-const deleteData = (dataId: number) => {
-  DeleteHit({id: dataId}).then(response => {
+const deleteData = (row: any) => {
+  DeleteHit({id_list: getSubmitId(row)}).then(response => {
     if (response){
       getTableDataList()
     }

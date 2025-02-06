@@ -97,7 +97,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="27%"/>
+      <el-table-column show-overflow-tooltip prop="id" align="center" label="报告id" min-width="5%"/>
+
+      <el-table-column show-overflow-tooltip prop="name" align="center" label="报告名称" min-width="22%"/>
 
       <el-table-column show-overflow-tooltip prop="create_time" align="center" label="生成时间"
                        min-width="13%">
