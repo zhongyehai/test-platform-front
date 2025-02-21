@@ -8,7 +8,32 @@
       size="small"
       row-key="id">
 
-      <el-table-column label="序号" min-width="10%">
+      <el-table-column label="排序" width="40" align="center">
+        <template #header>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div>可拖拽数据前的图标进行自定义排序</div>
+            </template>
+            <span style="color: #409EFF"><Help></Help></span>
+          </el-tooltip>
+        </template>
+        <template #default="scope">
+          <el-button
+              text
+              @dragstart="handleDragStart($event, scope.row, scope.$index)"
+              @dragover="handleDragOver($event, scope.$index)"
+              @drop="handleDrop($event, scope.$index)"
+              @dragend="handleDragEnd"
+              draggable="true"
+              class="drag-button"
+              :data-index="scope.$index"
+          >
+            <SortThree></SortThree>
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="序号" header-align="center" width="40">
         <template #default="scope">
           <span> {{ (pageNum - 1) * pageSize + scope.$index + 1 }} </span>
         </template>
@@ -25,10 +50,10 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import Sortable from "sortablejs"
 import {bus, busEvent} from "@/utils/bus-events";
 import {GetCaseSuiteList, ChangeCaseSuiteSort} from "@/api/business-api/case-suite";
 import {GetModuleList, ChangeModuleSort} from "@/api/business-api/module";
+import {Help, SortThree} from "@icon-park/vue-next";
 
 const props = defineProps({
   testType: {
@@ -48,7 +73,8 @@ const projectId = ref()
 const parent = ref()
 const pageNum = ref(1)
 const pageSize = ref(9999)
-const oldIdList = ref([])
+const oldIndex = ref(); // 当前拖拽项的索引
+const dragRow = ref();   // 当前拖拽的行数据
 const newIdList = ref([])
 
 const getTableDataList = () => {
@@ -57,14 +83,10 @@ const getTableDataList = () => {
   getFunc(props.testType,{project_id: projectId.value, parent: parent.value}).then(response => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
-
-    oldIdList.value = tableDataList.value.map(v => v.id)
-    newIdList.value = oldIdList.value.slice()
   })
 }
 
 onMounted(() => {
-  setSort()
   bus.on(busEvent.drawerIsShow, onShowDrawerEvent);
 })
 
@@ -80,6 +102,37 @@ const onShowDrawerEvent = (message: any) => {
   }
 }
 
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  oldIndex.value = index;
+  dragRow.value = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('drag-dragging');
+};
+
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+};
+
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('drag-dragging');
+};
+
+const handleDrop = (event, newIndex) => {
+  event.preventDefault();
+  const updatedData = [...tableDataList.value];
+  // // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex.value, 1);
+  // // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow.value);
+  // 恢复样式
+  event.target.classList.remove('drag-dragging');
+  newIdList.value = updatedData.map(item => item.id).slice()
+  sortTable()
+};
+
 const sortTable = () => {
   let sortFunc = props.useType === 'module' ?  ChangeModuleSort : ChangeCaseSuiteSort
   tableIsLoading.value = true
@@ -91,26 +144,6 @@ const sortTable = () => {
     tableIsLoading.value = false
     if (response){
       getTableDataList()
-    }
-  })
-}
-
-const setSort = () => {
-  let tbody = caseSuiteSortTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
-  Sortable.create(tbody, {
-    group: { // 相同的组之间可以相互拖拽
-      name: "oneColTable",
-      pull: true,
-      put: true,
-    },
-    animation: 150, // ms, number 单位：ms，定义排序动画的时间
-    onEnd: evt => {
-      const targetRow = tableDataList.value.splice(evt.oldIndex, 1)[0]
-      tableDataList.value.splice(evt.newIndex, 0, targetRow)
-
-      const tempIndex = newIdList.value.splice(evt.oldIndex, 1)[0]
-      newIdList.value.splice(evt.newIndex, 0, tempIndex)
-      sortTable()
     }
   })
 }

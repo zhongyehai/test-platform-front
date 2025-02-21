@@ -16,7 +16,7 @@
           <span style="margin-right: 20px">开始时间: {{ report.create_time }}</span>
           <!-- 执行耗时保留3为小数 -->
           <span style="margin-right: 20px">总共耗时: {{
-              reportSummary.time.case_duration ? reportSummary.time.case_duration.toString().slice(0, 5) : '-'
+              reportSummary.time.all_duration ? reportSummary.time.all_duration.toString().slice(0, 5) : '-'
             }} 秒</span>
 
         </span>

@@ -60,4 +60,19 @@ dialog上下左右在视口居中、内容高度过高过开启dialog内滚动�
   max-height: 100vh !important;
 }
 
+/*
+拖动排序的动效
+*/
+.drag-button {
+  cursor: move;
+  transition: transform 0.2s ease;
+}
+
+.drag-dragging {
+  opacity: 0.5;
+}
+
+.el-table__row {
+  transition: transform 0.3s ease; /* 表格行平滑过渡 */
+}
 </style>

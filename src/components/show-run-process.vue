@@ -152,7 +152,7 @@
                                   size="small"
                                   style="margin: 2px;padding: 2px"
                                   @click="changeReportStepStatus(null, null, scope.row.id, 'pause')"
-                              >暂停
+                              >打断点
                               </el-button>
                             </template>
                           </el-table-column>

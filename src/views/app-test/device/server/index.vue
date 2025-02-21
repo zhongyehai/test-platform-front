@@ -13,7 +13,33 @@
           :height="tableHeight"
           @row-dblclick="rowDblclick">
 
-        <el-table-column prop="id" label="序号" align="center" min-width="10%">
+        <el-table-column label="排序" width="40" align="center">
+          <template #header>
+            <el-tooltip class="item" effect="dark" placement="top-start">
+              <template #content>
+                <div>可拖拽数据前的图标进行自定义排序</div>
+              </template>
+              <span style="color: #409EFF"><Help></Help></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <el-button
+                text
+                style="text-align: center"
+                @dragstart="handleDragStart($event, scope.row, scope.$index)"
+                @dragover="handleDragOver($event, scope.$index)"
+                @drop="handleDrop($event, scope.$index)"
+                @dragend="handleDragEnd"
+                draggable="true"
+                class="drag-button"
+                :data-index="scope.$index"
+            >
+              <SortThree></SortThree>
+            </el-button>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="序号" header-align="center" width="40">
           <template #default="scope">
             <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
           </template>
@@ -90,14 +116,15 @@ import AddDrawer from './add-drawer.vue'
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
-import Sortable from "sortablejs";
 import {appiumServerRequestStatusMappingContent, appiumServerRequestStatusMappingTagType} from "@/components/business/mapping";
 import {ChangeServerSort, CopyServer, DeleteServer, GetServerList, RunServer} from "@/api/business-api/device-server";
 import {GetConfigByCode} from "@/api/config/config-value";
+import {Help, SortThree} from "@icon-park/vue-next";
 
 const serverTableRef = ref(null)
 const tableIsLoading = ref(false)
-const oldIdList = ref([])
+const oldIndex = ref(); // 当前拖拽项的索引
+const dragRow = ref();   // 当前拖拽的行数据
 const newIdList = ref([])
 const tableDataList = ref([])
 const tableDataTotal = ref(0)
@@ -171,11 +198,39 @@ const getTableDataList = () => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
     tableDataTotal.value = response.data.total
-
-    oldIdList.value = tableDataList.value.map(item => item.id)
-    newIdList.value = oldIdList.value.slice()
   })
 }
+
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  oldIndex.value = index;
+  dragRow.value = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('drag-dragging');
+};
+
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+};
+
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('drag-dragging');
+};
+
+const handleDrop = (event, newIndex) => {
+  event.preventDefault();
+  const updatedData = [...tableDataList.value];
+  // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex.value, 1);
+  // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow.value);
+  // 恢复样式
+  event.target.classList.remove('drag-dragging');
+  newIdList.value = updatedData.map(item => item.id).slice()
+  sortTable()
+};
 
 const sortTable = () => {
   tableIsLoading.value = true
@@ -191,25 +246,6 @@ const sortTable = () => {
   })
 }
 
-const setSort = () => {
-  let tbody = serverTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
-  Sortable.create(tbody, {
-    group: { // 相同的组之间可以相互拖拽
-      name: "table",
-      pull: true,
-      put: true,
-    },
-    animation: 150, // ms, number 单位：ms，定义排序动画的时间
-    onEnd(e: any) {
-      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
-      tableDataList.value.splice(e.newIndex, 0, targetRow)
-      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
-      newIdList.value.splice(e.newIndex, 0, tempIndex)
-      sortTable()
-    },
-  });
-}
-
 const getConfigByCode = () => {
   if (busEvent.data.serverOsMapping.length < 1){
     GetConfigByCode({ code: 'server_os_mapping' }).then(response => {
@@ -221,7 +257,6 @@ const getConfigByCode = () => {
 onMounted(() => {
   getTableDataList()
   getConfigByCode()
-  setSort()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
   setTableHeight()
   window.addEventListener('resize', handleResize);

@@ -8,8 +8,33 @@
     size="small"
     row-key="id"
   >
+    <el-table-column label="排序" width="40" align="center">
+      <template #header>
+        <el-tooltip class="item" effect="dark" placement="top-start">
+          <template #content>
+            <div>可拖拽数据前的图标进行自定义排序</div>
+          </template>
+          <span style="color: #409EFF"><Help></Help></span>
+        </el-tooltip>
+      </template>
+      <template #default="scope">
+        <el-button
+            text
+            style="text-align: center"
+            @dragstart="handleDragStart($event, scope.row, scope.$index)"
+            @dragover="handleDragOver($event, scope.$index)"
+            @drop="handleDrop($event, scope.$index)"
+            @dragend="handleDragEnd"
+            draggable="true"
+            class="drag-button"
+            :data-index="scope.$index"
+        >
+          <SortThree></SortThree>
+        </el-button>
+      </template>
+    </el-table-column>
 
-    <el-table-column label="id" header-align="center" min-width="5%">
+    <el-table-column label="序号" header-align="center" width="40">
       <template #default="scope">
         <div>{{ scope.$index + 1 }}</div>
       </template>
@@ -77,10 +102,8 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from "vue";
 
-import Sortable from "sortablejs"
-
 import {bus, busEvent} from "@/utils/bus-events";
-import {Clear, Copy, Minus, Plus} from "@icon-park/vue-next";
+import {Clear, Copy, Help, Minus, Plus, SortThree} from "@icon-park/vue-next";
 
 const props = defineProps({
   currentData: {
@@ -107,8 +130,8 @@ watch(() => props.currentData, (newValue, oldValue) => {
 
 const tempData = ref([])
 const dataTableRef = ref(null)
-const oldList = ref([])
-const newList = ref([])
+const oldIndex = ref(); // 当前拖拽项的索引
+const dragRow = ref();   // 当前拖拽的行数据
 
 const initTempData = (data: string | any[] | undefined) =>{
   if (data && data.length > 0) { // 有数据
@@ -119,8 +142,6 @@ const initTempData = (data: string | any[] | undefined) =>{
   } else {
     addRow(undefined)
   }
-  oldList.value = tempData.value.map(v => v.id)
-  newList.value = oldList.value.slice()
 }
 
 const changeData = () => {
@@ -167,30 +188,40 @@ const clearData = () => {
   tempData.value[0].key = null
 }
 
+
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  oldIndex.value = index;
+  dragRow.value = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('drag-dragging');
+};
+
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+};
+
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('drag-dragging');
+};
+
+const handleDrop = (event, newIndex) => {
+  event.preventDefault();
+  const updatedData = [...tempData.value];
+  // // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex.value, 1);
+  // // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow.value);
+  tempData.value = updatedData;
+  // 恢复样式
+  event.target.classList.remove('drag-dragging');
+};
+
 onMounted(() => {
   initTempData(undefined)
-  setSort()
 })
-
-// 拖拽排序
-const setSort = () => {
-  let tbody = dataTableRef.value.$el.querySelector(".el-table__body-wrapper tbody");
-  Sortable.create(tbody, {
-    group: { // 相同的组之间可以相互拖拽
-      name: "oneColTable",
-      pull: true,
-      put: true,
-    },
-    animation: 150, // ms, number 单位：ms，定义排序动画的时间
-    onEnd: evt => {
-      const targetRow = tempData.value.splice(evt.oldIndex, 1)[0]
-      tempData.value.splice(evt.newIndex, 0, targetRow)
-
-      const tempIndex = newList.value.splice(evt.oldIndex, 1)[0]
-      newList.value.splice(evt.newIndex, 0, tempIndex)
-    }
-  })
-}
 
 // 把选择的值暴露出来，给父组件引用
 defineExpose({

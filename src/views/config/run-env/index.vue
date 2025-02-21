@@ -53,7 +53,33 @@
           @row-dblclick="rowDblclick"
           row-key="id">
 
-          <el-table-column prop="id" label="序号" align="center" min-width="10%">
+        <el-table-column label="排序" width="40" align="center">
+          <template #header>
+            <el-tooltip class="item" effect="dark" placement="top-start">
+              <template #content>
+                <div>可拖拽数据前的图标进行自定义排序</div>
+              </template>
+              <span style="color: #409EFF"><Help></Help></span>
+            </el-tooltip>
+          </template>
+          <template #default="scope">
+            <el-button
+                text
+                style="text-align: center"
+                @dragstart="handleDragStart($event, scope.row, scope.$index)"
+                @dragover="handleDragOver($event, scope.$index)"
+                @drop="handleDrop($event, scope.$index)"
+                @dragend="handleDragEnd"
+                draggable="true"
+                class="drag-button"
+                :data-index="scope.$index"
+            >
+              <SortThree></SortThree>
+            </el-button>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="序号" header-align="center" width="40">
             <template #default="scope">
               <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
             </template>
@@ -109,7 +135,6 @@
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed} from "vue";
 import {ElMessage} from "element-plus";
-import Sortable from "sortablejs"
 
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './eidt-drawer.vue'
@@ -119,11 +144,13 @@ import ToBusinessDrawer from './to-business.vue'
 import {RunEnvGroupList, GetRunEnvList, RunEnvSort} from "@/api/config/run-env";
 import {bus, busEvent} from "@/utils/bus-events";
 import toClipboard from "@/utils/copy-to-memory";
+import {Help, SortThree} from "@icon-park/vue-next";
 
 const tableIsLoading = ref(false)
 const runEnvGroupList = ref([])
 const tableDataList = ref([])
-const oldIdList = ref([])
+const oldIndex = ref(); // 当前拖拽项的索引
+const dragRow = ref();   // 当前拖拽的行数据
 const newIdList = ref([])
 const tableDataTotal = ref(0)
 const queryItems = ref({
@@ -164,48 +191,6 @@ const changePagination = (pagination: any) => {
   getTableDataList()
 }
 
-// 表格行拖拽
-const setSort = () => {
-  let tbody = document.querySelector(".el-table__body-wrapper tbody");
-  Sortable.create(tbody, {
-    group: { // 相同的组之间可以相互拖拽
-      name: "table",
-      pull: true,
-      put: true,
-    },
-    animation: 150, // ms, number 单位：ms，定义排序动画的时间
-    onAdd: function (e: any) {
-      // 拖拽时候添加有新的节点的时候发生该事件
-      console.log("onAdd.foo:", e);
-    },
-    onUpdate: function (e: any) {
-      // 拖拽更新节点位置发生该事件
-      console.log("onUpdate.foo:", e);
-    },
-    onRemove: function (e: any) {
-      // 删除拖拽节点的时候促发该事件
-      console.log("onRemove.foo:", e);
-    },
-    onStart: function (e: any) {
-      // 开始拖拽出发该函数
-      console.log("onStart.foo:", e);
-    },
-    onSort: function (e: any) {
-      // 发生排序发生该事件
-      console.log("onUpdate.foo:", e);
-    },
-    onEnd(e: any) {
-      // 结束拖拽
-      console.log("结束表格拖拽", e);
-      const targetRow = tableDataList.value.splice(e.oldIndex, 1)[0]
-      tableDataList.value.splice(e.newIndex, 0, targetRow)
-      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
-      newIdList.value.splice(e.newIndex, 0, tempIndex)
-      sortTable()
-    },
-  });
-}
-
 const showEditDrawer = (row: object | undefined, command: string) => {
   let eventType = 'edit-run-env'
   let content = undefined
@@ -233,11 +218,39 @@ const getTableDataList = () => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
     tableDataTotal.value = response.data.total
-
-    oldIdList.value = tableDataList.value.map(item => item.id)
-    newIdList.value = oldIdList.value.slice()
   })
 }
+
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  oldIndex.value = index;
+  dragRow.value = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('drag-dragging');
+};
+
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+};
+
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('drag-dragging');
+};
+
+const handleDrop = (event, newIndex) => {
+  event.preventDefault();
+  const updatedData = [...tableDataList.value];
+  // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex.value, 1);
+  // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow.value);
+  // 恢复样式
+  event.target.classList.remove('drag-dragging');
+  newIdList.value = updatedData.map(item => item.id).slice()
+  sortTable()
+};
 
 const sortTable = () => {
   tableIsLoading.value = true
@@ -254,15 +267,10 @@ const sortTable = () => {
 }
 
 onMounted(() => {
-
   RunEnvGroupList({}).then((response: object) => {
     runEnvGroupList.value = response.data
   })
-
   getTableDataList()
-
-  setSort()
-
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
   setTableHeight()
   window.addEventListener('resize', handleResize);

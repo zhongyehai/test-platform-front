@@ -1,266 +1,106 @@
 <template>
-  <div class="layout-container">
+  <el-table :data="tableData" border style="width: 100%">
+    <el-table-column
+        label="操作"
+        width="100"
+        align="center"
+    >
 
-    <div class="layout-container-form flex space-between">
-      <div class="layout-container-form-handle">
-        <el-button type="primary" @click="showEditDrawer(undefined)"> 添加环境</el-button>
-        <el-button type="primary" @click="showToBusinessDrawer(undefined)">环境与业务线关联管理</el-button>
-      </div>
-
-      <div class="layout-container-form-search">
-        <el-select
-            v-model="queryItems.group"
-            placeholder="选择环境分组"
-            clearable
-            filterable
-            default-first-option
-            style="margin-right: 10px"
-            size="small"
+      <template #default="scope">
+        <el-button
+            icon="el-icon-rank"
+            @dragstart="handleDragStart($event, scope.row, scope.$index)"
+            @dragover="handleDragOver($event, scope.$index)"
+            @drop="handleDrop($event, scope.$index)"
+            @dragend="handleDragEnd"
+            draggable="true"
+            class="drag-button"
+            :data-index="scope.$index"
         >
-          <el-option v-for="item in runEnvGroupList" :key="item" :label="item" :value="item"/>
-        </el-select>
-
-        <el-input
-            v-model="queryItems.name"
-            clearable
-            size="small"
-            style="width: 200px; margin-right: 10px"
-            placeholder="环境名字，支持模糊搜索"/>
-
-        <el-input
-            v-model="queryItems.code"
-            class="input-with-select"
-            placeholder="环境code，支持模糊搜索"
-            size="small"
-            clearable
-            style="width: 200px; margin-right: 10px"
-        />
-
-        <el-button type="primary" @click="getRunEnvList()"> 搜索</el-button>
-      </div>
-    </div>
-
-    <div style="margin: 10px">
-
-      <el-table
-          :data="runEnvList"
-          v-loading="tableIsLoading"
-          element-loading-text="正在获取数据"
-          element-loading-spinner="el-icon-loading"
-          style="width: 100%"
-          stripe
-          :height="tableHeight"
-          @row-dblclick="rowDblclick"
-          row-key="id">
-
-        <el-table-column prop="id" label="序号" align="center" min-width="10%">
-          <template #default="scope">
-            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column show-overflow-tooltip prop="group" align="center" label="环境分组" min-width="10%">
-          <template #default="scope">
-            <span> {{ scope.row.group }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column show-overflow-tooltip prop="name" align="center"  label="环境名字" min-width="25%">
-          <template #default="scope">
-            <span> {{ scope.row.name }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column show-overflow-tooltip prop="code" align="center" label="环境code" min-width="20%">
-          <template #default="scope">
-            <span> {{ scope.row.code }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column show-overflow-tooltip prop="desc" align="center" label="备注" min-width="25%">
-          <template #default="scope">
-            <span> {{ scope.row.desc }} </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column fixed="right" show-overflow-tooltip prop="desc" align="center" label="操作" min-width="10%">
-          <template #default="scope">
-            <el-button type="text" size="small" @click.native="showEditDrawer(scope.row)">修改</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <pagination
-          v-show="runEnvListTotal > 0"
-          :pageNum="queryItems.page_num"
-          :pageSize="queryItems.page_size"
-          :total="runEnvListTotal"
-          @pageFunc="changePagination"
-      />
-    </div>
+          {{ scope.$index }}
+        </el-button>
+      </template>
 
 
-  </div>
+    </el-table-column>
+
+    <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+    <el-table-column prop="age" label="年龄" width="180"></el-table-column>
+  </el-table>
 </template>
 
-<script setup lang="ts">
-import {onMounted, ref, computed, onBeforeUnmount} from "vue";
-import {ElMessage} from "element-plus";
-import Sortable from "sortablejs"
+<script setup>
+import { ref } from 'vue';
 
-import Pagination from '@/components/pagination.vue'
+const tableData = ref([
+  { id: 1, name: '张三', age: 25 },
+  { id: 2, name: '李四', age: 30 },
+  { id: 3, name: '王五', age: 28 },
+]);
 
-import {RunEnvGroupList, GetRunEnvList, RunEnvSort} from "@/api/config/run-env";
-import {bus, busEvent} from "@/utils/bus-events";
-import toClipboard from "@/utils/copy-to-memory";
 
-const tableIsLoading = ref(false)
-const runEnvGroupList = ref([])
-const runEnvList = ref([])
-const oldIdList = ref([])
-const newIdList = ref([])
-const runEnvListTotal = ref(0)
-const queryItems = ref({
-  page_num: 1,
-  page_size: 20,
-  detail: true,
-  group: undefined,
-  name: undefined,
-  code: undefined
-})
+let oldIndex = null; // 当前拖拽项的索引
+let dragRow = null;   // 当前拖拽的行数据
 
-// 表格的高度
-const tableHeight = computed(() => {
-  return `${window.innerHeight * 0.67}px`
-})
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  console.log("拖拽开始: ", index, row);  // 查看 index 和 row 的值
+  oldIndex = index;
+  dragRow = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('dragging');
+};
 
-const rowDblclick = async (row: any, column: any, event: any) => {
-  try {
-    await toClipboard(row[column.property]);
-    ElMessage.success("已复制到粘贴板")
-  } catch (e) {
-    console.error(e);
-  }
-}
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+  // 可以通过其他方式高亮当前目标位置
+};
 
-const changePagination = (pagination: any) => {
-  queryItems.value.page_num = pagination.pageNum
-  queryItems.value.page_size = pagination.pageSize
-  getRunEnvList()
-}
 
-// 表格行拖拽
-const rowDrop = () => {
-  let tbody = document.querySelector(".el-table__body-wrapper tbody");
-  Sortable.create(tbody, {
-    group: { // 相同的组之间可以相互拖拽
-      name: "table",
-      pull: true,
-      put: true,
-    },
-    animation: 150, // ms, number 单位：ms，定义排序动画的时间
-    onAdd: function (e: any) {
-      // 拖拽时候添加有新的节点的时候发生该事件
-      console.log("onAdd.foo:", e);
-    },
-    onUpdate: function (e: any) {
-      // 拖拽更新节点位置发生该事件
-      console.log("onUpdate.foo:", e);
-    },
-    onRemove: function (e: any) {
-      // 删除拖拽节点的时候促发该事件
-      console.log("onRemove.foo:", e);
-    },
-    onStart: function (e: any) {
-      // 开始拖拽出发该函数
-      console.log("onStart.foo:", e);
-    },
-    onSort: function (e: any) {
-      // 发生排序发生该事件
-      console.log("onUpdate.foo:", e);
-    },
-    onEnd(e: any) {
-      // 结束拖拽
-      console.log("结束表格拖拽", e);
-      const targetRow = runEnvList.value.splice(e.oldIndex, 1)[0]
-      runEnvList.value.splice(e.newIndex, 0, targetRow)
-      const tempIndex = newIdList.value.splice(e.oldIndex, 1)[0]
-      newIdList.value.splice(e.newIndex, 0, tempIndex)
-      sortTable()
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('dragging');
+};
 
-      console.log("oldIdList: ", JSON.stringify(oldIdList.value));
-      console.log("newIdList: ", JSON.stringify(newIdList.value));
-      console.log("runEnvList: ", JSON.stringify(runEnvList.value));
-      // // 如果拖拽结束后顺序发生了变化，则对数据进行修改
-      // if (e.oldIndex !== e.newIndex) {
-      //   moveTable(e.oldIndex, e.newIndex) // 排序后和后端的交互函数
-      // }
-    },
-  });
-}
+const handleDrop = (event, newIndex) => {
+  console.log('oldIndex: ', oldIndex)
+  console.log('newIndex: ', newIndex)
+  event.preventDefault();
+  const updatedData = [...tableData.value];
+  console.log('updatedData: ', JSON.stringify(updatedData))
+  // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex, 1);
 
-const showEditDrawer = (row: object | undefined) => {
-  const content = row ? row : {id: undefined, type: undefined, name: undefined, value: undefined, desc: undefined}
-  bus.emit(busEvent.drawerIsShow, {eventType: 'run-env', content: content});
-}
-const showToBusinessDrawer = (row: object | undefined) => {
-  bus.emit(busEvent.drawerIsShow, {eventType: 'run-env-to-business', content: runEnvList});
-}
+  // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow);
 
-const getRunEnvList = () => {
-  queryItems.value.group = queryItems.value.group ? queryItems.value.group : undefined
-  queryItems.value.name = queryItems.value.name ? queryItems.value.name : undefined
-  queryItems.value.code = queryItems.value.code ? queryItems.value.code : undefined
-  tableIsLoading.value = true
-  GetRunEnvList(queryItems.value).then((response: object) => {
-    tableIsLoading.value = false
-    runEnvList.value = response.data.data
-    runEnvListTotal.value = response.data.total
+  // 更新表格数据
+  tableData.value = updatedData;
 
-    oldIdList.value = runEnvList.value.map(item => item.id)
-    newIdList.value = oldIdList.value.slice()
-  })
-}
+  // 恢复样式
+  event.target.classList.remove('dragging');
 
-const sortTable = () => {
-  tableIsLoading.value = true
-  RunEnvSort({
-    id_list: newIdList.value,
-    page_num: queryItems.value.page_num,
-    page_size: queryItems.value.page_size
-  }).then(response => {
-    tableIsLoading.value = false
-    if (response){
-      getRunEnvList()
-    }
-  })
-}
-
-onMounted(() => {
-
-  RunEnvGroupList({}).then((response: object) => {
-    runEnvGroupList.value = response.data
-  })
-
-  getRunEnvList()
-
-  rowDrop()
-
-  bus.on(busEvent.drawerIsCommit, drawerIsCommit);
-})
-
-onBeforeUnmount(() => {
-  bus.off(busEvent.drawerIsCommit, drawerIsCommit);
-})
-
-const drawerIsCommit = (message: any) => {
-  if (message.eventType === 'run-env') {
-    getRunEnvList()
-  }
-}
+  console.log('拖拽后的数据:', JSON.stringify(updatedData));
+};
 
 </script>
 
-<style scoped lang="scss">
+<style scoped>
+.el-button {
+  cursor: move;
+}
 
+.drag-button {
+  cursor: move;
+  transition: transform 0.2s ease;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.el-table__row {
+  transition: transform 0.3s ease; /* 表格行平滑过渡 */
+}
 </style>
