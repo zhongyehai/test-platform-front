@@ -68,7 +68,7 @@
       <template #reference>
         <el-button
             :disabled="selectedList.length === 0"
-            type="primary"
+            type="danger"
             size="small"
             style="margin-left: 5px"
             @click="checkDeleteIsShow = true"

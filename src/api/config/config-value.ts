@@ -24,6 +24,9 @@ export function GetConfigList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
 
+export function ChangeConfigSort(data: object) {
+    return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}
 
 export function GetConfigByCode(params: object) {
     return request({ url: currentBaseDir + '/by-code', method: 'get', params: params })

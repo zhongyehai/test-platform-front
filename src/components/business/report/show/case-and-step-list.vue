@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, watch, nextTick, computed} from "vue";
-import {ElTree} from 'element-plus'
+import {ElMessage, ElTree} from 'element-plus'
 import {
   GetReportStepDetail,
   GetReportStepImg,
@@ -343,6 +343,12 @@ const getReportSuiteList = () => {
   treeIsLoading.value = true
   GetReportSuiteList(props.testType, {report_id: reportId.value}).then(response => {
     treeIsLoading.value = false
+
+    if (response.data.length === 0) {
+      ElMessage.warning("明细未生成 或 已过期（超过一个月）")
+      return
+    }
+
     suiteList.value = response.data
     treeShowList.value = suiteList.value
     response.data.forEach(suite => {

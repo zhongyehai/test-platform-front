@@ -8,6 +8,10 @@ export function GetEnvList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
 
+export function ChangeEnvSort(data: object) {
+    return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}
+
 export function CopyEnv(data: object) {
     return request({url: currentBaseDir + '/copy', method: 'post', data: data})
 }
@@ -30,6 +34,10 @@ export function DeleteEnv(data: object) {
 
 export function GetAccountList(params: object) {
     return request({url: accountBaseDir + '/list', method: 'get', params: params})
+}
+
+export function ChangeAccountSort(data: object) {
+    return request({url: accountBaseDir + '/sort', method: 'put', data: data})
 }
 
 export function GetAccount(params: object) {

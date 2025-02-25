@@ -13,8 +13,8 @@ export function GetPermissionList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
 
-// 修改权限排序
-export function PermissionSort(data: object) {
+// 修改排序
+export function ChangePermissionSort(data: object) {
     return request({url: currentBaseDir + '/sort', method: 'put', data: data})
 }
 

@@ -28,6 +28,10 @@ export function GetWebHookList(params: object) {
     return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
+export function ChangeWebHookSort(data: object) {
+    return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
+}
+
 export function WebHookSort(data: object) {
     return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
 }

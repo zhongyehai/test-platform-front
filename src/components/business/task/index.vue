@@ -58,7 +58,33 @@
                     :height="tableHeight"
                     @row-dblclick="rowDblclick">
 
-                  <el-table-column prop="id" label="序号" align="center" min-width="7%">
+                  <el-table-column label="排序" width="40" align="center">
+                    <template #header>
+                      <el-tooltip class="item" effect="dark" placement="top-start">
+                        <template #content>
+                          <div>可拖拽数据前的图标进行自定义排序</div>
+                        </template>
+                        <span style="color: #409EFF"><Help></Help></span>
+                      </el-tooltip>
+                    </template>
+                    <template #default="scope">
+                      <el-button
+                          text
+                          style="text-align: center"
+                          @dragstart="handleDragStart($event, scope.row, scope.$index)"
+                          @dragover="handleDragOver($event, scope.$index)"
+                          @drop="handleDrop($event, scope.$index)"
+                          @dragend="handleDragEnd"
+                          draggable="true"
+                          class="drag-button"
+                          :data-index="scope.$index"
+                      >
+                        <SortThree></SortThree>
+                      </el-button>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column label="序号" header-align="center" width="40">
                     <template #default="scope">
                       <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
                     </template>
@@ -233,7 +259,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, watch, nextTick, computed} from "vue";
-import {Help, Plus} from "@icon-park/vue-next";
+import {Help, Plus, SortThree} from "@icon-park/vue-next";
 import Pagination from '@/components/pagination.vue'
 import EditDrawer from './drawer.vue'
 
@@ -241,7 +267,15 @@ import {GetProject, GetProjectList} from "@/api/business-api/project";
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage, ElTree} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
-import {CopyTask, DeleteTask, DisableTask, EnableTask, GetTaskList, RunTask} from "@/api/business-api/task";
+import {
+  ChangeTaskSort,
+  CopyTask,
+  DeleteTask,
+  DisableTask,
+  EnableTask,
+  GetTaskList,
+  RunTask
+} from "@/api/business-api/task";
 import {RunCase} from "@/api/business-api/case";
 // import SelectRunEnv from "@/components/select-run-env.vue";
 // import ShowRunProcess from "@/components/show-run-process.vue";
@@ -305,7 +339,9 @@ const setTableHeight = () => {
 const handleResize = () => {
   setTableHeight();
 }
-
+const oldIndex = ref(); // 当前拖拽项的索引
+const dragRow = ref();   // 当前拖拽的行数据
+const newIdList = ref([])
 const project = ref()
 const triggerFrom = 'task-index'
 const runTaskId = ref()
@@ -456,6 +492,52 @@ const getProjectList = () => {
     }
   })
 }
+
+// 记录拖拽前的数据顺序
+const handleDragStart = (event, row, index) => {
+  oldIndex.value = index;
+  dragRow.value = row;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", event.target);
+  event.target.classList.add('drag-dragging');
+};
+
+const handleDragOver = (event, index) => {
+  event.preventDefault();  // 必须调用这个方法才能使 drop 生效
+};
+
+const handleDragEnd = (event) => {
+  // 恢复拖拽操作的样式
+  event.target.classList.remove('drag-dragging');
+};
+
+const handleDrop = (event, newIndex) => {
+  event.preventDefault();
+  const updatedData = [...tableDataList.value];
+  // 移除当前拖拽的行数据
+  updatedData.splice(oldIndex.value, 1);
+  // 插入拖拽的行数据到目标索引位置
+  updatedData.splice(newIndex, 0, dragRow.value);
+  // 恢复样式
+  event.target.classList.remove('drag-dragging');
+  newIdList.value = updatedData.map(item => item.id).slice()
+  sortTable()
+};
+
+const sortTable = () => {
+  tableIsLoading.value = true
+  ChangeTaskSort(props.testType, {
+    id_list: newIdList.value,
+    page_num: queryItems.value.page_num,
+    page_size: queryItems.value.page_size
+  }).then(response => {
+    tableIsLoading.value = false
+    if (response){
+      getTableDataList()
+    }
+  })
+}
+
 onMounted(() => {
   nextTick(() => {
     reportTableIsShow.value = true

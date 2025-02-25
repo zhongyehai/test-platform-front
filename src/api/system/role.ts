@@ -8,6 +8,11 @@ export function GetRoleList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
 
+// 修改排序
+export function ChangeRoleSort(data: object) {
+    return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}
+
 // 获取权限信息
 export function GetRole(params: object) {
     return request({url: currentBaseDir, method: 'get', params: params})

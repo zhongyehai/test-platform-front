@@ -8,6 +8,10 @@ export function GetBugTrackList(params: object) {
     return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
+export function ChangeBugSort(data: object) {
+    return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
+}
+
 export function ChangeBugStatus(data: object) {
     return request({ url: currentBaseDir + '/status', method: 'put', data: data })
 }

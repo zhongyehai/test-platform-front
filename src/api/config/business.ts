@@ -24,6 +24,10 @@ export function GetBusinessList(params: object) {
     return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
+export function ChangeBusinessSort(data: object) {
+    return request({ url: currentBaseDir + '/sort', method: 'put', data: data })
+}
+
 export function BusinessToUser(data: object) {
     return request({ url: currentBaseDir + '/user', method: 'put', data: data })
 }

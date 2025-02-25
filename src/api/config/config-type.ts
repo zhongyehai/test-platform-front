@@ -23,3 +23,7 @@ export function DeleteConfigType(data: object) {
 export function GetConfigTypeList(params: object) {
     return request({url: currentBaseDir + '/list', method: 'get', params: params})
 }
+
+export function ChangeConfigTypeSort(data: object) {
+    return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}

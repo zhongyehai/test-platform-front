@@ -33,6 +33,11 @@ export function GetUserList(params: object) {
   return request({ url: currentBaseDir + '/list', method: 'get', params: params })
 }
 
+// 修改排序
+export function ChangeUserSort(data: object) {
+  return request({url: currentBaseDir + '/sort', method: 'put', data: data})
+}
+
 // 修改用户状态
 export function ChangeUserStatus(data: object) {
   return request({ url: currentBaseDir + '/status', method: 'put', data: data })
