@@ -42,7 +42,7 @@ const route: Route[] = [
       },
       {
         path: 'shell-mock',
-        component: createNameComponent(() => import('@/views/tools/shell-mock/index.vue')),
+        component: createNameComponent(() => import('@/views/tools/shell-command/index.vue')),
         meta: { title: 'shell造数据', icon: 'code' } // <iconpark-icon name=""></iconpark-icon>
       }
     ]
