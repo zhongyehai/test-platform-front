@@ -54,9 +54,9 @@
                   :height="tableHeight"
                   @row-dblclick="rowDblclick">
 
-                <el-table-column label="序号" align="center" width="60">
+                <el-table-column label="数据id" align="center" width="60">
                   <template #default="scope">
-                    <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+                    <span> {{ scope.row.id }} </span>
                   </template>
                 </el-table-column>
 
@@ -129,7 +129,10 @@
           label-width="90px">
 
         <el-form-item label="文件数据" prop="file_content" class="is-required" size="small">
-          <el-input v-model="formData.file_content" type="textarea" size="small" rows="10"/>
+          <el-input v-show="formData.command !== 'update_tl_ctrl_task'" v-model="formData.file_content" type="textarea" size="small" rows="10"/>
+          <div v-show="formData.command == 'update_tl_ctrl_task'" :style="jsonEditorStyle">
+            <jsonEditorView ref="jsonEditorViewRef" :json-data="formData.file_content" :height="editorHeight" />
+          </div>
         </el-form-item>
 
         <el-form-item label="执行命令" disabled="" prop="controller" size="small">
@@ -172,9 +175,10 @@
 <script setup lang="ts">
 import {onMounted, ref, onBeforeUnmount, computed, nextTick} from "vue";
 import Pagination from '@/components/pagination.vue'
+import jsonEditorView from '@/components/editor/json-editor.vue'
+import {ElMessage, ElTree} from "element-plus";
 
 import {GetUserList} from "@/api/system/user";
-import {ElMessage, ElTree} from "element-plus";
 import {
   GetShellCommandList,
   GetShellCommandRecord,
@@ -201,11 +205,12 @@ const queryItems = ref({
 })
 const drawerIsShow = ref(false)
 const submitButtonIsLoading = ref(false)
+const jsonEditorViewRef = ref(null)
 const ruleFormRef = ref(null)
 const formData = ref({
   id: undefined,
   command: undefined,
-  file_content: undefined,
+  file_content: '',
   command_out_put: undefined,
   cmd_id: undefined,
   algo_instance_id: undefined
@@ -220,7 +225,7 @@ const resetForm = () => {
   formData.value = {
     id: undefined,
     command: undefined,
-    file_content: undefined,
+    file_content: '',
     command_out_put: undefined,
     cmd_id: undefined,
     algo_instance_id: undefined
@@ -279,11 +284,21 @@ const getShellCommandList = () => {
   })
 }
 
+const jsonEditorStyle = computed(() => {
+  return {
+    width: `${window.innerWidth * 0.60}px`
+  }
+})
+
+const editorHeight = computed(() => {
+  return `${window.innerHeight * 0.50}px`
+})
+
 const getShellCommandRecord = (data_id: number) => {
   GetShellCommandRecord({id: data_id}).then((response: object) => {
     formData.value.id = response.data.id
     formData.value.command = response.data.command
-    formData.value.file_content = response.data.file_content
+    formData.value.file_content = formData.value.command === 'update_tl_ctrl_task' ? JSON.parse(response.data.file_content) : response.data.file_content
     formData.value.command_out_put = response.data.command_out_put
     formData.value.cmd_id = response.data.cmd_id
     formData.value.algo_instance_id = response.data.algo_instance_id
@@ -306,15 +321,27 @@ const showEditDrawer = (data) => {
     resetForm()
     formData.value.command = data.command
     queryItems.value.command = data.command
+    formData.value.file_content = formData.value.command === 'update_tl_ctrl_task' ? {} : ''
     getTableDataList()
   }
   submitButtonIsLoading.value = false
   drawerIsShow.value = true
 }
 
+const getDataJson = () => {
+  try {
+    return JSON.parse(jsonEditorViewRef.value.tempData)
+  }catch (e) {
+    ElMessage.warning('json数据格式错误')
+    throw new Error('json数据格式错误');
+  }
+}
+
 const sendCommand = () => {
   submitButtonIsLoading.value = true
-  SendShellCommand(formData.value).then(response => {
+  let submitData = JSON.parse(JSON.stringify(formData.value))
+  submitData.file_content = JSON.stringify(getDataJson())
+  SendShellCommand(submitData).then(response => {
     submitButtonIsLoading.value = false
     if (response){
       formData.value.cmd_id = response.data.cmd_id
