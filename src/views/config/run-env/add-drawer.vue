@@ -55,6 +55,7 @@
                     placeholder="选择环境分组"
                     clearable
                     filterable
+                    allow-create
                     default-first-option
                     style="margin-right: 10px; width: 100%"
                     size="small"

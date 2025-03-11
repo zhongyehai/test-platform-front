@@ -195,7 +195,7 @@ const showEditDrawer = (row: object | undefined, command: string) => {
   let eventType = 'edit-run-env'
   let content = undefined
   if (command == 'edit'){
-    content = row
+    content = JSON.parse(JSON.stringify(row))
   }else if (command == 'copy'){
     content = JSON.parse(JSON.stringify(row))
     content.id = undefined
@@ -210,6 +210,7 @@ const showToBusinessDrawer = (row: object | undefined) => {
 }
 
 const getTableDataList = () => {
+  getRunEnvGroupList()
   queryItems.value.group = queryItems.value.group ? queryItems.value.group : undefined
   queryItems.value.name = queryItems.value.name ? queryItems.value.name : undefined
   queryItems.value.code = queryItems.value.code ? queryItems.value.code : undefined
@@ -218,6 +219,13 @@ const getTableDataList = () => {
     tableIsLoading.value = false
     tableDataList.value = response.data.data
     tableDataTotal.value = response.data.total
+  })
+}
+
+// 获取环境分组
+const getRunEnvGroupList = () => {
+  RunEnvGroupList({}).then((response: object) => {
+    runEnvGroupList.value = response.data
   })
 }
 
@@ -267,9 +275,6 @@ const sortTable = () => {
 }
 
 onMounted(() => {
-  RunEnvGroupList({}).then((response: object) => {
-    runEnvGroupList.value = response.data
-  })
   getTableDataList()
   bus.on(busEvent.drawerIsCommit, drawerIsCommit);
   setTableHeight()

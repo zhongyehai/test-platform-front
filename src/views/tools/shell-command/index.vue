@@ -340,7 +340,9 @@ const getDataJson = () => {
 const sendCommand = () => {
   submitButtonIsLoading.value = true
   let submitData = JSON.parse(JSON.stringify(formData.value))
-  submitData.file_content = JSON.stringify(getDataJson())
+  if (submitData.command === 'update_tl_ctrl_task'){
+    submitData.file_content = JSON.stringify(getDataJson())
+  }
   SendShellCommand(submitData).then(response => {
     submitButtonIsLoading.value = false
     if (response){
