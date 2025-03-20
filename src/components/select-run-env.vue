@@ -1,11 +1,11 @@
 <template>
   <!-- 选择环境和运行模式 -->
   <el-dialog
-    title="设置运行参数"
-    append-to-body
-    v-model="dialogIsShow"
-    :close-on-click-modal="false"
-    width="75%"
+      title="设置运行参数"
+      append-to-body
+      v-model="dialogIsShow"
+      :close-on-click-modal="false"
+      width="75%"
   >
     <el-scrollbar class="aside_scroll" :style="{height: `${envScrollHeight}`}">
       <el-collapse v-model="defaultSettingItems">
@@ -18,6 +18,130 @@
           </div>
         </el-collapse-item>
 
+        <!-- 选择运行浏览器 -->
+        <el-collapse-item name="selectBrowser" v-if="testType === 'ui'">
+          <template #title>
+            <div class="el-collapse-item-title"> 选择浏览器: </div>
+          </template>
+          <div style="margin-left: 20px">
+            <div style="margin-top: 10px">
+              <label>
+              <span style="color: red">
+                请确保服务器已安装此浏览器、请确webdriver版本与浏览器版本匹配
+              </span>
+              </label>
+            </div>
+            <div style="margin-top: 10px">
+              <el-radio
+                  v-for="(value, key) in busEvent.data.runBrowserNameDict "
+                  :key="key"
+                  v-model="runBrowser"
+                  :label="key"
+              >{{ value }}
+              </el-radio>
+            </div>
+          </div>
+        </el-collapse-item>
+
+        <!-- 选择运行设备 -->
+        <el-collapse-item name="selectDevice" v-if="testType === 'app'">
+          <template #title>
+            <div class="el-collapse-item-title"> APP执行参数设置: </div>
+          </template>
+          <div style="margin-left: 20px">
+            <div style="margin-top: 40px">
+              <label>是否重置APP本地缓存： </label>
+            </div>
+            <div style="margin-top: 10px">
+              <label>
+              <span style="color: red">
+                重置历史运行APP记录的信息，如登录信息、地址信息等 <br>
+              </span>
+              </label>
+            </div>
+            <div style="margin-top: 10px">
+              <el-radio v-model="noReset" :label="false">重置</el-radio>
+              <el-radio v-model="noReset" :label="true">不重置</el-radio>
+            </div>
+
+            <div style="margin-top: 40px">
+              <label>运行终端： </label>
+            </div>
+            <div style="margin-top: 10px">
+              <label>
+              <span style="color: red">
+                运行服务器: 要连接哪个终端的appium服务器进行app自动化测试 <br>
+                运行手机: 该设备运行自动化测试的手机型号 <br>
+                注：请确保测试平台与选中的appium服务器网络通畅、appium服务器已启动、手机已连接到该服务器<br>
+              </span>
+              </label>
+            </div>
+            <el-row>
+              <el-col :span="12">
+                <div style="margin-top: 10px">
+                  <label>运行服务器：</label>
+                  <el-select
+                      v-model="runServer"
+                      filterable
+                      default-first-option
+                      placeholder="请选择运行服务器"
+                      style="width: 80%"
+                      size="small"
+                  >
+                    <el-option
+                        v-for="server in runServerList"
+                        :key="server.id"
+                        :label="`${server.name}   (最近一次访问：${appiumServerRequestStatusMappingContent[server.status]})`"
+                        :value="server.id"
+                    />
+                  </el-select>
+                </div>
+              </el-col>
+
+              <el-col :span="12">
+                <div style="margin-top: 10px">
+                  <label>运行手机：</label>
+                  <el-select
+                      v-model="runPhone"
+                      filterable
+                      default-first-option
+                      placeholder="请选择运行手机"
+                      style="width: 80%"
+                      size="small"
+                  >
+                    <el-option
+                        v-for="phone in runPhoneList"
+                        :key="phone.id"
+                        :label="phone.name"
+                        :value="phone.id"
+                    />
+                  </el-select>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+        </el-collapse-item>
+
+        <!-- 选择执行模式 -->
+        <el-collapse-item name="selectRunModel" v-if="testType !== 'app' && showSelectRunModel">
+          <template #title>
+            <div class="el-collapse-item-title"> 选择执行模式: </div>
+          </template>
+          <div style="margin-left: 20px">
+            <label>
+              <span style="color: red">
+                串行执行: 用例一条一条顺序串行执行 <br>
+                并行执行: 每条用例一个线程并行执行 <br>
+                注：并行执行仅仅是为了提升执行效率，请勿用于压力测试<br>
+              </span>
+            </label>
+            <div style="margin-top: 10px">
+              <el-radio v-for="(value, key) in runModeData" :key="key" v-model="runType" :label="key">{{ value }}</el-radio>
+            </div>
+          </div>
+        </el-collapse-item>
+
+        <!-- 重新指定参数 -->
         <el-collapse-item v-if="showRunArgs" name="editRunArgs">
           <template #title>
             <div class="el-collapse-item-title"> 重新指定参数: </div>
@@ -169,7 +293,7 @@ const runArgs = ref({
 const runEnvList = ref([])
 const defaultEnv = ref()
 const runType = ref('0')
-const defaultSettingItems = ref(['selectRunEnv', 'editRunArgs'])
+const defaultSettingItems = ref(['selectRunEnv', 'selectDevice', 'editRunArgs'])
 const showArgsTabName = ref('variables')
 const eventType = 'select-run-env'
 const triggerFrom = ref()

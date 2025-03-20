@@ -388,7 +388,8 @@ const clickRun = (row) => {
     triggerFrom: triggerFrom,
     showSelectRunModel: true,
     business_id: project.value.business_id,
-    runArgs: undefined
+    runArgs: undefined,
+    runEnv: row.env_list[0] // 默认选择任务设置的第一个环境
   })
 }
 

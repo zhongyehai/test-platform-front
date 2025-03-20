@@ -10,25 +10,25 @@
           style="width: 100%"
           stripe
           :height="tableHeight">
-        <el-table-column prop="id" label="序号" align="center" min-width="10%" >
+        <el-table-column prop="id" label="序号" align="center" width="40" >
           <template #default="scope">
             <span> {{ scope.$index + 1 }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="任务名" prop="name" align="center" min-width="20%">
+        <el-table-column show-overflow-tooltip label="任务名" prop="name" align="center" min-width="25%">
           <template #default="scope">
             <span> {{ scope.row.name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="任务方法名" prop="func_name" align="center" min-width="20%">
+        <el-table-column show-overflow-tooltip label="任务方法名" prop="func_name" align="center" min-width="15%">
           <template #default="scope">
             <span> {{ scope.row.func_name }} </span>
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="定时表达式" prop="cron" align="center" min-width="20%">
+        <el-table-column show-overflow-tooltip label="定时表达式" prop="cron" align="center" min-width="10%">
           <template #default="scope">
             <span>{{ scope.row.cron }}</span>
           </template>
@@ -40,7 +40,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column show-overflow-tooltip label="启用状态" prop="status" align="center" min-width="15%">
+        <el-table-column show-overflow-tooltip label="启用" prop="status" align="center" width="60">
           <template #default="scope">
             <el-switch v-model="scope.row.status" :loading="scope.row.loading" @change="changStatus(scope.row)" />
           </template>

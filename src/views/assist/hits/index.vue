@@ -86,9 +86,9 @@
 
         <el-table-column type="selection" min-width="2%"/>
 
-        <el-table-column prop="id" label="序号" align="center" min-width="6%">
+        <el-table-column prop="id" label="数据id" align="center" min-width="6%">
           <template #default="scope">
-            <span> {{ (queryItems.page_num - 1) * queryItems.page_size + scope.$index + 1 }} </span>
+            <span> {{ scope.row.id }} </span>
           </template>
         </el-table-column>
 
