@@ -23,7 +23,7 @@
         <template #reference>
           <el-button
               :disabled="selectedList.length < 1"
-              type="primary"
+              type="info"
               size="small">批量改为不执行</el-button>
         </template>
       </el-popconfirm>

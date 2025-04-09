@@ -32,6 +32,8 @@
                 </el-tooltip>
               </span>
 
+              <el-button v-show="report.status === 1" type="danger" size="small" @click="changeReportStepStatus()">中断测试执行</el-button>
+
               <el-button
                   v-if="reportSummary.result !== 'success'"
                   type="primary"
@@ -178,7 +180,7 @@
 import {onMounted, ref, onBeforeUnmount} from "vue";
 import {Help} from "@icon-park/vue-next";
 import {useRoute} from "vue-router"
-import {GetReport, DeleteReport, ReportAsCase} from "@/api/business-api/report";
+import {GetReport, DeleteReport, ReportAsCase, ChangeReportStepStatus} from "@/api/business-api/report";
 import {GetProject} from "@/api/business-api/project";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {bus, busEvent} from "@/utils/bus-events";
@@ -282,6 +284,12 @@ const deleteReport = () => {
       // window.open('about:blank', '_self')
       window.close();
     }
+  })
+}
+
+const changeReportStepStatus = () => {
+  ChangeReportStepStatus(props.testType, {report_id: report.value.id, status: 'stop'}).then(response => {
+    // location.reload(); // 刷新当前页面
   })
 }
 
