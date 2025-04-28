@@ -335,6 +335,15 @@
             ><Copy></Copy></el-button>
           </el-tooltip>
 
+          <el-tooltip class="item" effect="dark" placement="top-end" content="添加到预置断言">
+            <el-button
+                type="text"
+                size="small"
+                style="margin: 2px; padding: 0"
+                @click.native="showAddToApiValidator(scope.row)"
+            ><Export></Export></el-button>
+          </el-tooltip>
+
           <el-tooltip class="item" effect="dark" placement="top-end" content="删除当前行">
             <el-button
                 v-show="isShowDelButton(scope.$index)"
@@ -357,6 +366,26 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog
+        title="添加预置断言 - 设置别名"
+        append-to-body
+        v-model="showAddValidator"
+        :close-on-click-modal="false"
+        width="30%"
+    >
+      <div>
+        <el-input label="别名" v-model="addValidatorLabel" size="small" placeholder="断言作用、描述"/>
+      </div>
+
+      <template #footer>
+      <span class="dialog-footer">
+          <el-button size="small" @click="showAddValidator = false"> {{ '取消' }}</el-button>
+          <el-button type="primary" size="small" @click.native="addDefaultValidator()">添加</el-button>
+      </span>
+      </template>
+
+    </el-dialog>
 
     <el-drawer v-model="showSelectValidator" title="选择预置断言" size="60%">
       <el-table
@@ -384,7 +413,7 @@
 
         <el-table-column fixed="right" prop="desc" align="center" label="操作" min-width="6%">
           <template #default="scope">
-            <el-button type="text" size="small" @click.native="addDefaultValidator(scope.row)">添加</el-button>
+            <el-button type="text" size="small" @click.native="addDefaultValidatorToData(scope.row)">添加</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -396,8 +425,8 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {Clear, Copy, Help, Minus, Plus, SortThree} from "@icon-park/vue-next";
-import {GetConfigByCode} from "@/api/config/config-value";
+import {Clear, Copy, Help, Minus, Plus, SortThree, Export} from "@icon-park/vue-next";
+import {GetConfigByCode, PutConfigApiValidator} from "@/api/config/config-value";
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 
@@ -459,7 +488,24 @@ const validateDataTableRef = ref(null)
 const oldIndex = ref(); // 当前拖拽项的索引
 const dragRow = ref();   // 当前拖拽的行数据
 
-const addDefaultValidator = (row) => {
+const showAddValidator = ref(false);
+const addValidatorLabel = ref('');
+const currentValidator = ref({});
+const showAddToApiValidator = (row: any) => {
+  addValidatorLabel.value = '';
+  currentValidator.value = row;
+  showAddValidator.value = true
+}
+
+const addDefaultValidator = () => {
+  const data = JSON.parse(JSON.stringify(currentValidator.value));
+  delete data.id
+  PutConfigApiValidator({label: addValidatorLabel.value, value: currentValidator.value}).then(response => {
+    showAddValidator.value = false
+  })
+}
+
+const addDefaultValidatorToData = (row) => {
   row.value['id'] = `${Date.now()}`
   tempData.value.push(row.value)
 }

@@ -16,6 +16,10 @@ export function PutConfig(data: object) {
     return request({url: currentBaseDir, method: 'put', data: data})
 }
 
+export function PutConfigApiValidator(data: object) {
+    return request({url: currentBaseDir + '/api-validator', method: 'put', data: data})
+}
+
 export function DeleteConfig(data: object) {
     return request({url: currentBaseDir, method: 'delete', data: data})
 }
