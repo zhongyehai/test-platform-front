@@ -15,6 +15,10 @@
               <el-input v-model="element.from" disabled />
             </el-form-item>
 
+            <el-form-item label="步骤描述" prop="addr" size="small">
+              <el-input v-model="formData.desc" size="small" type="textarea" />
+            </el-form-item>
+
             <el-row>
               <el-col :span="12">
                 <el-form-item label="前置处理" size="small">
@@ -387,6 +391,7 @@ const placeholder2 = '{"x1": 500, "y1": 1000, "x2": 600, "y2": 1024}，坐标的
 const formData = ref({
   id: undefined,
   status: 1,
+  desc: '',
   name: '',
   wait_time_out: 10,
   up_func: [],
@@ -425,6 +430,7 @@ const resetForm = () => {
     id: undefined,
     status: 1,
     name: '',
+    desc: '',
     wait_time_out: 10,
     up_func: [],
     down_func: [],

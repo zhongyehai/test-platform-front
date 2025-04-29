@@ -23,6 +23,10 @@
               <el-input v-model="formData.addr" size="small" disabled />
             </el-form-item>
 
+            <el-form-item label="步骤描述" prop="addr" size="small">
+              <el-input v-model="formData.desc" size="small" type="textarea" />
+            </el-form-item>
+
             <el-row>
               <el-col :span="12">
                 <el-form-item label="前置处理" size="small">
@@ -393,6 +397,7 @@ const formData = ref({
   addr: undefined,
   api_from: undefined,
   status: 1,
+  desc: '',
   replace_host: 0,
   name: '',
   time_out: 60,
@@ -436,6 +441,7 @@ const resetForm = () => {
     addr: undefined,
     api_from: undefined,
     status: 1,
+    desc: '',
     replace_host: 0,
     name: '',
     time_out: 60,
