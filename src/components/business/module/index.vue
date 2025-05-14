@@ -138,7 +138,7 @@
 
 <script setup lang="ts">
 
-import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import {onMounted, ref, onBeforeUnmount, watch, computed, nextTick} from "vue";
 import {Clear, Copy, Delete, Minus, Plus, SortThree, Write} from "@icon-park/vue-next";
 import editModuleDrawer from "./edit-drawer.vue";
 import addModuleDrawer from "./add-drawer.vue";
@@ -276,20 +276,37 @@ const getApiToStep = () => {
 const getProjectList = () => {
   GetProjectList(props.testType, {page_num: 1, page_size: 99999}).then(response => {
     projectList.value = response.data.data
+
+    // 默认选中第一个服务/app
+    if(projectList.value.length > 0){
+      GetProject(props.testType, {id: projectList.value[0].id }).then(response => {
+        project.value = response.data
+        queryItems.value.project_id = projectList.value[0].id
+        getModuleList(queryItems.value.project_id, true)
+      })
+    }
   })
 }
 
-const getModuleList = (projectId: number) => {
+const getModuleList = (projectId: number, notGetProject: boolean) => {
   if (projectId){
     GetModuleList(props.testType, { 'project_id': projectId, page_num: 1, page_size: 99999 }).then(response => {
       var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
       treeData.value = arrayToTree(response_data, null)
       treeIsDone(treeData.value)
-    })
 
-    GetProject(props.testType, {id: projectId }).then(response => {
-      project.value = response.data
+      // 默认获取第一个用例集下的用例
+      if (response.data.data.length > 0){
+        nextTick(() => {
+          treeRef.value.$el.querySelector(".el-tree-node__content").click()
+        })
+      }
     })
+    if (!notGetProject){ // 如果默认选中服务的动作已经获取过服务信息了，则不再获取
+      GetProject(props.testType, {id: projectId }).then(response => {
+        project.value = response.data
+      })
+    }
   }
 }
 

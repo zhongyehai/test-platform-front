@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 
-import {onMounted, ref, onBeforeUnmount, watch, computed} from "vue";
+import {onMounted, ref, onBeforeUnmount, watch, computed, nextTick} from "vue";
 import editDrawer from "./edit-drawer.vue";
 import addDrawer from "./add-drawer.vue";
 import uploadDrawer from "./upload-drawer.vue";
@@ -237,6 +237,12 @@ const clickTree = (data: any) => {
 const getProjectList = () => {
   GetProjectList(props.testType, {page_num: 1, page_size: 99999}).then(response => {
     projectList.value = response.data.data
+
+    // 默认选中第一个服务/app
+    if(projectList.value.length > 0){
+      queryItems.value.project_id = projectList.value[0].id
+      getCaseSuiteList(queryItems.value.project_id)
+    }
   })
 }
 
@@ -246,6 +252,13 @@ const getCaseSuiteList = (projectId: number) => {
       var response_data = JSON.stringify(response.data) === '{}' ? [] : response.data.data
       treeData.value = arrayToTree(response_data, null)
       treeIsDone(treeData.value)
+
+      // 默认获取第一个用例集下的用例
+      if (response.data.data.length > 0){
+        nextTick(() => {
+          treeRef.value.$el.querySelector(".el-tree-node__content").click()
+        })
+      }
     })
 
     GetProject(props.testType, {id: projectId }).then(response => {
