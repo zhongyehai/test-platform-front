@@ -35,6 +35,8 @@ service.interceptors.request.use(
     (config: AxiosRequestConfig) => {
         // @ts-ignore
         config.headers['access-token'] = localStorage.getItem('accessToken')
+        // @ts-ignore
+        config.headers['request-id'] = crypto.randomUUID()
         return config
     },
     (error: AxiosError) => {

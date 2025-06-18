@@ -173,7 +173,7 @@
               type="text"
               size="small"
               style="margin: 0; padding: 2px"
-              @click.native="clickReRun(scope.row)"
+              @click.native="showReRunDialog(scope.row)"
           >重跑
           </el-button>
 
@@ -207,6 +207,28 @@
         @pageFunc="changePagination"
     />
 
+    <el-dialog
+        v-model="reRunDialogIsShow"
+        title="选择重跑维度"
+        width="500"
+    >
+      <div>
+        <span style="color: red">1、重跑失败的：重跑当前选择的报告下结果为不通过的用例</span>
+      </div>
+      <div>
+        <span style="color: red">2、重跑所有：重跑当前选择的报告下的所有用例</span>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <div style="float: left">
+            <el-button v-show="report.is_passed === 0" type="primary" size="small" @click="clickReRun('failed')">重跑失败的</el-button>
+            <el-button type="primary" size="small" @click="clickReRun('all')">重跑所有</el-button>
+          </div>
+          <el-button size="small" @click="reRunDialogIsShow = false">取消</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <SelectRunEnv :test-type="testType"></SelectRunEnv>
     <ShowRunProcess :test-type="testType"></ShowRunProcess>
   </div>
@@ -220,7 +242,7 @@ import {GetProject, GetProjectList} from "@/api/business-api/project";
 import {bus, busEvent} from "@/utils/bus-events";
 import {ElMessage} from "element-plus";
 import toClipboard from "@/utils/copy-to-memory";
-import {DeleteReport, GetReport, GetReportList} from "@/api/business-api/report";
+import {DeleteReport, GetReport, GetReportCaseFiledList, GetReportList} from "@/api/business-api/report";
 import {reportStatusMappingContent, reportStatusMappingTagType, reportTriggerTypeMappingContent} from "../mapping";
 import {GetRunEnvList} from "@/api/config/run-env";
 import {GetConfigByCode} from "@/api/config/config-value";
@@ -287,6 +309,9 @@ const handleResize = () => {
 
 const isAdmin = localStorage.getItem('permissions').indexOf('admin') !== -1
 const triggerFrom = 'report-index'
+const reRunDialogIsShow = ref(false)
+const reRunIdList = ref([])
+const reRunType = ref('failed')
 
 const rowDblclick = async (row: any, column: any, event: any) => {
   try {
@@ -342,8 +367,21 @@ const sendReRun = (tempRunArgs: any) => {
   })
 }
 
-const clickReRun = (row: {}) => {
+const showReRunDialog = (row: {}) => {
   report.value = row
+  reRunDialogIsShow.value = true
+}
+
+const clickReRun = (type: string) => {
+  reRunType.value = type
+  if(type === "all") {
+    reRunIdList.value = report.value.trigger_id
+  }else {
+    GetReportCaseFiledList(props.testType, {id: report.value.id}).then((response) => {
+      reRunIdList.value = response.data
+    })
+  }
+
   if (props.testType === 'app') {
     if (busEvent.data.runServerList.length < 1) {
       GetServerList({page_num: 1, page_size: 99999}).then(response => {
@@ -363,6 +401,9 @@ const clickReRun = (row: {}) => {
 
 const getRunUrl = () => {
   const run_type = report.value.run_type
+  if (reRunType.value === 'failed'){
+    return RunCase
+  }
   return run_type === 'task' ? RunTask
       : run_type === 'suite' ? RunCaseSuite
           : run_type === 'case' ? RunCase
@@ -372,7 +413,7 @@ const getRunUrl = () => {
 const reRun = (runConf) => {
   const runUrl = getRunUrl()
   runUrl(props.testType, {
-    id_list: report.value.trigger_id,
+    id_list: reRunIdList.value, // report.value.trigger_id,
     env_list: runConf.runEnv,
     is_async: runConf.runType,
     browser: runConf.browser,
@@ -390,6 +431,7 @@ const reRun = (runConf) => {
       })
     }
   })
+  reRunDialogIsShow.value = false
 }
 
 

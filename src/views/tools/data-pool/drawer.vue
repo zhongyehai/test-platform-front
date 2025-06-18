@@ -41,6 +41,7 @@
               clearable
               filterable
               default-first-option
+              allow-create
               style="margin-right: 10px; width: 100%"
               size="small"
           >
@@ -48,7 +49,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="使用状态" class="is-required" prop="business_status" size="small">
+        <el-form-item label="使用状态" class="is-required" prop="use_status" size="small">
           <el-select
               v-model="formData.use_status"
               placeholder="选择使用状态"

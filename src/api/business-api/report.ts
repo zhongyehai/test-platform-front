@@ -36,6 +36,10 @@ export function GetReportCaseList(testType: string, params: object) {
     return request({ url: getBaseDir(testType) + '/case-list', method: 'get', data: null, params: params })
 }
 
+export function GetReportCaseFiledList(testType: string, params: object) {
+    return request({ url: getBaseDir(testType) + '/case-filed', method: 'get', data: null, params: params })
+}
+
 export function GetReportCaseDetail(testType: string, params: object) {
     return request({ url: getBaseDir(testType) + '/case', method: 'get', data: null, params: params })
 }

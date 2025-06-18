@@ -21,30 +21,6 @@
                 </el-form-item>
               </el-col>
 
-              <el-col :span="8">
-                <el-form-item label="脚本文件">
-                  <el-select
-                      v-model="formData.script_list"
-                      filterable
-                      clearable
-                      multiple
-                      size="small"
-                      style="width: 100%"
-                      placeholder="请选则脚本"
-                  >
-                    <el-option v-for="item in scriptList" :key="item.id" :label="item.name" :value="item.id"/>
-                  </el-select>
-                  <el-popover class="el_popover_class" placement="top-start" trigger="hover">
-                    <div>
-                      <div>1、用例下要用到自定义函数可以在这里统一引用对应的脚本文件</div>
-                      <div>2、此处引用的脚本文件，对于当前用例下的测试步骤均有效</div>
-                      <div>3、若此处引用了脚本文件，服务处也引用了脚本文件，则会把两边引用的合并去重</div>
-                    </div>
-                    <span style="margin-left:5px;color: #409EFF"><Help></Help></span>
-                  </el-popover>
-                </el-form-item>
-              </el-col>
-
               <el-col :span="4">
                 <el-form-item label="执行次数" class="is-required">
                   <el-input-number
@@ -338,7 +314,6 @@ const formData = ref({
   desc: undefined,
   from: undefined,
   run_times: undefined,
-  script_list: [],
   variables: [{ key: null, value: null, remark: null, data_type: '' }],
   headers: [{ key: null, value: null, remark: null }],
   skip_if: {
@@ -366,7 +341,6 @@ const resetForm = () => {
     desc: undefined,
     from: undefined,
     run_times: undefined,
-    script_list: [],
     variables: [{ key: null, value: null, remark: null, data_type: '' }],
     headers: [{ key: null, value: null, remark: null }],
     skip_if: {

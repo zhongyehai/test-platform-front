@@ -235,8 +235,7 @@ const reportCase = ref({
     module_id: null,
     run_times: 1,
     variables: [],
-    create_user: 1,
-    script_list: []
+    create_user: 1
   },
   error_msg: ''
 })

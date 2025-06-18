@@ -3,7 +3,8 @@
   <div class="code-diff">
     <div style="text-align: center;">
       <el-button type="primary" size="small" @click="diffString">字符串对比</el-button>
-      <el-button type="primary" size="small" @click="diffJson">json对比</el-button>
+      <el-button type="primary" size="small" @click="diffJson(false)">json直接对比</el-button>
+      <el-button type="primary" size="small" @click="diffJson(true)">json递归排序后对比</el-button>
     </div>
     <el-row>
       <el-col :span="12">
@@ -47,19 +48,17 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from "vue";
 
-const oldString = ref<string>('');
+const oldString = ref<string>(JSON.stringify({"a":1,"b":[{"b2":2,"a2":2,"c2":3},{"a1":3,"c1":3,"b1":2}]}));
 const oldStringDiff = ref<string>('');
 const oldStringError = ref<string>('');
 
-const newString = ref<string>('');
+const newString = ref<string>(JSON.stringify({"b":[{"c2":3,"b2":3,"a2":2},{"c1":3,"a1":1,"b1":2}],"a":1}));
 const newStringDiff = ref<string>('');
 const newStringError = ref<string>('');
 
 const showDiffRes = ref(false);
 
-
 const inputHeight = ref(`${window.innerHeight * 0.67}px`)
-
 const setInputHeight = () => {
   if (window.innerHeight < 800) {  // 小屏
     inputHeight.value = `${window.innerHeight * 0.67}px`
@@ -68,15 +67,30 @@ const setInputHeight = () => {
   }
 }
 
-// 将通讯录按照 ABCD字母的顺序排序
-const sortObjByKey = (obj) => {
-  const keys = Object.keys(obj).sort();
-  const newObj = {};
-  for (let i = 0; i < keys.length; i++) {
-    const index = keys[i];
-    newObj[index] = obj[index];
+// 将对象递归排序
+const deepSort = (obj) => {
+  // 非对象或数组，直接返回
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
   }
-  return newObj;
+
+  // 对数组中的每个元素递归处理，数组顺序也一起改变
+  if (Array.isArray(obj)) {
+    return obj
+        .map(deepSort)  // 先递归处理所有元素
+        .sort((a, b) => {
+          // 统一排序规则：转换为JSON字符串比较 :ml-citation{ref="5,6" data="citationList"}
+          return JSON.stringify(a).localeCompare(JSON.stringify(b));
+        });
+  }
+
+  // 处理对象
+  return Object.keys(obj)
+      .sort()  // 按字母顺序排序键
+      .reduce((sorted, key) => {
+        sorted[key] = deepSort(obj[key]);  // 递归处理属性值
+        return sorted;
+      }, {});
 }
 
 const diffString = () => {
@@ -85,9 +99,13 @@ const diffString = () => {
   showDiffRes.value = true
 }
 
-const diffJson = () => {
+const diffJson = (isNeedSorted: boolean) => {
   try {
-    oldStringDiff.value = JSON.stringify(sortObjByKey(JSON.parse(oldString.value)), null, 2)
+    if (isNeedSorted) {
+      oldStringDiff.value = JSON.stringify(deepSort(JSON.parse(oldString.value)), null, 2)
+    }else {
+      oldStringDiff.value = JSON.stringify(JSON.parse(oldString.value), null, 2)
+    }
     oldStringError.value = ""
   }catch(err) {
     oldStringError.value = "不可序列化json，请检查"
@@ -95,7 +113,11 @@ const diffJson = () => {
   }
 
   try {
-    newStringDiff.value = JSON.stringify(sortObjByKey(JSON.parse(newString.value)), null, 2)
+    if (isNeedSorted) {
+      newStringDiff.value = JSON.stringify(deepSort(JSON.parse(newString.value)), null, 2)
+    }else {
+      newStringDiff.value = JSON.stringify(JSON.parse(newString.value), null, 2)
+    }
     newStringError.value = ""
   }catch(err) {
     newStringError.value = "不可序列化json，请检查"
@@ -132,7 +154,7 @@ onBeforeUnmount(() => {
 
 textarea {
   width: 95%;
-  //height: 500px;
+  /* height: 500px; */
   height: 900%;
   border: 1px solid #ccc;
   border-radius: 4px;

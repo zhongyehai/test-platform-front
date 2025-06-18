@@ -1,5 +1,7 @@
 # 测试平台前端 - vue3版本
 
+# 此版本暂停更新，最新更新请移步fastapi版本：https://github.com/zhongyehai/test-platform-fastapi-front
+
 ### [体验demo](http://139.196.100.202/#/login) ，账号：admin、密码：123456，请不要修改密码
 
 ### [去后端](https://gitee.com/Xiang-Qian-Zou/test-platform-api)
